@@ -1,6 +1,6 @@
 # BREWMASTER
 
-- [x] ### Intelligent configurable syntax highlighting and symbol auto-completion
+ ### - [x] Intelligent configurable syntax highlighting and symbol auto-completion
 Will help a lot with regular 6502 ASM and most basic CA65 features. Some of the assembler's more advanced features might not be well supported
 
 ### Live error feedback
