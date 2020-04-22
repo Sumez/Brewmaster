@@ -7,8 +7,8 @@
     <ProjectGuid>{25A34560-1B49-4408-B5B8-B6441A25AB9A}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>BrewMaster</RootNamespace>
-    <AssemblyName>BrewMaster</AssemblyName>
+    <RootNamespace>Brewmaster</RootNamespace>
+    <AssemblyName>Brewmaster</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -526,6 +526,7 @@
     <Content Include="Resources\Other\error.png" />
     <None Include="Resources\Other\smallload.png" />
     <None Include="Resources\Other\smallsave.png" />
+    <None Include="Resources\Other\logo.png" />
     <Content Include="Resources\Other\warning.png" />
     <None Include="Resources\Toolbar\buildrun.png" />
     <None Include="Resources\Toolbar\config.png" />
