@@ -59,9 +59,6 @@
     <ManifestCertificateThumbprint>F75947C0B5F7DE38ECAAC318AFCBC1444D1A1FFC</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>Silver-J_TemporaryKey.pfx</ManifestKeyFile>
-  </PropertyGroup>
-  <PropertyGroup>
     <GenerateManifests>false</GenerateManifests>
   </PropertyGroup>
   <PropertyGroup>
