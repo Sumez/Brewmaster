@@ -1,6 +1,6 @@
-﻿using BrewMaster.BuildProcess;
+﻿using Brewmaster.BuildProcess;
 
-namespace BrewMaster.Modules.Build
+namespace Brewmaster.Modules.Build
 {
 	public enum LogType
 	{

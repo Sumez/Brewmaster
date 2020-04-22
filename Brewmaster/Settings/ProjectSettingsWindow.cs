@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Linq;
 using System.Windows.Forms;
-using BrewMaster.ProjectModel;
-using BrewMaster.ProjectWizard;
+using Brewmaster.ProjectModel;
+using Brewmaster.ProjectWizard;
 
-namespace BrewMaster.Settings
+namespace Brewmaster.Settings
 {
 	public partial class ProjectSettingsWindow : Form
 	{

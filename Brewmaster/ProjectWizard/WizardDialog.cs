@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 
-namespace BrewMaster.ProjectWizard
+namespace Brewmaster.ProjectWizard
 {
 	public partial class WizardDialog : Form
 	{

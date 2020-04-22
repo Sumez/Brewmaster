@@ -4,9 +4,9 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
-using BrewMaster.ProjectModel;
+using Brewmaster.ProjectModel;
 
-namespace BrewMaster.Pipeline
+namespace Brewmaster.Pipeline
 {
 	public enum ChrOutputType
 	{

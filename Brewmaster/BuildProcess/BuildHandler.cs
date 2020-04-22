@@ -7,11 +7,11 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using BrewMaster.Modules.Build;
-using BrewMaster.Pipeline;
-using BrewMaster.ProjectModel;
+using Brewmaster.Modules.Build;
+using Brewmaster.Pipeline;
+using Brewmaster.ProjectModel;
 
-namespace BrewMaster.BuildProcess
+namespace Brewmaster.BuildProcess
 {
 	public interface IFileLocation
 	{

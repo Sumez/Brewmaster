@@ -1,5 +1,5 @@
 ﻿
-namespace BrewMaster.EditorWindows
+namespace Brewmaster.EditorWindows
 {
 	public class Symbol
 	{

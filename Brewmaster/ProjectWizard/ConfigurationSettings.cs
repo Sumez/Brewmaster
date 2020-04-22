@@ -4,9 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
-using BrewMaster.ProjectModel;
+using Brewmaster.ProjectModel;
 
-namespace BrewMaster.ProjectWizard
+namespace Brewmaster.ProjectWizard
 {
 	public partial class ConfigurationSettings : UserControl
 	{

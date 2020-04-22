@@ -5,9 +5,9 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using System.Windows.Forms.Design;
-using BrewMaster.ProjectExplorer;
+using Brewmaster.ProjectExplorer;
 
-namespace BrewMaster.Ide
+namespace Brewmaster.Ide
 {
 	[Designer(typeof(ParentControlDesigner))]
 	public class MultiSplitPanel : Panel

@@ -1,5 +1,5 @@
-﻿using BrewMaster.Modules.Watch;
-using BrewMaster.ProjectModel;
+﻿using Brewmaster.Modules.Watch;
+using Brewmaster.ProjectModel;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -8,10 +8,10 @@ using System.Linq;
 using System.Windows.Forms;
 using System.Xml;
 using System.Xml.Serialization;
-using BrewMaster.EditorWindows;
+using Brewmaster.EditorWindows;
 using ICSharpCode.TextEditor.Document;
 
-namespace BrewMaster.Settings
+namespace Brewmaster.Settings
 {
 	[Serializable]
 	public class Settings

@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
-using BrewMaster.ProjectModel;
+using Brewmaster.ProjectModel;
 using ICSharpCode.TextEditor;
 using ICSharpCode.TextEditor.Gui.CompletionWindow;
 
-namespace BrewMaster.EditorWindows
+namespace Brewmaster.EditorWindows
 {
 	public abstract class CompletionDataProvider : ICompletionDataProvider
 	{

@@ -2,11 +2,11 @@
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
-using BrewMaster.EditorWindows;
-using BrewMaster.ProjectModel;
+using Brewmaster.EditorWindows;
+using Brewmaster.ProjectModel;
 using ICSharpCode.TextEditor.Document;
 
-namespace BrewMaster.Settings
+namespace Brewmaster.Settings
 {
 	public partial class SettingsWindow : Form
 	{

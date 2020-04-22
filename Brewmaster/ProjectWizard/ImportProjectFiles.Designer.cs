@@ -1,6 +1,6 @@
 ﻿using System.Windows.Forms;
 
-namespace BrewMaster.ProjectWizard
+namespace Brewmaster.ProjectWizard
 {
 	partial class ImportProjectFiles
 	{

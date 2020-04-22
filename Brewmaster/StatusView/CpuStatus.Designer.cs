@@ -1,4 +1,4 @@
-﻿namespace BrewMaster.StatusView
+﻿namespace Brewmaster.StatusView
 {
 	partial class CpuStatus
 	{

@@ -1,4 +1,4 @@
-﻿namespace BrewMaster.Ide
+﻿namespace Brewmaster.Ide
 {
 	partial class FloatPanel
 	{

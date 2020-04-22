@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Windows.Forms;
-using BrewMaster.ProjectModel;
-using BrewMaster.Settings;
+using Brewmaster.ProjectModel;
+using Brewmaster.Settings;
 
-namespace BrewMaster.EditorWindows
+namespace Brewmaster.EditorWindows
 {
 	public class CodeMenu : ContextMenuStrip
 	{

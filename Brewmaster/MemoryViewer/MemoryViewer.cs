@@ -5,11 +5,11 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
-using BrewMaster.Modules.Watch;
-using BrewMaster.ProjectModel;
-using BrewMaster.Settings;
+using Brewmaster.Modules.Watch;
+using Brewmaster.ProjectModel;
+using Brewmaster.Settings;
 
-namespace BrewMaster.MemoryViewer
+namespace Brewmaster.MemoryViewer
 {
 	public class MemoryViewer : Panel
 	{

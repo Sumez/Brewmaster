@@ -1,8 +1,8 @@
-﻿using BrewMaster.Settings;
+﻿using Brewmaster.Settings;
 using System;
 using System.Collections.Generic;
 
-namespace BrewMaster.ProjectModel
+namespace Brewmaster.ProjectModel
 {
 	public class Breakpoint
 	{

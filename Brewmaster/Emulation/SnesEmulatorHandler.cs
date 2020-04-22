@@ -7,31 +7,31 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using BrewMaster.Modules.Build;
-using BrewMaster.ProjectModel;
+using Brewmaster.Modules.Build;
+using Brewmaster.ProjectModel;
 using Mesen.GUI;
 using Mesen.GUI.Config;
 using Mesen.GUI.Config.Shortcuts;
 using SnesBreakpointTypeFlags = Mesen.GUI.Debugger.BreakpointTypeFlags;
-using SnesBreakSource = BrewMaster.Emulation.BreakSource;
+using SnesBreakSource = Brewmaster.Emulation.BreakSource;
 using SnesApi = Mesen.GUI.EmuApi;
 using SnesDebugApi = Mesen.GUI.DebugApi;
 using SnesConfigApi = Mesen.GUI.ConfigApi;
 using SnesInputApi = Mesen.GUI.InputApi;
 using SnesDebuggerFlags = Mesen.GUI.DebuggerFlags;
 using SnesDebugState = Mesen.GUI.DebugState;
-using SnesEmulationFlags = BrewMaster.Emulation.EmulationFlags;
+using SnesEmulationFlags = Brewmaster.Emulation.EmulationFlags;
 using SnesBreakpoint = Mesen.GUI.Debugger.InteropBreakpoint;
 
 //using NotificationHandler = Mesen.GUI.NotificationListener;
 
-//using NotificationType = BrewMaster.Emulation.ConsoleNotificationType;
+//using NotificationType = Brewmaster.Emulation.ConsoleNotificationType;
 
 
-using EmuApi = BrewMaster.Emulation.EmuApi;
+using EmuApi = Brewmaster.Emulation.EmuApi;
 using SnesAspectRatio = Mesen.GUI.Config.VideoAspectRatio;
 
-namespace BrewMaster.Emulation
+namespace Brewmaster.Emulation
 {
 	public class EmuApi
 	{
@@ -46,7 +46,7 @@ namespace BrewMaster.Emulation
 			UInt32 major = (version >> 16) & 0xFFFF;
 			return new Version((int)major, (int)minor, (int)revision, 0);
 		}
-		[DllImport(DllPath)] public static extern void SetDisplayLanguage(BrewMaster.Emulation.Language lang);
+		[DllImport(DllPath)] public static extern void SetDisplayLanguage(Brewmaster.Emulation.Language lang);
 		[DllImport(DllPath)] public static extern IntPtr RegisterNotificationCallback(NotificationListener.NotificationCallback callback);
 		[DllImport(DllPath)] public static extern void UnregisterNotificationCallback(IntPtr notificationListener);
 	}
@@ -122,7 +122,7 @@ namespace BrewMaster.Emulation
 			SnesApi.InitDll();
 			//EmuApi.InitDll();
 			var version = SnesApi.GetMesenVersion();
-			//InteropEmu.SetDisplayLanguage(BrewMaster.Emulation.Language.English);
+			//InteropEmu.SetDisplayLanguage(Brewmaster.Emulation.Language.English);
 			//SnesApi.SetDisplayLanguage(Mesen.GUI.Forms.Language.English);
 
 

@@ -1,4 +1,4 @@
-﻿namespace BrewMaster.ProjectWizard
+﻿namespace Brewmaster.ProjectWizard
 {
 	partial class ConfigurationManager
 	{
@@ -31,7 +31,7 @@
 			System.Windows.Forms.Panel panel1;
 			this.okButton = new System.Windows.Forms.Button();
 			this.cancelButton = new System.Windows.Forms.Button();
-			this.ConfigurationSettings = new BrewMaster.ProjectWizard.ConfigurationSettings();
+			this.ConfigurationSettings = new Brewmaster.ProjectWizard.ConfigurationSettings();
 			panel1 = new System.Windows.Forms.Panel();
 			panel1.SuspendLayout();
 			this.SuspendLayout();

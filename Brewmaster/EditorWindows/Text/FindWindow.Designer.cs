@@ -1,4 +1,4 @@
-﻿namespace BrewMaster.EditorWindows.Text
+﻿namespace Brewmaster.EditorWindows.Text
 {
     partial class FindWindow
     {

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using BrewMaster.ProjectModel;
+using Brewmaster.ProjectModel;
 
-namespace BrewMaster.Pipeline
+namespace Brewmaster.Pipeline
 {
 	public abstract class DataPipeline
 	{

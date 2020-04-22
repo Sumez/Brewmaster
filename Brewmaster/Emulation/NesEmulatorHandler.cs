@@ -7,10 +7,10 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using BrewMaster.Modules.Build;
-using BrewMaster.ProjectModel;
+using Brewmaster.Modules.Build;
+using Brewmaster.ProjectModel;
 
-namespace BrewMaster.Emulation
+namespace Brewmaster.Emulation
 {
 	public class NametableData
 	{

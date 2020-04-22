@@ -4,10 +4,10 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
-using BrewMaster.ProjectModel;
-using BrewMaster.Settings;
+using Brewmaster.ProjectModel;
+using Brewmaster.Settings;
 
-namespace BrewMaster.Emulation
+namespace Brewmaster.Emulation
 {
 	public class MesenControl : UserControl, IMessageFilter
 	{
@@ -78,8 +78,8 @@ namespace BrewMaster.Emulation
 			this._toolTip = new System.Windows.Forms.ToolTip(this.components);
 			this._saveButton = new System.Windows.Forms.Button();
 			this._loadButton = new System.Windows.Forms.Button();
-			this._renderer = new BrewMaster.Emulation.MesenRenderer();
-			this._speedSlider = new BrewMaster.Emulation.SmallTrackBar();
+			this._renderer = new Brewmaster.Emulation.MesenRenderer();
+			this._speedSlider = new Brewmaster.Emulation.SmallTrackBar();
 			this._bottomPanel.SuspendLayout();
 			this._renderPanel.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this._speedSlider)).BeginInit();
@@ -112,7 +112,7 @@ namespace BrewMaster.Emulation
 			// 
 			this._saveButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this._saveButton.Enabled = false;
-			this._saveButton.Image = global::BrewMaster.Properties.Resources.smallsave;
+			this._saveButton.Image = global::Brewmaster.Properties.Resources.smallsave;
 			this._saveButton.Location = new System.Drawing.Point(304, 0);
 			this._saveButton.Name = "_saveButton";
 			this._saveButton.Size = new System.Drawing.Size(22, 20);
@@ -125,7 +125,7 @@ namespace BrewMaster.Emulation
 			// 
 			this._loadButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this._loadButton.Enabled = false;
-			this._loadButton.Image = global::BrewMaster.Properties.Resources.smallload;
+			this._loadButton.Image = global::Brewmaster.Properties.Resources.smallload;
 			this._loadButton.Location = new System.Drawing.Point(326, 0);
 			this._loadButton.Name = "_loadButton";
 			this._loadButton.Size = new System.Drawing.Size(22, 20);

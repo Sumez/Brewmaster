@@ -1,5 +1,5 @@
-﻿using BrewMaster.Emulation;
-using BrewMaster.ProjectModel;
+﻿using Brewmaster.Emulation;
+using Brewmaster.ProjectModel;
 using System;
 using System.ComponentModel;
 using System.Drawing;
@@ -8,9 +8,9 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using System.Windows.Forms.VisualStyles;
-using BrewMaster.Settings;
+using Brewmaster.Settings;
 
-namespace BrewMaster.Modules.Watch
+namespace Brewmaster.Modules.Watch
 {
 	public class WatchList : ListView
 	{

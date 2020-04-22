@@ -1,4 +1,4 @@
-﻿namespace BrewMaster.Settings
+﻿namespace Brewmaster.Settings
 {
 	partial class SettingsWindow
 	{
@@ -53,13 +53,13 @@
 			this.backgroundColor = new System.Windows.Forms.Panel();
 			this.textColor = new System.Windows.Forms.Panel();
 			this.styleList = new System.Windows.Forms.ListBox();
-			this.editorPreview = new BrewMaster.Settings.DummyCa65Editor();
+			this.editorPreview = new Brewmaster.Settings.DummyCa65Editor();
 			this.defaultKeysButton = new System.Windows.Forms.Button();
 			this.reassignKeyButton = new System.Windows.Forms.Button();
 			this.shortcutText = new System.Windows.Forms.TextBox();
 			this.featureList = new System.Windows.Forms.ListBox();
-			this.snesKeyBindings = new BrewMaster.Settings.KeyBindingSettings();
-			this.nesKeyBindings = new BrewMaster.Settings.KeyBindingSettings();
+			this.snesKeyBindings = new Brewmaster.Settings.KeyBindingSettings();
+			this.nesKeyBindings = new Brewmaster.Settings.KeyBindingSettings();
 			this.tabControl = new System.Windows.Forms.TabControl();
 			this.assemblerTab = new System.Windows.Forms.TabPage();
 			this.emulatorBackground = new System.Windows.Forms.Panel();

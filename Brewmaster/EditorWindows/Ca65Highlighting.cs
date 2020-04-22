@@ -4,11 +4,11 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using BrewMaster.ProjectModel;
+using Brewmaster.ProjectModel;
 using ICSharpCode.TextEditor;
 using ICSharpCode.TextEditor.Document;
 
-namespace BrewMaster.EditorWindows
+namespace Brewmaster.EditorWindows
 {
 	public class AsmWord : TextWord
 	{

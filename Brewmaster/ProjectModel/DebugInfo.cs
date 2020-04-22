@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace BrewMaster.ProjectModel
+namespace Brewmaster.ProjectModel
 {
 	public class DebugInfo
 	{

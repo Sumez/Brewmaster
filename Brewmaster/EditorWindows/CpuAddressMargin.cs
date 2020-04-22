@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Drawing;
-using BrewMaster.Modules.Watch;
-using BrewMaster.ProjectModel;
+using Brewmaster.Modules.Watch;
+using Brewmaster.ProjectModel;
 using ICSharpCode.TextEditor;
 
-namespace BrewMaster.EditorWindows
+namespace Brewmaster.EditorWindows
 {
 	public class CpuAddressMargin : AbstractMargin
 	{

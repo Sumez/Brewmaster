@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Globalization;
 using System.Windows.Forms;
-using BrewMaster.Emulation;
-using BrewMaster.ProjectModel;
+using Brewmaster.Emulation;
+using Brewmaster.ProjectModel;
 using Mesen.GUI;
 
-namespace BrewMaster.StatusView
+namespace Brewmaster.StatusView
 {
 	public partial class CpuStatus : UserControl
 	{

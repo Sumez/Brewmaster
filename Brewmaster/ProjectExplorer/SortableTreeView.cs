@@ -1,7 +1,7 @@
 ﻿using System.Drawing;
 using System.Windows.Forms;
 
-namespace BrewMaster.ProjectExplorer
+namespace Brewmaster.ProjectExplorer
 {
 	/// <summary>
 	/// A lot of messy basic code useful for any tree view with drag/drop and sorting features, making it

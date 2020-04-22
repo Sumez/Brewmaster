@@ -2,9 +2,9 @@
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
-using BrewMaster.ProjectModel;
+using Brewmaster.ProjectModel;
 
-namespace BrewMaster.ProjectExplorer
+namespace Brewmaster.ProjectExplorer
 {
 
 	public class EditableNode : TreeNode

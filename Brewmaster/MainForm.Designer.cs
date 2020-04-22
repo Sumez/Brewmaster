@@ -1,11 +1,11 @@
 ﻿using System.Windows.Forms;
-using BrewMaster.EditorWindows;
-using BrewMaster.Emulation;
-using BrewMaster.Ide;
-using BrewMaster.Ppu;
-using BrewMaster.StatusView;
+using Brewmaster.EditorWindows;
+using Brewmaster.Emulation;
+using Brewmaster.Ide;
+using Brewmaster.Ppu;
+using Brewmaster.StatusView;
 
-namespace BrewMaster
+namespace Brewmaster
 {
     partial class MainForm
     {
@@ -54,23 +54,23 @@ namespace BrewMaster
 			System.Windows.Forms.ToolStripSeparator toolStripSeparator13;
 			System.Windows.Forms.ToolStripSeparator toolStripSeparator37;
 			System.Windows.Forms.ToolStripSeparator toolStripSeparator27;
-			this.memoryViewer2 = new BrewMaster.MemoryViewer.MemoryViewer();
-			this.memoryViewer1 = new BrewMaster.MemoryViewer.MemoryViewer();
-			this.editorTabs = new BrewMaster.EditorWindows.EditorTabs();
-			this.mesen = new BrewMaster.Emulation.MesenControl();
-			this.cpuStatus1 = new BrewMaster.StatusView.CpuStatus();
-			this.Nametable = new BrewMaster.Ppu.NametableDisplay();
+			this.memoryViewer2 = new Brewmaster.MemoryViewer.MemoryViewer();
+			this.memoryViewer1 = new Brewmaster.MemoryViewer.MemoryViewer();
+			this.editorTabs = new Brewmaster.EditorWindows.EditorTabs();
+			this.mesen = new Brewmaster.Emulation.MesenControl();
+			this.cpuStatus1 = new Brewmaster.StatusView.CpuStatus();
+			this.Nametable = new Brewmaster.Ppu.NametableDisplay();
 			this.MemoryTabs = new System.Windows.Forms.TabControl();
 			this.CpuMemoryTab = new System.Windows.Forms.TabPage();
-			this.CpuMemoryViewer = new BrewMaster.MemoryViewer.MemoryViewer();
+			this.CpuMemoryViewer = new Brewmaster.MemoryViewer.MemoryViewer();
 			this.PpuMemoryTab = new System.Windows.Forms.TabPage();
-			this.PpuMemoryViewer = new BrewMaster.MemoryViewer.MemoryViewer();
+			this.PpuMemoryViewer = new Brewmaster.MemoryViewer.MemoryViewer();
 			this.OamMemoryTab = new System.Windows.Forms.TabPage();
-			this.OamMemoryViewer = new BrewMaster.MemoryViewer.MemoryViewer();
-			this.CartridgeExplorer = new BrewMaster.CartridgeExplorer.CartridgeExplorer();
-			this.WatchPanel = new BrewMaster.Ide.IdeGroupedPanel();
-			this.OutputPanel = new BrewMaster.Ide.IdeGroupedPanel();
-			this.ProjectExplorer = new BrewMaster.ProjectExplorer.ProjectExplorer();
+			this.OamMemoryViewer = new Brewmaster.MemoryViewer.MemoryViewer();
+			this.CartridgeExplorer = new Brewmaster.CartridgeExplorer.CartridgeExplorer();
+			this.WatchPanel = new Brewmaster.Ide.IdeGroupedPanel();
+			this.OutputPanel = new Brewmaster.Ide.IdeGroupedPanel();
+			this.ProjectExplorer = new Brewmaster.ProjectExplorer.ProjectExplorer();
 			this.ProjectExplorerImageList = new System.Windows.Forms.ImageList(this.components);
 			this.MainWindowMenu = new System.Windows.Forms.MenuStrip();
 			this.FileMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -244,8 +244,8 @@ namespace BrewMaster
 			this.textEditorContextMenu_InsertMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.textEditorContextMenu_InsertMacroMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.CodeItemImages = new System.Windows.Forms.ImageList(this.components);
-			this.MainEastContainer2 = new BrewMaster.Ide.MultiSplitContainer();
-			this._menuHelper = new BrewMaster.Modules.MenuHelper(this.components);
+			this.MainEastContainer2 = new Brewmaster.Ide.MultiSplitContainer();
+			this._menuHelper = new Brewmaster.Modules.MenuHelper(this.components);
 			watchTab = new System.Windows.Forms.TabPage();
 			tabPage1 = new System.Windows.Forms.TabPage();
 			availableIdePanels = new System.Windows.Forms.Panel();
@@ -725,7 +725,7 @@ namespace BrewMaster
 			// 
 			// File_OpenProjectMenuItem
 			// 
-			this.File_OpenProjectMenuItem.Image = global::BrewMaster.Properties.Resources.open;
+			this.File_OpenProjectMenuItem.Image = global::Brewmaster.Properties.Resources.open;
 			this.File_OpenProjectMenuItem.Name = "File_OpenProjectMenuItem";
 			this.File_OpenProjectMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
 			this.File_OpenProjectMenuItem.Size = new System.Drawing.Size(260, 22);
@@ -746,7 +746,7 @@ namespace BrewMaster
 			// 
 			// File_SaveMenuItem
 			// 
-			this.File_SaveMenuItem.Image = global::BrewMaster.Properties.Resources.save1;
+			this.File_SaveMenuItem.Image = global::Brewmaster.Properties.Resources.save1;
 			this.File_SaveMenuItem.Name = "File_SaveMenuItem";
 			this.File_SaveMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
 			this.File_SaveMenuItem.Size = new System.Drawing.Size(260, 22);
@@ -755,7 +755,7 @@ namespace BrewMaster
 			// 
 			// File_SaveAsMenuItem
 			// 
-			this.File_SaveAsMenuItem.Image = global::BrewMaster.Properties.Resources.save1;
+			this.File_SaveAsMenuItem.Image = global::Brewmaster.Properties.Resources.save1;
 			this.File_SaveAsMenuItem.Name = "File_SaveAsMenuItem";
 			this.File_SaveAsMenuItem.Size = new System.Drawing.Size(260, 22);
 			this.File_SaveAsMenuItem.Text = "Save As...";
@@ -763,7 +763,7 @@ namespace BrewMaster
 			// 
 			// File_SaveAllMenuItem
 			// 
-			this.File_SaveAllMenuItem.Image = global::BrewMaster.Properties.Resources.save_all;
+			this.File_SaveAllMenuItem.Image = global::Brewmaster.Properties.Resources.save_all;
 			this.File_SaveAllMenuItem.Name = "File_SaveAllMenuItem";
 			this.File_SaveAllMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
             | System.Windows.Forms.Keys.S)));
@@ -878,7 +878,7 @@ namespace BrewMaster
 			// 
 			// Edit_CutMenuItem
 			// 
-			this.Edit_CutMenuItem.Image = global::BrewMaster.Properties.Resources.cut1;
+			this.Edit_CutMenuItem.Image = global::Brewmaster.Properties.Resources.cut1;
 			this.Edit_CutMenuItem.Name = "Edit_CutMenuItem";
 			this.Edit_CutMenuItem.Size = new System.Drawing.Size(174, 22);
 			this.Edit_CutMenuItem.Text = "Cut                           ";
@@ -886,7 +886,7 @@ namespace BrewMaster
 			// 
 			// Edit_CopyMenuItem
 			// 
-			this.Edit_CopyMenuItem.Image = global::BrewMaster.Properties.Resources.copy1;
+			this.Edit_CopyMenuItem.Image = global::Brewmaster.Properties.Resources.copy1;
 			this.Edit_CopyMenuItem.Name = "Edit_CopyMenuItem";
 			this.Edit_CopyMenuItem.ShortcutKeyDisplayString = "Ctrl+C";
 			this.Edit_CopyMenuItem.Size = new System.Drawing.Size(174, 22);
@@ -895,7 +895,7 @@ namespace BrewMaster
 			// 
 			// Edit_PasteMenuItem
 			// 
-			this.Edit_PasteMenuItem.Image = global::BrewMaster.Properties.Resources.paste1;
+			this.Edit_PasteMenuItem.Image = global::Brewmaster.Properties.Resources.paste1;
 			this.Edit_PasteMenuItem.Name = "Edit_PasteMenuItem";
 			this.Edit_PasteMenuItem.ShortcutKeyDisplayString = "Ctrl+V";
 			this.Edit_PasteMenuItem.Size = new System.Drawing.Size(174, 22);
@@ -909,7 +909,7 @@ namespace BrewMaster
 			// 
 			// Edit_UndoMenuItem
 			// 
-			this.Edit_UndoMenuItem.Image = global::BrewMaster.Properties.Resources.undo1;
+			this.Edit_UndoMenuItem.Image = global::Brewmaster.Properties.Resources.undo1;
 			this.Edit_UndoMenuItem.Name = "Edit_UndoMenuItem";
 			this.Edit_UndoMenuItem.ShortcutKeyDisplayString = "Ctrl+Z";
 			this.Edit_UndoMenuItem.Size = new System.Drawing.Size(174, 22);
@@ -918,7 +918,7 @@ namespace BrewMaster
 			// 
 			// Edit_RedoMenuItem
 			// 
-			this.Edit_RedoMenuItem.Image = global::BrewMaster.Properties.Resources.redo1;
+			this.Edit_RedoMenuItem.Image = global::Brewmaster.Properties.Resources.redo1;
 			this.Edit_RedoMenuItem.Name = "Edit_RedoMenuItem";
 			this.Edit_RedoMenuItem.ShortcutKeyDisplayString = "Ctrl+Y";
 			this.Edit_RedoMenuItem.Size = new System.Drawing.Size(174, 22);
@@ -1110,7 +1110,7 @@ namespace BrewMaster
 			// 
 			// buildProjectMenuItem
 			// 
-			this.buildProjectMenuItem.Image = global::BrewMaster.Properties.Resources.build;
+			this.buildProjectMenuItem.Image = global::Brewmaster.Properties.Resources.build;
 			this.buildProjectMenuItem.Name = "buildProjectMenuItem";
 			this.buildProjectMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
             | System.Windows.Forms.Keys.B)));
@@ -1136,7 +1136,7 @@ namespace BrewMaster
 			// 
 			// runMenuItem
 			// 
-			this.runMenuItem.Image = global::BrewMaster.Properties.Resources.run;
+			this.runMenuItem.Image = global::Brewmaster.Properties.Resources.run;
 			this.runMenuItem.Name = "runMenuItem";
 			this.runMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F5;
 			this.runMenuItem.Size = new System.Drawing.Size(208, 22);
@@ -1145,7 +1145,7 @@ namespace BrewMaster
 			// 
 			// pauseMenuItem
 			// 
-			this.pauseMenuItem.Image = global::BrewMaster.Properties.Resources.pause;
+			this.pauseMenuItem.Image = global::Brewmaster.Properties.Resources.pause;
 			this.pauseMenuItem.Name = "pauseMenuItem";
 			this.pauseMenuItem.Size = new System.Drawing.Size(208, 22);
 			this.pauseMenuItem.Text = "Pause";
@@ -1153,7 +1153,7 @@ namespace BrewMaster
 			// 
 			// stopMenuItem
 			// 
-			this.stopMenuItem.Image = global::BrewMaster.Properties.Resources.stop1;
+			this.stopMenuItem.Image = global::Brewmaster.Properties.Resources.stop1;
 			this.stopMenuItem.Name = "stopMenuItem";
 			this.stopMenuItem.Size = new System.Drawing.Size(208, 22);
 			this.stopMenuItem.Text = "Stop";
@@ -1161,7 +1161,7 @@ namespace BrewMaster
 			// 
 			// restartMenuItem
 			// 
-			this.restartMenuItem.Image = global::BrewMaster.Properties.Resources.restart;
+			this.restartMenuItem.Image = global::Brewmaster.Properties.Resources.restart;
 			this.restartMenuItem.Name = "restartMenuItem";
 			this.restartMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.R)));
 			this.restartMenuItem.Size = new System.Drawing.Size(208, 22);
@@ -1573,7 +1573,7 @@ namespace BrewMaster
 			// newProjectToolStripButton
 			// 
 			this.newProjectToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.newProjectToolStripButton.Image = global::BrewMaster.Properties.Resources._new;
+			this.newProjectToolStripButton.Image = global::Brewmaster.Properties.Resources._new;
 			this.newProjectToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.newProjectToolStripButton.Name = "newProjectToolStripButton";
 			this.newProjectToolStripButton.Size = new System.Drawing.Size(23, 22);
@@ -1584,7 +1584,7 @@ namespace BrewMaster
 			// openProjectToolStripButton
 			// 
 			this.openProjectToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.openProjectToolStripButton.Image = global::BrewMaster.Properties.Resources.open;
+			this.openProjectToolStripButton.Image = global::Brewmaster.Properties.Resources.open;
 			this.openProjectToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.openProjectToolStripButton.Name = "openProjectToolStripButton";
 			this.openProjectToolStripButton.Size = new System.Drawing.Size(23, 22);
@@ -1594,7 +1594,7 @@ namespace BrewMaster
 			// saveToolStripButton
 			// 
 			this.saveToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.saveToolStripButton.Image = global::BrewMaster.Properties.Resources.save1;
+			this.saveToolStripButton.Image = global::Brewmaster.Properties.Resources.save1;
 			this.saveToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.saveToolStripButton.Name = "saveToolStripButton";
 			this.saveToolStripButton.Size = new System.Drawing.Size(23, 22);
@@ -1604,7 +1604,7 @@ namespace BrewMaster
 			// saveAllToolStripButton
 			// 
 			this.saveAllToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.saveAllToolStripButton.Image = global::BrewMaster.Properties.Resources.save_all;
+			this.saveAllToolStripButton.Image = global::Brewmaster.Properties.Resources.save_all;
 			this.saveAllToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.saveAllToolStripButton.Name = "saveAllToolStripButton";
 			this.saveAllToolStripButton.Size = new System.Drawing.Size(23, 22);
@@ -1614,7 +1614,7 @@ namespace BrewMaster
 			// undoToolStripButton
 			// 
 			this.undoToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.undoToolStripButton.Image = global::BrewMaster.Properties.Resources.undo1;
+			this.undoToolStripButton.Image = global::Brewmaster.Properties.Resources.undo1;
 			this.undoToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.undoToolStripButton.Name = "undoToolStripButton";
 			this.undoToolStripButton.Size = new System.Drawing.Size(23, 22);
@@ -1624,7 +1624,7 @@ namespace BrewMaster
 			// redoToolStripButton
 			// 
 			this.redoToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.redoToolStripButton.Image = global::BrewMaster.Properties.Resources.redo1;
+			this.redoToolStripButton.Image = global::Brewmaster.Properties.Resources.redo1;
 			this.redoToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.redoToolStripButton.Name = "redoToolStripButton";
 			this.redoToolStripButton.Size = new System.Drawing.Size(23, 22);
@@ -1634,7 +1634,7 @@ namespace BrewMaster
 			// cutToolStripButton
 			// 
 			this.cutToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.cutToolStripButton.Image = global::BrewMaster.Properties.Resources.cut1;
+			this.cutToolStripButton.Image = global::Brewmaster.Properties.Resources.cut1;
 			this.cutToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.cutToolStripButton.Name = "cutToolStripButton";
 			this.cutToolStripButton.Size = new System.Drawing.Size(23, 22);
@@ -1644,7 +1644,7 @@ namespace BrewMaster
 			// copyToolStripButton
 			// 
 			this.copyToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.copyToolStripButton.Image = global::BrewMaster.Properties.Resources.copy1;
+			this.copyToolStripButton.Image = global::Brewmaster.Properties.Resources.copy1;
 			this.copyToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.copyToolStripButton.Name = "copyToolStripButton";
 			this.copyToolStripButton.Size = new System.Drawing.Size(23, 22);
@@ -1654,7 +1654,7 @@ namespace BrewMaster
 			// pasteToolStripButton
 			// 
 			this.pasteToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.pasteToolStripButton.Image = global::BrewMaster.Properties.Resources.paste1;
+			this.pasteToolStripButton.Image = global::Brewmaster.Properties.Resources.paste1;
 			this.pasteToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.pasteToolStripButton.Name = "pasteToolStripButton";
 			this.pasteToolStripButton.Size = new System.Drawing.Size(23, 22);
@@ -1670,7 +1670,7 @@ namespace BrewMaster
 			// buildSettings
 			// 
 			this.buildSettings.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.buildSettings.Image = global::BrewMaster.Properties.Resources.config;
+			this.buildSettings.Image = global::Brewmaster.Properties.Resources.config;
 			this.buildSettings.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.buildSettings.Name = "buildSettings";
 			this.buildSettings.Size = new System.Drawing.Size(23, 22);
@@ -1680,7 +1680,7 @@ namespace BrewMaster
 			// build
 			// 
 			this.build.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.build.Image = global::BrewMaster.Properties.Resources.build2;
+			this.build.Image = global::Brewmaster.Properties.Resources.build2;
 			this.build.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.build.Name = "build";
 			this.build.Size = new System.Drawing.Size(23, 22);
@@ -1690,7 +1690,7 @@ namespace BrewMaster
 			// runNewBuild
 			// 
 			this.runNewBuild.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.runNewBuild.Image = global::BrewMaster.Properties.Resources.buildrun;
+			this.runNewBuild.Image = global::Brewmaster.Properties.Resources.buildrun;
 			this.runNewBuild.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.runNewBuild.Name = "runNewBuild";
 			this.runNewBuild.Size = new System.Drawing.Size(23, 22);
@@ -1711,7 +1711,7 @@ namespace BrewMaster
 			// run
 			// 
 			this.run.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.run.Image = global::BrewMaster.Properties.Resources.run;
+			this.run.Image = global::Brewmaster.Properties.Resources.run;
 			this.run.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.run.Name = "run";
 			this.run.Size = new System.Drawing.Size(23, 22);
@@ -1721,7 +1721,7 @@ namespace BrewMaster
 			// pause
 			// 
 			this.pause.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.pause.Image = global::BrewMaster.Properties.Resources.pause;
+			this.pause.Image = global::Brewmaster.Properties.Resources.pause;
 			this.pause.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.pause.Name = "pause";
 			this.pause.Size = new System.Drawing.Size(23, 22);
@@ -1731,7 +1731,7 @@ namespace BrewMaster
 			// stop
 			// 
 			this.stop.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.stop.Image = global::BrewMaster.Properties.Resources.stop1;
+			this.stop.Image = global::Brewmaster.Properties.Resources.stop1;
 			this.stop.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.stop.Name = "stop";
 			this.stop.Size = new System.Drawing.Size(23, 22);
@@ -1741,7 +1741,7 @@ namespace BrewMaster
 			// restart
 			// 
 			this.restart.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.restart.Image = global::BrewMaster.Properties.Resources.restart;
+			this.restart.Image = global::Brewmaster.Properties.Resources.restart;
 			this.restart.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.restart.Name = "restart";
 			this.restart.Size = new System.Drawing.Size(23, 22);
@@ -1751,7 +1751,7 @@ namespace BrewMaster
 			// flashCartridge
 			// 
 			this.flashCartridge.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.flashCartridge.Image = global::BrewMaster.Properties.Resources.cartridge;
+			this.flashCartridge.Image = global::Brewmaster.Properties.Resources.cartridge;
 			this.flashCartridge.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.flashCartridge.Name = "flashCartridge";
 			this.flashCartridge.Size = new System.Drawing.Size(23, 22);
@@ -1761,7 +1761,7 @@ namespace BrewMaster
 			// stepOver
 			// 
 			this.stepOver.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.stepOver.Image = global::BrewMaster.Properties.Resources.stepover;
+			this.stepOver.Image = global::Brewmaster.Properties.Resources.stepover;
 			this.stepOver.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.stepOver.Name = "stepOver";
 			this.stepOver.Size = new System.Drawing.Size(23, 22);
@@ -1781,7 +1781,7 @@ namespace BrewMaster
 			// stepOut
 			// 
 			this.stepOut.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.stepOut.Image = global::BrewMaster.Properties.Resources.stepout;
+			this.stepOut.Image = global::Brewmaster.Properties.Resources.stepout;
 			this.stepOut.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.stepOut.Name = "stepOut";
 			this.stepOut.Size = new System.Drawing.Size(23, 22);
@@ -1791,7 +1791,7 @@ namespace BrewMaster
 			// stepBack
 			// 
 			this.stepBack.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.stepBack.Image = global::BrewMaster.Properties.Resources.stepback;
+			this.stepBack.Image = global::Brewmaster.Properties.Resources.stepback;
 			this.stepBack.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.stepBack.Name = "stepBack";
 			this.stepBack.Size = new System.Drawing.Size(23, 22);
@@ -1970,7 +1970,7 @@ namespace BrewMaster
 			// 
 			// OpenProjectFileDialog
 			// 
-			this.OpenProjectFileDialog.Filter = "BrewMaster Project (*.bwm)|*.bwm|Nesicide Project (*.nesproject)|*.nesproject";
+			this.OpenProjectFileDialog.Filter = "Brewmaster Project (*.bwm)|*.bwm|Nesicide Project (*.nesproject)|*.nesproject";
 			// 
 			// OpenFilesFileDialog
 			// 
@@ -2000,7 +2000,7 @@ namespace BrewMaster
 			// 
 			// textEditorContextMenu_CutMenuItem
 			// 
-			this.textEditorContextMenu_CutMenuItem.Image = global::BrewMaster.Properties.Resources.cut1;
+			this.textEditorContextMenu_CutMenuItem.Image = global::Brewmaster.Properties.Resources.cut1;
 			this.textEditorContextMenu_CutMenuItem.Name = "textEditorContextMenu_CutMenuItem";
 			this.textEditorContextMenu_CutMenuItem.Size = new System.Drawing.Size(219, 22);
 			this.textEditorContextMenu_CutMenuItem.Text = "Cut                                          ";
@@ -2008,7 +2008,7 @@ namespace BrewMaster
 			// 
 			// textEditorContextMenu_CopyMenuItem
 			// 
-			this.textEditorContextMenu_CopyMenuItem.Image = global::BrewMaster.Properties.Resources.copy1;
+			this.textEditorContextMenu_CopyMenuItem.Image = global::Brewmaster.Properties.Resources.copy1;
 			this.textEditorContextMenu_CopyMenuItem.Name = "textEditorContextMenu_CopyMenuItem";
 			this.textEditorContextMenu_CopyMenuItem.Size = new System.Drawing.Size(219, 22);
 			this.textEditorContextMenu_CopyMenuItem.Text = "Copy";
@@ -2016,7 +2016,7 @@ namespace BrewMaster
 			// 
 			// textEditorContextMenu_PasteMenuItem
 			// 
-			this.textEditorContextMenu_PasteMenuItem.Image = global::BrewMaster.Properties.Resources.paste1;
+			this.textEditorContextMenu_PasteMenuItem.Image = global::Brewmaster.Properties.Resources.paste1;
 			this.textEditorContextMenu_PasteMenuItem.Name = "textEditorContextMenu_PasteMenuItem";
 			this.textEditorContextMenu_PasteMenuItem.Size = new System.Drawing.Size(219, 22);
 			this.textEditorContextMenu_PasteMenuItem.Text = "Paste";
@@ -2277,12 +2277,12 @@ namespace BrewMaster
 		private MemoryViewer.MemoryViewer PpuMemoryViewer;
 		private System.Windows.Forms.TabPage OamMemoryTab;
 		private MemoryViewer.MemoryViewer OamMemoryViewer;
-		private BrewMaster.Ide.IdeGroupedPanel WatchPanel;
+		private Brewmaster.Ide.IdeGroupedPanel WatchPanel;
 		private System.Windows.Forms.ToolStripMenuItem restartMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem snesProjectMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem settingsMenuItem;
 		private System.Windows.Forms.ToolStripSeparator toolStripSeparator24;
-		private BrewMaster.Ide.IdeGroupedPanel OutputPanel;
+		private Brewmaster.Ide.IdeGroupedPanel OutputPanel;
 		public Ide.MultiSplitContainer MainEastContainer2;
 		private ToolStripMenuItem runNewBuildMenuItem;
 		private ToolStripButton runNewBuild;

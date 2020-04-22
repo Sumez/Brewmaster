@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Serialization;
-using BrewMaster.Pipeline;
+using Brewmaster.Pipeline;
 
-namespace BrewMaster.ProjectModel
+namespace Brewmaster.ProjectModel
 {
 	[Serializable]
 	[XmlRoot("BrewmasterProject")]

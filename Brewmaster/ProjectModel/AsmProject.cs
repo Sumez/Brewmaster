@@ -8,12 +8,12 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
-using BrewMaster.EditorWindows;
-using BrewMaster.Pipeline;
-using BrewMaster.ProjectExplorer;
-using BrewMaster.ProjectModel.Compatibility;
+using Brewmaster.EditorWindows;
+using Brewmaster.Pipeline;
+using Brewmaster.ProjectExplorer;
+using Brewmaster.ProjectModel.Compatibility;
 
-namespace BrewMaster.ProjectModel
+namespace Brewmaster.ProjectModel
 {
 	public enum ProjectType
 	{

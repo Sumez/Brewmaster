@@ -8,23 +8,23 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using BrewMaster.BuildProcess;
-using BrewMaster.EditorWindows;
-using BrewMaster.EditorWindows.Images;
-using BrewMaster.EditorWindows.Text;
-using BrewMaster.Emulation;
-using BrewMaster.Ide;
-using BrewMaster.Modules;
-using BrewMaster.Modules.Breakpoints;
-using BrewMaster.Modules.Build;
-using BrewMaster.Modules.NumberHelper;
-using BrewMaster.Modules.Watch;
-using BrewMaster.ProjectExplorer;
-using BrewMaster.ProjectModel;
-using BrewMaster.ProjectWizard;
-using BrewMaster.Settings;
+using Brewmaster.BuildProcess;
+using Brewmaster.EditorWindows;
+using Brewmaster.EditorWindows.Images;
+using Brewmaster.EditorWindows.Text;
+using Brewmaster.Emulation;
+using Brewmaster.Ide;
+using Brewmaster.Modules;
+using Brewmaster.Modules.Breakpoints;
+using Brewmaster.Modules.Build;
+using Brewmaster.Modules.NumberHelper;
+using Brewmaster.Modules.Watch;
+using Brewmaster.ProjectExplorer;
+using Brewmaster.ProjectModel;
+using Brewmaster.ProjectWizard;
+using Brewmaster.Settings;
 
-namespace BrewMaster
+namespace Brewmaster
 {
 	public partial class MainForm : Form
     {
@@ -705,7 +705,7 @@ namespace BrewMaster
 	    private void LoadSettings()
 	    {
 			var userSettingsPath = Program.GetUserFilePath(SettingsFileName);
-			Settings = BrewMaster.Settings.Settings.Load(userSettingsPath);
+			Settings = Brewmaster.Settings.Settings.Load(userSettingsPath);
 	    }
 
         private void MainForm_Closing(object sender, FormClosingEventArgs e)
@@ -786,7 +786,7 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 				    CreateNewFileDialog.FileName = "";
 					CreateNewFileDialog.InitialDirectory = CurrentProject.Directory.FullName;
 				    CreateNewFileDialog.DefaultExt = ".bwm";
-				    CreateNewFileDialog.Filter = "BrewMaster projects|*.bwm";
+				    CreateNewFileDialog.Filter = "Brewmaster projects|*.bwm";
 				    if (CreateNewFileDialog.ShowDialog() != DialogResult.OK) return;
 				    var fileName = CreateNewFileDialog.FileName;
 

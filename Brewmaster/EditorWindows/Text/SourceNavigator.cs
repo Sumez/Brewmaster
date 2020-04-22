@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 
-namespace BrewMaster.EditorWindows.Text
+namespace Brewmaster.EditorWindows.Text
 {
 	public class SourceNavigator : UserControl
 	{

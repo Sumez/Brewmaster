@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Xml.Serialization;
 
-namespace BrewMaster.ProjectModel.Compatibility
+namespace Brewmaster.ProjectModel.Compatibility
 {
 	[Serializable]
 	[XmlRoot("ProjectFileHeader")]

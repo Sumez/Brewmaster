@@ -5,10 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using BrewMaster.ProjectModel;
-using BrewMaster.Settings;
+using Brewmaster.ProjectModel;
+using Brewmaster.Settings;
 
-namespace BrewMaster.Emulation
+namespace Brewmaster.Emulation
 {
 	public class MesenRenderer : UserControl
 	{

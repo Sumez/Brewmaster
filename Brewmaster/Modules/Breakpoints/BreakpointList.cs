@@ -4,11 +4,11 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using System.Windows.Forms.VisualStyles;
-using BrewMaster.Modules.Watch;
-using BrewMaster.ProjectModel;
-using BrewMaster.Settings;
+using Brewmaster.Modules.Watch;
+using Brewmaster.ProjectModel;
+using Brewmaster.Settings;
 
-namespace BrewMaster.Modules.Breakpoints
+namespace Brewmaster.Modules.Breakpoints
 {
 	public class BreakpointList : ListView
 	{

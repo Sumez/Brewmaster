@@ -1,6 +1,6 @@
 ﻿using System.Windows.Forms;
 
-namespace BrewMaster.CartridgeExplorer
+namespace Brewmaster.CartridgeExplorer
 {
 	public class CartridgeExplorer: TreeView
 	{

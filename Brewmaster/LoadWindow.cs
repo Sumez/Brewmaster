@@ -1,6 +1,6 @@
 ﻿using System.Windows.Forms;
 
-namespace BrewMaster
+namespace Brewmaster
 {
     public partial class LoadWindow : Form
     {

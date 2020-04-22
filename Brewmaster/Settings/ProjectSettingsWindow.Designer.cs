@@ -1,4 +1,4 @@
-﻿namespace BrewMaster.Settings
+﻿namespace Brewmaster.Settings
 {
 	partial class ProjectSettingsWindow
 	{
@@ -37,7 +37,7 @@
 			this.okButton = new System.Windows.Forms.Button();
 			this.cancelButton = new System.Windows.Forms.Button();
 			this.ConfigurationBox = new System.Windows.Forms.GroupBox();
-			this.configurationSettings1 = new BrewMaster.ProjectWizard.ConfigurationSettings();
+			this.configurationSettings1 = new Brewmaster.ProjectWizard.ConfigurationSettings();
 			this.ConfigurationSelector = new System.Windows.Forms.ComboBox();
 			this.ProjectName = new System.Windows.Forms.TextBox();
 			this.tabControl = new System.Windows.Forms.TabControl();

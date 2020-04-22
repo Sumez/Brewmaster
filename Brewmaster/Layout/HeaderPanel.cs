@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Drawing;
 using System.Windows.Forms;
-using BrewMaster.ProjectExplorer;
+using Brewmaster.ProjectExplorer;
 
-namespace BrewMaster.Ide
+namespace Brewmaster.Ide
 {
 
 	public class HeaderPanel : Panel

@@ -3,10 +3,10 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
-using BrewMaster.Emulation;
-using BrewMaster.Ide;
+using Brewmaster.Emulation;
+using Brewmaster.Ide;
 
-namespace BrewMaster.Ppu
+namespace Brewmaster.Ppu
 {
 	public class NametableDisplay : Panel, IHeaderManupulator
 	{

@@ -1,11 +1,11 @@
-﻿using BrewMaster.Emulation;
-using BrewMaster.ProjectModel;
+﻿using Brewmaster.Emulation;
+using Brewmaster.ProjectModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 
-namespace BrewMaster.Modules.Watch
+namespace Brewmaster.Modules.Watch
 {
 	public partial class WatchValues : UserControl
 	{

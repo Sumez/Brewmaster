@@ -1,4 +1,4 @@
-﻿namespace BrewMaster
+﻿namespace Brewmaster
 {
     partial class AboutWindow
     {
@@ -32,7 +32,7 @@
 			System.Windows.Forms.Label header;
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AboutWindow));
 			this.panel2 = new System.Windows.Forms.Panel();
-			this.logoPicture1 = new BrewMaster.LogoPicture();
+			this.logoPicture1 = new Brewmaster.LogoPicture();
 			this.link = new System.Windows.Forms.LinkLabel();
 			this.closeButton = new System.Windows.Forms.Button();
 			this.panel1 = new System.Windows.Forms.Panel();
@@ -69,7 +69,7 @@
 			// 
 			// logoPicture1
 			// 
-			this.logoPicture1.Image = global::BrewMaster.Properties.Resources.logo;
+			this.logoPicture1.Image = global::Brewmaster.Properties.Resources.logo;
 			this.logoPicture1.Location = new System.Drawing.Point(24, 71);
 			this.logoPicture1.Name = "logoPicture1";
 			this.logoPicture1.Size = new System.Drawing.Size(64, 64);

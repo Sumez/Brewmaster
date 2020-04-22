@@ -4,10 +4,10 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
-using BrewMaster.Ide;
-using BrewMaster.ProjectExplorer;
+using Brewmaster.Ide;
+using Brewmaster.ProjectExplorer;
 
-namespace BrewMaster.EditorWindows.Images
+namespace Brewmaster.EditorWindows.Images
 {
 	public class PaletteEntries : Panel
 	{
