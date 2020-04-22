@@ -1,0 +1,347 @@
+<?xml version="1.0"?>
+<MenuHelpCollection xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <MenuHelp>
+    <MenuItem>newProjectToolStripButton</MenuItem>
+    <HelpText>Create a new project from scratch, or using a template</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>FileMenuItem</MenuItem>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>saveAllToolStripButton</MenuItem>
+    <HelpText>Save all open files</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>copyToolStripButton</MenuItem>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>configurationSelector</MenuItem>
+    <HelpText>Select active build configuration for your current project</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>build</MenuItem>
+    <HelpText>Build project using active build configuration</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>openProjectToolStripButton</MenuItem>
+    <HelpText>Open a Brewmaster project</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>undoToolStripButton</MenuItem>
+    <HelpText>Undo</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>redoToolStripButton</MenuItem>
+    <HelpText>Redo</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>cutToolStripButton</MenuItem>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>pasteToolStripButton</MenuItem>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>runNewBuild</MenuItem>
+    <HelpText>Force a new build and run it in the emulator</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>run</MenuItem>
+    <HelpText>Run project in the emulator</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>flashCartridge</MenuItem>
+    <HelpText>Build project and flash it to a cartridge immediately</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>buildSettings</MenuItem>
+    <HelpText>Edit build configurations</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>pause</MenuItem>
+    <HelpText>Pause the emulator</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>stop</MenuItem>
+    <HelpText>Stop the emulator</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>restart</MenuItem>
+    <HelpText>Restart the emulator</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>stepOver</MenuItem>
+    <HelpText>Step over current instruction (skips subroutines)</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>stepInto</MenuItem>
+    <HelpText>Step to the next instruction</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>stepOut</MenuItem>
+    <HelpText>Step to next instruction after current subroutine</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>stepBack</MenuItem>
+    <HelpText>Step back one instruction (if possible)</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>saveToolStripButton</MenuItem>
+    <HelpText>Save current file</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>EmulatorMenuItem</MenuItem>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>BuildMenuItem</MenuItem>
+    <HelpText>Build project using active build configuration</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>buildProjectMenuItem</MenuItem>
+    <HelpText>Build project using active build configuration</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>runNewBuildMenuItem</MenuItem>
+    <HelpText>Force a new build and run it in the emulator</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>pauseMenuItem</MenuItem>
+    <HelpText>Pause the emulator</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>stopMenuItem</MenuItem>
+    <HelpText>Stop the emulator</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>restartMenuItem</MenuItem>
+    <HelpText>Restart the emulator</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>flashCartridgeMenuItem</MenuItem>
+    <HelpText>Build project and flash it to a cartridge immediately</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>stepOverMenuItem</MenuItem>
+    <HelpText>Step over current instruction (skips subroutines)</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>stepIntoMenuItem</MenuItem>
+    <HelpText>Step to the next instruction</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>stepOutMenuItem</MenuItem>
+    <HelpText>Step to next instruction after current subroutine</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>stepBackMenuItem</MenuItem>
+    <HelpText>Step back one instruction (if possible)</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>buildSettingsMenuItem</MenuItem>
+    <HelpText>Edit build configurations</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>runMenuItem</MenuItem>
+    <HelpText>Run project in the emulator</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>WindowMenuItem</MenuItem>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>HelpMenuItem</MenuItem>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>updateEveryFrameMenuItem</MenuItem>
+    <HelpText>Update information about the emulator state on ever frame (disable if slow)</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>randomValuesAtPowerOnMenuItem</MenuItem>
+    <HelpText>Starts the emulator at a random state, helps prevent initialization issues on real hardware</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>integerScalingMenuItem</MenuItem>
+    <HelpText>Integer scaling prevents a blurry image, but will fix resizing to 1x, 2x, etc. intervals</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>nesGraphicsMenuItem</MenuItem>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>nesAudioMenuItem</MenuItem>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>saveStateMenuItem</MenuItem>
+    <HelpText>Quick save current emulator state</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>loadStateMenuItem</MenuItem>
+    <HelpText>Quick load current emulator state</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>mapInputMenuItem</MenuItem>
+    <HelpText>Map input buttons for the emulator</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>playAudioMenuItem</MenuItem>
+    <HelpText>Enable or disable emulator audio</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>playPulse1MenuItem</MenuItem>
+    <HelpText>Enable or disable the first square pulse channel</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>playPulse2MenuItem</MenuItem>
+    <HelpText>Enable or disable the second square pulse channel</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>playTriangleMenuItem</MenuItem>
+    <HelpText>Enable or disable the triangle channel</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>playNoiseMenuItem</MenuItem>
+    <HelpText>Enable or disable the noise channel</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>playPcmMenuItem</MenuItem>
+    <HelpText>Enable or disable the PCM/DMC channel</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>displayNesBgMenuItem</MenuItem>
+    <HelpText>Enable or disable the background layer</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>displayNesObjectsMenuItem</MenuItem>
+    <HelpText>Enable or disable the sprite layer</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>closeAllWindowsMenuItem</MenuItem>
+    <HelpText>Close all currently open windows</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>aboutMenuItem</MenuItem>
+    <HelpText>About Brewmaster</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>ViewMenuItem</MenuItem>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>viewToolbarMenuItem</MenuItem>
+    <HelpText>Shows or hides the toolbar</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>viewStatusBarMenuItem</MenuItem>
+    <HelpText>Shows or hides this status bar</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>fullScreenMenuItem</MenuItem>
+    <HelpText>Display window in full screen</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>viewLineNumbersMenuItem</MenuItem>
+    <HelpText>Shows hides line numbers in text editor</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>lineAddressMappingsMenuItem</MenuItem>
+    <HelpText>Shows hides CPU addresses in source editor</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>EditMenuItem</MenuItem>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>Edit_CutMenuItem</MenuItem>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>Edit_CopyMenuItem</MenuItem>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>Edit_PasteMenuItem</MenuItem>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>Edit_UndoMenuItem</MenuItem>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>Edit_RedoMenuItem</MenuItem>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>findMenuItem</MenuItem>
+    <HelpText>Search for text in current file</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>findNextMenuItem</MenuItem>
+    <HelpText>Find the next instance of last searched text</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>replaceMenuItem</MenuItem>
+    <HelpText>Search for a text string and replace it with another</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>Edit_GoToMenuItem</MenuItem>
+    <HelpText>Go to a specific line number</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>selectAllMenuItem</MenuItem>
+    <HelpText>Select all text</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>File_NewMenuItem</MenuItem>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>File_OpenProjectMenuItem</MenuItem>
+    <HelpText>Open a Brewmaster project</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>nesProjectMenuItem</MenuItem>
+    <HelpText>Create a new project from scratch, or using a template</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>snesProjectMenuItem</MenuItem>
+    <HelpText>Create a new project from scratch, or using a template</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>sourceFileMenuItem</MenuItem>
+    <HelpText> </HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>includeFileMenuItem</MenuItem>
+    <HelpText> </HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>importProjectMenuItem</MenuItem>
+    <HelpText>Select a directory with an existing project, and try to import it as a Brewmaster project</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>File_SaveAsMenuItem</MenuItem>
+    <HelpText>Save a copy of the current file in a new location</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>File_SaveAllMenuItem</MenuItem>
+    <HelpText>Save all open files</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>File_CloseMenuItem</MenuItem>
+    <HelpText>Close current file</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>File_CloseAllMenuItem</MenuItem>
+    <HelpText>Close all open files</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>File_CloseProjectMenuItem</MenuItem>
+    <HelpText>Close current project</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>File_PrintMenuItem</MenuItem>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>File_PrintPreviewMenuItem</MenuItem>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>settingsMenuItem</MenuItem>
+    <HelpText>Change settings such as appearance, shortcut keys, etc.</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>recentProjectsMenuItem</MenuItem>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>File_ExitMenuItem</MenuItem>
+    <HelpText>Bye</HelpText>
+  </MenuHelp>
+</MenuHelpCollection>
