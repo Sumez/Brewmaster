@@ -24,6 +24,25 @@ namespace Brewmaster.StatusView
 			CheckDec.CheckedChanged += FlagChanged;
 			CheckV.CheckedChanged += FlagChanged;
 			CheckN.CheckedChanged += FlagChanged;
+
+			nesEnableNmi.CheckedChanged += NesPpuCtrlChanged;
+			nesLargeSprites.CheckedChanged += NesPpuCtrlChanged;
+			nesVramDown.CheckedChanged += NesPpuCtrlChanged;
+			nesBg1000.CheckedChanged += NesPpuCtrlChanged;
+			nesSprites1000.CheckedChanged += NesPpuCtrlChanged;
+
+			nesEmphasizeB.CheckedChanged += NesPpuCtrlChanged;
+			nesEmphasizeG.CheckedChanged += NesPpuCtrlChanged;
+			nesEmphasizeR.CheckedChanged += NesPpuCtrlChanged;
+			nesShowSprites.CheckedChanged += NesPpuCtrlChanged;
+			nesShowBg.CheckedChanged += NesPpuCtrlChanged;
+			nesShowLeftSprites.CheckedChanged += NesPpuCtrlChanged;
+			nesShowLeftBg.CheckedChanged += NesPpuCtrlChanged;
+			nesGreyscale.CheckedChanged += NesPpuCtrlChanged;
+
+			nesVblankFlag.CheckedChanged += NesPpuCtrlChanged;
+			nesSprite0.CheckedChanged += NesPpuCtrlChanged;
+			nesSpriteOverflow.CheckedChanged += NesPpuCtrlChanged;
 		}
 
 		bool _showDecimalNumbers = false;
@@ -53,6 +72,7 @@ namespace Brewmaster.StatusView
 		private bool _loading = false;
 		public void UpdateStates(RegisterState registerState)
 		{
+			if (registerState == null) return;
 			_loading = true;
 			_lastState = registerState;
 			if (registerState.Type == ProjectType.Nes) UpdateNesState(registerState.NesState);
@@ -102,6 +122,29 @@ namespace Brewmaster.StatusView
 			CheckDec.Checked = (state.CPU.PS & (1 << 3)) != 0;
 			CheckV.Checked = (state.CPU.PS & (1 << 6)) != 0;
 			CheckN.Checked = (state.CPU.PS & (1 << 7)) != 0;
+
+			UpdateTextBox(nesVramAddr, state.PPU.State.VideoRamAddr, 2);
+			UpdateTextBox(nesNtAddr, state.PPU.State.VideoRamAddr & 0x0fff | 0x2000, 2);
+			UpdateTextBox(nesPpuTRegister, state.PPU.State.TmpVideoRamAddr, 2);
+
+			nesEnableNmi.Checked = state.PPU.ControlFlags.VBlank > 0;
+			nesLargeSprites.Checked = state.PPU.ControlFlags.LargeSprites > 0;
+			nesVramDown.Checked = state.PPU.ControlFlags.VerticalWrite > 0;
+			nesBg1000.Checked = state.PPU.ControlFlags.BackgroundPatternAddr == 0x1000;
+			nesSprites1000.Checked = state.PPU.ControlFlags.SpritePatternAddr == 0x1000;
+
+			nesEmphasizeB.Checked = state.PPU.ControlFlags.IntensifyBlue > 0;
+			nesEmphasizeG.Checked = state.PPU.ControlFlags.IntensifyGreen > 0;
+			nesEmphasizeR.Checked = state.PPU.ControlFlags.IntensifyRed > 0;
+			nesShowSprites.Checked = state.PPU.ControlFlags.SpritesEnabled > 0;
+			nesShowBg.Checked = state.PPU.ControlFlags.BackgroundEnabled > 0;
+			nesShowLeftSprites.Checked = state.PPU.ControlFlags.SpriteMask > 0;
+			nesShowLeftBg.Checked = state.PPU.ControlFlags.BackgroundMask > 0;
+			nesGreyscale.Checked = state.PPU.ControlFlags.Grayscale > 0;
+
+			nesVblankFlag.Checked = state.PPU.StatusFlags.VerticalBlank > 0;
+			nesSprite0.Checked = state.PPU.StatusFlags.Sprite0Hit > 0;
+			nesSpriteOverflow.Checked = state.PPU.StatusFlags.SpriteOverflow > 0;
 
 			_lastCycle = (ulong)state.CPU.CycleCount;
 			_lastFrame = state.PPU.FrameCount;
@@ -240,6 +283,32 @@ namespace Brewmaster.StatusView
 			}
 			UpdateStates(_lastState);
 			PushStateChanges();
+		}
+
+		private void NesPpuCtrlChanged(object sender, EventArgs e)
+		{
+			if (_loading || _lastState == null) return;
+			_lastState.NesState.PPU.ControlFlags.VBlank = (byte)(nesEnableNmi.Checked ? 1 : 0);
+			_lastState.NesState.PPU.ControlFlags.LargeSprites = (byte)(nesLargeSprites.Checked ? 1 : 0);
+			_lastState.NesState.PPU.ControlFlags.VerticalWrite = (byte)(nesVramDown.Checked ? 1 : 0);
+			_lastState.NesState.PPU.ControlFlags.BackgroundPatternAddr = (byte)(nesBg1000.Checked ? 0x1000 : 0);
+			_lastState.NesState.PPU.ControlFlags.SpritePatternAddr = (byte)(nesSprites1000.Checked ? 0x1000 : 0);
+
+			_lastState.NesState.PPU.ControlFlags.IntensifyBlue = (byte)(nesEmphasizeB.Checked ? 1 : 0);
+			_lastState.NesState.PPU.ControlFlags.IntensifyGreen = (byte)(nesEmphasizeG.Checked ? 1 : 0);
+			_lastState.NesState.PPU.ControlFlags.IntensifyRed = (byte)(nesEmphasizeR.Checked ? 1 : 0);
+			_lastState.NesState.PPU.ControlFlags.SpritesEnabled = (byte)(nesShowSprites.Checked ? 1 : 0);
+			_lastState.NesState.PPU.ControlFlags.BackgroundEnabled = (byte)(nesShowBg.Checked ? 1 : 0);
+			_lastState.NesState.PPU.ControlFlags.SpriteMask = (byte)(nesShowLeftSprites.Checked ? 1 : 0);
+			_lastState.NesState.PPU.ControlFlags.BackgroundMask = (byte)(nesShowLeftBg.Checked ? 1 : 0);
+			_lastState.NesState.PPU.ControlFlags.Grayscale = (byte)(nesGreyscale.Checked ? 1 : 0);
+
+			_lastState.NesState.PPU.StatusFlags.VerticalBlank = (byte)(nesVblankFlag.Checked ? 1 : 0);
+			_lastState.NesState.PPU.StatusFlags.Sprite0Hit = (byte)(nesSprite0.Checked ? 1 : 0);
+			_lastState.NesState.PPU.StatusFlags.SpriteOverflow = (byte)(nesSpriteOverflow.Checked ? 1 : 0);
+
+			PushStateChanges();
+
 		}
 
 	}

@@ -113,6 +113,16 @@ namespace Brewmaster.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap collapsed {
+            get {
+                object obj = ResourceManager.GetObject("collapsed", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap config {
             get {
                 object obj = ResourceManager.GetObject("config", resourceCulture);
@@ -136,6 +146,16 @@ namespace Brewmaster.Properties {
         internal static System.Drawing.Bitmap cut1 {
             get {
                 object obj = ResourceManager.GetObject("cut1", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap expanded {
+            get {
+                object obj = ResourceManager.GetObject("expanded", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

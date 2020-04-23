@@ -374,6 +374,12 @@
     <Compile Include="StatusView\CpuStatus.Designer.cs">
       <DependentUpon>CpuStatus.cs</DependentUpon>
     </Compile>
+    <Compile Include="StatusView\ExpandButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="StatusView\HorizontalLine.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Templates\TemplateModule.cs" />
     <EmbeddedResource Include="AboutWindow.resx">
       <DependentUpon>AboutWindow.cs</DependentUpon>
@@ -520,10 +526,12 @@
     <None Include="Resources\Toolbar\stop.png" />
     <None Include="Resources\Files\cartridge.png" />
     <Content Include="nesproject.ico" />
+    <None Include="Resources\Other\collapsed.png" />
     <Content Include="Resources\Other\error.png" />
     <None Include="Resources\Other\smallload.png" />
     <None Include="Resources\Other\smallsave.png" />
     <None Include="Resources\Other\logo.png" />
+    <None Include="Resources\Other\expanded.png" />
     <Content Include="Resources\Other\warning.png" />
     <None Include="Resources\Toolbar\buildrun.png" />
     <None Include="Resources\Toolbar\config.png" />
