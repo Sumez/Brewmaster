@@ -56,28 +56,37 @@ namespace Brewmaster.ProjectExplorer
 
 		protected override bool OnBeforeDrag(object draggedItem)
 		{
-			var item = draggedItem as EditableNode;
-			return item != null && item != _dataRootNode && item != _projectRootNode;
+			return draggedItem is FileNode;
 		}
 
 		protected override void OnAfterDrag(IDataObject data, TreeNode dragTarget)
 		{
+			var targetRoot = GetRoot(dragTarget);
+			var targetDirectoryNode = dragTarget as DirectoryNode ?? dragTarget.Parent as DirectoryNode;
+			if (targetDirectoryNode == null) return;
+
 			if (data.GetDataPresent(typeof(FileNode)))
 			{
 				var fileNode = data.GetData(typeof(FileNode)) as FileNode;
+				if (fileNode == null) return;
+				var currentRoot = GetRoot(fileNode);
+				if (currentRoot != targetRoot) fileNode.FileInfo.Mode = targetRoot == _dataRootNode ? CompileMode.ContentPipeline : CompileMode.IncludeInAssembly;
+				if (targetDirectoryNode != fileNode.Parent)
+				{
+					var file = fileNode.FileInfo.File;
+					file.MoveTo(Path.Combine(targetDirectoryNode.DirectoryInfo.FullName, file.Name));
+					_project.Pristine = false;
+					RefreshTree();
+				}
 				return;
 			}
 			if (data.GetDataPresent("FileDrop"))
 			{
 				if (AddExistingFile == null) return;
-				var root = GetRoot(dragTarget);
-				var directoryNode = dragTarget as DirectoryNode ?? dragTarget.Parent as DirectoryNode;
-				if (directoryNode == null) return;
-
 				foreach (var file in ((string[])data.GetData("FileDrop")).Select(f => new FileInfo(f)))
 				{
 					if (!file.Exists) continue;
-					AddExistingFile(file.FullName, directoryNode.DirectoryInfo.FullName, root == _dataRootNode ? CompileMode.ContentPipeline : CompileMode.IncludeInAssembly);
+					AddExistingFile(file.FullName, targetDirectoryNode.DirectoryInfo.FullName, targetRoot == _dataRootNode ? CompileMode.ContentPipeline : CompileMode.IncludeInAssembly);
 				}
 				return;
 			}
