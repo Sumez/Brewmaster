@@ -35,7 +35,7 @@
 			this._viewportButton = new System.Windows.Forms.CheckBox();
 			this._scaleButton = new System.Windows.Forms.CheckBox();
 			this._layerButtonPanel = new System.Windows.Forms.FlowLayoutPanel();
-			this._tileMapDisplay = new Brewmaster.Ppu.NametableDisplay();
+			this._tileMapDisplay = new Brewmaster.Ppu.TileMapRender();
 			this.horizontalLine1 = new Brewmaster.StatusView.HorizontalLine();
 			RegisterToolTip = new System.Windows.Forms.ToolTip(this.components);
 			this._controlPanel.SuspendLayout();
@@ -142,7 +142,7 @@
 
 		#endregion
 
-		private Ppu.NametableDisplay _tileMapDisplay;
+		private Ppu.TileMapRender _tileMapDisplay;
 		private System.Windows.Forms.Panel _controlPanel;
 		private System.Windows.Forms.FlowLayoutPanel _layerButtonPanel;
 		private System.Windows.Forms.FlowLayoutPanel _displayButtonPanel;

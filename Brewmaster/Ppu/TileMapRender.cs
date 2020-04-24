@@ -4,11 +4,10 @@ using System.Drawing.Drawing2D;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using Brewmaster.Emulation;
-using Brewmaster.Ide;
 
 namespace Brewmaster.Ppu
 {
-	public class NametableDisplay : Panel
+	public class TileMapRender : Panel
 	{
 		private TileMapData _nametableData;
 		private Bitmap _nametableImage = new Bitmap(512, 480);
@@ -19,7 +18,7 @@ namespace Brewmaster.Ppu
 		private int _offsetX = 0;
 		private int _offsetY = 0;
 
-		public NametableDisplay()
+		public TileMapRender()
 		{
 			BackColor = Color.Black;
 			//BackgroundImage = new Bitmap(512, 480);
