@@ -12,15 +12,6 @@ using Brewmaster.ProjectModel;
 
 namespace Brewmaster.Emulation
 {
-	public class NametableData
-	{
-		public int ScrollX;
-		public int ScrollY;
-		public byte[][] PixelData = new byte[4][];
-		public byte[][] TileData = new byte[4][];
-		public byte[][] AttributeData = new byte[4][];
-	}
-
 	public class NesEmulatorHandler: IEmulatorHandler
 	{
 		private readonly Form _mainWindow;
@@ -36,13 +27,14 @@ namespace Brewmaster.Emulation
 		public event Action<EmulatorStatus> OnStatusChange;
 		public event Action<MemoryState> OnMemoryUpdate;
 		public event Action<RegisterState> OnRegisterUpdate;
-		public event Action<NametableData> OnNametableUpdate;
+		public event Action<TileMapData> OnTileMapUpdate;
 
 		private Object emulatorLock = new Object();
 
 		public NesEmulatorHandler(Form mainWindow)
 		{
 			_mainWindow = mainWindow;
+			_nametableData.OnRefreshRequest += PushNametableData;
 		}
 
 		public void LoadCartridgeAtSameState(string baseDir, string cartridgeFile, Func<int, int> getNewPc)
@@ -246,7 +238,8 @@ namespace Brewmaster.Emulation
 			_logHandler(new LogData(status, LogType.Normal));
 		}
 
-		private MemoryState _memoryState = new MemoryState(null, null, null);
+		private readonly MemoryState _memoryState = new MemoryState(null, null, null);
+		private readonly TileMapData _nametableData = new TileMapData { NumberOfMaps = 4, MapWidth = 256, MapHeight = 240, DataWidth = 256 * 4 };
 		private void EmitDebugData()
 		{
 			//lock (emulatorLock)
@@ -264,17 +257,19 @@ namespace Brewmaster.Emulation
 					InteropEmu.DebugGetState(ref state.NesState);
 					OnRegisterUpdate(state);
 				}
-				if (OnNametableUpdate != null)
-				{
-					var nametableData = new NametableData();
-					InteropEmu.DebugGetPpuScroll(out nametableData.ScrollX, out nametableData.ScrollY);
-					for (int i = 0; i < 4; i++)
-					{
-						InteropEmu.DebugGetNametable(i, false, out nametableData.PixelData[i], out nametableData.TileData[i], out nametableData.AttributeData[i]);
-					}
-					OnNametableUpdate(nametableData);
-				}
+				if (OnTileMapUpdate != null) PushNametableData();
 			}
+		}
+
+		private void PushNametableData()
+		{
+			InteropEmu.DebugGetPpuScroll(out _nametableData.ScrollX, out _nametableData.ScrollY);
+			for (int i = 0; i < _nametableData.NumberOfMaps; i++)
+			{
+				InteropEmu.DebugGetNametable(i, false, out _nametableData.PixelData[i], out _nametableData.TileData[i], out _nametableData.AttributeData[i]);
+			}
+			if (OnTileMapUpdate != null) OnTileMapUpdate(_nametableData);
+
 		}
 
 		public void SetCpuMemory(int offset, byte value)
@@ -299,7 +294,7 @@ namespace Brewmaster.Emulation
 			}
 		}
 
-		static private double ConvertVolume(int volume)
+		private static double ConvertVolume(int volume)
 		{
 			if(true) {
 				return ((double)volume / 100d);
@@ -307,7 +302,7 @@ namespace Brewmaster.Emulation
 				return 0;
 			}
 		}
-		static private double ConvertPanning(Int32 panning)
+		private static double ConvertPanning(Int32 panning)
 		{
 			return (double)((panning + 100) / 100d);
 		}

@@ -24,7 +24,7 @@ namespace Brewmaster.Settings
 		[XmlElement(ElementName = "RecentProject")]
 		public List<string> RecentProjects = new List<string>();
 		[XmlElement(ElementName = "UpdateRate")]
-		public int UpdateRate = 1;
+		public int UpdateRate = 30;
 
 		[XmlElement(ElementName = "EmuIntegerScaling")]
 		public bool EmuIntegerScaling = true;
@@ -56,6 +56,10 @@ namespace Brewmaster.Settings
 		public bool EmuDisplaySnesBg4 = true;
 		[XmlElement(ElementName = "EmuBackground")]
 		public string SerializedEmuBackground = "Black";
+		[XmlElement(ElementName = "ShowScrollOverlay")]
+		public bool ShowScrollOverlay = true;
+		[XmlElement(ElementName = "ResizeTileMap")]
+		public bool ResizeTileMap = true;
 		[XmlIgnore]
 		public Color EmuBackgroundColor
 		{

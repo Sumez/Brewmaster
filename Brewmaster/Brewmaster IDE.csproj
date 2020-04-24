@@ -145,6 +145,12 @@
     <Compile Include="Modules\MenuHelper.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Ppu\TileMapViewer.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Ppu\TileMapViewer.Designer.cs">
+      <DependentUpon>TileMapViewer.cs</DependentUpon>
+    </Compile>
     <Compile Include="ProjectExplorer\ProjectExplorerMenu.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -444,6 +450,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Layout\HeaderPanel.resx">
       <DependentUpon>HeaderPanel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Ppu\TileMapViewer.resx">
+      <DependentUpon>TileMapViewer.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ProjectExplorer\ProjectExplorer.resx">
       <DependentUpon>ProjectExplorer.cs</DependentUpon>

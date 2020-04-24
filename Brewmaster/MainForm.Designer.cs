@@ -59,7 +59,7 @@ namespace Brewmaster
 			this.editorTabs = new Brewmaster.EditorWindows.EditorTabs();
 			this.mesen = new Brewmaster.Emulation.MesenControl();
 			this.cpuStatus1 = new Brewmaster.StatusView.CpuStatus();
-			this.Nametable = new Brewmaster.Ppu.NametableDisplay();
+			this.TileMap = new Brewmaster.Ppu.TileMapViewer();
 			this.MemoryTabs = new System.Windows.Forms.TabControl();
 			this.CpuMemoryTab = new System.Windows.Forms.TabPage();
 			this.CpuMemoryViewer = new Brewmaster.MemoryViewer.MemoryViewer();
@@ -323,7 +323,7 @@ namespace Brewmaster
 			availableIdePanels.Controls.Add(this.editorTabs);
 			availableIdePanels.Controls.Add(this.mesen);
 			availableIdePanels.Controls.Add(this.cpuStatus1);
-			availableIdePanels.Controls.Add(this.Nametable);
+			availableIdePanels.Controls.Add(this.TileMap);
 			availableIdePanels.Controls.Add(this.MemoryTabs);
 			availableIdePanels.Controls.Add(this.CartridgeExplorer);
 			availableIdePanels.Controls.Add(this.WatchPanel);
@@ -372,15 +372,13 @@ namespace Brewmaster
 			this.cpuStatus1.Size = new System.Drawing.Size(856, 450);
 			this.cpuStatus1.TabIndex = 2;
 			// 
-			// Nametable
+			// TileMap
 			// 
-			this.Nametable.BackColor = System.Drawing.Color.Black;
-			this.Nametable.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.Nametable.Header = null;
-			this.Nametable.Location = new System.Drawing.Point(0, 0);
-			this.Nametable.Name = "Nametable";
-			this.Nametable.Size = new System.Drawing.Size(856, 450);
-			this.Nametable.TabIndex = 2;
+			this.TileMap.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.TileMap.Location = new System.Drawing.Point(0, 0);
+			this.TileMap.Name = "TileMap";
+			this.TileMap.Size = new System.Drawing.Size(856, 450);
+			this.TileMap.TabIndex = 2;
 			// 
 			// MemoryTabs
 			// 
@@ -2247,7 +2245,7 @@ namespace Brewmaster
 		private StatusView.CpuStatus cpuStatus1;
 		private System.Windows.Forms.ToolStripMenuItem EmulatorMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem updateEveryFrameMenuItem;
-		private Ppu.NametableDisplay Nametable;
+		private Ppu.TileMapViewer TileMap;
 		private System.Windows.Forms.ImageList CodeItemImages;
 		private System.Windows.Forms.ToolStripMenuItem findNextMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem nesGraphicsMenuItem;

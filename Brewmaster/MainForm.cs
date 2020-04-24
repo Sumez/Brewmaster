@@ -222,7 +222,7 @@ namespace Brewmaster
 				tabsWestContainer.AddPanel(westContainer).StaticWidth = 250;
 				tabsWestContainer.AddPanel(editorTabs);
 
-				eastContainer.AddPanel(new IdePanel(Nametable) { Label = "Nametables" });
+				eastContainer.AddPanel(new IdePanel(TileMap) { Label = "Nametables" });
 				eastContainer.AddPanel(new IdePanel(cpuStatus1) { Label = "Console Status" });
 				eastContainer.AddPanel(new IdePanel(mesen) { Label = "Mesen" });
 
@@ -274,7 +274,7 @@ namespace Brewmaster
 				_menuHelper.Prepare(new [] { MainWindowMenu, MainToolStrip }, WriteStatus);
 
 				// Apply settings
-				updateEveryFrameMenuItem.Checked = (mesen.UpdateRate = Settings.UpdateRate) != 0;
+				updateEveryFrameMenuItem.Checked = (mesen.UpdateRate = Settings.UpdateRate) == 1;
 				integerScalingMenuItem.Checked = mesen.IntegerScaling = Settings.EmuIntegerScaling;
 				randomValuesAtPowerOnMenuItem.Checked = mesen.RandomPowerOnState = Settings.EmuRandomPowerOn;
 				playSpcAudioMenuItem.Checked = mesen.PlayAudio = Settings.EmuPlayAudio;
@@ -286,7 +286,10 @@ namespace Brewmaster
 				displayNesBgMenuItem.Checked = mesen.ShowBgLayer = Settings.EmuDisplayNesBg;
 				displayNesObjectsMenuItem.Checked = mesen.ShowSpriteLayer = Settings.EmuDisplaySprites;
 				mesen.EmulatorBackgroundColor = Settings.EmuBackgroundColor;
-				
+
+				TileMap.ShowScrollOverlay = Settings.ShowScrollOverlay;
+				TileMap.FitImage = Settings.ResizeTileMap;
+
 				if (Settings.AsmHighlighting != null && Settings.AsmHighlighting.SerializedData.Count > 0) Ca65Highlighting.DefaultColors = Settings.AsmHighlighting.Data;
 				TextEditor.DefaultCodeProperties.Font = Settings.DefaultFont;
 
@@ -418,7 +421,7 @@ namespace Brewmaster
 		    emulator.OnStatusChange += ThreadSafeStatusHandler;
 		    emulator.OnMemoryUpdate += ThreadSafeMemoryHandler;
 		    emulator.OnRegisterUpdate += ThreadSafeDebugStateHandler;
-		    emulator.OnNametableUpdate += Nametable.UpdateNametableData;
+		    emulator.OnTileMapUpdate += TileMap.UpdateNametableData;
 
 		    cpuStatus1.StateEdited = emulator.ForceNewState;
 	    }
@@ -711,6 +714,9 @@ namespace Brewmaster
         private void MainForm_Closing(object sender, FormClosingEventArgs e)
         {
 	        if (!CloseCurrentProject(true)) e.Cancel = true;
+	        Settings.ShowScrollOverlay = TileMap.ShowScrollOverlay;
+	        Settings.ResizeTileMap = TileMap.FitImage;
+			Settings.Save();
         }
 
         private void newNesProjectMenuItem_Click(object sender, EventArgs e)
@@ -1612,7 +1618,7 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 
 		private void updateEveryFrameToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			mesen.UpdateRate = Settings.UpdateRate = updateEveryFrameMenuItem.Checked ? 1 : 0;
+			mesen.UpdateRate = Settings.UpdateRate = updateEveryFrameMenuItem.Checked ? 1 : 30;
 			Settings.Save();
 		}
 	    private void integerScalingToolStripMenuItem_Click(object sender, EventArgs e)

@@ -66,13 +66,15 @@ namespace Brewmaster.Emulation
 		public event Action<EmulatorStatus> OnStatusChange;
 		public event Action<MemoryState> OnMemoryUpdate;
 		public event Action<RegisterState> OnRegisterUpdate;
-		public event Action<NametableData> OnNametableUpdate;
+		public event Action<TileMapData> OnTileMapUpdate;
 
 		private Object emulatorLock = new Object();
 
 		public SnesEmulatorHandler(Form mainWindow)
 		{
 			_mainWindow = mainWindow;
+			_tileMapData.PixelData[0] = new byte[1024 * 1024 * 4];
+			_tileMapData.OnRefreshRequest += PushTileMapData;
 		}
 
 		public void LoadCartridge(string baseDir, string cartridgeFile)
@@ -241,36 +243,74 @@ namespace Brewmaster.Emulation
 			_logHandler(new LogData(status, LogType.Normal));
 		}
 
-		private MemoryState _memoryState = new MemoryState(null, null, null);
+		private readonly TileMapData _tileMapData = new TileMapData { NumberOfMaps = 1, DataWidth = 1024 * 4, NumberOfPages = 4 };
+		private readonly MemoryState _memoryState = new MemoryState(null, null, null);
+		private readonly RegisterState _state = new RegisterState(ProjectType.Snes);
+		private GetTilemapOptions _tilemapOptions = new GetTilemapOptions();
+
 		private void EmitDebugData()
 		{
 			//lock (emulatorLock)
 			{
+				if (OnMemoryUpdate != null || OnTileMapUpdate != null)
+				{
+					_memoryState.PpuData = SnesDebugApi.GetMemoryState(SnesMemoryType.VideoRam);
+				}
+				if (OnRegisterUpdate != null || OnTileMapUpdate != null)
+				{
+					_state.SnesState = SnesDebugApi.GetState();
+				}
+
 				if (OnMemoryUpdate != null)
 				{
 					_memoryState.CpuData = SnesDebugApi.GetMemoryState(SnesMemoryType.CpuMemory);
-					_memoryState.PpuData = SnesDebugApi.GetMemoryState(SnesMemoryType.VideoRam);
 					_memoryState.OamData = SnesDebugApi.GetMemoryState(SnesMemoryType.SpriteRam);
 					OnMemoryUpdate(_memoryState);
 				}
-				if (OnRegisterUpdate != null)
-				{
-					var state = new RegisterState(ProjectType.Snes);
-					state.SnesState = SnesDebugApi.GetState();
-					OnRegisterUpdate(state);
-
-				}
-				if (OnNametableUpdate != null)
-				{
-					//var nametableData = new NametableData();
-					//SnesDebugApi.GetScroll(out nametableData.ScrollX, out nametableData.ScrollY);
-					//for (int i = 0; i < 4; i++)
-					//{
-					//	SnesApi.DebugGetNametable(i, false, out nametableData.PixelData[i], out nametableData.TileData[i], out nametableData.AttributeData[i]);
-					//}
-					//OnNametableUpdate(nametableData);
-				}
+				if (OnRegisterUpdate != null) OnRegisterUpdate(_state);
+				if (OnTileMapUpdate != null) PushTileMapData();
 			}
+		}
+
+		private void PushTileMapData()
+		{
+			_tilemapOptions.Layer = (byte)_tileMapData.GetPage;
+			_tileMapData.MapWidth = GetMapWidth();
+			_tileMapData.MapHeight = GetMapHeight();
+			_memoryState.CgRam = SnesDebugApi.GetMemoryState(SnesMemoryType.CGRam);
+			DebugApi.GetTilemap(_tilemapOptions, _state.SnesState.Ppu, _memoryState.PpuData, _memoryState.CgRam, _tileMapData.PixelData[0]);
+
+			_tileMapData.ViewportHeight = _state.SnesState.Ppu.OverscanMode ? 239 : 224;
+			_tileMapData.ScrollX = (_state.SnesState.Ppu.BgMode == 7 ? (int)_state.SnesState.Ppu.Mode7.HScroll : _state.SnesState.Ppu.Layers[_tilemapOptions.Layer].HScroll) % _tileMapData.MapWidth;
+			_tileMapData.ScrollY = (_state.SnesState.Ppu.BgMode == 7 ? (int)_state.SnesState.Ppu.Mode7.VScroll : _state.SnesState.Ppu.Layers[_tilemapOptions.Layer].VScroll) % _tileMapData.MapHeight;
+
+			if (OnTileMapUpdate != null) OnTileMapUpdate(_tileMapData);
+		}
+
+		private int GetMapWidth()
+		{
+			if (_state.SnesState.Ppu.BgMode == 7) return 1024;
+
+			var layer = _state.SnesState.Ppu.Layers[_tilemapOptions.Layer];
+			var largeTileWidth = layer.LargeTiles || _state.SnesState.Ppu.BgMode == 5 || _state.SnesState.Ppu.BgMode == 6;
+
+			var width = 256;
+			if (layer.DoubleWidth) width *= 2;
+			if (largeTileWidth) width *= 2;
+			
+			return width;
+		}
+
+		private int GetMapHeight()
+		{
+			if (_state.SnesState.Ppu.BgMode == 7) return 1024;
+
+			var layer = _state.SnesState.Ppu.Layers[_tilemapOptions.Layer];
+
+			var height = 256;
+			if (layer.DoubleHeight) height *= 2;
+			if (layer.LargeTiles) height *= 2;
+			return height;
 		}
 
 		public void SetCpuMemory(int offset, byte value)
@@ -295,22 +335,6 @@ namespace Brewmaster.Emulation
 			}
 		}
 
-		static private double ConvertVolume(UInt32 volume)
-		{
-			if (true)
-			{
-				return ((double)volume / 100d);
-			}
-			else
-			{
-				return 0;
-			}
-		}
-		static private double ConvertPanning(Int32 panning)
-		{
-			return (double)((panning + 100) / 100d);
-		}
-
 		public static void ApplyEmulationConfig()
 		{
 			ConfigApi.SetEmulationConfig(EmulationConfig);
@@ -323,11 +347,6 @@ namespace Brewmaster.Emulation
 			//ConfigApi.SetDebuggerFlag(SnesDebuggerFlags.BreakOnWdm, BreakOnWdm);
 			//ConfigApi.SetDebuggerFlag(SnesDebuggerFlags.BreakOnStp, BreakOnStp);
 			//ConfigApi.SetDebuggerFlag(SnesDebuggerFlags.BreakOnUninitRead, BreakOnUninitRead);
-
-			//ConfigApi.SetDebuggerFlag(SnesDebuggerFlags.ShowUnidentifiedData, UnidentifiedBlockDisplay == CodeDisplayMode.Show);
-			//ConfigApi.SetDebuggerFlag(SnesDebuggerFlags.DisassembleUnidentifiedData, UnidentifiedBlockDisplay == CodeDisplayMode.Disassemble);
-			//ConfigApi.SetDebuggerFlag(SnesDebuggerFlags.ShowVerifiedData, VerifiedDataDisplay == CodeDisplayMode.Show);
-			//ConfigApi.SetDebuggerFlag(SnesDebuggerFlags.DisassembleVerifiedData, VerifiedDataDisplay == CodeDisplayMode.Disassemble);
 		}
 		public static void ApplyAudioConfig()
 		{
@@ -340,6 +359,7 @@ namespace Brewmaster.Emulation
 			ConfigApi.SetShortcutKeys(shortcutKeys, (UInt32)shortcutKeys.Length);
 			ConfigApi.SetPreferences(new InteropPreferencesConfig()
 			{
+//				ShowFps = true,
 				ShowFps = false,
 				ShowFrameCounter = false,
 				ShowGameTimer = false,
