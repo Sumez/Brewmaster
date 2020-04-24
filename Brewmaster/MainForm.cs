@@ -75,6 +75,7 @@ namespace Brewmaster
 			configurationSelector.Enabled =
 			buildSettings.Enabled = 
 			buildSettingsMenuItem.Enabled =
+			mapInputMenuItem.Enabled = 
 				CurrentProject != null;
 
 			nesGraphicsMenuItem.Visible =
@@ -1580,10 +1581,34 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 		}
 	    private void mapInputToolStripMenuItem_Click(object sender, EventArgs e)
 	    {
-		    ShowSettingsWindow(3);
-		}
+		    if (CurrentProject == null) return;
+		    using (var keyBindings = new KeyBindingWindow())
+		    {
+			    var mappings = CurrentProject.Type == ProjectType.Snes ? Settings.SnesMappings : Settings.NesMappings;
+			    keyBindings.StartPosition = FormStartPosition.CenterParent;
+			    keyBindings.KeyBindingSettings.SetMappings(mappings.Select(m => m.Clone()).ToList());
+			    if (keyBindings.ShowDialog(this) != DialogResult.OK) return;
 
-	    private void ShowSettingsWindow(int defaultTab = 0)
+			    var newMappings = keyBindings.KeyBindingSettings.Mappings.Select(m => m.Clone()).ToList();
+			    switch (CurrentProject.Type)
+			    {
+					case ProjectType.Nes:
+						Settings.NesMappings = newMappings;
+						break;
+					case ProjectType.Snes:
+					    Settings.SnesMappings = newMappings;
+					    break;
+			    }
+				Settings.Save();
+			}
+
+		}
+		private void emulatorSettingsMenuItem_Click(object sender, EventArgs e)
+	    {
+		    ShowSettingsWindow(3);
+	    }
+
+		private void ShowSettingsWindow(int defaultTab = 0)
 	    {
 		    using (var settingsWindow = new SettingsWindow(Settings))
 		    {

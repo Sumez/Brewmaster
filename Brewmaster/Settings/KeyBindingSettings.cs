@@ -58,6 +58,14 @@ namespace Brewmaster.Settings
 			}
 			ResumeLayout();
 		}
+
+		protected override void OnLayout(LayoutEventArgs a)
+		{
+			base.OnLayout(a);
+			if (Controls.Count == 0) return;
+			Height = Controls[0].Top + Controls[0].Height;
+			Parent.PerformLayout(this, "Height");
+		}
 	}
 
 }

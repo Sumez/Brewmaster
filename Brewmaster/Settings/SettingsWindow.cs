@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
@@ -10,6 +11,8 @@ namespace Brewmaster.Settings
 {
 	public partial class SettingsWindow : Form
 	{
+		private List<KeyboardMapping> _nesMappings;
+		private List<KeyboardMapping> _snesMappings;
 		public Settings Settings { get; private set; }
 		public Ca65Highlighting Highlighting { get; private set; }
 		public KeyBindings KeyBindings { get; private set; }
@@ -87,8 +90,12 @@ rts
 			featureList.SelectedValueChanged += (s, e) => UpdateKeyboardShortcut();
 			featureList.SelectedIndex = 0;
 
-			nesKeyBindings.SetMappings(settings.NesMappings.Select(m => m.Clone()).ToList());
-			snesKeyBindings.SetMappings(settings.SnesMappings.Select(m => m.Clone()).ToList());
+			_nesMappings = settings.NesMappings.Select(m => m.Clone()).ToList();
+			_snesMappings = settings.SnesMappings.Select(m => m.Clone()).ToList();
+
+			var updateValue = _updateRates.IndexOf(Settings.UpdateRate);
+			if (updateValue >= _updateRate.Minimum && updateValue <= _updateRate.Maximum) _updateRate.Value = updateValue;
+			UpdateRateHelp();
 
 			emulatorBackground.BackColor = settings.EmuBackgroundColor;
 			emulatorBackground.Click += (s, e) => SelectColor(emulatorBackground);
@@ -179,9 +186,10 @@ rts
 			Settings.DefaultFont = TextEditor.DefaultCodeProperties.Font = editorPreview.Font;
 			Settings.AsmHighlighting = new HighlightingColors {Data = Ca65Highlighting.DefaultColors = Highlighting.Colors};
 
-			Settings.NesMappings = nesKeyBindings.Mappings.Select(m => m.Clone()).ToList();
-			Settings.SnesMappings = snesKeyBindings.Mappings.Select(m => m.Clone()).ToList();
+			Settings.NesMappings = _nesMappings.Select(m => m.Clone()).ToList();
+			Settings.SnesMappings = _snesMappings.Select(m => m.Clone()).ToList();
 			Settings.EmuBackgroundColor = emulatorBackground.BackColor;
+			Settings.UpdateRate = _updateRates[_updateRate.Value];
 
 			Settings.Save();
 			DialogResult = DialogResult.OK;
@@ -196,6 +204,54 @@ rts
 
 			KeyBindings = KeyBindings.Defaults;
 			UpdateKeyboardShortcut();
+		}
+
+		private void _nesControllerButton_Click(object sender, EventArgs e)
+		{
+			using (var keyBindings = new KeyBindingWindow())
+			{
+				keyBindings.StartPosition = FormStartPosition.CenterParent;
+				keyBindings.KeyBindingSettings.SetMappings(_nesMappings.Select(m => m.Clone()).ToList());
+				if (keyBindings.ShowDialog(this) == DialogResult.OK)
+					_nesMappings = keyBindings.KeyBindingSettings.Mappings.Select(m => m.Clone()).ToList();
+			}
+		}
+
+		private void _snesControllerButton_Click(object sender, EventArgs e)
+		{
+			using (var keyBindings = new KeyBindingWindow())
+			{
+				keyBindings.StartPosition = FormStartPosition.CenterParent;
+				keyBindings.KeyBindingSettings.SetMappings(_snesMappings.Select(m => m.Clone()).ToList());
+				if (keyBindings.ShowDialog(this) == DialogResult.OK)
+					_snesMappings = keyBindings.KeyBindingSettings.Mappings.Select(m => m.Clone()).ToList();
+			}
+		}
+
+		private readonly List<int> _updateRates = new List<int>
+		{
+			0, 120, 90, 60, 45, 30, 15, 10, 5, 2, 1
+		};
+		private void _updateRate_Scroll(object sender, EventArgs e)
+		{
+			UpdateRateHelp();
+		}
+
+		private void UpdateRateHelp()
+		{
+			var refreshRate = _updateRates[_updateRate.Value];
+			switch (refreshRate)
+			{
+				case 0:
+					_updateRateHelp.Text = @"Only updates on break";
+					break;
+				case 1:
+					_updateRateHelp.Text = @"Updates every frame";
+					break;
+				default:
+					_updateRateHelp.Text = string.Format(@"Updates every {0} frames", refreshRate);
+					break;
+			}
 		}
 	}
 

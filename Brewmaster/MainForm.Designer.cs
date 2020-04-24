@@ -246,6 +246,7 @@ namespace Brewmaster
 			this.CodeItemImages = new System.Windows.Forms.ImageList(this.components);
 			this.MainEastContainer2 = new Brewmaster.Ide.MultiSplitContainer();
 			this._menuHelper = new Brewmaster.Modules.MenuHelper(this.components);
+			this.emulatorSettingsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			watchTab = new System.Windows.Forms.TabPage();
 			tabPage1 = new System.Windows.Forms.TabPage();
 			availableIdePanels = new System.Windows.Forms.Panel();
@@ -363,6 +364,7 @@ namespace Brewmaster
 			// 
 			// cpuStatus1
 			// 
+			this.cpuStatus1.AutoScroll = true;
 			this.cpuStatus1.AutoSize = true;
 			this.cpuStatus1.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.cpuStatus1.Location = new System.Drawing.Point(0, 0);
@@ -374,9 +376,13 @@ namespace Brewmaster
 			// 
 			// TileMap
 			// 
+			this.TileMap.AutoSize = true;
 			this.TileMap.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.TileMap.FitImage = false;
 			this.TileMap.Location = new System.Drawing.Point(0, 0);
+			this.TileMap.MinimumSize = new System.Drawing.Size(275, 0);
 			this.TileMap.Name = "TileMap";
+			this.TileMap.ShowScrollOverlay = false;
 			this.TileMap.Size = new System.Drawing.Size(856, 450);
 			this.TileMap.TabIndex = 2;
 			// 
@@ -1236,7 +1242,8 @@ namespace Brewmaster
             this.saveStateMenuItem,
             this.loadStateMenuItem,
             toolStripSeparator4,
-            this.mapInputMenuItem});
+            this.mapInputMenuItem,
+            this.emulatorSettingsMenuItem});
 			this.EmulatorMenuItem.Name = "EmulatorMenuItem";
 			this.EmulatorMenuItem.Size = new System.Drawing.Size(67, 20);
 			this.EmulatorMenuItem.Text = "Emulator";
@@ -2074,6 +2081,13 @@ namespace Brewmaster
 			this.MainEastContainer2.TabIndex = 1;
 			this.MainEastContainer2.Text = "multiSplitContainer2";
 			// 
+			// emulatorSettingsMenuItem
+			// 
+			this.emulatorSettingsMenuItem.Name = "emulatorSettingsMenuItem";
+			this.emulatorSettingsMenuItem.Size = new System.Drawing.Size(205, 22);
+			this.emulatorSettingsMenuItem.Text = "Emulator Settings...";
+			this.emulatorSettingsMenuItem.Click += new System.EventHandler(this.emulatorSettingsMenuItem_Click);
+			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -2308,6 +2322,7 @@ namespace Brewmaster
 		private Modules.MenuHelper _menuHelper;
 		public ToolStripStatusLabel toolStripStatusLabel1;
 		public ToolStripStatusLabel toolStripStatusLabel2;
+		private ToolStripMenuItem emulatorSettingsMenuItem;
 	}
 }
 

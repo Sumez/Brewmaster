@@ -40,6 +40,8 @@
 			System.Windows.Forms.Label label7;
 			System.Windows.Forms.Label label8;
 			System.Windows.Forms.TabPage emulatorTab;
+			System.Windows.Forms.Label label11;
+			System.Windows.Forms.Label label10;
 			System.Windows.Forms.Label label9;
 			this.okButton = new System.Windows.Forms.Button();
 			this.cancelButton = new System.Windows.Forms.Button();
@@ -53,17 +55,19 @@
 			this.backgroundColor = new System.Windows.Forms.Panel();
 			this.textColor = new System.Windows.Forms.Panel();
 			this.styleList = new System.Windows.Forms.ListBox();
-			this.editorPreview = new Brewmaster.Settings.DummyCa65Editor();
 			this.defaultKeysButton = new System.Windows.Forms.Button();
 			this.reassignKeyButton = new System.Windows.Forms.Button();
 			this.shortcutText = new System.Windows.Forms.TextBox();
 			this.featureList = new System.Windows.Forms.ListBox();
-			this.snesKeyBindings = new Brewmaster.Settings.KeyBindingSettings();
-			this.nesKeyBindings = new Brewmaster.Settings.KeyBindingSettings();
+			this._snesControllerButton = new System.Windows.Forms.Button();
+			this._nesControllerButton = new System.Windows.Forms.Button();
+			this._updateRateHelp = new System.Windows.Forms.Label();
+			this._updateRate = new System.Windows.Forms.TrackBar();
+			this.emulatorBackgroundButton = new System.Windows.Forms.Button();
+			this.emulatorBackground = new System.Windows.Forms.Panel();
 			this.tabControl = new System.Windows.Forms.TabControl();
 			this.assemblerTab = new System.Windows.Forms.TabPage();
-			this.emulatorBackground = new System.Windows.Forms.Panel();
-			this.emulatorBackgroundButton = new System.Windows.Forms.Button();
+			this.editorPreview = new Brewmaster.Settings.DummyCa65Editor();
 			label1 = new System.Windows.Forms.Label();
 			label2 = new System.Windows.Forms.Label();
 			label3 = new System.Windows.Forms.Label();
@@ -76,11 +80,14 @@
 			label7 = new System.Windows.Forms.Label();
 			label8 = new System.Windows.Forms.Label();
 			emulatorTab = new System.Windows.Forms.TabPage();
+			label11 = new System.Windows.Forms.Label();
+			label10 = new System.Windows.Forms.Label();
 			label9 = new System.Windows.Forms.Label();
 			panel1.SuspendLayout();
 			styleTab.SuspendLayout();
 			keyBindingTab.SuspendLayout();
 			emulatorTab.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this._updateRate)).BeginInit();
 			this.tabControl.SuspendLayout();
 			this.assemblerTab.SuspendLayout();
 			this.SuspendLayout();
@@ -285,18 +292,6 @@
 			this.styleList.Size = new System.Drawing.Size(202, 160);
 			this.styleList.TabIndex = 2;
 			// 
-			// editorPreview
-			// 
-			this.editorPreview.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.editorPreview.EnableFolding = false;
-			this.editorPreview.IsIconBarVisible = true;
-			this.editorPreview.IsReadOnly = true;
-			this.editorPreview.Location = new System.Drawing.Point(8, 172);
-			this.editorPreview.Name = "editorPreview";
-			this.editorPreview.Size = new System.Drawing.Size(578, 148);
-			this.editorPreview.TabIndex = 0;
-			this.editorPreview.VRulerRow = 0;
-			// 
 			// keyBindingTab
 			// 
 			keyBindingTab.BackColor = System.Drawing.SystemColors.Control;
@@ -372,11 +367,15 @@
 			// emulatorTab
 			// 
 			emulatorTab.BackColor = System.Drawing.SystemColors.Control;
+			emulatorTab.Controls.Add(this._snesControllerButton);
+			emulatorTab.Controls.Add(this._nesControllerButton);
+			emulatorTab.Controls.Add(label11);
+			emulatorTab.Controls.Add(this._updateRateHelp);
+			emulatorTab.Controls.Add(this._updateRate);
+			emulatorTab.Controls.Add(label10);
 			emulatorTab.Controls.Add(this.emulatorBackgroundButton);
 			emulatorTab.Controls.Add(label9);
 			emulatorTab.Controls.Add(this.emulatorBackground);
-			emulatorTab.Controls.Add(this.snesKeyBindings);
-			emulatorTab.Controls.Add(this.nesKeyBindings);
 			emulatorTab.Location = new System.Drawing.Point(4, 26);
 			emulatorTab.Name = "emulatorTab";
 			emulatorTab.Padding = new System.Windows.Forms.Padding(3);
@@ -384,21 +383,85 @@
 			emulatorTab.TabIndex = 3;
 			emulatorTab.Text = "Emulators";
 			// 
-			// snesKeyBindings
+			// _snesControllerButton
 			// 
-			this.snesKeyBindings.Location = new System.Drawing.Point(419, 6);
-			this.snesKeyBindings.Name = "snesKeyBindings";
-			this.snesKeyBindings.Size = new System.Drawing.Size(167, 306);
-			this.snesKeyBindings.TabIndex = 1;
-			this.snesKeyBindings.Text = "keyBindingSettings2";
+			this._snesControllerButton.AutoSize = true;
+			this._snesControllerButton.Location = new System.Drawing.Point(109, 118);
+			this._snesControllerButton.Name = "_snesControllerButton";
+			this._snesControllerButton.Size = new System.Drawing.Size(101, 25);
+			this._snesControllerButton.TabIndex = 19;
+			this._snesControllerButton.Text = "SNES controller...";
+			this._snesControllerButton.Click += new System.EventHandler(this._snesControllerButton_Click);
 			// 
-			// nesKeyBindings
+			// _nesControllerButton
 			// 
-			this.nesKeyBindings.Location = new System.Drawing.Point(251, 6);
-			this.nesKeyBindings.Name = "nesKeyBindings";
-			this.nesKeyBindings.Size = new System.Drawing.Size(162, 306);
-			this.nesKeyBindings.TabIndex = 0;
-			this.nesKeyBindings.Text = "keyBindingSettings1";
+			this._nesControllerButton.AutoSize = true;
+			this._nesControllerButton.Location = new System.Drawing.Point(9, 118);
+			this._nesControllerButton.Name = "_nesControllerButton";
+			this._nesControllerButton.Size = new System.Drawing.Size(94, 25);
+			this._nesControllerButton.TabIndex = 18;
+			this._nesControllerButton.Text = "NES controller...";
+			this._nesControllerButton.Click += new System.EventHandler(this._nesControllerButton_Click);
+			// 
+			// label11
+			// 
+			label11.AutoSize = true;
+			label11.Location = new System.Drawing.Point(6, 102);
+			label11.Name = "label11";
+			label11.Size = new System.Drawing.Size(88, 13);
+			label11.TabIndex = 17;
+			label11.Text = "Set key bindings:";
+			// 
+			// _updateRateHelp
+			// 
+			this._updateRateHelp.AutoSize = true;
+			this._updateRateHelp.Location = new System.Drawing.Point(146, 67);
+			this._updateRateHelp.Name = "_updateRateHelp";
+			this._updateRateHelp.Size = new System.Drawing.Size(0, 13);
+			this._updateRateHelp.TabIndex = 16;
+			// 
+			// _updateRate
+			// 
+			this._updateRate.Location = new System.Drawing.Point(9, 67);
+			this._updateRate.Name = "_updateRate";
+			this._updateRate.Size = new System.Drawing.Size(131, 45);
+			this._updateRate.TabIndex = 15;
+			this._updateRate.Scroll += new System.EventHandler(this._updateRate_Scroll);
+			// 
+			// label10
+			// 
+			label10.AutoSize = true;
+			label10.Location = new System.Drawing.Point(6, 51);
+			label10.Name = "label10";
+			label10.Size = new System.Drawing.Size(122, 13);
+			label10.TabIndex = 14;
+			label10.Text = "Debug data refresh rate:";
+			// 
+			// emulatorBackgroundButton
+			// 
+			this.emulatorBackgroundButton.Location = new System.Drawing.Point(65, 23);
+			this.emulatorBackgroundButton.Name = "emulatorBackgroundButton";
+			this.emulatorBackgroundButton.Size = new System.Drawing.Size(75, 25);
+			this.emulatorBackgroundButton.TabIndex = 13;
+			this.emulatorBackgroundButton.Text = "Change...";
+			this.emulatorBackgroundButton.UseVisualStyleBackColor = true;
+			// 
+			// label9
+			// 
+			label9.AutoSize = true;
+			label9.Location = new System.Drawing.Point(6, 7);
+			label9.Name = "label9";
+			label9.Size = new System.Drawing.Size(150, 13);
+			label9.TabIndex = 5;
+			label9.Text = "Emulator window background:";
+			// 
+			// emulatorBackground
+			// 
+			this.emulatorBackground.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.emulatorBackground.Location = new System.Drawing.Point(9, 23);
+			this.emulatorBackground.Name = "emulatorBackground";
+			this.emulatorBackground.Size = new System.Drawing.Size(50, 25);
+			this.emulatorBackground.TabIndex = 4;
 			// 
 			// tabControl
 			// 
@@ -426,31 +489,17 @@
 			this.assemblerTab.TabIndex = 2;
 			this.assemblerTab.Text = "Assembler";
 			// 
-			// emulatorBackground
+			// editorPreview
 			// 
-			this.emulatorBackground.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.emulatorBackground.Location = new System.Drawing.Point(9, 23);
-			this.emulatorBackground.Name = "emulatorBackground";
-			this.emulatorBackground.Size = new System.Drawing.Size(50, 25);
-			this.emulatorBackground.TabIndex = 4;
-			// 
-			// label9
-			// 
-			label9.AutoSize = true;
-			label9.Location = new System.Drawing.Point(6, 7);
-			label9.Name = "label9";
-			label9.Size = new System.Drawing.Size(150, 13);
-			label9.TabIndex = 5;
-			label9.Text = "Emulator window background:";
-			// 
-			// emulatorBackgroundButton
-			// 
-			this.emulatorBackgroundButton.Location = new System.Drawing.Point(65, 23);
-			this.emulatorBackgroundButton.Name = "emulatorBackgroundButton";
-			this.emulatorBackgroundButton.Size = new System.Drawing.Size(75, 25);
-			this.emulatorBackgroundButton.TabIndex = 13;
-			this.emulatorBackgroundButton.Text = "Change...";
-			this.emulatorBackgroundButton.UseVisualStyleBackColor = true;
+			this.editorPreview.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.editorPreview.EnableFolding = false;
+			this.editorPreview.IsIconBarVisible = true;
+			this.editorPreview.IsReadOnly = true;
+			this.editorPreview.Location = new System.Drawing.Point(8, 172);
+			this.editorPreview.Name = "editorPreview";
+			this.editorPreview.Size = new System.Drawing.Size(578, 148);
+			this.editorPreview.TabIndex = 0;
+			this.editorPreview.VRulerRow = 0;
 			// 
 			// SettingsWindow
 			// 
@@ -475,6 +524,7 @@
 			keyBindingTab.PerformLayout();
 			emulatorTab.ResumeLayout(false);
 			emulatorTab.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)(this._updateRate)).EndInit();
 			this.tabControl.ResumeLayout(false);
 			this.assemblerTab.ResumeLayout(false);
 			this.assemblerTab.PerformLayout();
@@ -503,9 +553,11 @@
 		private System.Windows.Forms.TextBox shortcutText;
 		private System.Windows.Forms.Button defaultKeysButton;
 		private System.Windows.Forms.TabPage assemblerTab;
-		private KeyBindingSettings snesKeyBindings;
-		private KeyBindingSettings nesKeyBindings;
 		private System.Windows.Forms.Panel emulatorBackground;
 		private System.Windows.Forms.Button emulatorBackgroundButton;
+		private System.Windows.Forms.Label _updateRateHelp;
+		private System.Windows.Forms.TrackBar _updateRate;
+		private System.Windows.Forms.Button _snesControllerButton;
+		private System.Windows.Forms.Button _nesControllerButton;
 	}
 }

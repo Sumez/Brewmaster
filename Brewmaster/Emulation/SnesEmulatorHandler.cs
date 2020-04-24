@@ -74,7 +74,7 @@ namespace Brewmaster.Emulation
 		{
 			_mainWindow = mainWindow;
 			_tileMapData.PixelData[0] = new byte[1024 * 1024 * 4];
-			_tileMapData.OnRefreshRequest += PushTileMapData;
+			_tileMapData.OnRefreshRequest += () => PushTileMapData();
 		}
 
 		public void LoadCartridge(string baseDir, string cartridgeFile)
@@ -268,16 +268,18 @@ namespace Brewmaster.Emulation
 					OnMemoryUpdate(_memoryState);
 				}
 				if (OnRegisterUpdate != null) OnRegisterUpdate(_state);
-				if (OnTileMapUpdate != null) PushTileMapData();
+				if (OnTileMapUpdate != null) PushTileMapData(true, true);
 			}
 		}
 
-		private void PushTileMapData()
+		private void PushTileMapData(bool skipVram = false, bool skipState = false)
 		{
+			if (!skipVram) _memoryState.PpuData = SnesDebugApi.GetMemoryState(SnesMemoryType.VideoRam);
+			if (!skipState) _state.SnesState = _state.SnesState = SnesDebugApi.GetState();
+			_memoryState.CgRam = SnesDebugApi.GetMemoryState(SnesMemoryType.CGRam);
 			_tilemapOptions.Layer = (byte)_tileMapData.GetPage;
 			_tileMapData.MapWidth = GetMapWidth();
 			_tileMapData.MapHeight = GetMapHeight();
-			_memoryState.CgRam = SnesDebugApi.GetMemoryState(SnesMemoryType.CGRam);
 			DebugApi.GetTilemap(_tilemapOptions, _state.SnesState.Ppu, _memoryState.PpuData, _memoryState.CgRam, _tileMapData.PixelData[0]);
 
 			_tileMapData.ViewportHeight = _state.SnesState.Ppu.OverscanMode ? 239 : 224;
