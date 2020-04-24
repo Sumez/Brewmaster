@@ -183,6 +183,7 @@ namespace Brewmaster.Emulation
 		public void UpdateSettings(MesenControl.EmulatorSettings settings)
 		{
 			EmulationConfig.RamPowerOnState = settings.RandomPowerOnState ? RamState.Random : RamState.AllZeros;
+			EmulationConfig.EnableMapperRandomPowerOnState = settings.RandomPowerOnState;
 			VideoConfig.HideBgLayer0 = !settings.ShowBgLayer1;
 			VideoConfig.HideBgLayer1 = !settings.ShowBgLayer2;
 			VideoConfig.HideBgLayer2 = !settings.ShowBgLayer3;

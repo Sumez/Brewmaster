@@ -82,11 +82,8 @@ namespace Brewmaster.Ppu
 
 		private void ScaleImage()
 		{
-			SuspendLayout();
-			var image = new Bitmap(512, 480);
-
 			lock (_backBufferLock)
-			using (var g = Graphics.FromImage(image))
+			using (var g = Graphics.FromImage(_pictureBox.Image))
 			{
 				g.CompositingMode = CompositingMode.SourceCopy;
 				g.CompositingQuality = CompositingQuality.HighSpeed;
@@ -103,12 +100,6 @@ namespace Brewmaster.Ppu
 					g.DrawImage(_nametableImage, 0, 0);
 				}
 			}
-
-			var oldImage = _pictureBox.Image;
-			_pictureBox.Image = image;
-			oldImage.Dispose();
-
-			ResumeLayout();
 		}
 
 		protected override void OnSizeChanged(EventArgs e)
@@ -136,6 +127,12 @@ namespace Brewmaster.Ppu
 			_pictureBox.Top = _offsetY;
 		}
 
+		protected override void OnPaint(PaintEventArgs e)
+		{
+			base.OnPaint(e);
+
+		}
+
 		public void RefreshImage()
 		{
 			//int tileIndexOffset = _state.PPU.ControlFlags.BackgroundPatternAddr == 0x1000 ? 256 : 0;
@@ -151,7 +148,7 @@ namespace Brewmaster.Ppu
 				for (int i = 0; i < 4; i++)
 				{
 					var handle = GCHandle.Alloc(_nametableData.PixelData[i], GCHandleType.Pinned);
-					var source = new Bitmap(256, 240, 4 * 256, System.Drawing.Imaging.PixelFormat.Format32bppArgb, handle.AddrOfPinnedObject());
+					using (var source = new Bitmap(256, 240, 4 * 256, System.Drawing.Imaging.PixelFormat.Format32bppArgb, handle.AddrOfPinnedObject()))
 					try
 					{
 						gNametable.DrawImage(source, new Rectangle(i % 2 == 0 ? 0 : 256, i <= 1 ? 0 : 240, 256, 240), new Rectangle(0, 0, 256, 240), GraphicsUnit.Pixel);

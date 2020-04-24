@@ -338,6 +338,7 @@ namespace Brewmaster.Emulation
 		public void UpdateSettings(MesenControl.EmulatorSettings settings)
 		{
 			InteropEmu.SetRamPowerOnState(settings.RandomPowerOnState ? RamPowerOnState.Random : RamPowerOnState.AllZeros);
+			InteropEmu.SetFlag(EmulationFlags.RandomizeMapperPowerOnState, settings.RandomPowerOnState);
 
 			InteropEmu.SetMasterVolume(settings.PlayAudio ? 25 / 10d : 0, 75 / 100d);
 			InteropEmu.SetChannelVolume(AudioChannel.Square1, ConvertVolume(settings.PlaySquare1 ? 100 : 0));
