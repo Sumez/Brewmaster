@@ -278,7 +278,7 @@
     </Compile>
     <Compile Include="Pipeline\ChrPipeline.cs" />
     <Compile Include="Pipeline\DataPipeline.cs" />
-    <Compile Include="Ppu\NametableDisplay.cs">
+    <Compile Include="Ppu\TileMapRender.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Program.cs" />
