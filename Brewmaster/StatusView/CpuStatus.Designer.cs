@@ -45,15 +45,17 @@
 			System.Windows.Forms.Label label6;
 			System.Windows.Forms.Label label9;
 			System.Windows.Forms.ToolTip RegisterToolTip;
-			Brewmaster.StatusView.HorizontalLine horizontalLine1;
-			Brewmaster.StatusView.HorizontalLine horizontalLine2;
-			Brewmaster.StatusView.HorizontalLine horizontalLine3;
-			Brewmaster.StatusView.HorizontalLine horizontalLine4;
 			System.Windows.Forms.Panel PpuGroup;
 			System.Windows.Forms.Panel panel4;
 			System.Windows.Forms.Label label15;
 			System.Windows.Forms.Label label13;
 			System.Windows.Forms.Label label14;
+			System.Windows.Forms.Panel stackGroup;
+			Brewmaster.StatusView.HorizontalLine horizontalLine5;
+			Brewmaster.StatusView.HorizontalLine horizontalLine4;
+			Brewmaster.StatusView.HorizontalLine horizontalLine3;
+			Brewmaster.StatusView.HorizontalLine horizontalLine2;
+			Brewmaster.StatusView.HorizontalLine horizontalLine1;
 			this.EditP = new System.Windows.Forms.TextBox();
 			this.EditSP = new System.Windows.Forms.TextBox();
 			this.EditPC = new System.Windows.Forms.TextBox();
@@ -97,7 +99,18 @@
 			this.label12 = new System.Windows.Forms.Label();
 			this.label11 = new System.Windows.Forms.Label();
 			this.label10 = new System.Windows.Forms.Label();
+			this.panel6 = new System.Windows.Forms.Panel();
+			this.completeStack = new System.Windows.Forms.TextBox();
+			this.label17 = new System.Windows.Forms.Label();
+			this.panel5 = new System.Windows.Forms.Panel();
+			this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
+			this.stack8bit = new System.Windows.Forms.RadioButton();
+			this.stack16bit = new System.Windows.Forms.RadioButton();
+			this.stack24bit = new System.Windows.Forms.RadioButton();
+			this.topOfStack = new System.Windows.Forms.TextBox();
+			this.label16 = new System.Windows.Forms.Label();
 			this.expandPpu = new Brewmaster.StatusView.ExpandButton();
+			this.expandStack = new Brewmaster.StatusView.ExpandButton();
 			this.expandTiming = new Brewmaster.StatusView.ExpandButton();
 			this.expandFlags = new Brewmaster.StatusView.ExpandButton();
 			this.expandCpu = new Brewmaster.StatusView.ExpandButton();
@@ -117,15 +130,17 @@
 			label6 = new System.Windows.Forms.Label();
 			label9 = new System.Windows.Forms.Label();
 			RegisterToolTip = new System.Windows.Forms.ToolTip(this.components);
-			horizontalLine1 = new Brewmaster.StatusView.HorizontalLine();
-			horizontalLine2 = new Brewmaster.StatusView.HorizontalLine();
-			horizontalLine3 = new Brewmaster.StatusView.HorizontalLine();
-			horizontalLine4 = new Brewmaster.StatusView.HorizontalLine();
 			PpuGroup = new System.Windows.Forms.Panel();
 			panel4 = new System.Windows.Forms.Panel();
 			label15 = new System.Windows.Forms.Label();
 			label13 = new System.Windows.Forms.Label();
 			label14 = new System.Windows.Forms.Label();
+			stackGroup = new System.Windows.Forms.Panel();
+			horizontalLine5 = new Brewmaster.StatusView.HorizontalLine();
+			horizontalLine4 = new Brewmaster.StatusView.HorizontalLine();
+			horizontalLine3 = new Brewmaster.StatusView.HorizontalLine();
+			horizontalLine2 = new Brewmaster.StatusView.HorizontalLine();
+			horizontalLine1 = new Brewmaster.StatusView.HorizontalLine();
 			RegisterGroup.SuspendLayout();
 			FlagGroup.SuspendLayout();
 			FlagTable.SuspendLayout();
@@ -136,6 +151,10 @@
 			PpuGroup.SuspendLayout();
 			this.nesPpuPanel.SuspendLayout();
 			panel4.SuspendLayout();
+			stackGroup.SuspendLayout();
+			this.panel6.SuspendLayout();
+			this.panel5.SuspendLayout();
+			this.flowLayoutPanel1.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// RegisterGroup
@@ -764,46 +783,6 @@
 			RegisterToolTip.SetToolTip(this.nesSpriteOverflow, "Gets set when a sprite overflow is detected on a scanline (buggy)");
 			this.nesSpriteOverflow.UseVisualStyleBackColor = true;
 			// 
-			// horizontalLine1
-			// 
-			horizontalLine1.Dock = System.Windows.Forms.DockStyle.Top;
-			horizontalLine1.LineColor = System.Drawing.SystemColors.ButtonShadow;
-			horizontalLine1.Location = new System.Drawing.Point(2, 52);
-			horizontalLine1.Name = "horizontalLine1";
-			horizontalLine1.Size = new System.Drawing.Size(376, 1);
-			horizontalLine1.TabIndex = 7;
-			horizontalLine1.Text = "horizontalLine1";
-			// 
-			// horizontalLine2
-			// 
-			horizontalLine2.Dock = System.Windows.Forms.DockStyle.Top;
-			horizontalLine2.LineColor = System.Drawing.SystemColors.ButtonShadow;
-			horizontalLine2.Location = new System.Drawing.Point(2, 117);
-			horizontalLine2.Name = "horizontalLine2";
-			horizontalLine2.Size = new System.Drawing.Size(376, 1);
-			horizontalLine2.TabIndex = 8;
-			horizontalLine2.Text = "horizontalLine2";
-			// 
-			// horizontalLine3
-			// 
-			horizontalLine3.Dock = System.Windows.Forms.DockStyle.Top;
-			horizontalLine3.LineColor = System.Drawing.SystemColors.ButtonShadow;
-			horizontalLine3.Location = new System.Drawing.Point(2, 216);
-			horizontalLine3.Name = "horizontalLine3";
-			horizontalLine3.Size = new System.Drawing.Size(376, 1);
-			horizontalLine3.TabIndex = 9;
-			horizontalLine3.Text = "horizontalLine3";
-			// 
-			// horizontalLine4
-			// 
-			horizontalLine4.Dock = System.Windows.Forms.DockStyle.Top;
-			horizontalLine4.LineColor = System.Drawing.SystemColors.ButtonShadow;
-			horizontalLine4.Location = new System.Drawing.Point(2, 237);
-			horizontalLine4.Name = "horizontalLine4";
-			horizontalLine4.Size = new System.Drawing.Size(376, 1);
-			horizontalLine4.TabIndex = 10;
-			horizontalLine4.Text = "horizontalLine4";
-			// 
 			// PpuGroup
 			// 
 			PpuGroup.AutoSize = true;
@@ -957,6 +936,149 @@
 			this.label10.TabIndex = 1;
 			this.label10.Text = "Controller ($2000)";
 			// 
+			// stackGroup
+			// 
+			stackGroup.AutoSize = true;
+			stackGroup.Controls.Add(this.panel6);
+			stackGroup.Controls.Add(this.panel5);
+			stackGroup.Dock = System.Windows.Forms.DockStyle.Top;
+			stackGroup.Location = new System.Drawing.Point(2, 237);
+			stackGroup.MinimumSize = new System.Drawing.Size(0, 20);
+			stackGroup.Name = "stackGroup";
+			stackGroup.Size = new System.Drawing.Size(376, 71);
+			stackGroup.TabIndex = 12;
+			// 
+			// panel6
+			// 
+			this.panel6.AutoSize = true;
+			this.panel6.Controls.Add(this.completeStack);
+			this.panel6.Controls.Add(this.label17);
+			this.panel6.Dock = System.Windows.Forms.DockStyle.Top;
+			this.panel6.Location = new System.Drawing.Point(0, 22);
+			this.panel6.Name = "panel6";
+			this.panel6.Size = new System.Drawing.Size(376, 49);
+			this.panel6.TabIndex = 23;
+			// 
+			// completeStack
+			// 
+			this.completeStack.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.completeStack.BackColor = System.Drawing.SystemColors.Window;
+			this.completeStack.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
+			this.completeStack.ImeMode = System.Windows.Forms.ImeMode.Alpha;
+			this.completeStack.Location = new System.Drawing.Point(95, 0);
+			this.completeStack.MaxLength = 2;
+			this.completeStack.Multiline = true;
+			this.completeStack.Name = "completeStack";
+			this.completeStack.ReadOnly = true;
+			this.completeStack.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+			this.completeStack.Size = new System.Drawing.Size(278, 46);
+			this.completeStack.TabIndex = 20;
+			// 
+			// label17
+			// 
+			this.label17.Dock = System.Windows.Forms.DockStyle.Left;
+			this.label17.Location = new System.Drawing.Point(0, 0);
+			this.label17.Name = "label17";
+			this.label17.Padding = new System.Windows.Forms.Padding(3, 3, 0, 0);
+			this.label17.Size = new System.Drawing.Size(95, 49);
+			this.label17.TabIndex = 0;
+			this.label17.Text = "Complete stack";
+			// 
+			// panel5
+			// 
+			this.panel5.Controls.Add(this.flowLayoutPanel1);
+			this.panel5.Controls.Add(this.topOfStack);
+			this.panel5.Controls.Add(this.label16);
+			this.panel5.Dock = System.Windows.Forms.DockStyle.Top;
+			this.panel5.Location = new System.Drawing.Point(0, 0);
+			this.panel5.Name = "panel5";
+			this.panel5.Size = new System.Drawing.Size(376, 22);
+			this.panel5.TabIndex = 22;
+			// 
+			// flowLayoutPanel1
+			// 
+			this.flowLayoutPanel1.Controls.Add(this.stack8bit);
+			this.flowLayoutPanel1.Controls.Add(this.stack16bit);
+			this.flowLayoutPanel1.Controls.Add(this.stack24bit);
+			this.flowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Left;
+			this.flowLayoutPanel1.Location = new System.Drawing.Point(117, 0);
+			this.flowLayoutPanel1.Name = "flowLayoutPanel1";
+			this.flowLayoutPanel1.Size = new System.Drawing.Size(200, 22);
+			this.flowLayoutPanel1.TabIndex = 24;
+			// 
+			// stack8bit
+			// 
+			this.stack8bit.Appearance = System.Windows.Forms.Appearance.Button;
+			this.stack8bit.Checked = true;
+			this.stack8bit.Location = new System.Drawing.Point(2, 0);
+			this.stack8bit.Margin = new System.Windows.Forms.Padding(2, 0, 0, 5);
+			this.stack8bit.Name = "stack8bit";
+			this.stack8bit.Size = new System.Drawing.Size(30, 20);
+			this.stack8bit.TabIndex = 21;
+			this.stack8bit.TabStop = true;
+			this.stack8bit.Text = "8";
+			this.stack8bit.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+			this.stack8bit.UseVisualStyleBackColor = true;
+			// 
+			// stack16bit
+			// 
+			this.stack16bit.Appearance = System.Windows.Forms.Appearance.Button;
+			this.stack16bit.Location = new System.Drawing.Point(34, 0);
+			this.stack16bit.Margin = new System.Windows.Forms.Padding(2, 0, 0, 3);
+			this.stack16bit.Name = "stack16bit";
+			this.stack16bit.Size = new System.Drawing.Size(30, 20);
+			this.stack16bit.TabIndex = 22;
+			this.stack16bit.Text = "16";
+			this.stack16bit.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+			this.stack16bit.UseVisualStyleBackColor = true;
+			// 
+			// stack24bit
+			// 
+			this.stack24bit.Appearance = System.Windows.Forms.Appearance.Button;
+			this.stack24bit.Location = new System.Drawing.Point(66, 0);
+			this.stack24bit.Margin = new System.Windows.Forms.Padding(2, 0, 0, 3);
+			this.stack24bit.Name = "stack24bit";
+			this.stack24bit.Size = new System.Drawing.Size(30, 20);
+			this.stack24bit.TabIndex = 23;
+			this.stack24bit.Text = "24";
+			this.stack24bit.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+			this.stack24bit.UseVisualStyleBackColor = true;
+			// 
+			// topOfStack
+			// 
+			this.topOfStack.BackColor = System.Drawing.SystemColors.Window;
+			this.topOfStack.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
+			this.topOfStack.Dock = System.Windows.Forms.DockStyle.Left;
+			this.topOfStack.ImeMode = System.Windows.Forms.ImeMode.Alpha;
+			this.topOfStack.Location = new System.Drawing.Point(95, 0);
+			this.topOfStack.MaxLength = 2;
+			this.topOfStack.Name = "topOfStack";
+			this.topOfStack.ReadOnly = true;
+			this.topOfStack.Size = new System.Drawing.Size(22, 20);
+			this.topOfStack.TabIndex = 20;
+			this.topOfStack.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+			// 
+			// label16
+			// 
+			this.label16.Dock = System.Windows.Forms.DockStyle.Left;
+			this.label16.Location = new System.Drawing.Point(0, 0);
+			this.label16.Name = "label16";
+			this.label16.Padding = new System.Windows.Forms.Padding(3, 3, 0, 0);
+			this.label16.Size = new System.Drawing.Size(95, 22);
+			this.label16.TabIndex = 0;
+			this.label16.Text = "Top of stack";
+			// 
+			// horizontalLine5
+			// 
+			horizontalLine5.Dock = System.Windows.Forms.DockStyle.Top;
+			horizontalLine5.LineColor = System.Drawing.SystemColors.ButtonShadow;
+			horizontalLine5.Location = new System.Drawing.Point(2, 329);
+			horizontalLine5.Name = "horizontalLine5";
+			horizontalLine5.Size = new System.Drawing.Size(376, 1);
+			horizontalLine5.TabIndex = 14;
+			horizontalLine5.Text = "horizontalLine5";
+			// 
 			// expandPpu
 			// 
 			this.expandPpu.ButtonText = "PPU";
@@ -965,11 +1087,45 @@
 			this.expandPpu.ExpandPanel = PpuGroup;
 			this.expandPpu.FlatAppearance.BorderSize = 0;
 			this.expandPpu.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.expandPpu.Location = new System.Drawing.Point(2, 217);
+			this.expandPpu.Location = new System.Drawing.Point(2, 309);
 			this.expandPpu.Name = "expandPpu";
 			this.expandPpu.Size = new System.Drawing.Size(376, 20);
 			this.expandPpu.TabIndex = 6;
 			this.expandPpu.UseVisualStyleBackColor = true;
+			// 
+			// horizontalLine4
+			// 
+			horizontalLine4.Dock = System.Windows.Forms.DockStyle.Top;
+			horizontalLine4.LineColor = System.Drawing.SystemColors.ButtonShadow;
+			horizontalLine4.Location = new System.Drawing.Point(2, 308);
+			horizontalLine4.Name = "horizontalLine4";
+			horizontalLine4.Size = new System.Drawing.Size(376, 1);
+			horizontalLine4.TabIndex = 10;
+			horizontalLine4.Text = "horizontalLine4";
+			// 
+			// expandStack
+			// 
+			this.expandStack.ButtonText = "Stack";
+			this.expandStack.Dock = System.Windows.Forms.DockStyle.Top;
+			this.expandStack.ExpandedState = false;
+			this.expandStack.ExpandPanel = stackGroup;
+			this.expandStack.FlatAppearance.BorderSize = 0;
+			this.expandStack.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+			this.expandStack.Location = new System.Drawing.Point(2, 217);
+			this.expandStack.Name = "expandStack";
+			this.expandStack.Size = new System.Drawing.Size(376, 20);
+			this.expandStack.TabIndex = 13;
+			this.expandStack.UseVisualStyleBackColor = true;
+			// 
+			// horizontalLine3
+			// 
+			horizontalLine3.Dock = System.Windows.Forms.DockStyle.Top;
+			horizontalLine3.LineColor = System.Drawing.SystemColors.ButtonShadow;
+			horizontalLine3.Location = new System.Drawing.Point(2, 216);
+			horizontalLine3.Name = "horizontalLine3";
+			horizontalLine3.Size = new System.Drawing.Size(376, 1);
+			horizontalLine3.TabIndex = 9;
+			horizontalLine3.Text = "horizontalLine3";
 			// 
 			// expandTiming
 			// 
@@ -985,6 +1141,16 @@
 			this.expandTiming.TabIndex = 3;
 			this.expandTiming.UseVisualStyleBackColor = true;
 			// 
+			// horizontalLine2
+			// 
+			horizontalLine2.Dock = System.Windows.Forms.DockStyle.Top;
+			horizontalLine2.LineColor = System.Drawing.SystemColors.ButtonShadow;
+			horizontalLine2.Location = new System.Drawing.Point(2, 117);
+			horizontalLine2.Name = "horizontalLine2";
+			horizontalLine2.Size = new System.Drawing.Size(376, 1);
+			horizontalLine2.TabIndex = 8;
+			horizontalLine2.Text = "horizontalLine2";
+			// 
 			// expandFlags
 			// 
 			this.expandFlags.ButtonText = "Flags";
@@ -998,6 +1164,16 @@
 			this.expandFlags.Size = new System.Drawing.Size(376, 20);
 			this.expandFlags.TabIndex = 5;
 			this.expandFlags.UseVisualStyleBackColor = true;
+			// 
+			// horizontalLine1
+			// 
+			horizontalLine1.Dock = System.Windows.Forms.DockStyle.Top;
+			horizontalLine1.LineColor = System.Drawing.SystemColors.ButtonShadow;
+			horizontalLine1.Location = new System.Drawing.Point(2, 52);
+			horizontalLine1.Name = "horizontalLine1";
+			horizontalLine1.Size = new System.Drawing.Size(376, 1);
+			horizontalLine1.TabIndex = 7;
+			horizontalLine1.Text = "horizontalLine1";
 			// 
 			// expandCpu
 			// 
@@ -1019,9 +1195,12 @@
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.AutoScroll = true;
 			this.AutoSize = true;
+			this.Controls.Add(horizontalLine5);
 			this.Controls.Add(PpuGroup);
-			this.Controls.Add(horizontalLine4);
 			this.Controls.Add(this.expandPpu);
+			this.Controls.Add(horizontalLine4);
+			this.Controls.Add(stackGroup);
+			this.Controls.Add(this.expandStack);
 			this.Controls.Add(horizontalLine3);
 			this.Controls.Add(TimingGroup);
 			this.Controls.Add(this.expandTiming);
@@ -1034,7 +1213,7 @@
 			this.MinimumSize = new System.Drawing.Size(275, 0);
 			this.Name = "CpuStatus";
 			this.Padding = new System.Windows.Forms.Padding(2, 0, 0, 0);
-			this.Size = new System.Drawing.Size(378, 639);
+			this.Size = new System.Drawing.Size(378, 622);
 			RegisterGroup.ResumeLayout(false);
 			RegisterGroup.PerformLayout();
 			FlagGroup.ResumeLayout(false);
@@ -1051,6 +1230,13 @@
 			this.nesPpuPanel.PerformLayout();
 			panel4.ResumeLayout(false);
 			panel4.PerformLayout();
+			stackGroup.ResumeLayout(false);
+			stackGroup.PerformLayout();
+			this.panel6.ResumeLayout(false);
+			this.panel6.PerformLayout();
+			this.panel5.ResumeLayout(false);
+			this.panel5.PerformLayout();
+			this.flowLayoutPanel1.ResumeLayout(false);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -1105,5 +1291,16 @@
 		private System.Windows.Forms.TextBox nesNtAddr;
 		private System.Windows.Forms.TextBox nesVramAddr;
 		private System.Windows.Forms.TextBox nesPpuTRegister;
+		private ExpandButton expandStack;
+		private System.Windows.Forms.Panel panel5;
+		private System.Windows.Forms.Label label16;
+		private System.Windows.Forms.TextBox topOfStack;
+		private System.Windows.Forms.Panel panel6;
+		private System.Windows.Forms.TextBox completeStack;
+		private System.Windows.Forms.Label label17;
+		private System.Windows.Forms.RadioButton stack8bit;
+		private System.Windows.Forms.RadioButton stack24bit;
+		private System.Windows.Forms.RadioButton stack16bit;
+		private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
 	}
 }

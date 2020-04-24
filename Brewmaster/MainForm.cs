@@ -264,6 +264,7 @@ namespace Brewmaster
 					UpdateCpuMemory(state.CpuData);
 					UpdatePpuMemory(state.PpuData);
 					UpdateOamMemory(state.OamData);
+					cpuStatus1.UpdateMemory(state.CpuData);
 				};
 				_debugStateHandler = (state) => cpuStatus1.UpdateStates(state);
 

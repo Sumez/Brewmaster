@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Text;
 using System.Windows.Forms;
 using Brewmaster.Emulation;
 using Brewmaster.ProjectModel;
@@ -43,6 +44,10 @@ namespace Brewmaster.StatusView
 			nesVblankFlag.CheckedChanged += NesPpuCtrlChanged;
 			nesSprite0.CheckedChanged += NesPpuCtrlChanged;
 			nesSpriteOverflow.CheckedChanged += NesPpuCtrlChanged;
+
+			stack8bit.CheckedChanged += StackSizeChanged;
+			stack16bit.CheckedChanged += StackSizeChanged;
+			stack24bit.CheckedChanged += StackSizeChanged;
 		}
 
 		bool _showDecimalNumbers = false;
@@ -77,6 +82,7 @@ namespace Brewmaster.StatusView
 			_lastState = registerState;
 			if (registerState.Type == ProjectType.Nes) UpdateNesState(registerState.NesState);
 			if (registerState.Type == ProjectType.Snes) UpdateSnesState(registerState.SnesState);
+			RefreshStack();
 			_loading = false;
 		}
 
@@ -88,6 +94,7 @@ namespace Brewmaster.StatusView
 			UpdateTextBox(EditX, state.Cpu.X, (state.Cpu.PS & ProcFlags.IndexMode8) != 0 ? 1 : 2);
 			UpdateTextBox(EditY, state.Cpu.Y, (state.Cpu.PS & ProcFlags.IndexMode8) != 0 ? 1 : 2);
 			UpdateTextBox(EditSP, state.Cpu.SP, 2);
+			_stackPointer = state.Cpu.SP;
 
 			CheckC.Checked = (state.Cpu.PS & ProcFlags.Carry) != 0;
 			CheckZ.Checked = (state.Cpu.PS & ProcFlags.Zero) != 0;
@@ -115,6 +122,7 @@ namespace Brewmaster.StatusView
 			UpdateTextBox(EditX, state.CPU.X, 1);
 			UpdateTextBox(EditY, state.CPU.Y, 1);
 			UpdateTextBox(EditSP, state.CPU.SP, 1);
+			_stackPointer = state.CPU.SP | 0x100;
 
 			CheckC.Checked = (state.CPU.PS & (1 << 0)) != 0;
 			CheckZ.Checked = (state.CPU.PS & (1 << 1)) != 0;
@@ -311,5 +319,44 @@ namespace Brewmaster.StatusView
 
 		}
 
+		private byte[] _cpuMemory = new byte[0];
+		private int _stackPointer = 0;
+		public void UpdateMemory(byte[] stateCpuData)
+		{
+			_cpuMemory = stateCpuData;
+			RefreshStack();
+		}
+
+		private void StackSizeChanged(object sender, EventArgs e)
+		{
+			topOfStack.Width = stack24bit.Checked ? 50 : stack16bit.Checked ? 34 : 22;
+			RefreshStack();
+		}
+
+		private void RefreshStack()
+		{
+			var stackPage = _stackPointer & 0xff00;
+			var stackBottom = stackPage + 0x100;
+			var stackOffset = _stackPointer & 0xff;
+			var first = true;
+
+			var stringBuilder = new StringBuilder((stackBottom - _stackPointer) * 4);
+			var topSize = stack24bit.Checked ? 3 : stack16bit.Checked ? 2 : 1;
+			for (var i = topSize; i > 0; i--)
+			{
+				stringBuilder.Append(Convert.ToString(_cpuMemory[stackPage | ((stackOffset + i) & 0xff)], 16).PadLeft(2, '0'));
+				if (i == 3) stringBuilder.Append(':');
+			}
+			topOfStack.Text = stringBuilder.ToString();
+
+			stringBuilder = new StringBuilder((stackBottom - _stackPointer) * 4);
+			for (var i = _stackPointer + 1; i < stackBottom; i++)
+			{
+				if (!first) stringBuilder.Append(", ");
+				stringBuilder.Append(Convert.ToString(_cpuMemory[i], 16).PadLeft(2, '0'));
+				first = false;
+			}
+			completeStack.Text = stringBuilder.ToString();
+		}
 	}
 }
