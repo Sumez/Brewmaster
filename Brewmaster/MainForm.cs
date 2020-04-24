@@ -121,7 +121,7 @@ namespace Brewmaster
 			else filenameLabel.Text = editorTab.ProjectFile.File.FullName;
 
 			if (editorTab is TextEditorWindow textEditorWindow) SetCaretInformation(textEditorWindow);
-			else lineLabel.Text = columnLabel.Text = "";
+			else lineLabel.Text = fpsLabel.Text = "";
 
 			UpdateTabListInWindowMenu();
 		}
@@ -130,7 +130,7 @@ namespace Brewmaster
 	    {
 			var caret = textEditorWindow.TextEditor.ActiveTextAreaControl.Caret;
 		    lineLabel.Text = (caret.Line + 1).ToString();
-		    columnLabel.Text = (caret.Column + 1).ToString();
+		    fpsLabel.Text = (caret.Column + 1).ToString();
 		}
 
 	    private void BuildErrorUpdate(List<BuildHandler.BuildError> list)
@@ -424,11 +424,17 @@ namespace Brewmaster
 		    emulator.OnMemoryUpdate += ThreadSafeMemoryHandler;
 		    emulator.OnRegisterUpdate += ThreadSafeDebugStateHandler;
 		    emulator.OnTileMapUpdate += TileMap.UpdateNametableData;
+		    emulator.OnFpsUpdate += fps => BeginInvoke(new Action<int>(UpdateFps), fps);
 
 		    cpuStatus1.StateEdited = emulator.ForceNewState;
 	    }
 
-		private void UnloadEmulator()
+	    private void UpdateFps(int fps)
+	    {
+		    fpsLabel.Text = string.Format(@"{0} FPS", fps);
+	    }
+
+	    private void UnloadEmulator()
 		{
 			if (mesen.Emulator == null) return;
 

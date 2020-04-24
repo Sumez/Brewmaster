@@ -73,7 +73,7 @@ namespace Brewmaster.Emulation
 		{
 			if (_currentRenderSurface == null) return;
 			var t = Math.Min((double)Width / 256, (double)Height / 240);
-			if (IntegerScaling) t = Math.Floor(t);
+			if (IntegerScaling) t = Math.Max(1, Math.Floor(t));
 			var targetWidth = (int)(256 * t);
 			var targetHeight = (int)(240 * t);
 			//renderSurface.SizeChanged

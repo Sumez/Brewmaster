@@ -142,6 +142,7 @@
     <Compile Include="CartridgeExplorer\CartridgeExplorer.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Emulation\EmulatorHandler.cs" />
     <Compile Include="Modules\MenuHelper.cs">
       <SubType>Component</SubType>
     </Compile>

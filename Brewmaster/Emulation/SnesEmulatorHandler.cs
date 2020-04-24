@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
@@ -51,15 +53,12 @@ namespace Brewmaster.Emulation
 		[DllImport(DllPath)] public static extern void UnregisterNotificationCallback(IntPtr notificationListener);
 	}
 
-	public class SnesEmulatorHandler: IEmulatorHandler
+	public class SnesEmulatorHandler: EmulatorHandler, IEmulatorHandler
 	{
 		private readonly Form _mainWindow;
 		private Control _renderControl;
 		private NotificationListener _notifListener;
 		private Action<LogData> _logHandler;
-
-		public int UpdateRate { get; set; }
-		private int _updateCounter = 0;
 
 		public event Action OnRun;
 		public event Action<int> OnBreak;
@@ -206,6 +205,7 @@ namespace Brewmaster.Emulation
 					{
 						RefreshBreakpoints();
 					}
+					GameLoaded();
 					if (OnRun != null) OnRun();
 					if (OnStatusChange != null) OnStatusChange(EmulatorStatus.Playing);
 					EmitDebugData();
@@ -228,11 +228,7 @@ namespace Brewmaster.Emulation
 					EmitDebugData();
 					break;
 				case ConsoleNotificationType.PpuFrameDone:
-					if (UpdateRate == 0) break;
-					_updateCounter++;
-					if (_updateCounter < UpdateRate) break;
-					EmitDebugData();
-					_updateCounter = 0;
+					CountFrame();
 					break;
 			}
 
@@ -248,7 +244,7 @@ namespace Brewmaster.Emulation
 		private readonly RegisterState _state = new RegisterState(ProjectType.Snes);
 		private GetTilemapOptions _tilemapOptions = new GetTilemapOptions();
 
-		private void EmitDebugData()
+		protected override void EmitDebugData()
 		{
 			//lock (emulatorLock)
 			{
@@ -361,7 +357,6 @@ namespace Brewmaster.Emulation
 			ConfigApi.SetShortcutKeys(shortcutKeys, (UInt32)shortcutKeys.Length);
 			ConfigApi.SetPreferences(new InteropPreferencesConfig()
 			{
-//				ShowFps = true,
 				ShowFps = false,
 				ShowFrameCounter = false,
 				ShowGameTimer = false,
@@ -470,7 +465,7 @@ namespace Brewmaster.Emulation
 			}
 		}
 
-		public bool IsRunning()
+		public override bool IsRunning()
 		{
 			return _isRunning;
 			//return false && !SnesApi.IsPaused();

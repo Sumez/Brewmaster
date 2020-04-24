@@ -12,15 +12,12 @@ using Brewmaster.ProjectModel;
 
 namespace Brewmaster.Emulation
 {
-	public class NesEmulatorHandler: IEmulatorHandler
+	public class NesEmulatorHandler: EmulatorHandler, IEmulatorHandler
 	{
 		private readonly Form _mainWindow;
 		private Control _renderControl;
 		private InteropEmu.NotificationListener _notifListener;
 		private Action<LogData> _logHandler;
-
-		private int _updateCounter;
-		public int UpdateRate { get; set; }
 
 		public event Action OnRun;
 		public event Action<int> OnBreak;
@@ -204,6 +201,7 @@ namespace Brewmaster.Emulation
 					{
 						RefreshBreakpoints();
 					}
+					GameLoaded();
 					if (OnRun != null) OnRun();
 					if (OnStatusChange != null) OnStatusChange(EmulatorStatus.Playing);
 					EmitDebugData();
@@ -223,11 +221,7 @@ namespace Brewmaster.Emulation
 					EmitDebugData();
 					return;
 				case InteropEmu.ConsoleNotificationType.PpuFrameDone:
-					if (UpdateRate == 0) return;
-					_updateCounter++;
-					if (_updateCounter < UpdateRate) return;
-					EmitDebugData();
-					_updateCounter = 0;
+					CountFrame();
 					return;
 			}
 
@@ -240,7 +234,7 @@ namespace Brewmaster.Emulation
 
 		private readonly MemoryState _memoryState = new MemoryState(null, null, null);
 		private readonly TileMapData _nametableData = new TileMapData { NumberOfMaps = 4, MapWidth = 256, MapHeight = 240, DataWidth = 256 * 4 };
-		private void EmitDebugData()
+		protected override void EmitDebugData()
 		{
 			//lock (emulatorLock)
 			{
@@ -601,7 +595,7 @@ namespace Brewmaster.Emulation
 			}
 		}
 
-		public bool IsRunning()
+		public override bool IsRunning()
 		{
 			return InteropEmu.IsRunning();
 		}

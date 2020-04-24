@@ -14,6 +14,7 @@ namespace Brewmaster.Emulation
 		event Action<RegisterState> OnRegisterUpdate;
 		event Action OnRun;
 		event Action<EmulatorStatus> OnStatusChange;
+		event Action<int> OnFpsUpdate;
 
 		int UpdateRate { set; }
 
