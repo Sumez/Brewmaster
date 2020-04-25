@@ -1,6 +1,6 @@
 ﻿using System.Windows.Forms;
 
-namespace BrewMaster.Modules.NumberHelper
+namespace Brewmaster.Modules.NumberHelper
 {
 	partial class NumberHelper
 	{

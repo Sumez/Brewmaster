@@ -1,4 +1,4 @@
-﻿namespace BrewMaster.Modules.Watch
+﻿namespace Brewmaster.Modules.Watch
 {
 	partial class WatchValues
 	{
@@ -28,7 +28,7 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
-			this.watchList = new BrewMaster.Modules.Watch.WatchList();
+			this.watchList = new Brewmaster.Modules.Watch.WatchList();
 			this.SuspendLayout();
 			// 
 			// watchList

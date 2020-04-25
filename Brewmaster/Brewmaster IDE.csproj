@@ -7,8 +7,8 @@
     <ProjectGuid>{25A34560-1B49-4408-B5B8-B6441A25AB9A}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>BrewMaster</RootNamespace>
-    <AssemblyName>BrewMaster</AssemblyName>
+    <RootNamespace>Brewmaster</RootNamespace>
+    <AssemblyName>Brewmaster</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -23,8 +23,8 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>1</ApplicationRevision>
-    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>0.1.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>true</BootstrapperEnabled>
@@ -57,9 +57,6 @@
   </PropertyGroup>
   <PropertyGroup>
     <ManifestCertificateThumbprint>F75947C0B5F7DE38ECAAC318AFCBC1444D1A1FFC</ManifestCertificateThumbprint>
-  </PropertyGroup>
-  <PropertyGroup>
-    <ManifestKeyFile>Silver-J_TemporaryKey.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
     <GenerateManifests>false</GenerateManifests>
@@ -145,8 +142,21 @@
     <Compile Include="CartridgeExplorer\CartridgeExplorer.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Emulation\EmulatorHandler.cs" />
     <Compile Include="Modules\MenuHelper.cs">
       <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Ppu\SpriteViewer.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Ppu\SpriteViewer.Designer.cs">
+      <DependentUpon>SpriteViewer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Ppu\TileMapViewer.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Ppu\TileMapViewer.Designer.cs">
+      <DependentUpon>TileMapViewer.cs</DependentUpon>
     </Compile>
     <Compile Include="ProjectExplorer\ProjectExplorerMenu.cs">
       <SubType>Component</SubType>
@@ -275,7 +285,7 @@
     </Compile>
     <Compile Include="Pipeline\ChrPipeline.cs" />
     <Compile Include="Pipeline\DataPipeline.cs" />
-    <Compile Include="Ppu\NametableDisplay.cs">
+    <Compile Include="Ppu\TileMapRender.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Program.cs" />
@@ -352,6 +362,9 @@
       <DependentUpon>NewProjectPath.cs</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Settings\KeyBindingWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Settings\ButtonAssignment.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -376,6 +389,12 @@
     </Compile>
     <Compile Include="StatusView\CpuStatus.Designer.cs">
       <DependentUpon>CpuStatus.cs</DependentUpon>
+    </Compile>
+    <Compile Include="StatusView\ExpandButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="StatusView\HorizontalLine.cs">
+      <SubType>Component</SubType>
     </Compile>
     <Compile Include="Templates\TemplateModule.cs" />
     <EmbeddedResource Include="AboutWindow.resx">
@@ -442,6 +461,12 @@
     <EmbeddedResource Include="Layout\HeaderPanel.resx">
       <DependentUpon>HeaderPanel.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Ppu\SpriteViewer.resx">
+      <DependentUpon>SpriteViewer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Ppu\TileMapViewer.resx">
+      <DependentUpon>TileMapViewer.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="ProjectExplorer\ProjectExplorer.resx">
       <DependentUpon>ProjectExplorer.cs</DependentUpon>
     </EmbeddedResource>
@@ -480,6 +505,9 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <EmbeddedResource Include="Settings\KeyBindingWindow.resx">
+      <DependentUpon>KeyBindingWindow.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Settings\ButtonAssignment.resx">
       <DependentUpon>ButtonAssignment.cs</DependentUpon>
     </EmbeddedResource>
@@ -523,9 +551,12 @@
     <None Include="Resources\Toolbar\stop.png" />
     <None Include="Resources\Files\cartridge.png" />
     <Content Include="nesproject.ico" />
+    <None Include="Resources\Other\collapsed.png" />
     <Content Include="Resources\Other\error.png" />
     <None Include="Resources\Other\smallload.png" />
     <None Include="Resources\Other\smallsave.png" />
+    <None Include="Resources\Other\logo.png" />
+    <None Include="Resources\Other\expanded.png" />
     <Content Include="Resources\Other\warning.png" />
     <None Include="Resources\Toolbar\buildrun.png" />
     <None Include="Resources\Toolbar\config.png" />

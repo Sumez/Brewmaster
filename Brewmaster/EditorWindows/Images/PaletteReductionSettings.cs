@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
-using BrewMaster.Pipeline;
-using BrewMaster.ProjectModel;
+using Brewmaster.Pipeline;
+using Brewmaster.ProjectModel;
 
-namespace BrewMaster.EditorWindows.Images
+namespace Brewmaster.EditorWindows.Images
 {
 	public class PaletteReductionSettings : UserControl
 	{

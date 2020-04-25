@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
-using BrewMaster.BuildProcess;
-using BrewMaster.Ide;
+using Brewmaster.BuildProcess;
+using Brewmaster.Ide;
 
-namespace BrewMaster.Modules.Build
+namespace Brewmaster.Modules.Build
 {
 	public class ErrorList : ListView
 	{

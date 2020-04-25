@@ -6,7 +6,7 @@ using System.Linq;
 using System.Windows.Forms;
 using System.Xml.Serialization;
 
-namespace BrewMaster.Modules
+namespace Brewmaster.Modules
 {
 	public class MenuHelper : Component
 	{

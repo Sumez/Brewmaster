@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Linq;
 using System.Windows.Forms;
-using BrewMaster.ProjectModel;
+using Brewmaster.ProjectModel;
 
-namespace BrewMaster.ProjectWizard
+namespace Brewmaster.ProjectWizard
 {
 	public partial class ConfigurationManager : Form
 	{

@@ -1,7 +1,7 @@
 ﻿using System.Drawing;
 using System.Windows.Forms;
 
-namespace BrewMaster.Ide
+namespace Brewmaster.Ide
 {
 	public static class Prompt
 	{

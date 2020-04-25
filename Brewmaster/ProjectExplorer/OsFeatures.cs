@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using Microsoft.Win32;
 
-namespace BrewMaster.ProjectExplorer
+namespace Brewmaster.ProjectExplorer
 {
 	public static class OsFeatures
 	{

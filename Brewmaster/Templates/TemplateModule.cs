@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using BrewMaster.ProjectModel;
+using Brewmaster.ProjectModel;
 
-namespace BrewMaster.Templates
+namespace Brewmaster.Templates
 {
 	public class TemplateModule
 	{

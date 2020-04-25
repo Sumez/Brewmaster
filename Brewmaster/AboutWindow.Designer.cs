@@ -1,4 +1,4 @@
-﻿namespace BrewMaster
+﻿namespace Brewmaster
 {
     partial class AboutWindow
     {
@@ -28,68 +28,85 @@
         /// </summary>
         private void InitializeComponent()
         {
-			System.Windows.Forms.Label label1;
+			System.Windows.Forms.Label text;
+			System.Windows.Forms.Label header;
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AboutWindow));
 			this.panel2 = new System.Windows.Forms.Panel();
-			this.linkLabel1 = new System.Windows.Forms.LinkLabel();
-			this.label2 = new System.Windows.Forms.Label();
-			this.button1 = new System.Windows.Forms.Button();
+			this.logoPicture1 = new Brewmaster.LogoPicture();
+			this.link = new System.Windows.Forms.LinkLabel();
+			this.closeButton = new System.Windows.Forms.Button();
 			this.panel1 = new System.Windows.Forms.Panel();
-			label1 = new System.Windows.Forms.Label();
+			this.panel3 = new System.Windows.Forms.Panel();
+			text = new System.Windows.Forms.Label();
+			header = new System.Windows.Forms.Label();
 			this.panel2.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.logoPicture1)).BeginInit();
+			this.panel3.SuspendLayout();
 			this.SuspendLayout();
 			// 
-			// label1
+			// text
 			// 
-			label1.AutoSize = true;
-			label1.Location = new System.Drawing.Point(85, 44);
-			label1.Name = "label1";
-			label1.Size = new System.Drawing.Size(217, 65);
-			label1.TabIndex = 4;
-			label1.Text = "Version 0.1.0\r\n\r\nAn open source homebrew IDE for Windows\r\n\r\n2019 Created by Sumez" +
-    "";
+			text.AutoSize = true;
+			text.Location = new System.Drawing.Point(113, 74);
+			text.Name = "text";
+			text.Size = new System.Drawing.Size(217, 65);
+			text.TabIndex = 4;
+			text.Text = "Version 0.1.0\r\n\r\nAn open source homebrew IDE for Windows\r\n\r\n2019-2020 Created by " +
+    "Sumez";
 			// 
 			// panel2
 			// 
-			this.panel2.Controls.Add(this.linkLabel1);
-			this.panel2.Controls.Add(this.label2);
-			this.panel2.Controls.Add(this.button1);
-			this.panel2.Controls.Add(label1);
+			this.panel2.Controls.Add(this.logoPicture1);
+			this.panel2.Controls.Add(this.panel3);
+			this.panel2.Controls.Add(this.link);
+			this.panel2.Controls.Add(this.closeButton);
+			this.panel2.Controls.Add(text);
 			this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.panel2.Location = new System.Drawing.Point(0, 0);
 			this.panel2.Name = "panel2";
 			this.panel2.Size = new System.Drawing.Size(387, 210);
 			this.panel2.TabIndex = 0;
 			// 
-			// linkLabel1
+			// logoPicture1
 			// 
-			this.linkLabel1.AutoSize = true;
-			this.linkLabel1.Location = new System.Drawing.Point(85, 124);
-			this.linkLabel1.Name = "linkLabel1";
-			this.linkLabel1.Size = new System.Drawing.Size(118, 13);
-			this.linkLabel1.TabIndex = 6;
-			this.linkLabel1.TabStop = true;
-			this.linkLabel1.Text = "https://brewmaster.dev";
-			this.linkLabel1.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel1_LinkClicked);
+			this.logoPicture1.Image = global::Brewmaster.Properties.Resources.logo;
+			this.logoPicture1.Location = new System.Drawing.Point(24, 71);
+			this.logoPicture1.Name = "logoPicture1";
+			this.logoPicture1.Size = new System.Drawing.Size(64, 64);
+			this.logoPicture1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+			this.logoPicture1.TabIndex = 8;
+			this.logoPicture1.TabStop = false;
 			// 
-			// label2
+			// link
 			// 
-			this.label2.AutoSize = true;
-			this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F);
-			this.label2.Location = new System.Drawing.Point(80, 13);
-			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(159, 31);
-			this.label2.TabIndex = 5;
-			this.label2.Text = "Brewmaster";
+			this.link.AutoSize = true;
+			this.link.Location = new System.Drawing.Point(113, 153);
+			this.link.Name = "link";
+			this.link.Size = new System.Drawing.Size(118, 13);
+			this.link.TabIndex = 6;
+			this.link.TabStop = true;
+			this.link.Text = "https://brewmaster.dev";
+			this.link.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel1_LinkClicked);
 			// 
-			// button1
+			// header
 			// 
-			this.button1.Location = new System.Drawing.Point(300, 175);
-			this.button1.Name = "button1";
-			this.button1.Size = new System.Drawing.Size(75, 23);
-			this.button1.TabIndex = 0;
-			this.button1.Text = "Close";
-			this.button1.Click += new System.EventHandler(this.button1_Click);
+			header.AutoSize = true;
+			header.Font = new System.Drawing.Font("Microsoft Tai Le", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			header.Location = new System.Drawing.Point(18, 11);
+			header.Name = "header";
+			header.Size = new System.Drawing.Size(153, 34);
+			header.TabIndex = 5;
+			header.Text = "Brewmaster";
+			// 
+			// closeButton
+			// 
+			this.closeButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+			this.closeButton.Location = new System.Drawing.Point(300, 175);
+			this.closeButton.Name = "closeButton";
+			this.closeButton.Size = new System.Drawing.Size(75, 23);
+			this.closeButton.TabIndex = 0;
+			this.closeButton.Text = "Close";
+			this.closeButton.Click += new System.EventHandler(this.button1_Click);
 			// 
 			// panel1
 			// 
@@ -98,10 +115,21 @@
 			this.panel1.Size = new System.Drawing.Size(65, 65);
 			this.panel1.TabIndex = 0;
 			// 
-			// About_Form
+			// panel3
+			// 
+			this.panel3.BackColor = System.Drawing.Color.White;
+			this.panel3.Controls.Add(header);
+			this.panel3.Dock = System.Windows.Forms.DockStyle.Top;
+			this.panel3.Location = new System.Drawing.Point(0, 0);
+			this.panel3.Name = "panel3";
+			this.panel3.Size = new System.Drawing.Size(387, 55);
+			this.panel3.TabIndex = 9;
+			// 
+			// AboutWindow
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+			this.CancelButton = this.closeButton;
 			this.ClientSize = new System.Drawing.Size(387, 210);
 			this.Controls.Add(this.panel2);
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
@@ -114,6 +142,9 @@
 			this.Text = "About Brewmaster";
 			this.panel2.ResumeLayout(false);
 			this.panel2.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)(this.logoPicture1)).EndInit();
+			this.panel3.ResumeLayout(false);
+			this.panel3.PerformLayout();
 			this.ResumeLayout(false);
 
         }
@@ -122,8 +153,9 @@
 
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.Panel panel1;
-        private System.Windows.Forms.Button button1;
-		private System.Windows.Forms.Label label2;
-		private System.Windows.Forms.LinkLabel linkLabel1;
+        private System.Windows.Forms.Button closeButton;
+		private System.Windows.Forms.LinkLabel link;
+		private LogoPicture logoPicture1;
+		private System.Windows.Forms.Panel panel3;
 	}
 }

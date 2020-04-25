@@ -1,4 +1,4 @@
-﻿namespace BrewMaster
+﻿namespace Brewmaster
 {
 	// TODO: Find something better to do with this
     partial class LoadWindow

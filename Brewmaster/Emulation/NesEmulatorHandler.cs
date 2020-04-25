@@ -7,42 +7,31 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using BrewMaster.Modules.Build;
-using BrewMaster.ProjectModel;
+using Brewmaster.Modules.Build;
+using Brewmaster.ProjectModel;
 
-namespace BrewMaster.Emulation
+namespace Brewmaster.Emulation
 {
-	public class NametableData
-	{
-		public int ScrollX;
-		public int ScrollY;
-		public byte[][] PixelData = new byte[4][];
-		public byte[][] TileData = new byte[4][];
-		public byte[][] AttributeData = new byte[4][];
-	}
-
-	public class NesEmulatorHandler: IEmulatorHandler
+	public class NesEmulatorHandler: EmulatorHandler, IEmulatorHandler
 	{
 		private readonly Form _mainWindow;
 		private Control _renderControl;
 		private InteropEmu.NotificationListener _notifListener;
 		private Action<LogData> _logHandler;
 
-		private int _updateCounter;
-		public int UpdateRate { get; set; }
-
 		public event Action OnRun;
 		public event Action<int> OnBreak;
 		public event Action<EmulatorStatus> OnStatusChange;
 		public event Action<MemoryState> OnMemoryUpdate;
 		public event Action<RegisterState> OnRegisterUpdate;
-		public event Action<NametableData> OnNametableUpdate;
+		public event Action<TileMapData> OnTileMapUpdate;
 
 		private Object emulatorLock = new Object();
 
 		public NesEmulatorHandler(Form mainWindow)
 		{
 			_mainWindow = mainWindow;
+			_nametableData.OnRefreshRequest += PushNametableData;
 		}
 
 		public void LoadCartridgeAtSameState(string baseDir, string cartridgeFile, Func<int, int> getNewPc)
@@ -212,6 +201,7 @@ namespace BrewMaster.Emulation
 					{
 						RefreshBreakpoints();
 					}
+					GameLoaded();
 					if (OnRun != null) OnRun();
 					if (OnStatusChange != null) OnStatusChange(EmulatorStatus.Playing);
 					EmitDebugData();
@@ -231,11 +221,7 @@ namespace BrewMaster.Emulation
 					EmitDebugData();
 					return;
 				case InteropEmu.ConsoleNotificationType.PpuFrameDone:
-					if (UpdateRate == 0) return;
-					_updateCounter++;
-					if (_updateCounter < UpdateRate) return;
-					EmitDebugData();
-					_updateCounter = 0;
+					CountFrame();
 					return;
 			}
 
@@ -246,8 +232,9 @@ namespace BrewMaster.Emulation
 			_logHandler(new LogData(status, LogType.Normal));
 		}
 
-		private MemoryState _memoryState = new MemoryState(null, null, null);
-		private void EmitDebugData()
+		private readonly MemoryState _memoryState = new MemoryState(null, null, null);
+		private readonly TileMapData _nametableData = new TileMapData { NumberOfMaps = 4, MapWidth = 256, MapHeight = 240, DataWidth = 256 * 4 };
+		protected override void EmitDebugData()
 		{
 			//lock (emulatorLock)
 			{
@@ -264,17 +251,19 @@ namespace BrewMaster.Emulation
 					InteropEmu.DebugGetState(ref state.NesState);
 					OnRegisterUpdate(state);
 				}
-				if (OnNametableUpdate != null)
-				{
-					var nametableData = new NametableData();
-					InteropEmu.DebugGetPpuScroll(out nametableData.ScrollX, out nametableData.ScrollY);
-					for (int i = 0; i < 4; i++)
-					{
-						InteropEmu.DebugGetNametable(i, false, out nametableData.PixelData[i], out nametableData.TileData[i], out nametableData.AttributeData[i]);
-					}
-					OnNametableUpdate(nametableData);
-				}
+				if (OnTileMapUpdate != null) PushNametableData();
 			}
+		}
+
+		private void PushNametableData()
+		{
+			InteropEmu.DebugGetPpuScroll(out _nametableData.ScrollX, out _nametableData.ScrollY);
+			for (int i = 0; i < _nametableData.NumberOfMaps; i++)
+			{
+				InteropEmu.DebugGetNametable(i, false, out _nametableData.PixelData[i], out _nametableData.TileData[i], out _nametableData.AttributeData[i]);
+			}
+			if (OnTileMapUpdate != null) OnTileMapUpdate(_nametableData);
+
 		}
 
 		public void SetCpuMemory(int offset, byte value)
@@ -299,7 +288,7 @@ namespace BrewMaster.Emulation
 			}
 		}
 
-		static private double ConvertVolume(int volume)
+		private static double ConvertVolume(int volume)
 		{
 			if(true) {
 				return ((double)volume / 100d);
@@ -307,7 +296,7 @@ namespace BrewMaster.Emulation
 				return 0;
 			}
 		}
-		static private double ConvertPanning(Int32 panning)
+		private static double ConvertPanning(Int32 panning)
 		{
 			return (double)((panning + 100) / 100d);
 		}
@@ -338,6 +327,7 @@ namespace BrewMaster.Emulation
 		public void UpdateSettings(MesenControl.EmulatorSettings settings)
 		{
 			InteropEmu.SetRamPowerOnState(settings.RandomPowerOnState ? RamPowerOnState.Random : RamPowerOnState.AllZeros);
+			InteropEmu.SetFlag(EmulationFlags.RandomizeMapperPowerOnState, settings.RandomPowerOnState);
 
 			InteropEmu.SetMasterVolume(settings.PlayAudio ? 25 / 10d : 0, 75 / 100d);
 			InteropEmu.SetChannelVolume(AudioChannel.Square1, ConvertVolume(settings.PlaySquare1 ? 100 : 0));
@@ -605,7 +595,7 @@ namespace BrewMaster.Emulation
 			}
 		}
 
-		public bool IsRunning()
+		public override bool IsRunning()
 		{
 			return InteropEmu.IsRunning();
 		}

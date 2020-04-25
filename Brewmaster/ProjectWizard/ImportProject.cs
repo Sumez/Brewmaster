@@ -1,7 +1,7 @@
 ﻿using System.IO;
-using BrewMaster.ProjectModel;
+using Brewmaster.ProjectModel;
 
-namespace BrewMaster.ProjectWizard
+namespace Brewmaster.ProjectWizard
 {
 	public class ImportProject : WizardDialog
 	{

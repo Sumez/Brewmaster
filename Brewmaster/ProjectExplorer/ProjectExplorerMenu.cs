@@ -2,10 +2,10 @@
 using System.ComponentModel;
 using System.IO;
 using System.Windows.Forms;
-using BrewMaster.ProjectModel;
-using BrewMaster.Settings;
+using Brewmaster.ProjectModel;
+using Brewmaster.Settings;
 
-namespace BrewMaster.ProjectExplorer
+namespace Brewmaster.ProjectExplorer
 {
 	class ProjectExplorerMenu : ContextMenuStrip
 	{

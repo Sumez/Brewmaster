@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using BrewMaster.EditorWindows;
-using BrewMaster.Pipeline;
+using Brewmaster.EditorWindows;
+using Brewmaster.Pipeline;
 
-namespace BrewMaster.ProjectModel
+namespace Brewmaster.ProjectModel
 {
 	public class AsmProjectFile
 	{

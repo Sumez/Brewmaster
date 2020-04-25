@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Drawing;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 
-namespace BrewMaster.Ide
+namespace Brewmaster.Ide
 {
 	public static class IdeExtensions
 	{
@@ -43,6 +43,7 @@ namespace BrewMaster.Ide
 
 		public IdePanel(Control childControl): this()
 		{
+			Child = childControl;
 			childControl.Dock = DockStyle.Fill;
 			Controls.Add(childControl);
 			Controls.SetChildIndex(childControl, 0);
@@ -50,31 +51,38 @@ namespace BrewMaster.Ide
 			if (headerManupulator != null) headerManupulator.Header = Header;
 		}
 
+		public Control Child { get; protected set; }
+
 		private void InitializeComponent()
 		{
 			Controls.Add(Header);
 		}
 
 	}
+
 	public class IdeGroupedPanel : IdePanel
 	{
-		protected readonly TabControl _tabs = new TabControl { Dock = DockStyle.Fill, Alignment = TabAlignment.Bottom };
+		private IdeTab _selectedTab;
+		public List<IdeTab> Tabs = new List<IdeTab>();
+
+		private void SelectTab(IdeTab targetTab)
+		{
+			if (targetTab == _selectedTab) return;
+			_selectedTab = targetTab;
+			SuspendLayout();
+			foreach (var tab in Tabs.Where(t => t != _selectedTab)) tab.Panel.Visible = false;
+			_selectedTab.Panel.Visible = true;
+			ResumeLayout();
+		}
 
 
 		public IdeGroupedPanel() : base()
 		{
-			InitializeComponent();
-		}
-
-		private void InitializeComponent()
-		{
-			Controls.Add(_tabs);
-			Controls.SetChildIndex(_tabs, 0);
-			_tabs.SelectedIndexChanged += (sender, args) => { RefreshLabel(); };
 		}
 
 		private void RefreshLabel()
 		{
+			/*
 			Label = _tabs.TabPages.Count > 0 ? (_tabs.SelectedTab ?? _tabs.TabPages[0]).Text : "";
 
 			if (_tabs.TabPages.Count > 1)
@@ -87,42 +95,82 @@ namespace BrewMaster.Ide
 				_tabs.ItemSize = new Size(0, 1);
 				_tabs.SizeMode = TabSizeMode.Fixed;
 			}
+			*/
 		}
 
 		public void ShowPanel(IdePanel panel)
 		{
-			var tabPage = _tabs.TabPages.OfType<IdeTabPage>().FirstOrDefault(t => t.Child == panel);
-			if (tabPage != null) _tabs.SelectedTab = tabPage;
+			var tab = Tabs.FirstOrDefault(t => t.Panel == panel);
+			if (tab != null) tab.Selected = true;
 		}
 
-		public IdeTabPage AddPanel(IdePanel panel, bool selectTab = false, int? index = null)
+		public void AddPanel(IdePanel panel, bool selectTab = false, int? index = null)
 		{
+			if (panel is IdeGroupedPanel groupedPanel)
+			{
+				foreach (var newTab in groupedPanel.Tabs)
+				{
+					AddPanel(newTab.Panel, selectTab && newTab.Selected);
+				}
+				groupedPanel.Dispose();
+				return;
+			}
 			panel.ShowHeader = false;
 			panel.GroupParent = this;
-			var newTab = new IdeTabPage(panel);
-			if (index.HasValue && index.Value < _tabs.TabCount) _tabs.TabPages.Insert(index.Value, newTab);
-			else _tabs.TabPages.Add(newTab);
 
-			if (selectTab) _tabs.SelectedTab = newTab;
+			if (index.HasValue && index.Value >= Tabs.Count) index = null;
+
+			var tab = index.HasValue
+				? Header.InsertTab(index.Value, panel)
+				: Header.AddTab(panel);
+			panel.Dock = DockStyle.Fill;
+
+			tab.WasSelected += () => SelectTab(tab);
+			if (index.HasValue) Tabs.Insert(index.Value, tab);
+			else Tabs.Add(tab);
+			if (selectTab || Tabs.Count == 1) tab.Selected = true;
+			else panel.Visible = false;
+
+			Controls.Add(panel);
+			Controls.SetChildIndex(panel, 0);
 			RefreshLabel();
-
-			return newTab;
 		}
+
 		public void RemovePanel(IdePanel panel)
 		{
-			IdeTabPage removeTab = null;
-			foreach (var tab in _tabs.TabPages.OfType<IdeTabPage>())
+			var tab = Tabs.FirstOrDefault(t => t.Panel == panel);
+			if (tab == null) return;
+			if (Tabs.Count == 1) throw new Exception("Can't remove the last tab in a grouped panel");
+			Controls.Remove(tab.Panel);
+			Tabs.Remove(tab);
+			tab.Panel.Visible = true;
+			tab.Panel.ShowHeader = true;
+			tab.Panel.GroupParent = null;
+
+			if (Tabs.Count == 1) // Only one tab remaining, so remove grouped panel
 			{
-				if (tab.Child == panel) removeTab = tab;
+				var lastPanel = Tabs[0].Panel;
+				var myParent = Parent;
+				// Remove myself before adding child panel to avoid confusing floatpanels
+				myParent.Controls.Remove(this);
+				myParent.Controls.Add(lastPanel);
+				lastPanel.Visible = true;
+				lastPanel.ShowHeader = true;
+				lastPanel.GroupParent = null;
+				Dispose();
+				return;
 			}
-			if (removeTab != null) _tabs.TabPages.Remove(removeTab);
-			panel.ShowHeader = true;
+			if (tab.Selected)
+			{
+				Tabs.First(t => t != tab).Selected = true;
+			}
+			Header.RemoveTab(tab);
 			RefreshLabel();
 		}
 
 		public IEnumerable<IdePanel> Panels
 		{
-			get { return _tabs.TabPages.OfType<IdeTabPage>().Select(p => p.Child); }
+			get { return Tabs.Select(t => t.Panel); }
 		}
 
 	}

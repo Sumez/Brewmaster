@@ -8,23 +8,24 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using BrewMaster.BuildProcess;
-using BrewMaster.EditorWindows;
-using BrewMaster.EditorWindows.Images;
-using BrewMaster.EditorWindows.Text;
-using BrewMaster.Emulation;
-using BrewMaster.Ide;
-using BrewMaster.Modules;
-using BrewMaster.Modules.Breakpoints;
-using BrewMaster.Modules.Build;
-using BrewMaster.Modules.NumberHelper;
-using BrewMaster.Modules.Watch;
-using BrewMaster.ProjectExplorer;
-using BrewMaster.ProjectModel;
-using BrewMaster.ProjectWizard;
-using BrewMaster.Settings;
+using Brewmaster.BuildProcess;
+using Brewmaster.EditorWindows;
+using Brewmaster.EditorWindows.Images;
+using Brewmaster.EditorWindows.Text;
+using Brewmaster.Emulation;
+using Brewmaster.Ide;
+using Brewmaster.Modules;
+using Brewmaster.Modules.Breakpoints;
+using Brewmaster.Modules.Build;
+using Brewmaster.Modules.NumberHelper;
+using Brewmaster.Modules.Watch;
+using Brewmaster.Ppu;
+using Brewmaster.ProjectExplorer;
+using Brewmaster.ProjectModel;
+using Brewmaster.ProjectWizard;
+using Brewmaster.Settings;
 
-namespace BrewMaster
+namespace Brewmaster
 {
 	public partial class MainForm : Form
     {
@@ -75,6 +76,7 @@ namespace BrewMaster
 			configurationSelector.Enabled =
 			buildSettings.Enabled = 
 			buildSettingsMenuItem.Enabled =
+			mapInputMenuItem.Enabled = 
 				CurrentProject != null;
 
 			nesGraphicsMenuItem.Visible =
@@ -120,7 +122,7 @@ namespace BrewMaster
 			else filenameLabel.Text = editorTab.ProjectFile.File.FullName;
 
 			if (editorTab is TextEditorWindow textEditorWindow) SetCaretInformation(textEditorWindow);
-			else lineLabel.Text = columnLabel.Text = "";
+			else lineLabel.Text = fpsLabel.Text = "";
 
 			UpdateTabListInWindowMenu();
 		}
@@ -129,7 +131,7 @@ namespace BrewMaster
 	    {
 			var caret = textEditorWindow.TextEditor.ActiveTextAreaControl.Caret;
 		    lineLabel.Text = (caret.Line + 1).ToString();
-		    columnLabel.Text = (caret.Column + 1).ToString();
+		    fpsLabel.Text = (caret.Column + 1).ToString();
 		}
 
 	    private void BuildErrorUpdate(List<BuildHandler.BuildError> list)
@@ -207,6 +209,9 @@ namespace BrewMaster
 				lineAddressMappingsMenuItem.Checked = Settings.ShowLineAddresses;
 
 				// Load layout
+				var ppuPanel = new IdeGroupedPanel();
+				ppuPanel.AddPanel(new IdePanel(TileMap) { Label = "Tilemaps / Nametables" });
+				ppuPanel.AddPanel(new IdePanel(new SpriteViewer()) { Label = "Sprites" });
 				WatchPanel.AddPanel(new IdePanel(WatchValues = new WatchValues()) { Label = "Watch" });
 				WatchPanel.AddPanel(new IdePanel(BreakpointList = new BreakpointList()) { Label = "Breakpoints" });
 
@@ -222,7 +227,7 @@ namespace BrewMaster
 				tabsWestContainer.AddPanel(westContainer).StaticWidth = 250;
 				tabsWestContainer.AddPanel(editorTabs);
 
-				eastContainer.AddPanel(new IdePanel(Nametable) { Label = "Nametables" });
+				eastContainer.AddPanel(ppuPanel);
 				eastContainer.AddPanel(new IdePanel(cpuStatus1) { Label = "Console Status" });
 				eastContainer.AddPanel(new IdePanel(mesen) { Label = "Mesen" });
 
@@ -263,6 +268,7 @@ namespace BrewMaster
 					UpdateCpuMemory(state.CpuData);
 					UpdatePpuMemory(state.PpuData);
 					UpdateOamMemory(state.OamData);
+					cpuStatus1.UpdateMemory(state.CpuData);
 				};
 				_debugStateHandler = (state) => cpuStatus1.UpdateStates(state);
 
@@ -274,7 +280,7 @@ namespace BrewMaster
 				_menuHelper.Prepare(new [] { MainWindowMenu, MainToolStrip }, WriteStatus);
 
 				// Apply settings
-				updateEveryFrameMenuItem.Checked = (mesen.UpdateRate = Settings.UpdateRate) != 0;
+				updateEveryFrameMenuItem.Checked = (mesen.UpdateRate = Settings.UpdateRate) == 1;
 				integerScalingMenuItem.Checked = mesen.IntegerScaling = Settings.EmuIntegerScaling;
 				randomValuesAtPowerOnMenuItem.Checked = mesen.RandomPowerOnState = Settings.EmuRandomPowerOn;
 				playSpcAudioMenuItem.Checked = mesen.PlayAudio = Settings.EmuPlayAudio;
@@ -286,7 +292,10 @@ namespace BrewMaster
 				displayNesBgMenuItem.Checked = mesen.ShowBgLayer = Settings.EmuDisplayNesBg;
 				displayNesObjectsMenuItem.Checked = mesen.ShowSpriteLayer = Settings.EmuDisplaySprites;
 				mesen.EmulatorBackgroundColor = Settings.EmuBackgroundColor;
-				
+
+				TileMap.ShowScrollOverlay = Settings.ShowScrollOverlay;
+				TileMap.FitImage = Settings.ResizeTileMap;
+
 				if (Settings.AsmHighlighting != null && Settings.AsmHighlighting.SerializedData.Count > 0) Ca65Highlighting.DefaultColors = Settings.AsmHighlighting.Data;
 				TextEditor.DefaultCodeProperties.Font = Settings.DefaultFont;
 
@@ -307,11 +316,11 @@ namespace BrewMaster
 			if (idePanel == null) return;
 
 			var menuItem = new ToolStripMenuItem(idePanel.Label);
-			menuItem.Checked = idePanel.FindForm() == this;
+			menuItem.Checked = idePanel.FindForm() != null;
 			menuItem.CheckOnClick = true;
 			menuItem.Click += (s, e) => {
-				if (!menuItem.Checked) LayoutHandler.HidePanel(windowControl);
-				else LayoutHandler.ShowPanel(windowControl);
+				if (!menuItem.Checked) LayoutHandler.HidePanel(idePanel);
+				else LayoutHandler.ShowPanel(idePanel);
 			};
 			ViewMenuItem.DropDownItems.Add(menuItem);
 
@@ -418,12 +427,18 @@ namespace BrewMaster
 		    emulator.OnStatusChange += ThreadSafeStatusHandler;
 		    emulator.OnMemoryUpdate += ThreadSafeMemoryHandler;
 		    emulator.OnRegisterUpdate += ThreadSafeDebugStateHandler;
-		    emulator.OnNametableUpdate += Nametable.UpdateNametableData;
+		    emulator.OnTileMapUpdate += TileMap.UpdateNametableData;
+		    emulator.OnFpsUpdate += fps => BeginInvoke(new Action<int>(UpdateFps), fps);
 
 		    cpuStatus1.StateEdited = emulator.ForceNewState;
 	    }
 
-		private void UnloadEmulator()
+	    private void UpdateFps(int fps)
+	    {
+		    fpsLabel.Text = string.Format(@"{0} FPS", fps);
+	    }
+
+	    private void UnloadEmulator()
 		{
 			if (mesen.Emulator == null) return;
 
@@ -705,12 +720,15 @@ namespace BrewMaster
 	    private void LoadSettings()
 	    {
 			var userSettingsPath = Program.GetUserFilePath(SettingsFileName);
-			Settings = BrewMaster.Settings.Settings.Load(userSettingsPath);
+			Settings = Brewmaster.Settings.Settings.Load(userSettingsPath);
 	    }
 
         private void MainForm_Closing(object sender, FormClosingEventArgs e)
         {
 	        if (!CloseCurrentProject(true)) e.Cancel = true;
+	        Settings.ShowScrollOverlay = TileMap.ShowScrollOverlay;
+	        Settings.ResizeTileMap = TileMap.FitImage;
+			Settings.Save();
         }
 
         private void newNesProjectMenuItem_Click(object sender, EventArgs e)
@@ -786,7 +804,7 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 				    CreateNewFileDialog.FileName = "";
 					CreateNewFileDialog.InitialDirectory = CurrentProject.Directory.FullName;
 				    CreateNewFileDialog.DefaultExt = ".bwm";
-				    CreateNewFileDialog.Filter = "BrewMaster projects|*.bwm";
+				    CreateNewFileDialog.Filter = "Brewmaster projects|*.bwm";
 				    if (CreateNewFileDialog.ShowDialog() != DialogResult.OK) return;
 				    var fileName = CreateNewFileDialog.FileName;
 
@@ -1504,9 +1522,9 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 			restartMenuItem.PerformClick();
 		}
 
-	    public void ReleasePanel(HeaderPanel panel, Point offset)
+	    public void ReleasePanel(IdePanel panel, Point location)
 	    {
-		    LayoutHandler.ReleasePanel(panel.Parent, offset);
+		    LayoutHandler.ReleasePanel(panel, location);
 	    }
 
 		private void stepOver_Click(object sender, EventArgs e)
@@ -1574,10 +1592,34 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 		}
 	    private void mapInputToolStripMenuItem_Click(object sender, EventArgs e)
 	    {
-		    ShowSettingsWindow(3);
-		}
+		    if (CurrentProject == null) return;
+		    using (var keyBindings = new KeyBindingWindow())
+		    {
+			    var mappings = CurrentProject.Type == ProjectType.Snes ? Settings.SnesMappings : Settings.NesMappings;
+			    keyBindings.StartPosition = FormStartPosition.CenterParent;
+			    keyBindings.KeyBindingSettings.SetMappings(mappings.Select(m => m.Clone()).ToList());
+			    if (keyBindings.ShowDialog(this) != DialogResult.OK) return;
 
-	    private void ShowSettingsWindow(int defaultTab = 0)
+			    var newMappings = keyBindings.KeyBindingSettings.Mappings.Select(m => m.Clone()).ToList();
+			    switch (CurrentProject.Type)
+			    {
+					case ProjectType.Nes:
+						Settings.NesMappings = newMappings;
+						break;
+					case ProjectType.Snes:
+					    Settings.SnesMappings = newMappings;
+					    break;
+			    }
+				Settings.Save();
+			}
+
+		}
+		private void emulatorSettingsMenuItem_Click(object sender, EventArgs e)
+	    {
+		    ShowSettingsWindow(3);
+	    }
+
+		private void ShowSettingsWindow(int defaultTab = 0)
 	    {
 		    using (var settingsWindow = new SettingsWindow(Settings))
 		    {
@@ -1612,7 +1654,7 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 
 		private void updateEveryFrameToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			mesen.UpdateRate = Settings.UpdateRate = updateEveryFrameMenuItem.Checked ? 1 : 0;
+			mesen.UpdateRate = Settings.UpdateRate = updateEveryFrameMenuItem.Checked ? 1 : 30;
 			Settings.Save();
 		}
 	    private void integerScalingToolStripMenuItem_Click(object sender, EventArgs e)

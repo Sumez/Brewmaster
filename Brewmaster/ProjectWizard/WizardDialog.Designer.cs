@@ -1,4 +1,4 @@
-﻿namespace BrewMaster.ProjectWizard
+﻿namespace Brewmaster.ProjectWizard
 {
 	partial class WizardDialog
 	{

@@ -5,15 +5,15 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using BrewMaster.BuildProcess;
-using BrewMaster.Emulation;
-using BrewMaster.Modules.Watch;
-using BrewMaster.ProjectModel;
-using BrewMaster.Settings;
+using Brewmaster.BuildProcess;
+using Brewmaster.Emulation;
+using Brewmaster.Modules.Watch;
+using Brewmaster.ProjectModel;
+using Brewmaster.Settings;
 using ICSharpCode.TextEditor;
 using ICSharpCode.TextEditor.Document;
 
-namespace BrewMaster.EditorWindows
+namespace Brewmaster.EditorWindows
 {
 
 	public class Ca65Formatting : DefaultFormattingStrategy, IFormattingStrategy
@@ -187,7 +187,7 @@ namespace BrewMaster.EditorWindows
 			
 			ActiveTextAreaControl.TextArea.KeyUp += delegate(object sender, KeyEventArgs e)
 													{
-														/*if (e.KeyCode == Program.Keys[BrewMaster.Settings.Feature.GoToDefinition])
+														/*if (e.KeyCode == Program.Keys[Brewmaster.Settings.Feature.GoToDefinition])
 														{
 															GoToSymbol();
 															return;

@@ -1,5 +1,5 @@
-﻿using BrewMaster.Modules.Watch;
-using BrewMaster.ProjectModel;
+﻿using Brewmaster.Modules.Watch;
+using Brewmaster.ProjectModel;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -8,10 +8,10 @@ using System.Linq;
 using System.Windows.Forms;
 using System.Xml;
 using System.Xml.Serialization;
-using BrewMaster.EditorWindows;
+using Brewmaster.EditorWindows;
 using ICSharpCode.TextEditor.Document;
 
-namespace BrewMaster.Settings
+namespace Brewmaster.Settings
 {
 	[Serializable]
 	public class Settings
@@ -24,7 +24,7 @@ namespace BrewMaster.Settings
 		[XmlElement(ElementName = "RecentProject")]
 		public List<string> RecentProjects = new List<string>();
 		[XmlElement(ElementName = "UpdateRate")]
-		public int UpdateRate = 1;
+		public int UpdateRate = 30;
 
 		[XmlElement(ElementName = "EmuIntegerScaling")]
 		public bool EmuIntegerScaling = true;
@@ -56,6 +56,10 @@ namespace BrewMaster.Settings
 		public bool EmuDisplaySnesBg4 = true;
 		[XmlElement(ElementName = "EmuBackground")]
 		public string SerializedEmuBackground = "Black";
+		[XmlElement(ElementName = "ShowScrollOverlay")]
+		public bool ShowScrollOverlay = true;
+		[XmlElement(ElementName = "ResizeTileMap")]
+		public bool ResizeTileMap = true;
 		[XmlIgnore]
 		public Color EmuBackgroundColor
 		{

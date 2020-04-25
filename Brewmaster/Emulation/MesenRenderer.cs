@@ -5,10 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using BrewMaster.ProjectModel;
-using BrewMaster.Settings;
+using Brewmaster.ProjectModel;
+using Brewmaster.Settings;
 
-namespace BrewMaster.Emulation
+namespace Brewmaster.Emulation
 {
 	public class MesenRenderer : UserControl
 	{
@@ -73,7 +73,7 @@ namespace BrewMaster.Emulation
 		{
 			if (_currentRenderSurface == null) return;
 			var t = Math.Min((double)Width / 256, (double)Height / 240);
-			if (IntegerScaling) t = Math.Floor(t);
+			if (IntegerScaling) t = Math.Max(1, Math.Floor(t));
 			var targetWidth = (int)(256 * t);
 			var targetHeight = (int)(240 * t);
 			//renderSurface.SizeChanged

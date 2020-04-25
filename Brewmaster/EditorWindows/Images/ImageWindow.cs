@@ -6,10 +6,10 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
-using BrewMaster.Pipeline;
-using BrewMaster.ProjectModel;
+using Brewmaster.Pipeline;
+using Brewmaster.ProjectModel;
 
-namespace BrewMaster.EditorWindows.Images
+namespace Brewmaster.EditorWindows.Images
 {
 	public class ImageWindow : SaveableEditorWindow
 	{

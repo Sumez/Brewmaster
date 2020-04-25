@@ -4,17 +4,15 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 
-namespace BrewMaster.Ide
+namespace Brewmaster.Ide
 {
 	public partial class FloatPanel : Form
 	{
-		private Action<FloatPanel> _dock;
-		private Action<Point> _suggestDock;
-		public FloatPanel(Action<FloatPanel> dock, Action<Point> suggestDock)
-		{
-			_dock = dock;
-			_suggestDock = suggestDock;
+		private readonly LayoutHandler _layoutHandler;
 
+		public FloatPanel(LayoutHandler layoutHandler)
+		{
+			_layoutHandler = layoutHandler;
 			InitializeComponent();
 		}
 
@@ -25,12 +23,10 @@ namespace BrewMaster.Ide
 			base.OnControlAdded(e);
 
 			var idePanel = Controls.OfType<IdePanel>().FirstOrDefault();
-			if (idePanel != null) _header = idePanel.Header;
-			if (_header == null) _header = Controls.OfType<HeaderPanel>().FirstOrDefault();
-			if (_header != null)
+			if (idePanel != null)
 			{
-				_header.MouseDown -= AscendMouseEvent;
-				_header.MouseDown += AscendMouseEvent;
+				_header = idePanel.Header;
+				_header.MouseDownHandler = AscendMouseEvent;
 			}
 		}
 
@@ -41,7 +37,7 @@ namespace BrewMaster.Ide
 
 		protected override void OnClosing(CancelEventArgs e)
 		{
-			if (_header != null) _header.MouseDown -= AscendMouseEvent;
+			if (_header != null) _header.MouseDownHandler = null;
 			base.OnClosing(e);
 		}
 
@@ -73,10 +69,7 @@ namespace BrewMaster.Ide
 		protected override void OnResizeEnd(EventArgs e)
 		{
 			base.OnResizeEnd(e);
-			if (_dragging)
-			{
-				_dock(this);
-			}
+			if (_dragging) _layoutHandler.DockPanel(this);
 			TopMost = false;
 			_dragging = false;
 		}
@@ -88,8 +81,19 @@ namespace BrewMaster.Ide
 			//System.Diagnostics.Debug.Write(cursorPosition.X + "," + cursorPosition.Y + Environment.NewLine);
 
 			TopMost = true;
-			if (_dragging) _suggestDock(cursorPosition);
+			if (_dragging) _layoutHandler.SuggestDock(cursorPosition, this);
 		}
 
+		public void SetChildPanel(IdePanel panel)
+		{
+			if (Controls.Count >= 0) Controls.Clear();
+			Controls.Add(panel);
+		}
+		public IdePanel ChildPanel { get { return Controls[0] as IdePanel; } }
+
+		public void ReleasePanel(IdePanel panel, Point location)
+		{
+			_layoutHandler.ReleasePanel(panel, location);
+		}
 	}
 }

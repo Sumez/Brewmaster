@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Windows.Forms;
-using BrewMaster.ProjectModel;
+using Brewmaster.ProjectModel;
 
-namespace BrewMaster.EditorWindows
+namespace Brewmaster.EditorWindows
 {
 	public class EditorWindow : TabPage
 	{

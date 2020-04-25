@@ -5,9 +5,9 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using System.Windows.Forms.Design;
-using BrewMaster.ProjectExplorer;
+using Brewmaster.ProjectExplorer;
 
-namespace BrewMaster.Ide
+namespace Brewmaster.Ide
 {
 	[Designer(typeof(ParentControlDesigner))]
 	public class MultiSplitPanel : Panel
@@ -194,7 +194,7 @@ namespace BrewMaster.Ide
 				Panels.RemoveAt(index);
 				Splits.RemoveAt(index);
 				Controls.Remove(panel);
-				Splits[Splits.Count - 1] = FullSize;
+				if (Splits.Count > 0) Splits[Splits.Count - 1] = FullSize;
 				AdjustPanels();
 				ResumeLayout();
 			}

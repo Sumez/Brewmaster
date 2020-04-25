@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
-namespace BrewMaster.Modules.Build
+namespace Brewmaster.Modules.Build
 {
 	public class OutputWindow : Panel
 	{
@@ -155,7 +155,7 @@ namespace BrewMaster.Modules.Build
 		{
 			this.hScrollBar = new System.Windows.Forms.HScrollBar();
 			this.vScrollBar = new System.Windows.Forms.VScrollBar();
-			this.OutputTextBox = new BrewMaster.Modules.Build.RichTextBoxImproved();
+			this.OutputTextBox = new Brewmaster.Modules.Build.RichTextBoxImproved();
 			this.SuspendLayout();
 			// 
 			// hScrollBar

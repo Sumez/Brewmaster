@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using System.Windows.Forms.VisualStyles;
-using BrewMaster.ProjectExplorer;
-using BrewMaster.Properties;
+using Brewmaster.ProjectExplorer;
+using Brewmaster.Properties;
 
-namespace BrewMaster.EditorWindows
+namespace Brewmaster.EditorWindows
 {
 	public class EditorTabs : TabControl
     {

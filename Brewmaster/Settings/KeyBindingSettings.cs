@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace BrewMaster.Settings
+namespace Brewmaster.Settings
 {
 	public class KeyBindingSettings : Control
 	{
@@ -57,6 +57,14 @@ namespace BrewMaster.Settings
 				Controls.SetChildIndex(panel, 0);
 			}
 			ResumeLayout();
+		}
+
+		protected override void OnLayout(LayoutEventArgs a)
+		{
+			base.OnLayout(a);
+			if (Controls.Count == 0) return;
+			Height = Controls[0].Top + Controls[0].Height;
+			Parent.PerformLayout(this, "Height");
 		}
 	}
 

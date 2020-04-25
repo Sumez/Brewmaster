@@ -1,19 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
-using BrewMaster.Modules.Build;
-using BrewMaster.ProjectModel;
+using Brewmaster.Modules.Build;
+using Brewmaster.ProjectModel;
 
-namespace BrewMaster.Emulation
+namespace Brewmaster.Emulation
 {
 	public interface IEmulatorHandler : IDisposable
 	{
 		event Action<int> OnBreak;
 		event Action<MemoryState> OnMemoryUpdate;
-		event Action<NametableData> OnNametableUpdate;
+		event Action<TileMapData> OnTileMapUpdate;
 		event Action<RegisterState> OnRegisterUpdate;
 		event Action OnRun;
 		event Action<EmulatorStatus> OnStatusChange;
+		event Action<int> OnFpsUpdate;
 
 		int UpdateRate { set; }
 
@@ -56,6 +57,30 @@ namespace BrewMaster.Emulation
 		public Mesen.GUI.DebugState SnesState;
 		public ProjectType Type { get; }
 	}
+	public class TileMapData
+	{
+		public int ScrollX;
+		public int ScrollY;
+		public int NumberOfMaps;
+		public byte[][] PixelData = new byte[4][];
+		public byte[][] TileData = new byte[4][];
+		public byte[][] AttributeData = new byte[4][];
+		public int MapWidth;
+		public int MapHeight;
+		public int DataWidth;
+		public int NumberOfPages = 1;
+		public int GetPage { get; private set; }
+		public int ViewportWidth = 256;
+		public int ViewportHeight = 240;
+
+		public event Action OnRefreshRequest;
+		public void RequestRefresh(int page)
+		{
+			GetPage = page;
+			if (OnRefreshRequest != null) OnRefreshRequest();
+		}
+	}
+
 	public class MemoryState
 	{
 		public MemoryState(byte[] cpuData, byte[] ppuData, byte[] oamData)
@@ -68,6 +93,7 @@ namespace BrewMaster.Emulation
 		public byte[] CpuData;
 		public byte[] PpuData;
 		public byte[] OamData;
+		public byte[] CgRam;
 
 		// TODO: Check size of symbols (24/16/8) and use knowledge of CPU bank registers (K/DP/DB) to look at correct address
 

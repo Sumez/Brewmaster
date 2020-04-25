@@ -4,10 +4,10 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
-using BrewMaster.Pipeline;
-using BrewMaster.ProjectModel;
+using Brewmaster.Pipeline;
+using Brewmaster.ProjectModel;
 
-namespace BrewMaster.EditorWindows.Images
+namespace Brewmaster.EditorWindows.Images
 {
 	public class ChrPipelineSettings : UserControl
 	{
@@ -131,7 +131,7 @@ namespace BrewMaster.EditorWindows.Images
 			this.ChrPipelinePanel = new System.Windows.Forms.FlowLayoutPanel();
 			this.PaletteGroup = new System.Windows.Forms.GroupBox();
 			this.rgbValue = new System.Windows.Forms.TextBox();
-			this.PaletteEntries = new BrewMaster.EditorWindows.Images.PaletteEntries();
+			this.PaletteEntries = new Brewmaster.EditorWindows.Images.PaletteEntries();
 			this._enablePaletteAssignments = new System.Windows.Forms.CheckBox();
 			this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
 			ExportPaletteGroup = new System.Windows.Forms.GroupBox();

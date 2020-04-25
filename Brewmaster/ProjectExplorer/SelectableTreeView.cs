@@ -1,6 +1,6 @@
 ﻿using System.Windows.Forms;
 
-namespace BrewMaster.ProjectExplorer
+namespace Brewmaster.ProjectExplorer
 {
 	/// <summary>
 	/// Fixes issues with the default WinForms TreeView class, allowing the user to mark an item on mouse

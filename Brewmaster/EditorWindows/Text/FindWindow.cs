@@ -5,7 +5,7 @@ using System.Linq;
 using System.Windows.Forms;
 using ICSharpCode.TextEditor;
 
-namespace BrewMaster.EditorWindows.Text
+namespace Brewmaster.EditorWindows.Text
 {
 	public partial class FindWindow : Form
     {

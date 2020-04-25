@@ -297,11 +297,11 @@
   </MenuHelp>
   <MenuHelp>
     <MenuItem>sourceFileMenuItem</MenuItem>
-    <HelpText> </HelpText>
+    <HelpText />
   </MenuHelp>
   <MenuHelp>
     <MenuItem>includeFileMenuItem</MenuItem>
-    <HelpText> </HelpText>
+    <HelpText />
   </MenuHelp>
   <MenuHelp>
     <MenuItem>importProjectMenuItem</MenuItem>
@@ -343,5 +343,17 @@
   <MenuHelp>
     <MenuItem>File_ExitMenuItem</MenuItem>
     <HelpText>Bye</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>snesGraphicsMenuItem</MenuItem>
+    <HelpText />
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>snesAudioMenuItem</MenuItem>
+    <HelpText />
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>emulatorSettingsMenuItem</MenuItem>
+    <HelpText>Change various settings for the emulator</HelpText>
   </MenuHelp>
 </MenuHelpCollection>

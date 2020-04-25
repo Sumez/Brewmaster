@@ -2,10 +2,10 @@
 using System.IO;
 using System.Threading;
 using System.Windows.Forms;
-using BrewMaster.ProjectExplorer;
-using BrewMaster.Settings;
+using Brewmaster.ProjectExplorer;
+using Brewmaster.Settings;
 
-namespace BrewMaster
+namespace Brewmaster
 {
     static class Program
     {
