@@ -8,36 +8,38 @@ namespace Brewmaster.Ide
 {
 	public class LayoutHandler
 	{
-		private readonly MainForm Form;
-		private readonly Dictionary<Control, PanelPosition> _memorizedPanelPositions = new Dictionary<Control, PanelPosition>();
+		private readonly MainForm _form;
+		private readonly Dictionary<IdePanel, PanelPosition> _memorizedPanelPositions = new Dictionary<IdePanel, PanelPosition>();
 		public List<MultiSplitContainer> DockContainers { get; private set; }
 
 
 		public LayoutHandler(MainForm mainForm)
 		{
-			Form = mainForm;
+			_form = mainForm;
 			DockContainers = new List<MultiSplitContainer>();
 		}
 
 		public void DockPanel(FloatPanel panel)
 		{
-			if (DockSuggestion.HasValue && _suggestedSplit != null)
+			if (DockSuggestion == null) return;
+
+			panel.SuspendLayout();
+			_form.SuspendLayout();
+			if (DockSuggestion.LayoutSplit != null)
 			{
 				var panelSize = panel.Size;
-				var parent = _suggestedSplit.Parent;
-				var multiSplitParent = _suggestedSplit.Parent as MultiSplitContainer;
-				panel.SuspendLayout();
-				Form.SuspendLayout();
+				var parent = DockSuggestion.LayoutSplit.Parent;
+				var multiSplitParent = DockSuggestion.LayoutSplit.Parent as MultiSplitContainer;
 
 				if (multiSplitParent != null)
 				{
-					AddPanelToSplitContainer(multiSplitParent, panel, _suggestedSplit.Index);
+					AddPanelToSplitContainer(multiSplitParent, panel.ChildPanel, DockSuggestion.LayoutSplit.Index);
 				}
 				else { 
 					var splitContainer = new SplitContainer();
 					splitContainer.Dock = DockStyle.Fill;
 					splitContainer.BorderStyle = BorderStyle.FixedSingle;
-					if (!_suggestedSplit.Horizontal) splitContainer.Orientation = Orientation.Horizontal;
+					if (!DockSuggestion.LayoutSplit.Horizontal) splitContainer.Orientation = Orientation.Horizontal;
 
 					var list = new List<Control>();
 					foreach (Control control in parent.Controls) list.Add(control);
@@ -48,59 +50,53 @@ namespace Brewmaster.Ide
 					foreach (Control control in panel.Controls) list.Add(control);
 					foreach (Control control in list) splitContainer.Panel2.Controls.Add(control);
 				}
-				Form.ResumeLayout();
-				panel.ResumeLayout();
-				panel.Close();
-				panel.Dispose();
-
-				Form.Focus();
 			}
+			else if (DockSuggestion.JoinPanel is IdeGroupedPanel groupedPanel)
+			{
+				groupedPanel.AddPanel(panel.ChildPanel, true);
+			}
+			else
+			{
+				JoinPanels(DockSuggestion.JoinPanel, panel.ChildPanel);
+			}
+			_form.ResumeLayout();
+			panel.ResumeLayout();
+			panel.Close();
+			panel.Dispose();
+
+			_form.Focus();
 			DockSuggestion = null;
-			_suggestedSplit = null;
 		}
 
-		private void AddPanelToSplitContainer(MultiSplitContainer multiSplitParent, Control panel, int index)
+		private void AddPanelToSplitContainer(MultiSplitContainer multiSplitParent, IdePanel panel, int index)
 		{
 			var splitPanel = multiSplitParent.AddPanel(index);
-			var list = new List<Control>();
-			foreach (Control control in panel.Controls) list.Add(control);
-			foreach (var control in list) splitPanel.Add(control);
+			splitPanel.Add(panel);
 		}
 
-		public void ReleasePanel(Control panel, Point offset)
+		public void ReleasePanel(IdePanel panel, Point offset)
 		{
 			var windowSize = panel.Size;
 			var windowLocation = panel.PointToScreen(offset);
-			var floatPanel = new FloatPanel(DockPanel, SuggestDock);
-			floatPanel.SuspendLayout();
-			Form.SuspendLayout();
-			var list = new List<Control>();
-			foreach (Control control in panel.Controls) list.Add(control);
-			foreach (Control control in list) floatPanel.Controls.Add(control);
-			list.Clear();
-
 			RemovePanelFromSplitContainer(panel);
-			
-			floatPanel.Show(Form);
-			floatPanel.Location = windowLocation;
-			floatPanel.Size = windowSize;
-			floatPanel.ResumeLayout();
-			Form.ResumeLayout();
-		}
 
-		public void CreateFloatPanel(IdePanel panel)
+			_form.SuspendLayout();
+			CreateFloatPanel(panel, windowLocation, windowSize);
+			_form.ResumeLayout();
+		}
+		private void CreateFloatPanel(IdePanel panel, Point? location = null, Size? size = null)
 		{
 			var floatPanel = new FloatPanel(DockPanel, SuggestDock);
 			floatPanel.SuspendLayout();
-			floatPanel.Controls.Add(panel);
+			floatPanel.SetChildPanel(panel);
+			floatPanel.Show(_form);
 
-			floatPanel.Show(Form);
-			//floatPanel.Location = windowLocation;
-			//floatPanel.Size = windowSize;
+			if (location.HasValue) floatPanel.Location = location.Value;
+			if (size.HasValue) floatPanel.Size = size.Value;
 			floatPanel.ResumeLayout();
 		}
 
-		private void RemovePanelFromSplitContainer(Control panel)
+		private void RemovePanelFromSplitContainer(IdePanel panel)
 		{
 			var multiSplitPanel = panel.Parent as MultiSplitPanel;
 			if (multiSplitPanel == null) multiSplitPanel = panel.Parent.Parent as MultiSplitPanel;
@@ -113,6 +109,10 @@ namespace Brewmaster.Ide
 						Index = splitContainer.Panels.IndexOf(multiSplitPanel)
 					};
 				splitContainer.RemovePanel(multiSplitPanel);
+				if (splitContainer.Splits.Count == 0)
+				{
+					// TODO: Last panel removed, hide it but keep the dock suggestion available
+				}
 			}
 		}
 		private void RemovePanelFromGroupedPanel(IdePanel panel, IdeGroupedPanel groupedPanel)
@@ -122,7 +122,7 @@ namespace Brewmaster.Ide
 			{
 				_memorizedPanelPositions[panel] = new PanelPosition
 				{
-					Index = groupedPanel.Panels.ToList().IndexOf(panel),
+					Index = groupedPanel.Tabs.FindIndex(t => t.Panel == panel),
 					Sibling = sibling
 				};
 			}
@@ -141,35 +141,33 @@ namespace Brewmaster.Ide
 				}
 				parent = parent.Parent;
 			}
-			// TODO: If sibling isn't in a groupedpanel anymore, create one
+			// Sibling isn't in a groupedpanel anymore, so join panels in a new one
+			JoinPanels(sibling, idePanel, index);
 		}
 
+		private void JoinPanels(IdePanel existingPanel, IdePanel newPanel, int newIndex = 1)
+		{
+			var parent = existingPanel.Parent;
+			var groupedPanel = new IdeGroupedPanel {Dock = DockStyle.Fill};
+			groupedPanel.AddPanel(newPanel);
+			groupedPanel.AddPanel(existingPanel, false, newIndex > 0 ? 0 : 1);
+			parent.Controls.Add(groupedPanel);
+		}
 
 
 		public void SuggestDock(Point cursorPosition)
 		{
-			var match = false;
 			foreach (var container in DockContainers)
 			{
-				match = CheckDockLocation(container);
-				if (match) break;
+				if (CheckDockLocation(container)) return;
 			}
-			/*match = CheckDockLocation(Form.NorthSouthContainer.Panel2, "south", true) ||
-			CheckDockLocation(Form.WestCenterContainer.Panel1, "west", false) ||
-			CheckDockLocation(Form.MainEastContainer.Panel2, "east", false);*/
-
-			if (!match && DockSuggestion.HasValue)
-			{
-				DockSuggestion = null;
-				_suggestedSplit = null;
-
-			}
+			DockSuggestion = null;
 		}
 
 		private Overlay DockOverlay { get; set; }
-		private Rectangle? _dockSuggestion;
+		private DockSuggestion _dockSuggestion;
 
-		public Rectangle? DockSuggestion
+		public DockSuggestion DockSuggestion
 		{
 			get { return _dockSuggestion; }
 			set
@@ -184,11 +182,11 @@ namespace Brewmaster.Ide
 				{
 					if (DockOverlay == null)
 					{
-						DockOverlay = new Overlay(Form);
-						DockOverlay.Show(Form);
+						DockOverlay = new Overlay(_form);
+						DockOverlay.Show(_form);
 					}
 
-					DockOverlay.Rectangle = _dockSuggestion.Value;
+					DockOverlay.Rectangle = _dockSuggestion.Bounds;
 					DockOverlay.Visible = true;
 					DockOverlay.Invalidate();
 
@@ -196,12 +194,29 @@ namespace Brewmaster.Ide
 			}
 		}
 
-		private LayoutSplit _suggestedSplit;
 		private bool CheckDockLocation(MultiSplitContainer container)
 		{
 			var horizontal = container.Horizontal;
 			var absoluteBounds = container.Parent.RectangleToScreen(container.Bounds);
 			if (!absoluteBounds.Contains(Cursor.Position)) return false;
+
+			foreach (var panel in container.Panels)
+			{
+				var idePanel = panel.ControlContainer.Controls[0] as IdePanel;
+				if (idePanel != null)
+				{
+					var headerBounds = idePanel.RectangleToScreen(idePanel.Header.Bounds);
+					if (headerBounds.Contains(Cursor.Position))
+					{
+						DockSuggestion = new DockSuggestion
+						{
+							Bounds = headerBounds,
+							JoinPanel = idePanel
+						};
+						return true;
+					}
+				}
+			}
 
 			var splits = new List<LayoutSplit>();
 			var splitIndex = 0;
@@ -257,11 +272,13 @@ namespace Brewmaster.Ide
 				oversized = absoluteBounds.Top - suggestion.Top;
 				if (oversized > 0) suggestion.Y += oversized;
 			}
-			if (DockSuggestion == null || suggestion != DockSuggestion.Value)
+			if (DockSuggestion == null || suggestion != DockSuggestion.Bounds)
 			{
-				DockSuggestion = suggestion;
-				_suggestedSplit = closestSplit;
-
+				DockSuggestion = new DockSuggestion
+				{
+					Bounds = suggestion,
+					LayoutSplit = closestSplit
+				};
 			}
 		}
 
@@ -310,28 +327,28 @@ namespace Brewmaster.Ide
 			DockContainers = containers.ToList();
 		}
 
-		public void HidePanel(Control windowControl)
+		public void HidePanel(IdePanel panel)
 		{
-			var idePanel = GetPanel(windowControl);
-			Control parent = idePanel;
+			Control parent = panel;
 			while (parent != null)
 			{
 				if (parent is IdeGroupedPanel groupedPanel)
 				{
-					RemovePanelFromGroupedPanel(idePanel, groupedPanel);
+					RemovePanelFromGroupedPanel(panel, groupedPanel);
 					return;
 				}
 				parent = parent.Parent;
 			}
 
-			var panelForm = windowControl.FindForm();
+			var panelForm = panel.FindForm();
 			if (panelForm != null && !(panelForm is MainForm))
 			{
+				_memorizedPanelPositions.Remove(panel);
 				panelForm.Visible = false;
 				return;
 			}
 
-			if (idePanel != null) RemovePanelFromSplitContainer(idePanel);
+			RemovePanelFromSplitContainer(panel);
 		}
 
 		public static IdePanel GetPanel(Control control)
@@ -345,33 +362,29 @@ namespace Brewmaster.Ide
 			return control as IdePanel;
 		}
 
-		public void ShowPanel(Control windowControl)
+		public void ShowPanel(IdePanel panel)
 		{
-			var panelForm = windowControl.FindForm();
+			var panelForm = panel.FindForm();
 			if (panelForm != null && !(panelForm is MainForm))
 			{
 				panelForm.Visible = true;
 				return;
 			}
 
-			var idePanel = GetPanel(windowControl);
-			if (idePanel == null) return;
-			if (!_memorizedPanelPositions.ContainsKey(idePanel))
+			if (!_memorizedPanelPositions.ContainsKey(panel))
 			{
 				// Panel was never visible in the first place, show as new form
-				CreateFloatPanel(idePanel);
+				CreateFloatPanel(panel);
 				return;
 			}
 
-			var position = _memorizedPanelPositions[idePanel];
+			var position = _memorizedPanelPositions[panel];
+			_form.SuspendLayout();
 			if (position.Sibling != null)
-			{
-				AddPanelToGroupedPanel(position.Sibling, idePanel, position.Index);
-			}
+				AddPanelToGroupedPanel(position.Sibling, panel, position.Index);
 			else
-			{
-				AddPanelToSplitContainer(position.SplitContainer, idePanel, Math.Max(position.Index, position.SplitContainer.Panels.Count));
-			}
+				AddPanelToSplitContainer(position.SplitContainer, panel, Math.Min(position.Index, position.SplitContainer.Panels.Count));
+			_form.ResumeLayout();
 		}
 
 
@@ -390,5 +403,12 @@ namespace Brewmaster.Ide
 		public int Location { get; set; }
 		public Control Parent { get; set; }
 		public bool Horizontal { get; set; }
+	}
+
+	public class DockSuggestion
+	{
+		public Rectangle Bounds { get; set; }
+		public LayoutSplit LayoutSplit { get; set; }
+		public IdePanel JoinPanel { get; set; }
 	}
 }

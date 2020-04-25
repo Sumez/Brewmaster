@@ -339,8 +339,9 @@ namespace Brewmaster.StatusView
 			var stackBottom = stackPage + 0x100;
 			var stackOffset = _stackPointer & 0xff;
 			var first = true;
+			if (_cpuMemory.Length < stackBottom) return;
 
-			var stringBuilder = new StringBuilder((stackBottom - _stackPointer) * 4);
+				var stringBuilder = new StringBuilder((stackBottom - _stackPointer) * 4);
 			var topSize = stack24bit.Checked ? 3 : stack16bit.Checked ? 2 : 1;
 			for (var i = topSize; i > 0; i--)
 			{

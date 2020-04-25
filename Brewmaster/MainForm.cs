@@ -19,6 +19,7 @@ using Brewmaster.Modules.Breakpoints;
 using Brewmaster.Modules.Build;
 using Brewmaster.Modules.NumberHelper;
 using Brewmaster.Modules.Watch;
+using Brewmaster.Ppu;
 using Brewmaster.ProjectExplorer;
 using Brewmaster.ProjectModel;
 using Brewmaster.ProjectWizard;
@@ -208,6 +209,9 @@ namespace Brewmaster
 				lineAddressMappingsMenuItem.Checked = Settings.ShowLineAddresses;
 
 				// Load layout
+				var ppuPanel = new IdeGroupedPanel();
+				ppuPanel.AddPanel(new IdePanel(TileMap) { Label = "Tilemaps / Nametables" });
+				ppuPanel.AddPanel(new IdePanel(new SpriteViewer()) { Label = "Sprites" });
 				WatchPanel.AddPanel(new IdePanel(WatchValues = new WatchValues()) { Label = "Watch" });
 				WatchPanel.AddPanel(new IdePanel(BreakpointList = new BreakpointList()) { Label = "Breakpoints" });
 
@@ -223,7 +227,7 @@ namespace Brewmaster
 				tabsWestContainer.AddPanel(westContainer).StaticWidth = 250;
 				tabsWestContainer.AddPanel(editorTabs);
 
-				eastContainer.AddPanel(new IdePanel(TileMap) { Label = "Nametables" });
+				eastContainer.AddPanel(ppuPanel);
 				eastContainer.AddPanel(new IdePanel(cpuStatus1) { Label = "Console Status" });
 				eastContainer.AddPanel(new IdePanel(mesen) { Label = "Mesen" });
 
@@ -312,11 +316,11 @@ namespace Brewmaster
 			if (idePanel == null) return;
 
 			var menuItem = new ToolStripMenuItem(idePanel.Label);
-			menuItem.Checked = idePanel.FindForm() == this;
+			menuItem.Checked = idePanel.FindForm() != null;
 			menuItem.CheckOnClick = true;
 			menuItem.Click += (s, e) => {
-				if (!menuItem.Checked) LayoutHandler.HidePanel(windowControl);
-				else LayoutHandler.ShowPanel(windowControl);
+				if (!menuItem.Checked) LayoutHandler.HidePanel(idePanel);
+				else LayoutHandler.ShowPanel(idePanel);
 			};
 			ViewMenuItem.DropDownItems.Add(menuItem);
 
@@ -1520,7 +1524,7 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 
 	    public void ReleasePanel(HeaderPanel panel, Point offset)
 	    {
-		    LayoutHandler.ReleasePanel(panel.Parent, offset);
+		    LayoutHandler.ReleasePanel(panel.Parent as IdePanel, offset);
 	    }
 
 		private void stepOver_Click(object sender, EventArgs e)

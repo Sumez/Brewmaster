@@ -194,7 +194,7 @@ namespace Brewmaster.Ide
 				Panels.RemoveAt(index);
 				Splits.RemoveAt(index);
 				Controls.Remove(panel);
-				Splits[Splits.Count - 1] = FullSize;
+				if (Splits.Count > 0) Splits[Splits.Count - 1] = FullSize;
 				AdjustPanels();
 				ResumeLayout();
 			}

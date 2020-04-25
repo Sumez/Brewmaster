@@ -25,10 +25,9 @@ namespace Brewmaster.Ide
 			base.OnControlAdded(e);
 
 			var idePanel = Controls.OfType<IdePanel>().FirstOrDefault();
-			if (idePanel != null) _header = idePanel.Header;
-			if (_header == null) _header = Controls.OfType<HeaderPanel>().FirstOrDefault();
-			if (_header != null)
+			if (idePanel != null)
 			{
+				_header = idePanel.Header;
 				_header.MouseDown -= AscendMouseEvent;
 				_header.MouseDown += AscendMouseEvent;
 			}
@@ -91,5 +90,11 @@ namespace Brewmaster.Ide
 			if (_dragging) _suggestDock(cursorPosition);
 		}
 
+		public void SetChildPanel(IdePanel panel)
+		{
+			if (Controls.Count >= 0) Controls.Clear();
+			Controls.Add(panel);
+		}
+		public IdePanel ChildPanel { get { return Controls[0] as IdePanel; } }
 	}
 }

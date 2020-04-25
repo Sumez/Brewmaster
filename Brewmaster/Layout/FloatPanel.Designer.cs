@@ -1,4 +1,6 @@
-﻿namespace Brewmaster.Ide
+﻿using System.Windows.Forms;
+
+namespace Brewmaster.Ide
 {
 	partial class FloatPanel
 	{
@@ -34,6 +36,7 @@
 			this.Name = "FloatPanel";
 			this.ShowIcon = false;
 			this.ShowInTaskbar = false;
+			this.FormBorderStyle = FormBorderStyle.SizableToolWindow;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Load += new System.EventHandler(this.FloatPanel_Load);
 			this.ResumeLayout(false);
