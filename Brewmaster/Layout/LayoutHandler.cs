@@ -74,11 +74,14 @@ namespace Brewmaster.Ide
 			splitPanel.Add(panel);
 		}
 
-		public void ReleasePanel(IdePanel panel, Point offset)
+		public void ReleasePanel(IdePanel panel, Point windowLocation)
 		{
 			var windowSize = panel.Size;
-			var windowLocation = panel.PointToScreen(offset);
-			RemovePanelFromSplitContainer(panel);
+			
+			if (panel.Parent is IdeGroupedPanel groupedPanel)
+				groupedPanel.RemovePanel(panel);
+			else
+				RemovePanelFromSplitContainer(panel);
 
 			_form.SuspendLayout();
 			CreateFloatPanel(panel, windowLocation, windowSize);
@@ -86,7 +89,7 @@ namespace Brewmaster.Ide
 		}
 		private void CreateFloatPanel(IdePanel panel, Point? location = null, Size? size = null)
 		{
-			var floatPanel = new FloatPanel(DockPanel, SuggestDock);
+			var floatPanel = new FloatPanel(this);
 			floatPanel.SuspendLayout();
 			floatPanel.SetChildPanel(panel);
 			floatPanel.Show(_form);
@@ -155,8 +158,12 @@ namespace Brewmaster.Ide
 		}
 
 
-		public void SuggestDock(Point cursorPosition)
+		public void SuggestDock(Point cursorPosition, FloatPanel activePanel)
 		{
+			foreach (var floatPanel in Application.OpenForms.OfType<FloatPanel>().Where(p => p != activePanel))
+			{
+				if (CheckGroupDock(floatPanel.ChildPanel)) return;
+			}
 			foreach (var container in DockContainers)
 			{
 				if (CheckDockLocation(container)) return;
@@ -194,6 +201,20 @@ namespace Brewmaster.Ide
 			}
 		}
 
+		private bool CheckGroupDock(IdePanel idePanel)
+		{
+			if (idePanel == null) return false;
+			var headerBounds = idePanel.RectangleToScreen(idePanel.Header.Bounds);
+			if (!headerBounds.Contains(Cursor.Position)) return false;
+			
+			DockSuggestion = new DockSuggestion
+			{
+				Bounds = headerBounds,
+				JoinPanel = idePanel
+			};
+			return true;
+		}
+
 		private bool CheckDockLocation(MultiSplitContainer container)
 		{
 			var horizontal = container.Horizontal;
@@ -202,20 +223,7 @@ namespace Brewmaster.Ide
 
 			foreach (var panel in container.Panels)
 			{
-				var idePanel = panel.ControlContainer.Controls[0] as IdePanel;
-				if (idePanel != null)
-				{
-					var headerBounds = idePanel.RectangleToScreen(idePanel.Header.Bounds);
-					if (headerBounds.Contains(Cursor.Position))
-					{
-						DockSuggestion = new DockSuggestion
-						{
-							Bounds = headerBounds,
-							JoinPanel = idePanel
-						};
-						return true;
-					}
-				}
+				if (CheckGroupDock(panel.ControlContainer.Controls[0] as IdePanel)) return true;
 			}
 
 			var splits = new List<LayoutSplit>();

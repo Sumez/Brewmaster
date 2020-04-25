@@ -143,14 +143,20 @@ namespace Brewmaster.Ide
 			if (Tabs.Count == 1) throw new Exception("Can't remove the last tab in a grouped panel");
 			Controls.Remove(tab.Panel);
 			Tabs.Remove(tab);
+			tab.Panel.Visible = true;
+			tab.Panel.ShowHeader = true;
+			tab.Panel.GroupParent = null;
+
 			if (Tabs.Count == 1) // Only one tab remaining, so remove grouped panel
 			{
 				var lastPanel = Tabs[0].Panel;
-				Parent.Controls.Add(lastPanel);
+				var myParent = Parent;
+				// Remove myself before adding child panel to avoid confusing floatpanels
+				myParent.Controls.Remove(this);
+				myParent.Controls.Add(lastPanel);
 				lastPanel.Visible = true;
 				lastPanel.ShowHeader = true;
 				lastPanel.GroupParent = null;
-				Parent.Controls.Remove(this);
 				Dispose();
 				return;
 			}

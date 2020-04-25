@@ -1522,9 +1522,9 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 			restartMenuItem.PerformClick();
 		}
 
-	    public void ReleasePanel(HeaderPanel panel, Point offset)
+	    public void ReleasePanel(IdePanel panel, Point location)
 	    {
-		    LayoutHandler.ReleasePanel(panel.Parent as IdePanel, offset);
+		    LayoutHandler.ReleasePanel(panel, location);
 	    }
 
 		private void stepOver_Click(object sender, EventArgs e)

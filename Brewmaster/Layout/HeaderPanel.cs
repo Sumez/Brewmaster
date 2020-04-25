@@ -8,6 +8,7 @@ namespace Brewmaster.Ide
 
 	public class HeaderPanel : Panel
     {
+	    public MouseEventHandler MouseDownHandler { get; set; }
 		public const int DragTreshold = 20;
 		private Label _label;
 	    private FlowLayoutPanel _tabPanel;
@@ -36,19 +37,17 @@ namespace Brewmaster.Ide
 
 			var mouseHandler = new OsFeatures.GlobalMouseHandler();
 	        mouseHandler.MouseMoved += MouseMoved;
-	        mouseHandler.MouseUp += l => _dragging = false;
+	        mouseHandler.MouseUp += l => { _dragging = null; return false; };
 	        mouseHandler.MouseDown += LeftMouseDown;
 	        Application.AddMessageFilter(mouseHandler);
 			ControlRemoved += (s, a) => Application.RemoveMessageFilter(mouseHandler);
 		}
 
 
-		private bool _dragging = false;
+		private IdePanel _dragging;
 	    private Point _dragOffset;
 	    protected bool LeftMouseDown(Point location)
 	    {
-		    if (!(FindForm() is MainForm)) return false;
-
 		    var control = OsFeatures.GlobalMouseHandler.GetCurrentControl();
 		    if (control != null)
 		    {
@@ -58,31 +57,51 @@ namespace Brewmaster.Ide
 
 			if (!Bounds.Contains(Parent.PointToClient(location))) return false;
 
-			_dragging = true;
+		    if ((FindForm() is MainForm)) _dragging = Parent as IdePanel;
 		    _dragOffset = location;
-		    return false;
+		    if (Parent is IdeGroupedPanel groupedPanel)
+			    foreach (var tab in groupedPanel.Tabs)
+			    {
+				    if (tab.Button.Bounds.Contains(_tabPanel.PointToClient(location)))
+					    _dragging = tab.Panel;
+			    }
+			
+			return false;
 	    }
 
 	    protected bool MouseMoved(Point location)
 	    {
-		    if (!_dragging) return false;
+		    if (_dragging == null) return false;
 
 		    var delta = new Point(Cursor.Position.X - _dragOffset.X, Cursor.Position.Y - _dragOffset.Y);
 
 		    if (Math.Abs(delta.X) > DragTreshold || Math.Abs(delta.Y) > DragTreshold)
 		    {
-			    _dragging = false;
-			    var mainForm = FindForm() as MainForm;
-			    if (mainForm == null) return false;
-
-			    mainForm.ReleasePanel(this, delta);
-			    OnMouseDown(new MouseEventArgs(MouseButtons.Left, 1, 0, 0, 0)); // Forces form drag immediately
+			    var draggingPanel = _dragging;
+			    _dragging = null;
+			    var form = FindForm();
+			    if (form is MainForm mainForm)
+			    {
+				    mainForm.ReleasePanel(draggingPanel, PointToScreen(delta));
+			    }
+				else if (form is FloatPanel floatPanel)
+			    {
+					floatPanel.ReleasePanel(draggingPanel, PointToScreen(delta));
+				}
+			    else return false;
+				draggingPanel.Header.OnMouseDown(new MouseEventArgs(MouseButtons.Left, 1, 0, 0, 0)); // Forces form drag immediately
 		    }
 
 		    return false;
 	    }
 
-		protected override void OnCreateControl()
+	    protected override void OnMouseDown(MouseEventArgs e)
+	    {
+		    base.OnMouseDown(e);
+		    if (MouseDownHandler != null) MouseDownHandler(this, e);
+	    }
+
+	    protected override void OnCreateControl()
 	    {
 		    base.OnCreateControl();
 		    Height = 20;
@@ -93,7 +112,8 @@ namespace Brewmaster.Ide
 		    get { return _label.Text; }
 		    set { _label.Text = value; }
 	    }
-        /*protected override void OnPaint(PaintEventArgs e)
+
+	    /*protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
 			e.Graphics.DrawLine(new Pen(SystemColors.ActiveBorder, 1), ClientRectangle.Left, ClientRectangle.Bottom-1, ClientRectangle.Right, ClientRectangle.Bottom-1);
@@ -157,6 +177,7 @@ namespace Brewmaster.Ide
 			_tabButton.Appearance = Appearance.Button;
 			_tabButton.FlatStyle = FlatStyle.Flat;
 			_tabButton.FlatAppearance.BorderSize = 0;
+			_tabButton.FlatAppearance.MouseOverBackColor = SystemColors.ButtonHighlight;
 			_tabButton.ForeColor = parent.ForeColor;
 			_tabButton.BackColor = parent.BackColor;
 			_tabButton.Margin = Padding.Empty;
