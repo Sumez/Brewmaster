@@ -1,6 +1,7 @@
 ﻿using Brewmaster.Settings;
 using System;
 using System.Collections.Generic;
+using Brewmaster.Modules.Watch;
 
 namespace Brewmaster.ProjectModel
 {
@@ -66,6 +67,23 @@ namespace Brewmaster.ProjectModel
 				Broken = false;
 			}
 			else Broken = true;
+		}
+
+		public string GetAddressDescription()
+		{
+			return string.Format("{0}{1} ({2})",
+				WatchValue.FormatHexAddress(StartAddress),
+				EndAddress == null ? "" : ("-" + WatchValue.FormatHexAddress(EndAddress.Value)),
+				AddressType.ToString().ToUpper());
+		}
+
+		public override string ToString()
+		{
+			return File != null
+				? string.Format("{0}:{1}", File.File.Name, CurrentLine)
+				: Symbol != null
+					? Symbol + (StartAddress >= 0 ? string.Format(" ({0})", WatchValue.FormatHexAddress(StartAddress)) : "")
+					: GetAddressDescription();
 		}
 	}
 }
