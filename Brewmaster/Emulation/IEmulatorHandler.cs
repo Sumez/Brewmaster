@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Windows.Forms;
 using Brewmaster.Modules.Build;
+using Brewmaster.Modules.SpriteList;
 using Brewmaster.ProjectModel;
 
 namespace Brewmaster.Emulation
@@ -10,10 +10,8 @@ namespace Brewmaster.Emulation
 	public interface IEmulatorHandler : IDisposable
 	{
 		event Action<int> OnBreak;
-		event Action<MemoryState> OnMemoryUpdate;
 		event Action<TileMapData> OnTileMapUpdate;
-		event Action<SpriteData> OnSpriteUpdate;
-		event Action<RegisterState> OnRegisterUpdate;
+		event Action<EmulationState> OnRegisterUpdate;
 		event Action OnRun;
 		event Action<EmulatorStatus> OnStatusChange;
 		event Action<int> OnFpsUpdate;
@@ -42,29 +40,31 @@ namespace Brewmaster.Emulation
 		void Stop();
 		void SetScale(double scale);
 		void SetSpeed(int speed);
-		void ForceNewState(RegisterState state);
+		void ForceNewState(EmulationState state);
 		void SaveState(string file);
 		void LoadState(string file);
 		void UpdateSettings(MesenControl.EmulatorSettings emulatorSettings);
 		void UpdateControllerMappings(Dictionary<int, int> mappings);
 	}
 
-	public class RegisterState
+	public class EmulationState
 	{
-		public RegisterState(ProjectType type)
+		public EmulationState(ProjectType type)
 		{
 			Type = type;
 		}
 		public DebugState NesState;
 		public Mesen.GUI.DebugState SnesState;
 		public ProjectType Type { get; }
+		public SpriteData Sprites = new SpriteData();
+		public TileMapData TileMaps;
+		public MemoryState Memory = new MemoryState(null, null, null);
 	}
 
 	public class SpriteData
 	{
 		public byte[] PixelData = new byte[256 * 240 * 4];
-		public int SelectedSprite { get; set; }
-		public Rectangle SelectedBounds { get; set; }
+		public List<Sprite> Details { get; set; }
 	}
 
 	public class TileMapData

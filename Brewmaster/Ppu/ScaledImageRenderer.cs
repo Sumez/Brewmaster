@@ -26,6 +26,7 @@ namespace Brewmaster.Ppu
 			_pictureBox.Width = 512;
 			_pictureBox.Height = 480;
 			Controls.Add(_pictureBox);
+			_pictureBox.MouseDown += (s, a) => ClickedPicture(a);
 
 			AutoScroll = true;
 		}
@@ -97,7 +98,13 @@ namespace Brewmaster.Ppu
 		{
 			base.OnPaint(e);
 		}
-
+		protected void ClickedPicture(MouseEventArgs e)
+		{
+			var location = new Point((int)(e.X / _scale), (int)(e.Y / _scale));
+			//location.Offset(-_pictureBox.Left, -_pictureBox.Top);
+			OnMouseDownScaled(new MouseEventArgs(e.Button, e.Clicks, location.X, location.Y, 0));
+		}
+		protected virtual void OnMouseDownScaled(MouseEventArgs e) { }
 		public void SetImageSize(int width, int height)
 		{
 			_backBuffer.Dispose();
@@ -113,7 +120,8 @@ namespace Brewmaster.Ppu
 			if (!Visible) return;
 			DrawBackBuffer(() => Graphics.FromImage(_backBuffer));
 			ScaleImage();
-			_pictureBox.Invalidate();
+			if (InvokeRequired) BeginInvoke(new Action(Refresh));
+			else Refresh();
 		}
 
 		protected override void OnVisibleChanged(EventArgs e)

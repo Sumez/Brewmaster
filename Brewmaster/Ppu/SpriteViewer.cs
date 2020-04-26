@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Windows.Forms;
-using Brewmaster.Emulation;
+using Brewmaster.Modules;
 
 namespace Brewmaster.Ppu
 {
 	public partial class SpriteViewer : UserControl
 	{
-		public SpriteViewer()
+		public SpriteViewer(Events events)
 		{
 			InitializeComponent();
+			_spriteDisplay.ModuleEvents = events;
 		}
 
 		protected override void OnLayout(LayoutEventArgs e)
@@ -28,10 +29,6 @@ namespace Brewmaster.Ppu
 			_spriteDisplay.FitImage = _scaleButton.Checked;
 			// Removes confusing focus from current button
 			//if (_scaleButton.Focused && _layerButtons.Count > _requestedLayerId) _layerButtons[_requestedLayerId].Focus();
-		}
-		public void UpdateSpriteData(SpriteData data)
-		{
-			_spriteDisplay.UpdateSpriteData(data);
 		}
 	}
 }
