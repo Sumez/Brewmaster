@@ -35,7 +35,7 @@
 			this._scaleButton = new System.Windows.Forms.CheckBox();
 			this._layerButtonPanel = new System.Windows.Forms.FlowLayoutPanel();
 			this.horizontalLine1 = new Brewmaster.StatusView.HorizontalLine();
-			this._tileMapDisplay = new Brewmaster.Ppu.TileMapRender();
+			this._spriteDisplay = new Brewmaster.Ppu.SpriteRender();
 			RegisterToolTip = new System.Windows.Forms.ToolTip(this.components);
 			this._controlPanel.SuspendLayout();
 			this._displayButtonPanel.SuspendLayout();
@@ -99,21 +99,20 @@
 			// 
 			// _tileMapDisplay
 			// 
-			this._tileMapDisplay.AutoScroll = true;
-			this._tileMapDisplay.BackColor = System.Drawing.Color.Black;
-			this._tileMapDisplay.FitImage = false;
-			this._tileMapDisplay.Location = new System.Drawing.Point(0, 0);
-			this._tileMapDisplay.Name = "_tileMapDisplay";
-			this._tileMapDisplay.ShowScrollOverlay = false;
-			this._tileMapDisplay.Size = new System.Drawing.Size(317, 320);
-			this._tileMapDisplay.TabIndex = 0;
+			this._spriteDisplay.AutoScroll = true;
+			this._spriteDisplay.BackColor = System.Drawing.Color.Black;
+			this._spriteDisplay.FitImage = false;
+			this._spriteDisplay.Location = new System.Drawing.Point(0, 0);
+			this._spriteDisplay.Name = "_spriteDisplay";
+			this._spriteDisplay.Size = new System.Drawing.Size(317, 320);
+			this._spriteDisplay.TabIndex = 0;
 			// 
 			// SpriteViewer
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.AutoSize = true;
 			this.Controls.Add(this.horizontalLine1);
-			this.Controls.Add(this._tileMapDisplay);
+			this.Controls.Add(this._spriteDisplay);
 			this.Controls.Add(this._controlPanel);
 			this.MinimumSize = new System.Drawing.Size(275, 0);
 			this.Name = "SpriteViewer";
@@ -131,6 +130,6 @@
 		private System.Windows.Forms.FlowLayoutPanel _displayButtonPanel;
 		private System.Windows.Forms.CheckBox _scaleButton;
 		private StatusView.HorizontalLine horizontalLine1;
-		private TileMapRender _tileMapDisplay;
+		private SpriteRender _spriteDisplay;
 	}
 }

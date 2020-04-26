@@ -25,6 +25,7 @@ namespace Brewmaster.Emulation
 		public event Action<MemoryState> OnMemoryUpdate;
 		public event Action<RegisterState> OnRegisterUpdate;
 		public event Action<TileMapData> OnTileMapUpdate;
+		public event Action<SpriteData> OnSpriteUpdate;
 
 		private Object emulatorLock = new Object();
 

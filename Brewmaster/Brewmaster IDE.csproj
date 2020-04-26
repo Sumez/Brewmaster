@@ -146,11 +146,17 @@
     <Compile Include="Modules\MenuHelper.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Ppu\SpriteRender.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Ppu\SpriteViewer.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Ppu\SpriteViewer.Designer.cs">
       <DependentUpon>SpriteViewer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Ppu\ScaledImageRenderer.cs">
+      <SubType>Component</SubType>
     </Compile>
     <Compile Include="Ppu\TileMapViewer.cs">
       <SubType>UserControl</SubType>

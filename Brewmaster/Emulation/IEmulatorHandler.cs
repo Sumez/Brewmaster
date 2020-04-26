@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Windows.Forms;
 using Brewmaster.Modules.Build;
 using Brewmaster.ProjectModel;
@@ -11,6 +12,7 @@ namespace Brewmaster.Emulation
 		event Action<int> OnBreak;
 		event Action<MemoryState> OnMemoryUpdate;
 		event Action<TileMapData> OnTileMapUpdate;
+		event Action<SpriteData> OnSpriteUpdate;
 		event Action<RegisterState> OnRegisterUpdate;
 		event Action OnRun;
 		event Action<EmulatorStatus> OnStatusChange;
@@ -57,6 +59,14 @@ namespace Brewmaster.Emulation
 		public Mesen.GUI.DebugState SnesState;
 		public ProjectType Type { get; }
 	}
+
+	public class SpriteData
+	{
+		public byte[] PixelData = new byte[256 * 240 * 4];
+		public int SelectedSprite { get; set; }
+		public Rectangle SelectedBounds { get; set; }
+	}
+
 	public class TileMapData
 	{
 		public int ScrollX;

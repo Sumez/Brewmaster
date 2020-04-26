@@ -34,6 +34,7 @@ namespace Brewmaster
 
 	    public AsmProject CurrentProject { get; set; }
 	    public Settings.Settings Settings { get; private set; }
+	    public SpriteViewer Sprites { get; private set; }
 	    public LayoutHandler LayoutHandler { get; private set; }
 	    public BuildHandler BuildHandler { get; private set; }
 	    public string RequestFile { get; set; }
@@ -211,7 +212,7 @@ namespace Brewmaster
 				// Load layout
 				var ppuPanel = new IdeGroupedPanel();
 				ppuPanel.AddPanel(new IdePanel(TileMap) { Label = "Tilemaps / Nametables" });
-				ppuPanel.AddPanel(new IdePanel(new SpriteViewer()) { Label = "Sprites" });
+				ppuPanel.AddPanel(new IdePanel(Sprites = new SpriteViewer()) { Label = "Sprites" });
 				WatchPanel.AddPanel(new IdePanel(WatchValues = new WatchValues()) { Label = "Watch" });
 				WatchPanel.AddPanel(new IdePanel(BreakpointList = new BreakpointList()) { Label = "Breakpoints" });
 
@@ -310,7 +311,8 @@ namespace Brewmaster
 			ResumeLayout();
         }
 
-		private void AddWindowOption(Control windowControl)
+
+	    private void AddWindowOption(Control windowControl)
 		{
 			var idePanel = LayoutHandler.GetPanel(windowControl);
 			if (idePanel == null) return;
@@ -428,7 +430,8 @@ namespace Brewmaster
 		    emulator.OnMemoryUpdate += ThreadSafeMemoryHandler;
 		    emulator.OnRegisterUpdate += ThreadSafeDebugStateHandler;
 		    emulator.OnTileMapUpdate += TileMap.UpdateNametableData;
-		    emulator.OnFpsUpdate += fps => BeginInvoke(new Action<int>(UpdateFps), fps);
+		    emulator.OnSpriteUpdate += Sprites.UpdateSpriteData;
+			emulator.OnFpsUpdate += fps => BeginInvoke(new Action<int>(UpdateFps), fps);
 
 		    cpuStatus1.StateEdited = emulator.ForceNewState;
 	    }
