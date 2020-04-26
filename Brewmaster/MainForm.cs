@@ -139,8 +139,8 @@ namespace Brewmaster
 		    ErrorList.RefreshList(list);
 		    if (list.Any(e => e.Type == BuildHandler.BuildError.BuildErrorType.Error))
 		    {
-			    var outputPanel = ErrorList.Parent as IdePanel;
-			    if (outputPanel != null) outputPanel.GroupParent.ShowPanel(outputPanel);
+			    var errorPanel = ErrorList.Parent as IdePanel;
+			    if (errorPanel != null && errorPanel.GroupParent != null) errorPanel.GroupParent.ShowPanel(errorPanel);
 		    }
 	    }
 

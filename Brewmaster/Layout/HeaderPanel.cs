@@ -48,6 +48,7 @@ namespace Brewmaster.Ide
 	    private Point _dragOffset;
 	    protected bool LeftMouseDown(Point location)
 	    {
+		    if (Parent == null) return false;
 		    var control = OsFeatures.GlobalMouseHandler.GetCurrentControl();
 		    if (control != null)
 		    {
@@ -184,6 +185,7 @@ namespace Brewmaster.Ide
 			_tabButton.Height = parent.Height;
 			_tabButton.CheckedChanged += (s, a) => { if (Selected && WasSelected != null) WasSelected(); };
 			_tabButton.MouseDown += (s, a) => { if (a.Button == MouseButtons.Left) Selected = true; };
+			panel.LabelChanged += text => _tabButton.Text = text;
 
 			Panel = panel;
 		}

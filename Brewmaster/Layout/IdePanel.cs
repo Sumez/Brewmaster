@@ -21,12 +21,17 @@ namespace Brewmaster.Ide
 
 	public class IdePanel : Panel
 	{
+		public event Action<string> LabelChanged;
 		public HeaderPanel Header = new HeaderPanel { Dock = DockStyle.Top };
 
 		public string Label
 		{
 			get { return Header.Label; }
-			set { Header.Label = value; }
+			set
+			{
+				Header.Label = value;
+				if (LabelChanged != null) LabelChanged(value);
+			}
 		}
 
 		public bool ShowHeader
@@ -57,7 +62,6 @@ namespace Brewmaster.Ide
 		{
 			Controls.Add(Header);
 		}
-
 	}
 
 	public class IdeGroupedPanel : IdePanel
