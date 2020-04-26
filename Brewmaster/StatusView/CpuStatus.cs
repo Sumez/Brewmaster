@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Text;
 using System.Windows.Forms;
 using Brewmaster.Emulation;
+using Brewmaster.Modules;
 using Brewmaster.ProjectModel;
 using Mesen.GUI;
 
@@ -15,6 +16,16 @@ namespace Brewmaster.StatusView
 			InitializeComponent();
 			InitializeFlagEvents();
 			SetMode(ProjectType.Nes);
+		}
+
+		public Events ModuleEvents
+		{
+			get { return _moduleEvents; }
+			set
+			{
+				_moduleEvents = value;
+				_moduleEvents.EmulationStateUpdate += UpdateStates;
+			}
 		}
 
 		private void InitializeFlagEvents()
@@ -73,15 +84,16 @@ namespace Brewmaster.StatusView
 			}
 		}
 
-		private RegisterState _lastState = null;
+		private EmulationState _lastState = null;
 		private bool _loading = false;
-		public void UpdateStates(RegisterState registerState)
+		public void UpdateStates(EmulationState state)
 		{
-			if (registerState == null) return;
+			if (state == null) return;
 			_loading = true;
-			_lastState = registerState;
-			if (registerState.Type == ProjectType.Nes) UpdateNesState(registerState.NesState);
-			if (registerState.Type == ProjectType.Snes) UpdateSnesState(registerState.SnesState);
+			_lastState = state;
+			if (state.Type == ProjectType.Nes) UpdateNesState(state.NesState);
+			if (state.Type == ProjectType.Snes) UpdateSnesState(state.SnesState);
+			_cpuMemory = state.Memory.CpuData;
 			RefreshStack();
 			_loading = false;
 		}
@@ -182,7 +194,7 @@ namespace Brewmaster.StatusView
 		private ulong _cycleBase = 0;
 		private uint _lastFrame = 0;
 		private ulong _lastCycle = 0;
-		public Action<RegisterState> StateEdited;
+		public Action<EmulationState> StateEdited;
 
 		private void ResetFrame_Click(object sender, EventArgs e)
 		{
@@ -321,11 +333,7 @@ namespace Brewmaster.StatusView
 
 		private byte[] _cpuMemory = new byte[0];
 		private int _stackPointer = 0;
-		public void UpdateMemory(byte[] stateCpuData)
-		{
-			_cpuMemory = stateCpuData;
-			RefreshStack();
-		}
+		private Events _moduleEvents;
 
 		private void StackSizeChanged(object sender, EventArgs e)
 		{

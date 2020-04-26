@@ -246,13 +246,7 @@ namespace Brewmaster.Modules.Breakpoints
 		}
 		public void Update()
 		{
-			SubItems[1].Text = 
-				Breakpoint.File != null
-				? string.Format("{0}:{1}", Breakpoint.File.File.Name, Breakpoint.CurrentLine)
-				: Breakpoint.Symbol != null
-						? Breakpoint.Symbol + (Breakpoint.StartAddress >= 0 ? string.Format(" ({0})", WatchValue.FormatHexAddress(Breakpoint.StartAddress)) : "")
-						: string.Format("{0}{1}", WatchValue.FormatHexAddress(Breakpoint.StartAddress),
-							Breakpoint.EndAddress == null ? "" : ("-" + WatchValue.FormatHexAddress(Breakpoint.EndAddress.Value)));
+			SubItems[1].Text = Breakpoint.ToString();
 			SubItems[2].Text = string.Format(@"{0}{1}{2}",
 				Breakpoint.Type.HasFlag(Breakpoint.Types.Read) ? "R" : "-",
 				Breakpoint.Type.HasFlag(Breakpoint.Types.Write) ? "W" : "-",

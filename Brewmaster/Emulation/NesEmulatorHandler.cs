@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Brewmaster.Modules.Build;
+using Brewmaster.Modules.SpriteList;
 using Brewmaster.ProjectModel;
 
 namespace Brewmaster.Emulation
@@ -22,8 +23,7 @@ namespace Brewmaster.Emulation
 		public event Action OnRun;
 		public event Action<int> OnBreak;
 		public event Action<EmulatorStatus> OnStatusChange;
-		public event Action<MemoryState> OnMemoryUpdate;
-		public event Action<RegisterState> OnRegisterUpdate;
+		public event Action<EmulationState> OnRegisterUpdate;
 		public event Action<TileMapData> OnTileMapUpdate;
 
 		private Object emulatorLock = new Object();
@@ -31,7 +31,8 @@ namespace Brewmaster.Emulation
 		public NesEmulatorHandler(Form mainWindow)
 		{
 			_mainWindow = mainWindow;
-			_nametableData.OnRefreshRequest += PushNametableData;
+			_debugState.TileMaps = new TileMapData { NumberOfMaps = 4, MapWidth = 256, MapHeight = 240, DataWidth = 256 * 4 };
+			_debugState.TileMaps.OnRefreshRequest += PushNametableData;
 		}
 
 		public void LoadCartridgeAtSameState(string baseDir, string cartridgeFile, Func<int, int> getNewPc)
@@ -177,7 +178,7 @@ namespace Brewmaster.Emulation
 			_renderControl.Size = new Size(size.Width, size.Height);
 		}
 
-		public void ForceNewState(RegisterState state)
+		public void ForceNewState(EmulationState state)
 		{
 			InteropEmu.DebugSetState(state.NesState);
 		}
@@ -232,24 +233,22 @@ namespace Brewmaster.Emulation
 			_logHandler(new LogData(status, LogType.Normal));
 		}
 
-		private readonly MemoryState _memoryState = new MemoryState(null, null, null);
-		private readonly TileMapData _nametableData = new TileMapData { NumberOfMaps = 4, MapWidth = 256, MapHeight = 240, DataWidth = 256 * 4 };
+		private readonly EmulationState _debugState = new EmulationState(ProjectType.Nes);
 		protected override void EmitDebugData()
 		{
 			//lock (emulatorLock)
 			{
-				if (OnMemoryUpdate != null)
-				{
-					_memoryState.CpuData = InteropEmu.DebugGetMemoryState(DebugMemoryType.CpuMemory);
-					_memoryState.PpuData = InteropEmu.DebugGetMemoryState(DebugMemoryType.PpuMemory);
-					_memoryState.OamData = InteropEmu.DebugGetMemoryState(DebugMemoryType.SpriteMemory);
-					OnMemoryUpdate(_memoryState);
-				}
 				if (OnRegisterUpdate != null)
 				{
-					var state = new RegisterState(ProjectType.Nes);
-					InteropEmu.DebugGetState(ref state.NesState);
-					OnRegisterUpdate(state);
+					_debugState.Memory.CpuData = InteropEmu.DebugGetMemoryState(DebugMemoryType.CpuMemory);
+					_debugState.Memory.PpuData = InteropEmu.DebugGetMemoryState(DebugMemoryType.PpuMemory);
+					_debugState.Memory.OamData = InteropEmu.DebugGetMemoryState(DebugMemoryType.SpriteMemory);
+
+					InteropEmu.DebugGetState(ref _debugState.NesState);
+					_debugState.Sprites.PixelData = InteropEmu.DebugGetSprites();
+					_debugState.Sprites.Details = Sprite.GetNesSprites(_debugState.Memory.OamData, _debugState.NesState.PPU.ControlFlags.LargeSprites == 1);
+
+					OnRegisterUpdate(_debugState);
 				}
 				if (OnTileMapUpdate != null) PushNametableData();
 			}
@@ -257,12 +256,12 @@ namespace Brewmaster.Emulation
 
 		private void PushNametableData()
 		{
-			InteropEmu.DebugGetPpuScroll(out _nametableData.ScrollX, out _nametableData.ScrollY);
-			for (int i = 0; i < _nametableData.NumberOfMaps; i++)
+			InteropEmu.DebugGetPpuScroll(out _debugState.TileMaps.ScrollX, out _debugState.TileMaps.ScrollY);
+			for (int i = 0; i < _debugState.TileMaps.NumberOfMaps; i++)
 			{
-				InteropEmu.DebugGetNametable(i, false, out _nametableData.PixelData[i], out _nametableData.TileData[i], out _nametableData.AttributeData[i]);
+				InteropEmu.DebugGetNametable(i, false, out _debugState.TileMaps.PixelData[i], out _debugState.TileMaps.TileData[i], out _debugState.TileMaps.AttributeData[i]);
 			}
-			if (OnTileMapUpdate != null) OnTileMapUpdate(_nametableData);
+			if (OnTileMapUpdate != null) OnTileMapUpdate(_debugState.TileMaps);
 
 		}
 

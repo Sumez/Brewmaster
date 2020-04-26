@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Brewmaster.Modules.Build;
+using Brewmaster.Modules.SpriteList;
 using Brewmaster.ProjectModel;
 using Mesen.GUI;
 using Mesen.GUI.Config;
@@ -21,16 +20,11 @@ using SnesDebugApi = Mesen.GUI.DebugApi;
 using SnesConfigApi = Mesen.GUI.ConfigApi;
 using SnesInputApi = Mesen.GUI.InputApi;
 using SnesDebuggerFlags = Mesen.GUI.DebuggerFlags;
-using SnesDebugState = Mesen.GUI.DebugState;
-using SnesEmulationFlags = Brewmaster.Emulation.EmulationFlags;
 using SnesBreakpoint = Mesen.GUI.Debugger.InteropBreakpoint;
 
 //using NotificationHandler = Mesen.GUI.NotificationListener;
 
 //using NotificationType = Brewmaster.Emulation.ConsoleNotificationType;
-
-
-using EmuApi = Brewmaster.Emulation.EmuApi;
 using SnesAspectRatio = Mesen.GUI.Config.VideoAspectRatio;
 
 namespace Brewmaster.Emulation
@@ -63,8 +57,7 @@ namespace Brewmaster.Emulation
 		public event Action OnRun;
 		public event Action<int> OnBreak;
 		public event Action<EmulatorStatus> OnStatusChange;
-		public event Action<MemoryState> OnMemoryUpdate;
-		public event Action<RegisterState> OnRegisterUpdate;
+		public event Action<EmulationState> OnRegisterUpdate;
 		public event Action<TileMapData> OnTileMapUpdate;
 
 		private Object emulatorLock = new Object();
@@ -72,8 +65,8 @@ namespace Brewmaster.Emulation
 		public SnesEmulatorHandler(Form mainWindow)
 		{
 			_mainWindow = mainWindow;
-			_tileMapData.PixelData[0] = new byte[1024 * 1024 * 4];
-			_tileMapData.OnRefreshRequest += () => PushTileMapData();
+			_state.TileMaps.PixelData[0] = new byte[1024 * 1024 * 4];
+			_state.TileMaps.OnRefreshRequest += () => PushTileMapData();
 		}
 
 		public void LoadCartridge(string baseDir, string cartridgeFile)
@@ -166,7 +159,7 @@ namespace Brewmaster.Emulation
 			ApplyEmulationConfig();
 		}
 
-		public void ForceNewState(RegisterState state)
+		public void ForceNewState(EmulationState state)
 		{
 			// TODO when Mesen-S supports it
 		}
@@ -239,50 +232,48 @@ namespace Brewmaster.Emulation
 			_logHandler(new LogData(status, LogType.Normal));
 		}
 
-		private readonly TileMapData _tileMapData = new TileMapData { NumberOfMaps = 1, DataWidth = 1024 * 4, NumberOfPages = 4 };
-		private readonly MemoryState _memoryState = new MemoryState(null, null, null);
-		private readonly RegisterState _state = new RegisterState(ProjectType.Snes);
+		private readonly EmulationState _state = new EmulationState(ProjectType.Snes)
+		{
+			TileMaps = new TileMapData {NumberOfMaps = 1, DataWidth = 1024 * 4, NumberOfPages = 4}
+		};
 		private GetTilemapOptions _tilemapOptions = new GetTilemapOptions();
+		private GetSpritePreviewOptions _spriteOptions = new GetSpritePreviewOptions();
 
 		protected override void EmitDebugData()
 		{
-			//lock (emulatorLock)
+			if (OnRegisterUpdate != null)
 			{
-				if (OnMemoryUpdate != null || OnTileMapUpdate != null)
-				{
-					_memoryState.PpuData = SnesDebugApi.GetMemoryState(SnesMemoryType.VideoRam);
-				}
-				if (OnRegisterUpdate != null || OnTileMapUpdate != null)
-				{
-					_state.SnesState = SnesDebugApi.GetState();
-				}
+				_state.SnesState = SnesDebugApi.GetState();
+				_state.Memory.PpuData = SnesDebugApi.GetMemoryState(SnesMemoryType.VideoRam);
+				_state.Memory.OamData = SnesDebugApi.GetMemoryState(SnesMemoryType.SpriteRam);
+				_state.Memory.CgRam = SnesDebugApi.GetMemoryState(SnesMemoryType.CGRam);
+				_state.Memory.CpuData = SnesDebugApi.GetMemoryState(SnesMemoryType.CpuMemory);
+				SnesDebugApi.GetSpritePreview(_spriteOptions, _state.SnesState.Ppu, _state.Memory.PpuData, _state.Memory.OamData, _state.Memory.CgRam, _state.Sprites.PixelData);
+				_state.Sprites.Details = Sprite.GetSnesSprites(_state.Memory.OamData, _state.SnesState.Ppu.OamMode);
 
-				if (OnMemoryUpdate != null)
-				{
-					_memoryState.CpuData = SnesDebugApi.GetMemoryState(SnesMemoryType.CpuMemory);
-					_memoryState.OamData = SnesDebugApi.GetMemoryState(SnesMemoryType.SpriteRam);
-					OnMemoryUpdate(_memoryState);
-				}
-				if (OnRegisterUpdate != null) OnRegisterUpdate(_state);
+				OnRegisterUpdate(_state);
 				if (OnTileMapUpdate != null) PushTileMapData(true, true);
 			}
 		}
 
 		private void PushTileMapData(bool skipVram = false, bool skipState = false)
 		{
-			if (!skipVram) _memoryState.PpuData = SnesDebugApi.GetMemoryState(SnesMemoryType.VideoRam);
+			if (!skipVram)
+			{
+				_state.Memory.CgRam = SnesDebugApi.GetMemoryState(SnesMemoryType.CGRam);
+				_state.Memory.PpuData = SnesDebugApi.GetMemoryState(SnesMemoryType.VideoRam);
+			}
 			if (!skipState) _state.SnesState = _state.SnesState = SnesDebugApi.GetState();
-			_memoryState.CgRam = SnesDebugApi.GetMemoryState(SnesMemoryType.CGRam);
-			_tilemapOptions.Layer = (byte)_tileMapData.GetPage;
-			_tileMapData.MapWidth = GetMapWidth();
-			_tileMapData.MapHeight = GetMapHeight();
-			DebugApi.GetTilemap(_tilemapOptions, _state.SnesState.Ppu, _memoryState.PpuData, _memoryState.CgRam, _tileMapData.PixelData[0]);
+			_tilemapOptions.Layer = (byte)_state.TileMaps.GetPage;
+			_state.TileMaps.MapWidth = GetMapWidth();
+			_state.TileMaps.MapHeight = GetMapHeight();
+			SnesDebugApi.GetTilemap(_tilemapOptions, _state.SnesState.Ppu, _state.Memory.PpuData, _state.Memory.CgRam, _state.TileMaps.PixelData[0]);
 
-			_tileMapData.ViewportHeight = _state.SnesState.Ppu.OverscanMode ? 239 : 224;
-			_tileMapData.ScrollX = (_state.SnesState.Ppu.BgMode == 7 ? (int)_state.SnesState.Ppu.Mode7.HScroll : _state.SnesState.Ppu.Layers[_tilemapOptions.Layer].HScroll) % _tileMapData.MapWidth;
-			_tileMapData.ScrollY = (_state.SnesState.Ppu.BgMode == 7 ? (int)_state.SnesState.Ppu.Mode7.VScroll : _state.SnesState.Ppu.Layers[_tilemapOptions.Layer].VScroll) % _tileMapData.MapHeight;
+			_state.TileMaps.ViewportHeight = _state.SnesState.Ppu.OverscanMode ? 239 : 224;
+			_state.TileMaps.ScrollX = (_state.SnesState.Ppu.BgMode == 7 ? (int)_state.SnesState.Ppu.Mode7.HScroll : _state.SnesState.Ppu.Layers[_tilemapOptions.Layer].HScroll) % _state.TileMaps.MapWidth;
+			_state.TileMaps.ScrollY = (_state.SnesState.Ppu.BgMode == 7 ? (int)_state.SnesState.Ppu.Mode7.VScroll : _state.SnesState.Ppu.Layers[_tilemapOptions.Layer].VScroll) % _state.TileMaps.MapHeight;
 
-			if (OnTileMapUpdate != null) OnTileMapUpdate(_tileMapData);
+			if (OnTileMapUpdate != null) OnTileMapUpdate(_state.TileMaps);
 		}
 
 		private int GetMapWidth()
@@ -335,12 +326,12 @@ namespace Brewmaster.Emulation
 
 		public static void ApplyEmulationConfig()
 		{
-			ConfigApi.SetEmulationConfig(EmulationConfig);
+			SnesConfigApi.SetEmulationConfig(EmulationConfig);
 		}
 
 		public static void ApplyDebuggerConfig()
 		{
-			ConfigApi.SetDebuggerFlag(SnesDebuggerFlags.BreakOnBrk, true);
+			SnesConfigApi.SetDebuggerFlag(SnesDebuggerFlags.BreakOnBrk, true);
 			//ConfigApi.SetDebuggerFlag(SnesDebuggerFlags.BreakOnCop, BreakOnCop);
 			//ConfigApi.SetDebuggerFlag(SnesDebuggerFlags.BreakOnWdm, BreakOnWdm);
 			//ConfigApi.SetDebuggerFlag(SnesDebuggerFlags.BreakOnStp, BreakOnStp);
@@ -348,14 +339,14 @@ namespace Brewmaster.Emulation
 		}
 		public static void ApplyAudioConfig()
 		{
-			ConfigApi.SetAudioConfig(new AudioConfig());
+			SnesConfigApi.SetAudioConfig(new AudioConfig());
 		}
 
 		public static void ApplyPreferenceConfig()
 		{
-			ShortcutKeyInfo[] shortcutKeys = new ShortcutKeyInfo[0];
-			ConfigApi.SetShortcutKeys(shortcutKeys, (UInt32)shortcutKeys.Length);
-			ConfigApi.SetPreferences(new InteropPreferencesConfig()
+			var shortcutKeys = new ShortcutKeyInfo[0];
+			SnesConfigApi.SetShortcutKeys(shortcutKeys, (UInt32)shortcutKeys.Length);
+			SnesConfigApi.SetPreferences(new InteropPreferencesConfig()
 			{
 				ShowFps = false,
 				ShowFrameCounter = false,
@@ -373,7 +364,7 @@ namespace Brewmaster.Emulation
 
 		private static void ApplyVideoConfig()
 		{
-			ConfigApi.SetVideoConfig(VideoConfig);
+			SnesConfigApi.SetVideoConfig(VideoConfig);
 		}
 
 		private void ApplyInputConfig()
@@ -400,7 +391,7 @@ namespace Brewmaster.Emulation
 			var config = new InputConfig();
 			config.Controllers[0].Type = ControllerType.SnesController;
 			config.Controllers[0].Keys.Mapping1 = p1Mapping;
-			ConfigApi.SetInputConfig(config);
+			SnesConfigApi.SetInputConfig(config);
 		}
 		private static uint GetMapping(Dictionary<int, int> mappings, int defaultKey)
 		{

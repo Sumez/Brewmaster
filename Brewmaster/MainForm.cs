@@ -18,6 +18,7 @@ using Brewmaster.Modules;
 using Brewmaster.Modules.Breakpoints;
 using Brewmaster.Modules.Build;
 using Brewmaster.Modules.NumberHelper;
+using Brewmaster.Modules.SpriteList;
 using Brewmaster.Modules.Watch;
 using Brewmaster.Ppu;
 using Brewmaster.ProjectExplorer;
@@ -34,6 +35,8 @@ namespace Brewmaster
 
 	    public AsmProject CurrentProject { get; set; }
 	    public Settings.Settings Settings { get; private set; }
+	    public SpriteViewer Sprites { get; private set; }
+	    public SpriteList SpriteList { get; private set; }
 	    public LayoutHandler LayoutHandler { get; private set; }
 	    public BuildHandler BuildHandler { get; private set; }
 	    public string RequestFile { get; set; }
@@ -42,8 +45,7 @@ namespace Brewmaster
 		private readonly Action<int> _breakHandler;
 	    private readonly Action<IEnumerable<Breakpoint>> _breakpointHandler;
 		private readonly Action<EmulatorStatus> _emulationStatusHandler;
-		private readonly Action<MemoryState> _memoryHandler;
-		private readonly Action<RegisterState> _debugStateHandler;
+		private readonly Action<EmulationState> _debugStateHandler;
 		private Events _moduleEvents = new Events();
 		private MemoryState _memoryState;
 
@@ -137,12 +139,14 @@ namespace Brewmaster
 	    private void BuildErrorUpdate(List<BuildHandler.BuildError> list)
 	    {
 		    ErrorList.RefreshList(list);
-		    if (list.Any(e => e.Type == BuildHandler.BuildError.BuildErrorType.Error))
-		    {
-			    var outputPanel = ErrorList.Parent as IdePanel;
-			    if (outputPanel != null) outputPanel.GroupParent.ShowPanel(outputPanel);
-		    }
+		    if (list.Any(e => e.Type == BuildHandler.BuildError.BuildErrorType.Error)) RevealPanel(ErrorList);
 	    }
+
+	    private void RevealPanel(Control targetControl)
+	    {
+			var panel = targetControl.Parent as IdePanel;
+		    if (panel != null && panel.GroupParent != null) panel.GroupParent.ShowPanel(panel);
+		}
 
 
 		private void ThreadSafeLogOutput(LogData data)
@@ -166,12 +170,7 @@ namespace Brewmaster
 		{
 			BeginInvoke(_emulationStatusHandler, status);
 		}
-	    private void ThreadSafeMemoryHandler(MemoryState state)
-	    {
-		    if (IsDisposed || Disposing) return;
-			BeginInvoke(_memoryHandler, state);
-	    }
-		private void ThreadSafeDebugStateHandler(RegisterState state)
+		private void ThreadSafeDebugStateHandler(EmulationState state)
 		{
 			if (IsDisposed || Disposing) return;
 			BeginInvoke(_debugStateHandler, state);
@@ -211,7 +210,12 @@ namespace Brewmaster
 				// Load layout
 				var ppuPanel = new IdeGroupedPanel();
 				ppuPanel.AddPanel(new IdePanel(TileMap) { Label = "Tilemaps / Nametables" });
-				ppuPanel.AddPanel(new IdePanel(new SpriteViewer()) { Label = "Sprites" });
+				ppuPanel.AddPanel(new IdePanel(Sprites = new SpriteViewer(_moduleEvents)) { Label = "Sprites" });
+
+				var memoryPanel = new IdeGroupedPanel();
+				memoryPanel.AddPanel(new IdePanel(MemoryTabs) { Label = "Memory Viewer" });
+				memoryPanel.AddPanel(new IdePanel(SpriteList = new SpriteList(_moduleEvents)) { Label = "Sprite list" });
+
 				WatchPanel.AddPanel(new IdePanel(WatchValues = new WatchValues()) { Label = "Watch" });
 				WatchPanel.AddPanel(new IdePanel(BreakpointList = new BreakpointList()) { Label = "Breakpoints" });
 
@@ -228,12 +232,13 @@ namespace Brewmaster
 				tabsWestContainer.AddPanel(editorTabs);
 
 				eastContainer.AddPanel(ppuPanel);
+				cpuStatus1.ModuleEvents = _moduleEvents; // TODO Initialize object with events instance
 				eastContainer.AddPanel(new IdePanel(cpuStatus1) { Label = "Console Status" });
 				eastContainer.AddPanel(new IdePanel(mesen) { Label = "Mesen" });
 
 				southContainer.AddPanel(OutputPanel);
 				southContainer.AddPanel(WatchPanel);
-				southContainer.AddPanel(new IdePanel(MemoryTabs) { Label = "Memory Viewer" });
+				southContainer.AddPanel(memoryPanel);
 
 				westContainer.AddPanel(new IdePanel(ProjectExplorer) { Label = "Project Explorer" });
 				westContainer.AddPanel(new IdePanel(CartridgeExplorer) { Label = "Cartridge Explorer" });
@@ -246,8 +251,9 @@ namespace Brewmaster
 				AddWindowOption(ProjectExplorer);
 				AddWindowOption(mesen);
 				AddWindowOption(OutputWindow);
-				AddWindowOption(memoryViewer1);
-				AddWindowOption(memoryViewer2);
+				AddWindowOption(TileMap);
+				AddWindowOption(Sprites);
+				AddWindowOption(MemoryTabs);
 				AddWindowOption(cpuStatus1);
 				AddWindowOption(WatchValues);
 				AddWindowOption(BreakpointList);
@@ -261,16 +267,20 @@ namespace Brewmaster
 				_breakpointHandler = SetBreakpoints;
 				_emulationStatusHandler = EmulatorStatusChanged;
 
-				_memoryHandler = (state) =>
+				_debugStateHandler = (state) =>
 				{
-					_memoryState = state;
-					WatchValues.SetData(state);
-					UpdateCpuMemory(state.CpuData);
-					UpdatePpuMemory(state.PpuData);
-					UpdateOamMemory(state.OamData);
-					cpuStatus1.UpdateMemory(state.CpuData);
+					_memoryState = state.Memory;
+					WatchValues.SetData(state.Memory);
+					UpdateCpuMemory(state.Memory.CpuData);
+					UpdatePpuMemory(state.Memory.PpuData);
+					UpdateOamMemory(state.Memory.OamData);
+					_moduleEvents.UpdateStates(state);
 				};
-				_debugStateHandler = (state) => cpuStatus1.UpdateStates(state);
+				_moduleEvents.SelectedSpriteChanged += (index) =>
+				{
+					RevealPanel(Sprites);
+					RevealPanel(SpriteList);
+				};
 
 
 				editorTabs.TabWindowsChanged += (tabs) => ActiveFileChanged();
@@ -310,7 +320,8 @@ namespace Brewmaster
 			ResumeLayout();
         }
 
-		private void AddWindowOption(Control windowControl)
+
+	    private void AddWindowOption(Control windowControl)
 		{
 			var idePanel = LayoutHandler.GetPanel(windowControl);
 			if (idePanel == null) return;
@@ -425,10 +436,9 @@ namespace Brewmaster
 		    emulator.OnBreak += ThreadSafeBreakHandler;
 		    emulator.OnRun += ActivateBreakPointsForCurrentProject;
 		    emulator.OnStatusChange += ThreadSafeStatusHandler;
-		    emulator.OnMemoryUpdate += ThreadSafeMemoryHandler;
 		    emulator.OnRegisterUpdate += ThreadSafeDebugStateHandler;
 		    emulator.OnTileMapUpdate += TileMap.UpdateNametableData;
-		    emulator.OnFpsUpdate += fps => BeginInvoke(new Action<int>(UpdateFps), fps);
+			emulator.OnFpsUpdate += fps => BeginInvoke(new Action<int>(UpdateFps), fps);
 
 		    cpuStatus1.StateEdited = emulator.ForceNewState;
 	    }
@@ -1638,7 +1648,8 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 			}
 		    mesen.SetButtonMappings(Settings.NesMappings, Settings.SnesMappings);
 		    mesen.EmulatorBackgroundColor = Settings.EmuBackgroundColor;
-	    }
+			updateEveryFrameMenuItem.Checked = (mesen.UpdateRate = Settings.UpdateRate) == 1;
+		}
 		private void buildSettingsMenuItem_Click(object sender, EventArgs e)
 	    {
 		    if (CurrentProject == null) return;
