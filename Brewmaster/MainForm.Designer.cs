@@ -1,9 +1,5 @@
 ﻿using System.Windows.Forms;
 using Brewmaster.EditorWindows;
-using Brewmaster.Emulation;
-using Brewmaster.Ide;
-using Brewmaster.Ppu;
-using Brewmaster.StatusView;
 
 namespace Brewmaster
 {
@@ -37,8 +33,6 @@ namespace Brewmaster
         private void InitializeComponent()
         {
 			this.components = new System.ComponentModel.Container();
-			System.Windows.Forms.TabPage watchTab;
-			System.Windows.Forms.TabPage tabPage1;
 			System.Windows.Forms.Panel availableIdePanels;
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
 			System.Windows.Forms.ToolStripSeparator toolStripSeparator14;
@@ -244,13 +238,9 @@ namespace Brewmaster
 			this.OutputPanel = new Brewmaster.Ide.IdeGroupedPanel();
 			this.ProjectExplorer = new Brewmaster.ProjectExplorer.ProjectExplorer();
 			this.MainEastContainer2 = new Brewmaster.Ide.MultiSplitContainer();
-			this.memoryViewer2 = new Brewmaster.MemoryViewer.MemoryViewer();
-			this.memoryViewer1 = new Brewmaster.MemoryViewer.MemoryViewer();
 			this._menuHelper = new Brewmaster.Modules.MenuHelper(this.components);
 			this.toolStripStatusLabel3 = new System.Windows.Forms.ToolStripStatusLabel();
 			this.toolStripStatusLabel4 = new System.Windows.Forms.ToolStripStatusLabel();
-			watchTab = new System.Windows.Forms.TabPage();
-			tabPage1 = new System.Windows.Forms.TabPage();
 			availableIdePanels = new System.Windows.Forms.Panel();
 			toolStripSeparator14 = new System.Windows.Forms.ToolStripSeparator();
 			toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
@@ -265,8 +255,6 @@ namespace Brewmaster
 			toolStripSeparator13 = new System.Windows.Forms.ToolStripSeparator();
 			toolStripSeparator37 = new System.Windows.Forms.ToolStripSeparator();
 			toolStripSeparator27 = new System.Windows.Forms.ToolStripSeparator();
-			watchTab.SuspendLayout();
-			tabPage1.SuspendLayout();
 			availableIdePanels.SuspendLayout();
 			this.MemoryTabs.SuspendLayout();
 			this.CpuMemoryTab.SuspendLayout();
@@ -278,28 +266,6 @@ namespace Brewmaster
 			this.statusBar.SuspendLayout();
 			this.textEditorContextMenuStrip.SuspendLayout();
 			this.SuspendLayout();
-			// 
-			// watchTab
-			// 
-			watchTab.Controls.Add(this.memoryViewer2);
-			watchTab.Location = new System.Drawing.Point(4, 4);
-			watchTab.Name = "watchTab";
-			watchTab.Padding = new System.Windows.Forms.Padding(3);
-			watchTab.Size = new System.Drawing.Size(170, 107);
-			watchTab.TabIndex = 0;
-			watchTab.Text = "Watch";
-			watchTab.UseVisualStyleBackColor = true;
-			// 
-			// tabPage1
-			// 
-			tabPage1.Controls.Add(this.memoryViewer1);
-			tabPage1.Location = new System.Drawing.Point(4, 22);
-			tabPage1.Name = "tabPage1";
-			tabPage1.Padding = new System.Windows.Forms.Padding(3);
-			tabPage1.Size = new System.Drawing.Size(170, 107);
-			tabPage1.TabIndex = 0;
-			tabPage1.Text = "Watch";
-			tabPage1.UseVisualStyleBackColor = true;
 			// 
 			// availableIdePanels
 			// 
@@ -339,7 +305,7 @@ namespace Brewmaster
 			this.CpuMemoryTab.Padding = new System.Windows.Forms.Padding(3);
 			this.CpuMemoryTab.Size = new System.Drawing.Size(848, 424);
 			this.CpuMemoryTab.TabIndex = 0;
-			this.CpuMemoryTab.Text = "CPU Addresses";
+			this.CpuMemoryTab.Text = "CPU";
 			this.CpuMemoryTab.UseVisualStyleBackColor = true;
 			// 
 			// PpuMemoryTab
@@ -350,7 +316,7 @@ namespace Brewmaster
 			this.PpuMemoryTab.Padding = new System.Windows.Forms.Padding(3);
 			this.PpuMemoryTab.Size = new System.Drawing.Size(848, 424);
 			this.PpuMemoryTab.TabIndex = 1;
-			this.PpuMemoryTab.Text = "PPU Addresses";
+			this.PpuMemoryTab.Text = "PPU";
 			this.PpuMemoryTab.UseVisualStyleBackColor = true;
 			// 
 			// OamMemoryTab
@@ -2072,26 +2038,6 @@ namespace Brewmaster
 			this.MainEastContainer2.TabIndex = 1;
 			this.MainEastContainer2.Text = "multiSplitContainer2";
 			// 
-			// memoryViewer2
-			// 
-			this.memoryViewer2.BackColor = System.Drawing.SystemColors.Control;
-			this.memoryViewer2.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.memoryViewer2.Font = new System.Drawing.Font("Consolas", 10F);
-			this.memoryViewer2.Location = new System.Drawing.Point(3, 3);
-			this.memoryViewer2.Name = "memoryViewer2";
-			this.memoryViewer2.Size = new System.Drawing.Size(164, 101);
-			this.memoryViewer2.TabIndex = 0;
-			// 
-			// memoryViewer1
-			// 
-			this.memoryViewer1.BackColor = System.Drawing.SystemColors.Control;
-			this.memoryViewer1.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.memoryViewer1.Font = new System.Drawing.Font("Consolas", 10F);
-			this.memoryViewer1.Location = new System.Drawing.Point(3, 3);
-			this.memoryViewer1.Name = "memoryViewer1";
-			this.memoryViewer1.Size = new System.Drawing.Size(164, 101);
-			this.memoryViewer1.TabIndex = 0;
-			// 
 			// toolStripStatusLabel3
 			// 
 			this.toolStripStatusLabel3.AutoSize = false;
@@ -2127,8 +2073,6 @@ namespace Brewmaster
 			this.Text = "Brewmaster";
 			this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_Closing);
-			watchTab.ResumeLayout(false);
-			tabPage1.ResumeLayout(false);
 			availableIdePanels.ResumeLayout(false);
 			availableIdePanels.PerformLayout();
 			this.MemoryTabs.ResumeLayout(false);
@@ -2301,8 +2245,6 @@ namespace Brewmaster
 		private System.Windows.Forms.ToolStripButton stepInto;
 		private System.Windows.Forms.ToolStripButton stepOut;
 		private System.Windows.Forms.ToolStripButton stepBack;
-		private MemoryViewer.MemoryViewer memoryViewer1;
-		private MemoryViewer.MemoryViewer memoryViewer2;
 		private System.Windows.Forms.TabControl MemoryTabs;
 		private System.Windows.Forms.TabPage CpuMemoryTab;
 		private MemoryViewer.MemoryViewer CpuMemoryViewer;

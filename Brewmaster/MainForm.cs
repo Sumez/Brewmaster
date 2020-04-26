@@ -247,8 +247,9 @@ namespace Brewmaster
 				AddWindowOption(ProjectExplorer);
 				AddWindowOption(mesen);
 				AddWindowOption(OutputWindow);
-				AddWindowOption(memoryViewer1);
-				AddWindowOption(memoryViewer2);
+				AddWindowOption(TileMap);
+				AddWindowOption(Sprites);
+				AddWindowOption(MemoryTabs);
 				AddWindowOption(cpuStatus1);
 				AddWindowOption(WatchValues);
 				AddWindowOption(BreakpointList);
