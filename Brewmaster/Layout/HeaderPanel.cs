@@ -48,7 +48,7 @@ namespace Brewmaster.Ide
 	    private Point _dragOffset;
 	    protected bool LeftMouseDown(Point location)
 	    {
-		    if (Parent == null) return false;
+		    if (!Visible || Parent == null) return false;
 		    var control = OsFeatures.GlobalMouseHandler.GetCurrentControl();
 		    if (control != null)
 		    {
