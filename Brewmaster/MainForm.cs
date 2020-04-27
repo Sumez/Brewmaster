@@ -376,7 +376,7 @@ namespace Brewmaster
 			BuildHandler.Log = ThreadSafeLogOutput;
 		    BuildHandler.RefreshErrorList = ThreadSafeBuildErrorUpdate;
 			BuildHandler.Status = SetStatus;
-		    BuildHandler.OnDebugDataUpdated += RefreshBreakpointsToLatestBuild;
+		    BuildHandler.OnDebugDataUpdated += () => BeginInvoke(new Action(RefreshBreakpointsToLatestBuild));
 
 		    configurationSelector.SelectedIndexChanged += (sender, args) => ChangeConfiguration();
 
@@ -1023,7 +1023,6 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 		    OamMemoryViewer.SetBreakpoints(allBreakpoints.Where(bp => bp.AddressType == Breakpoint.AddressTypes.Oam));
 
 		    foreach (var editor in editorTabs.TabPages.OfType<TextEditorWindow>()) editor.RefreshEditorBreakpoints();
-		    // TODO: This foreach causes an avalance of breakpoint updates in all modules. Should only refresh once
 		}
 
 		private bool CloseCurrentProject(bool closingApplication = false)
