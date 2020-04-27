@@ -421,9 +421,10 @@ namespace Brewmaster
 		private void LoadEmulator(ProjectType projectType)
 	    {
 		    mesen.SwitchSystem(projectType, (e) => InitializeEmulator(e, projectType));
-		    CpuMemoryViewer.DataChanged += mesen.Emulator.SetCpuMemory;
-		    PpuMemoryViewer.DataChanged += mesen.Emulator.SetPpuMemory;
-		    OamMemoryViewer.DataChanged += mesen.Emulator.SetOamMemory;
+			// TODO: Use events object and/or go through mesen control
+		    CpuMemoryViewer.DataChanged = mesen.Emulator.SetCpuMemory;
+		    PpuMemoryViewer.DataChanged = mesen.Emulator.SetPpuMemory;
+		    OamMemoryViewer.DataChanged = mesen.Emulator.SetOamMemory;
 	    }
 
 	    private void InitializeEmulator(IEmulatorHandler emulator, ProjectType projectType)

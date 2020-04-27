@@ -57,7 +57,8 @@ namespace Brewmaster.Settings
 
 		public BreakpointEditor(Breakpoint breakpoint, AsmProject project) : this(project)
 		{
-			
+			if (breakpoint.File != null) return; // Editing editor breakpoints outside of the text editor windows causes too many potential issues
+
 			Breakpoint = breakpoint;
 			if (breakpoint.File != null) _breakBySourceLine.Checked = true;
 			else if (breakpoint.Symbol != null) _breakBySymbol.Checked = true;
@@ -92,9 +93,9 @@ namespace Brewmaster.Settings
 			System.Windows.Forms.FlowLayoutPanel flowLayoutPanel2;
 			System.Windows.Forms.Label label5;
 			System.Windows.Forms.Label label6;
-			this._addressFromRom = new System.Windows.Forms.RadioButton();
 			this._addressFromCpu = new System.Windows.Forms.RadioButton();
 			this._addressFromVram = new System.Windows.Forms.RadioButton();
+			this._addressFromRom = new System.Windows.Forms.RadioButton();
 			this._breakOnRead = new System.Windows.Forms.CheckBox();
 			this._breakOnWrite = new System.Windows.Forms.CheckBox();
 			this._breakOnExecute = new System.Windows.Forms.CheckBox();
@@ -124,7 +125,7 @@ namespace Brewmaster.Settings
 			// label1
 			// 
 			label1.AutoSize = true;
-			label1.Location = new System.Drawing.Point(184, 38);
+			label1.Location = new System.Drawing.Point(183, 433);
 			label1.Name = "label1";
 			label1.Size = new System.Drawing.Size(30, 13);
 			label1.TabIndex = 7;
@@ -133,7 +134,7 @@ namespace Brewmaster.Settings
 			// label2
 			// 
 			label2.AutoSize = true;
-			label2.Location = new System.Drawing.Point(28, 137);
+			label2.Location = new System.Drawing.Point(28, 84);
 			label2.Name = "label2";
 			label2.Size = new System.Drawing.Size(33, 13);
 			label2.TabIndex = 10;
@@ -142,7 +143,7 @@ namespace Brewmaster.Settings
 			// label3
 			// 
 			label3.AutoSize = true;
-			label3.Location = new System.Drawing.Point(124, 137);
+			label3.Location = new System.Drawing.Point(124, 84);
 			label3.Name = "label3";
 			label3.Size = new System.Drawing.Size(23, 13);
 			label3.TabIndex = 12;
@@ -151,7 +152,7 @@ namespace Brewmaster.Settings
 			// label4
 			// 
 			label4.AutoSize = true;
-			label4.Location = new System.Drawing.Point(205, 137);
+			label4.Location = new System.Drawing.Point(205, 84);
 			label4.Name = "label4";
 			label4.Size = new System.Drawing.Size(50, 13);
 			label4.TabIndex = 14;
@@ -160,29 +161,19 @@ namespace Brewmaster.Settings
 			// flowLayoutPanel1
 			// 
 			flowLayoutPanel1.AutoSize = true;
-			flowLayoutPanel1.Controls.Add(this._addressFromRom);
 			flowLayoutPanel1.Controls.Add(this._addressFromCpu);
 			flowLayoutPanel1.Controls.Add(this._addressFromVram);
-			flowLayoutPanel1.Location = new System.Drawing.Point(31, 156);
+			flowLayoutPanel1.Controls.Add(this._addressFromRom);
+			flowLayoutPanel1.Location = new System.Drawing.Point(31, 103);
 			flowLayoutPanel1.Name = "flowLayoutPanel1";
 			flowLayoutPanel1.Size = new System.Drawing.Size(241, 23);
 			flowLayoutPanel1.TabIndex = 15;
 			// 
-			// _addressFromRom
-			// 
-			this._addressFromRom.AutoSize = true;
-			this._addressFromRom.Location = new System.Drawing.Point(3, 3);
-			this._addressFromRom.Name = "_addressFromRom";
-			this._addressFromRom.Size = new System.Drawing.Size(50, 17);
-			this._addressFromRom.TabIndex = 0;
-			this._addressFromRom.TabStop = true;
-			this._addressFromRom.Text = "ROM";
-			this._addressFromRom.UseVisualStyleBackColor = true;
-			// 
 			// _addressFromCpu
 			// 
 			this._addressFromCpu.AutoSize = true;
-			this._addressFromCpu.Location = new System.Drawing.Point(59, 3);
+			this._addressFromCpu.Checked = true;
+			this._addressFromCpu.Location = new System.Drawing.Point(3, 3);
 			this._addressFromCpu.Name = "_addressFromCpu";
 			this._addressFromCpu.Size = new System.Drawing.Size(82, 17);
 			this._addressFromCpu.TabIndex = 1;
@@ -193,13 +184,22 @@ namespace Brewmaster.Settings
 			// _addressFromVram
 			// 
 			this._addressFromVram.AutoSize = true;
-			this._addressFromVram.Location = new System.Drawing.Point(147, 3);
+			this._addressFromVram.Location = new System.Drawing.Point(91, 3);
 			this._addressFromVram.Name = "_addressFromVram";
 			this._addressFromVram.Size = new System.Drawing.Size(89, 17);
 			this._addressFromVram.TabIndex = 2;
-			this._addressFromVram.TabStop = true;
 			this._addressFromVram.Text = "PPU / VRAM";
 			this._addressFromVram.UseVisualStyleBackColor = true;
+			// 
+			// _addressFromRom
+			// 
+			this._addressFromRom.AutoSize = true;
+			this._addressFromRom.Location = new System.Drawing.Point(186, 3);
+			this._addressFromRom.Name = "_addressFromRom";
+			this._addressFromRom.Size = new System.Drawing.Size(50, 17);
+			this._addressFromRom.TabIndex = 0;
+			this._addressFromRom.Text = "ROM";
+			this._addressFromRom.UseVisualStyleBackColor = true;
 			// 
 			// flowLayoutPanel2
 			// 
@@ -207,7 +207,7 @@ namespace Brewmaster.Settings
 			flowLayoutPanel2.Controls.Add(this._breakOnRead);
 			flowLayoutPanel2.Controls.Add(this._breakOnWrite);
 			flowLayoutPanel2.Controls.Add(this._breakOnExecute);
-			flowLayoutPanel2.Location = new System.Drawing.Point(9, 205);
+			flowLayoutPanel2.Location = new System.Drawing.Point(9, 152);
 			flowLayoutPanel2.Name = "flowLayoutPanel2";
 			flowLayoutPanel2.Size = new System.Drawing.Size(260, 23);
 			flowLayoutPanel2.TabIndex = 16;
@@ -239,8 +239,6 @@ namespace Brewmaster.Settings
 			// _breakOnExecute
 			// 
 			this._breakOnExecute.AutoSize = true;
-			this._breakOnExecute.Checked = true;
-			this._breakOnExecute.CheckState = System.Windows.Forms.CheckState.Checked;
 			this._breakOnExecute.Location = new System.Drawing.Point(118, 3);
 			this._breakOnExecute.Name = "_breakOnExecute";
 			this._breakOnExecute.Size = new System.Drawing.Size(65, 17);
@@ -251,7 +249,7 @@ namespace Brewmaster.Settings
 			// label5
 			// 
 			label5.AutoSize = true;
-			label5.Location = new System.Drawing.Point(9, 189);
+			label5.Location = new System.Drawing.Point(9, 136);
 			label5.Name = "label5";
 			label5.Size = new System.Drawing.Size(53, 13);
 			label5.TabIndex = 17;
@@ -260,17 +258,18 @@ namespace Brewmaster.Settings
 			// label6
 			// 
 			label6.AutoSize = true;
-			label6.Location = new System.Drawing.Point(9, 231);
+			label6.Location = new System.Drawing.Point(9, 178);
 			label6.Name = "label6";
 			label6.Size = new System.Drawing.Size(59, 13);
 			label6.TabIndex = 18;
 			label6.Text = "Conditions:";
+			label6.Visible = false;
 			// 
 			// _cancelButton
 			// 
 			this._cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this._cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this._cancelButton.Location = new System.Drawing.Point(198, 344);
+			this._cancelButton.Location = new System.Drawing.Point(198, 182);
 			this._cancelButton.Name = "_cancelButton";
 			this._cancelButton.Size = new System.Drawing.Size(75, 23);
 			this._cancelButton.TabIndex = 1;
@@ -280,7 +279,7 @@ namespace Brewmaster.Settings
 			// _okButton
 			// 
 			this._okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this._okButton.Location = new System.Drawing.Point(117, 344);
+			this._okButton.Location = new System.Drawing.Point(117, 182);
 			this._okButton.Name = "_okButton";
 			this._okButton.Size = new System.Drawing.Size(75, 23);
 			this._okButton.TabIndex = 2;
@@ -290,7 +289,8 @@ namespace Brewmaster.Settings
 			// 
 			// _breakBySourceLine
 			// 
-			this._breakBySourceLine.Location = new System.Drawing.Point(12, 12);
+			this._breakBySourceLine.Enabled = false;
+			this._breakBySourceLine.Location = new System.Drawing.Point(12, 407);
 			this._breakBySourceLine.Name = "_breakBySourceLine";
 			this._breakBySourceLine.Size = new System.Drawing.Size(260, 17);
 			this._breakBySourceLine.TabIndex = 3;
@@ -299,7 +299,7 @@ namespace Brewmaster.Settings
 			// 
 			// _breakBySymbol
 			// 
-			this._breakBySymbol.Location = new System.Drawing.Point(12, 62);
+			this._breakBySymbol.Location = new System.Drawing.Point(12, 9);
 			this._breakBySymbol.Name = "_breakBySymbol";
 			this._breakBySymbol.Size = new System.Drawing.Size(260, 17);
 			this._breakBySymbol.TabIndex = 4;
@@ -309,7 +309,7 @@ namespace Brewmaster.Settings
 			// _breakByAddress
 			// 
 			this._breakByAddress.Checked = true;
-			this._breakByAddress.Location = new System.Drawing.Point(12, 111);
+			this._breakByAddress.Location = new System.Drawing.Point(12, 58);
 			this._breakByAddress.Name = "_breakByAddress";
 			this._breakByAddress.Size = new System.Drawing.Size(261, 17);
 			this._breakByAddress.TabIndex = 5;
@@ -321,35 +321,35 @@ namespace Brewmaster.Settings
 			// 
 			this._fileSelect.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this._fileSelect.FormattingEnabled = true;
-			this._fileSelect.Location = new System.Drawing.Point(31, 35);
+			this._fileSelect.Location = new System.Drawing.Point(31, 430);
 			this._fileSelect.Name = "_fileSelect";
 			this._fileSelect.Size = new System.Drawing.Size(147, 21);
 			this._fileSelect.TabIndex = 6;
 			// 
 			// _fileLineNumber
 			// 
-			this._fileLineNumber.Location = new System.Drawing.Point(215, 35);
+			this._fileLineNumber.Location = new System.Drawing.Point(215, 430);
 			this._fileLineNumber.Name = "_fileLineNumber";
 			this._fileLineNumber.Size = new System.Drawing.Size(43, 20);
 			this._fileLineNumber.TabIndex = 8;
 			// 
 			// _symbol
 			// 
-			this._symbol.Location = new System.Drawing.Point(31, 85);
+			this._symbol.Location = new System.Drawing.Point(31, 32);
 			this._symbol.Name = "_symbol";
 			this._symbol.Size = new System.Drawing.Size(147, 20);
 			this._symbol.TabIndex = 9;
 			// 
 			// _fromAddress
 			// 
-			this._fromAddress.Location = new System.Drawing.Point(61, 134);
+			this._fromAddress.Location = new System.Drawing.Point(61, 81);
 			this._fromAddress.Name = "_fromAddress";
 			this._fromAddress.Size = new System.Drawing.Size(57, 20);
 			this._fromAddress.TabIndex = 11;
 			// 
 			// _toAddress
 			// 
-			this._toAddress.Location = new System.Drawing.Point(146, 134);
+			this._toAddress.Location = new System.Drawing.Point(146, 81);
 			this._toAddress.Name = "_toAddress";
 			this._toAddress.Size = new System.Drawing.Size(57, 20);
 			this._toAddress.TabIndex = 13;
@@ -357,17 +357,18 @@ namespace Brewmaster.Settings
 			// _conditions
 			// 
 			this._conditions.AcceptsReturn = true;
-			this._conditions.Location = new System.Drawing.Point(12, 247);
+			this._conditions.Location = new System.Drawing.Point(12, 194);
 			this._conditions.Multiline = true;
 			this._conditions.Name = "_conditions";
 			this._conditions.Size = new System.Drawing.Size(260, 86);
 			this._conditions.TabIndex = 19;
+			this._conditions.Visible = false;
 			// 
 			// BreakpointEditor
 			// 
 			this.AcceptButton = this._okButton;
 			this.CancelButton = this._cancelButton;
-			this.ClientSize = new System.Drawing.Size(285, 379);
+			this.ClientSize = new System.Drawing.Size(285, 217);
 			this.Controls.Add(this._conditions);
 			this.Controls.Add(label6);
 			this.Controls.Add(label5);
@@ -425,6 +426,7 @@ namespace Brewmaster.Settings
 				breakpoint.StartAddress = -1;
 				breakpoint.EndAddress = null;
 				breakpoint.AddressType = Breakpoint.AddressTypes.PrgRom;
+				_breakOnExecute.Checked = true;
 			}
 			else if (_breakBySymbol.Checked)
 			{
@@ -458,22 +460,11 @@ namespace Brewmaster.Settings
 				if (_addressFromRom.Checked) breakpoint.AddressType = Breakpoint.AddressTypes.PrgRom;
 				if (_addressFromVram.Checked) breakpoint.AddressType = Breakpoint.AddressTypes.Ppu;
 			}
-			if (breakpoint.File != null) _breakBySourceLine.Checked = true;
-			else if (breakpoint.Symbol != null) _breakBySymbol.Checked = true;
-			else _breakByAddress.Checked = true;
-			DisableInputs();
 
-			if (!string.IsNullOrWhiteSpace(breakpoint.Symbol)) _symbol.Text = breakpoint.Symbol;
-			if (breakpoint.StartAddress >= 0) _fromAddress.Text = Convert.ToString(breakpoint.StartAddress, 16).ToUpper();
-			if (breakpoint.EndAddress.HasValue && breakpoint.EndAddress >= 0) _fromAddress.Text = Convert.ToString(breakpoint.EndAddress.Value, 16).ToUpper();
-
-			_breakOnExecute.Checked = breakpoint.Type.HasFlag(Breakpoint.Types.Execute);
-			_breakOnRead.Checked = breakpoint.Type.HasFlag(Breakpoint.Types.Read);
-			_breakOnWrite.Checked = breakpoint.Type.HasFlag(Breakpoint.Types.Write);
-
-			if (breakpoint.AddressType == Breakpoint.AddressTypes.Cpu) _addressFromCpu.Checked = true;
-			if (breakpoint.AddressType == Breakpoint.AddressTypes.PrgRom) _addressFromRom.Checked = true;
-			if (breakpoint.AddressType == Breakpoint.AddressTypes.Ppu) _addressFromVram.Checked = true;
+			breakpoint.Type = 0;
+			if (_breakOnExecute.Checked) breakpoint.Type |= Breakpoint.Types.Execute;
+			if (_breakOnRead.Checked) breakpoint.Type |= Breakpoint.Types.Read;
+			if (_breakOnWrite.Checked) breakpoint.Type |= Breakpoint.Types.Write;
 
 			DialogResult = DialogResult.OK;
 			Close();

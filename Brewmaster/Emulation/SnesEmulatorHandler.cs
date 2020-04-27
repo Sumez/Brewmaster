@@ -304,6 +304,7 @@ namespace Brewmaster.Emulation
 
 		public void SetCpuMemory(int offset, byte value)
 		{
+			// TODO: Is emulator running?
 			SnesDebugApi.SetMemoryValue(SnesMemoryType.CpuMemory, (uint)offset, value);
 		}
 		public void SetPpuMemory(int offset, byte value)

@@ -106,7 +106,8 @@ namespace Brewmaster.EditorWindows
 				Pristine = true;
 			}
 
-			RefreshEditorBreakpoints(true);
+			RefreshEditorBreakpoints();
+			RefreshEditorBuildInfo();
 
 			string textType;
 			switch (ProjectFile.File.Extension)
@@ -137,19 +138,16 @@ namespace Brewmaster.EditorWindows
 			}
 		}
 
-		public void RefreshEditorBreakpoints(bool updateBreaktpoinsInProject = false)
+		public void RefreshEditorBreakpoints()
 		{
 			var codeEditor = TextEditor as CodeEditor;
-			if (codeEditor != null)
-			{
-				codeEditor.UpdateBreakpointsInEditor();
-				if (ProjectFile.DebugLines != null)
-				{
-					codeEditor.UpdateBreakpointsWithBuildInfo();
-					// TODO: This requires an editor window to be open for its breakpoints to work. Do we want it to work like that?
-					if (updateBreaktpoinsInProject) codeEditor.RefreshBreakpointsInProject();
-				}
-			}
+			if (codeEditor != null) codeEditor.UpdateBreakpointsInEditor();
+		}
+		public void RefreshEditorBuildInfo()
+		{
+			var codeEditor = TextEditor as CodeEditor;
+			if (codeEditor != null && ProjectFile.DebugLines != null) codeEditor.UpdateBreakpointsWithBuildInfo();
+			// TODO: This requires an editor window to be open for its breakpoints to work. Do we want it to work like that?
 		}
 
 

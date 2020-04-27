@@ -384,6 +384,8 @@ namespace Brewmaster.EditorWindows
 				breakpoint.BuildLine = breakpoint.LineNumber;
 				breakpoint.Healthy = File.DebugLines.ContainsKey(breakpoint.BuildLine + 1);
 			}
+
+			RefreshBreakpointsInProject();
 			ActiveTextAreaControl.TextArea.Invalidate();
 		}
 		public void RemoveFocusArrow()
