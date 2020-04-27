@@ -350,7 +350,7 @@ namespace Brewmaster.EditorWindows
 			}
 		}
 
-		public void RefreshBreakpointsInProject()
+		private void RefreshBreakpointsInProject()
 		{
 			foreach (var breakpointMarker in Document.BookmarkManager.Marks.OfType<BreakpointMarker>())
 				if (breakpointMarker.GlobalBreakpoint != null)

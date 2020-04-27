@@ -1244,7 +1244,6 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 			    if (codeEditor == null) continue;
 				
 			    codeEditor.UpdateBreakpointsWithBuildInfo();
-			    codeEditor.RefreshBreakpointsInProject();
 			}
 		}
 
