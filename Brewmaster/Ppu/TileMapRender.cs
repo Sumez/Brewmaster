@@ -45,7 +45,7 @@ namespace Brewmaster.Ppu
 			lock (BackBufferLock)
 			using (var graphics = getGraphics())
 			{
-				graphics.Clear(Color.Transparent);
+				graphics.Clear(Color.Black);
 				var width = _nametableData.MapWidth;
 				var height = _nametableData.MapHeight;
 				for (int i = 0; i < _nametableData.NumberOfMaps; i++)
