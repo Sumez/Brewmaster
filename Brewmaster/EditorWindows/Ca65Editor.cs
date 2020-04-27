@@ -214,6 +214,7 @@ namespace Brewmaster.EditorWindows
 					if (bp.GlobalBreakpoint.CurrentLine != bp.LineNumber + 1) changed = true;
 					bp.GlobalBreakpoint.CurrentLine = bp.LineNumber + 1;
 				}
+
 				if (changed) RefreshBreakpointsInProject();
 			};
 		}
@@ -348,6 +349,7 @@ namespace Brewmaster.EditorWindows
 				breakpoint.EnabledChanged += () => marker.IsEnabled = !breakpoint.Disabled;
 			}
 		}
+
 		private void RefreshBreakpointsInProject()
 		{
 			foreach (var breakpointMarker in Document.BookmarkManager.Marks.OfType<BreakpointMarker>())
@@ -382,6 +384,7 @@ namespace Brewmaster.EditorWindows
 				breakpoint.BuildLine = breakpoint.LineNumber;
 				breakpoint.Healthy = File.DebugLines.ContainsKey(breakpoint.BuildLine + 1);
 			}
+
 			RefreshBreakpointsInProject();
 			ActiveTextAreaControl.TextArea.Invalidate();
 		}

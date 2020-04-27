@@ -4,7 +4,6 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using System.Windows.Forms.VisualStyles;
-using Brewmaster.Modules.Watch;
 using Brewmaster.ProjectModel;
 using Brewmaster.Settings;
 
@@ -12,19 +11,19 @@ namespace Brewmaster.Modules.Breakpoints
 {
 	public class BreakpointList : ListView
 	{
-		public Action<IEnumerable<Breakpoint>> RemoveBreakpoints;
-		public Action<Breakpoint> AddBreakpoint;
-		public Action UpdatedBreakpoints;
 		private ToolStripMenuItem clearAllMenuItem;
 		private ToolStripMenuItem goToMenuItem;
+		private ToolStripMenuItem addMenuItem;
+		private readonly Events _events;
 
 		private List<BreakpointItem> SelectedBreakpoints
 		{
 			get { return SelectedItems.OfType<BreakpointItem>().ToList(); }
 		}
 
-		public BreakpointList()
+		public BreakpointList(Events events)
 		{
+			_events = events;
 			InitializeComponent();
 			OwnerDraw = true;
 			ShowGroups = false;
@@ -44,6 +43,9 @@ namespace Brewmaster.Modules.Breakpoints
 
 			contextMenu.Opening += (s, a) =>
 			{
+				var project = _events.GetCurrentProject();
+
+				addMenuItem.Enabled = project != null;
 				clearAllMenuItem.Enabled = Items.Count > 0;
 				goToMenuItem.Enabled = editMenuItem.Enabled = 
 					deleteMenuItem.Enabled = enableMenuItem.Enabled = SelectedBreakpoints.Any();
@@ -64,22 +66,23 @@ namespace Brewmaster.Modules.Breakpoints
 
 			clearAllMenuItem.Click += (s, a) =>
 			{
-				if (RemoveBreakpoints != null) RemoveBreakpoints(Items.OfType<BreakpointItem>().Select(b => b.Breakpoint));
+				_events.RemoveBreakpoints(Items.OfType<BreakpointItem>().Select(b => b.Breakpoint));
 			};
 			deleteMenuItem.Click += (s, a) =>
 			{
-				if (RemoveBreakpoints != null) RemoveBreakpoints(SelectedBreakpoints.Select(b => b.Breakpoint));
+				_events.RemoveBreakpoints(SelectedBreakpoints.Select(b => b.Breakpoint));
 			};
 			enableMenuItem.Click += (s, a) =>
 			{
 				var targetStatus = SelectedBreakpoints.All(i => !i.Breakpoint.Disabled);
 				foreach (var item in SelectedBreakpoints) item.Breakpoint.Disabled = targetStatus;
-				if (RemoveBreakpoints != null) RemoveBreakpoints(new Breakpoint[] {});
+				_events.RemoveBreakpoints(new Breakpoint[] {});
 				Invalidate();
-				if (UpdatedBreakpoints != null) UpdatedBreakpoints();
+				_events.UpdatedBreakpoints();
 			};
-			goToMenuItem.Click += (s, a) => ActivateBreakpoint(SelectedBreakpoints.FirstOrDefault());
-			editMenuItem.Click += (s, a) => ActivateBreakpoint(SelectedBreakpoints.FirstOrDefault());
+			goToMenuItem.Click += (s, a) => JumpToBreakpoint(SelectedBreakpoints.FirstOrDefault());
+			editMenuItem.Click += (s, a) => EditBreakpoint(SelectedBreakpoints.FirstOrDefault());
+			addMenuItem.Click += (s, a) => AddNewBreakpoint();
 
 			Program.BindKey(Feature.RemoveFromList, (keys) => deleteMenuItem.ShortcutKeys = keys);
 			ContextMenuStrip = contextMenu;
@@ -90,7 +93,34 @@ namespace Brewmaster.Modules.Breakpoints
 		private void ActivateBreakpoint(BreakpointItem item)
 		{
 			if (item == null) return;
+			if (item.Breakpoint.File != null) JumpToBreakpoint(item);
+			else EditBreakpoint(item);
+		}
+
+		private void JumpToBreakpoint(BreakpointItem item)
+		{
+			if (item == null) return;
 			if (item.Breakpoint.File != null && GoTo != null) GoTo(item.Breakpoint.File, item.Breakpoint.CurrentLine);
+		}
+		private void EditBreakpoint(BreakpointItem item)
+		{
+			if (item == null) return;
+			using (var dialog = new BreakpointEditor(item.Breakpoint, _events.GetCurrentProject()))
+			{
+				dialog.StartPosition = FormStartPosition.CenterParent;
+				if (dialog.ShowDialog(this) == DialogResult.OK) _events.UpdatedBreakpoints();
+			}
+		}
+
+		private void AddNewBreakpoint()
+		{
+			var project = _events.GetCurrentProject();
+			if (project == null) return;
+			using (var dialog = new BreakpointEditor(project))
+			{
+				dialog.StartPosition = FormStartPosition.CenterParent;
+				if (dialog.ShowDialog(this) == DialogResult.OK) _events.AddBreakpoint(dialog.Breakpoint);
+			}
 		}
 
 		protected override void OnItemActivate(EventArgs e)
@@ -137,7 +167,7 @@ namespace Brewmaster.Modules.Breakpoints
 			if (location.SubItem == location.Item.SubItems[0])
 			{
 				breakpointItem.Breakpoint.Disabled = !breakpointItem.Breakpoint.Disabled;
-				if (UpdatedBreakpoints != null) UpdatedBreakpoints();
+				_events.UpdatedBreakpoints();
 			}
 			Invalidate();
 		}
@@ -153,6 +183,7 @@ namespace Brewmaster.Modules.Breakpoints
 		private void InitializeComponent()
 		{
 			this.components = new System.ComponentModel.Container();
+			System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
 			this.contextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.enableMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.editMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -160,12 +191,21 @@ namespace Brewmaster.Modules.Breakpoints
 			this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
 			this.deleteMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.clearAllMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.addMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
 			this.contextMenu.SuspendLayout();
 			this.SuspendLayout();
+			// 
+			// toolStripSeparator2
+			// 
+			toolStripSeparator2.Name = "toolStripSeparator2";
+			toolStripSeparator2.Size = new System.Drawing.Size(166, 6);
 			// 
 			// contextMenu
 			// 
 			this.contextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.addMenuItem,
+            toolStripSeparator2,
             this.enableMenuItem,
             this.editMenuItem,
             this.goToMenuItem,
@@ -173,7 +213,7 @@ namespace Brewmaster.Modules.Breakpoints
             this.deleteMenuItem,
             this.clearAllMenuItem});
 			this.contextMenu.Name = "contextMenu";
-			this.contextMenu.Size = new System.Drawing.Size(170, 120);
+			this.contextMenu.Size = new System.Drawing.Size(170, 126);
 			// 
 			// enableMenuItem
 			// 
@@ -204,11 +244,17 @@ namespace Brewmaster.Modules.Breakpoints
 			this.deleteMenuItem.Size = new System.Drawing.Size(169, 22);
 			this.deleteMenuItem.Text = "Delete Breakpoint";
 			// 
-			// clearListMenuItem
+			// clearAllMenuItem
 			// 
 			this.clearAllMenuItem.Name = "clearAllMenuItem";
 			this.clearAllMenuItem.Size = new System.Drawing.Size(169, 22);
 			this.clearAllMenuItem.Text = "Clear All";
+			// 
+			// addMenuItem
+			// 
+			this.addMenuItem.Name = "addMenuItem";
+			this.addMenuItem.Size = new System.Drawing.Size(169, 22);
+			this.addMenuItem.Text = "Add New...";
 			this.contextMenu.ResumeLayout(false);
 			this.ResumeLayout(false);
 

@@ -15,7 +15,7 @@ namespace Brewmaster.MemoryViewer
 	{
 		private VScrollBar ScrollBar;
 		private int Rows { get; set; }
-		public event Action<int, byte> DataChanged;
+		public Action<int, byte> DataChanged;
 		public event Action<string, bool> AddWatch;
 		public event Action<int, Breakpoint.Types> AddBreakpoint;
 		public event Action<IEnumerable<Breakpoint>> RemoveBreakpoints;
