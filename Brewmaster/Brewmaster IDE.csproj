@@ -143,6 +143,9 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Emulation\EmulatorHandler.cs" />
+    <Compile Include="Modules\Breakpoints\BreakpointEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Modules\MenuHelper.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -452,6 +455,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Modules\Breakpoints\BreakpointList.resx">
       <DependentUpon>BreakpointList.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Modules\Breakpoints\BreakpointEditor.resx">
+      <DependentUpon>BreakpointEditor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Modules\Build\ErrorList.resx">
       <DependentUpon>ErrorList.cs</DependentUpon>

@@ -55,6 +55,11 @@ namespace Brewmaster.ProjectModel
 			set { _type = value; }
 		}
 
+		public override string ToString()
+		{
+			return GetRelativePath();
+		}
+
 		// TODO: Is a "same dir" include path in an included file relative to the original file, or the included file
 		private static void GetSymbolsFromText(string source, List<Symbol> newSymbols, List<string> exportedSymbols, string[] includePaths, List<string> files = null)
 		{

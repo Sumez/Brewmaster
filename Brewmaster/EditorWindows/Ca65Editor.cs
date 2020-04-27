@@ -214,6 +214,7 @@ namespace Brewmaster.EditorWindows
 					if (bp.GlobalBreakpoint.CurrentLine != bp.LineNumber + 1) changed = true;
 					bp.GlobalBreakpoint.CurrentLine = bp.LineNumber + 1;
 				}
+
 				if (changed) RefreshBreakpointsInProject();
 			};
 		}
@@ -348,7 +349,8 @@ namespace Brewmaster.EditorWindows
 				breakpoint.EnabledChanged += () => marker.IsEnabled = !breakpoint.Disabled;
 			}
 		}
-		private void RefreshBreakpointsInProject()
+
+		public void RefreshBreakpointsInProject()
 		{
 			foreach (var breakpointMarker in Document.BookmarkManager.Marks.OfType<BreakpointMarker>())
 				if (breakpointMarker.GlobalBreakpoint != null)
@@ -382,7 +384,6 @@ namespace Brewmaster.EditorWindows
 				breakpoint.BuildLine = breakpoint.LineNumber;
 				breakpoint.Healthy = File.DebugLines.ContainsKey(breakpoint.BuildLine + 1);
 			}
-			RefreshBreakpointsInProject();
 			ActiveTextAreaControl.TextArea.Invalidate();
 		}
 		public void RemoveFocusArrow()
@@ -511,7 +512,7 @@ namespace Brewmaster.EditorWindows
 		}
 		private BreakpointMarker AddBreakpointMarker(int line, int buildLine, bool healthy, bool enabled)
 		{
-			var marker = new BreakpointMarker(Document, line, buildLine, enabled, healthy, RefreshBreakpointsInProject);
+			var marker = new BreakpointMarker(Document, line, buildLine, enabled, healthy, () => RefreshBreakpointsInProject());
 			Document.BookmarkManager.AddMark(marker);
 			var arrow = Document.BookmarkManager.Marks.OfType<PcArrow>().FirstOrDefault();
 			if (arrow != null)

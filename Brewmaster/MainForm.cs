@@ -217,7 +217,7 @@ namespace Brewmaster
 				memoryPanel.AddPanel(new IdePanel(SpriteList = new SpriteList(_moduleEvents)) { Label = "Sprite list" });
 
 				WatchPanel.AddPanel(new IdePanel(WatchValues = new WatchValues()) { Label = "Watch" });
-				WatchPanel.AddPanel(new IdePanel(BreakpointList = new BreakpointList()) { Label = "Breakpoints" });
+				WatchPanel.AddPanel(new IdePanel(BreakpointList = new BreakpointList(_moduleEvents)) { Label = "Breakpoints" });
 
 				OutputPanel.AddPanel(new IdePanel(OutputWindow = new OutputWindow()) { Label = "Output" });
 				OutputPanel.AddPanel(new IdePanel(ErrorList = new ErrorList()) { Label = "Build Errors" });
@@ -358,11 +358,12 @@ namespace Brewmaster
 			PpuMemoryViewer.RemoveBreakpoints += RemoveBreakpoints;
 			OamMemoryViewer.RemoveBreakpoints += RemoveBreakpoints;
 
-		    BreakpointList.RemoveBreakpoints = RemoveBreakpoints;
-		    BreakpointList.AddBreakpoint = AddBreakpoint;
-		    BreakpointList.GoTo = (file, line) => FocusOnCodeLine(file, line);
-			BreakpointList.UpdatedBreakpoints = ActivateBreakPointsForCurrentProject;
+		    _moduleEvents.GetCurrentProject = () => CurrentProject;
+		    _moduleEvents.RemoveBreakpoints = RemoveBreakpoints;
+		    _moduleEvents.AddBreakpoint = AddBreakpoint;
+		    _moduleEvents.UpdatedBreakpoints = ActivateBreakPointsForCurrentProject;
 
+		    BreakpointList.GoTo = (file, line) => FocusOnCodeLine(file, line);
 		    OutputWindow.GoTo = (file, line) => FocusOnCodeLine(file, line);
 		    ErrorList.GoTo = (file, line) => FocusOnCodeLine(file, line);
 
@@ -394,12 +395,7 @@ namespace Brewmaster
 
 	    private void RemoveBreakpoints(IEnumerable<Breakpoint> breakpoints)
 		{
-			if (CurrentProject != null)
-			{
-				CurrentProject.RemoveBreakpoints(breakpoints);
-				foreach (var editor in editorTabs.TabPages.OfType<TextEditorWindow>()) editor.RefreshEditorBreakpoints();
-				// TODO: This foreach causes an avalance of breakpoint updates in all modules. Should only refresh once
-			}
+			if (CurrentProject != null) CurrentProject.RemoveBreakpoints(breakpoints);
 
 		}
 
@@ -701,9 +697,7 @@ namespace Brewmaster
 
 		private void ActivateBreakPointsForCurrentProject()
 		{
-			var breakpoints = CurrentProject.GetAllBreakpoints().ToArray();
-			foreach (var breakpoint in breakpoints.Where(bp => bp.Symbol != null)) breakpoint.UpdateFromSymbols(CurrentProject.DebugSymbols);
-			mesen.Emulator.SetBreakpoints(breakpoints.Where(bp => !bp.Broken && !bp.Disabled));
+			CurrentProject.RefreshBreakpoints();
 		}
 
         public void UpdateTabListInWindowMenu()
@@ -1027,6 +1021,9 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 		    CpuMemoryViewer.SetBreakpoints(allBreakpoints.Where(bp => bp.AddressType == Breakpoint.AddressTypes.Cpu));
 		    PpuMemoryViewer.SetBreakpoints(allBreakpoints.Where(bp => bp.AddressType == Breakpoint.AddressTypes.Ppu));
 		    OamMemoryViewer.SetBreakpoints(allBreakpoints.Where(bp => bp.AddressType == Breakpoint.AddressTypes.Oam));
+
+		    foreach (var editor in editorTabs.TabPages.OfType<TextEditorWindow>()) editor.RefreshEditorBreakpoints();
+		    // TODO: This foreach causes an avalance of breakpoint updates in all modules. Should only refresh once
 		}
 
 		private bool CloseCurrentProject(bool closingApplication = false)
@@ -1247,8 +1244,9 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 			    if (codeEditor == null) continue;
 				
 			    codeEditor.UpdateBreakpointsWithBuildInfo();
-		    }
-	    }
+			    codeEditor.RefreshBreakpointsInProject();
+			}
+		}
 
 		private void buildToolStripMenuItem_Click(object sender, EventArgs e)
         {

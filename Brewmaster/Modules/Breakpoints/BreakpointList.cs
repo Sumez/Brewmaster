@@ -4,7 +4,6 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using System.Windows.Forms.VisualStyles;
-using Brewmaster.Modules.Watch;
 using Brewmaster.ProjectModel;
 using Brewmaster.Settings;
 
@@ -12,19 +11,18 @@ namespace Brewmaster.Modules.Breakpoints
 {
 	public class BreakpointList : ListView
 	{
-		public Action<IEnumerable<Breakpoint>> RemoveBreakpoints;
-		public Action<Breakpoint> AddBreakpoint;
-		public Action UpdatedBreakpoints;
 		private ToolStripMenuItem clearAllMenuItem;
 		private ToolStripMenuItem goToMenuItem;
+		private readonly Events _events;
 
 		private List<BreakpointItem> SelectedBreakpoints
 		{
 			get { return SelectedItems.OfType<BreakpointItem>().ToList(); }
 		}
 
-		public BreakpointList()
+		public BreakpointList(Events events)
 		{
+			_events = events;
 			InitializeComponent();
 			OwnerDraw = true;
 			ShowGroups = false;
@@ -48,7 +46,7 @@ namespace Brewmaster.Modules.Breakpoints
 				goToMenuItem.Enabled = editMenuItem.Enabled = 
 					deleteMenuItem.Enabled = enableMenuItem.Enabled = SelectedBreakpoints.Any();
 
-				if (SelectedBreakpoints.Any(i => i.Breakpoint.File != null)) editMenuItem.Enabled = false;
+				//if (SelectedBreakpoints.Any(i => i.Breakpoint.File != null)) editMenuItem.Enabled = false;
 				if (SelectedBreakpoints.Any(i => i.Breakpoint.File == null)) goToMenuItem.Enabled = false;
 				enableMenuItem.CheckState = SelectedBreakpoints.Any() && SelectedBreakpoints.All(i => !i.Breakpoint.Disabled)
 					? CheckState.Checked
@@ -64,22 +62,22 @@ namespace Brewmaster.Modules.Breakpoints
 
 			clearAllMenuItem.Click += (s, a) =>
 			{
-				if (RemoveBreakpoints != null) RemoveBreakpoints(Items.OfType<BreakpointItem>().Select(b => b.Breakpoint));
+				_events.RemoveBreakpoints(Items.OfType<BreakpointItem>().Select(b => b.Breakpoint));
 			};
 			deleteMenuItem.Click += (s, a) =>
 			{
-				if (RemoveBreakpoints != null) RemoveBreakpoints(SelectedBreakpoints.Select(b => b.Breakpoint));
+				_events.RemoveBreakpoints(SelectedBreakpoints.Select(b => b.Breakpoint));
 			};
 			enableMenuItem.Click += (s, a) =>
 			{
 				var targetStatus = SelectedBreakpoints.All(i => !i.Breakpoint.Disabled);
 				foreach (var item in SelectedBreakpoints) item.Breakpoint.Disabled = targetStatus;
-				if (RemoveBreakpoints != null) RemoveBreakpoints(new Breakpoint[] {});
+				_events.RemoveBreakpoints(new Breakpoint[] {});
 				Invalidate();
-				if (UpdatedBreakpoints != null) UpdatedBreakpoints();
+				_events.UpdatedBreakpoints();
 			};
-			goToMenuItem.Click += (s, a) => ActivateBreakpoint(SelectedBreakpoints.FirstOrDefault());
-			editMenuItem.Click += (s, a) => ActivateBreakpoint(SelectedBreakpoints.FirstOrDefault());
+			goToMenuItem.Click += (s, a) => JumpToBreakpoint(SelectedBreakpoints.FirstOrDefault());
+			editMenuItem.Click += (s, a) => EditBreakpoint(SelectedBreakpoints.FirstOrDefault());
 
 			Program.BindKey(Feature.RemoveFromList, (keys) => deleteMenuItem.ShortcutKeys = keys);
 			ContextMenuStrip = contextMenu;
@@ -90,7 +88,24 @@ namespace Brewmaster.Modules.Breakpoints
 		private void ActivateBreakpoint(BreakpointItem item)
 		{
 			if (item == null) return;
+			if (item.Breakpoint.File != null) JumpToBreakpoint(item);
+			else EditBreakpoint(item);
+		}
+
+		private void JumpToBreakpoint(BreakpointItem item)
+		{
+			if (item == null) return;
 			if (item.Breakpoint.File != null && GoTo != null) GoTo(item.Breakpoint.File, item.Breakpoint.CurrentLine);
+		}
+		private void EditBreakpoint(BreakpointItem item)
+		{
+			if (item == null) return;
+			using (var dialog = new BreakpointEditor(item.Breakpoint, _events.GetCurrentProject()))
+			{
+				dialog.StartPosition = FormStartPosition.CenterParent;
+				dialog.ShowDialog(this);
+				_events.UpdatedBreakpoints();
+			}
 		}
 
 		protected override void OnItemActivate(EventArgs e)
@@ -137,7 +152,7 @@ namespace Brewmaster.Modules.Breakpoints
 			if (location.SubItem == location.Item.SubItems[0])
 			{
 				breakpointItem.Breakpoint.Disabled = !breakpointItem.Breakpoint.Disabled;
-				if (UpdatedBreakpoints != null) UpdatedBreakpoints();
+				_events.UpdatedBreakpoints();
 			}
 			Invalidate();
 		}
