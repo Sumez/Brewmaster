@@ -514,7 +514,7 @@ namespace Brewmaster.EditorWindows
 		}
 		private BreakpointMarker AddBreakpointMarker(int line, int buildLine, bool healthy, bool enabled)
 		{
-			var marker = new BreakpointMarker(Document, line, buildLine, enabled, healthy, () => RefreshBreakpointsInProject());
+			var marker = new BreakpointMarker(Document, line, buildLine, enabled, healthy, RefreshBreakpointsInProject);
 			Document.BookmarkManager.AddMark(marker);
 			var arrow = Document.BookmarkManager.Marks.OfType<PcArrow>().FirstOrDefault();
 			if (arrow != null)
