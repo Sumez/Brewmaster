@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows.Forms;
+using Brewmaster.Modules;
 using Brewmaster.ProjectModel;
 
 namespace Brewmaster.EditorWindows
@@ -8,18 +9,20 @@ namespace Brewmaster.EditorWindows
 	{
 		protected MainForm MainWindow { get; set; }
 		public AsmProjectFile ProjectFile { get; protected set; }
+		public Events ModuleEvents { get; protected set; }
 
-		public EditorWindow(MainForm form, AsmProjectFile file)
+		public EditorWindow(MainForm form, AsmProjectFile file, Events events)
 		{
 			MainWindow = form;
 			ProjectFile = file;
+			ModuleEvents = events;
 			Text = ProjectFile.File.Name;
 		}
 	}
 
 	public abstract class SaveableEditorWindow : EditorWindow, ISaveable
 	{
-		protected SaveableEditorWindow(MainForm form, AsmProjectFile file) : base(form, file) { }
+		protected SaveableEditorWindow(MainForm form, AsmProjectFile file, Events events) : base(form, file, events) { }
 		public abstract void Save();
 
 		private bool _pristine;

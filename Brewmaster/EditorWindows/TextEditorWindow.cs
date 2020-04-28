@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Brewmaster.EditorWindows.Text;
 using Brewmaster.Ide;
+using Brewmaster.Modules;
 using Brewmaster.ProjectModel;
 
 namespace Brewmaster.EditorWindows
@@ -21,13 +22,13 @@ namespace Brewmaster.EditorWindows
 
 		public Action ThreadSafeRefreshWarning { get; set; }
 		public Action ThreadSafeRefresh { get; set; }
-		public TextEditorWindow(MainForm form, AsmProjectFile file) : base(form, file)
+		public TextEditorWindow(MainForm form, AsmProjectFile file, Events moduleEvents) : base(form, file, moduleEvents)
 		{
 			switch (file.Type)
 			{
 				case FileType.Source:
 				case FileType.Include:
-					TextEditor = new Ca65Editor(ProjectFile);
+					TextEditor = new Ca65Editor(ProjectFile, moduleEvents);
 					break;
 				case FileType.Text:
 				default:

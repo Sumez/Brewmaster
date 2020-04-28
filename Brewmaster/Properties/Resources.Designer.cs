@@ -61,6 +61,31 @@ namespace Brewmaster.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &lt;HTML&gt;
+        ///&lt;HEAD&gt;
+        ///  &lt;META NAME=&quot;GENERATOR&quot; CONTENT=&quot;Microsoft FrontPage 4.0&quot;&gt;
+        ///  &lt;META HTTP-EQUIV=&quot;Content-Type&quot; CONTENT=&quot;text/html; charset=iso-8859-1&quot;&gt;
+        ///  &lt;TITLE&gt;6502 Reference&lt;/TITLE&gt;
+        ///  &lt;LINK REL=&quot;StyleSheet&quot; HREF=&quot;../obelisk.css&quot; TYPE=&quot;text/css&quot; media=&quot;screen,print&quot;&gt;
+        ///&lt;/HEAD&gt;
+        ///&lt;BODY&gt;
+        ///&lt;script type=&quot;text/javascript&quot;&gt;&lt;!--
+        ///google_ad_client = &quot;pub-0826595092783671&quot;;
+        ////* 6502 Header */
+        ///google_ad_slot = &quot;9208748029&quot;;
+        ///google_ad_width = 728;
+        ///google_ad_height = 90;
+        /////--&gt;
+        ///&lt;/script&gt;
+        ///&lt;script type=&quot;text/javasc [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _6502 {
+            get {
+                return ResourceManager.GetString("_6502", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap _new {

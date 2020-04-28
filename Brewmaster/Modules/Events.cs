@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Brewmaster.Emulation;
+using Brewmaster.Modules.OpcodeHelper;
 using Brewmaster.ProjectModel;
 
 namespace Brewmaster.Modules
@@ -16,6 +17,12 @@ namespace Brewmaster.Modules
 		public event Action<EmulationState> EmulationStateUpdate;
 		public int SelectedSprite { get; private set; } = -1;
 		public event Action<int> SelectedSpriteChanged;
+		public event Action<Opcode> HighlightedOpcode;
+
+		public void HighlightOpcode(Opcode opcode)
+		{
+			if (HighlightedOpcode != null) HighlightedOpcode(opcode);
+		}
 
 		public void UpdateStates(EmulationState state)
 		{

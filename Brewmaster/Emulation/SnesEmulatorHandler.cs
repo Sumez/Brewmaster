@@ -106,7 +106,7 @@ namespace Brewmaster.Emulation
 		{
 			_isRunning = true;
 			var task = new Thread(() => {
-				SnesApi.Run();
+				//SnesApi.;
 			}, 30000000);
 			task.Start();
 		}
@@ -177,7 +177,7 @@ namespace Brewmaster.Emulation
 		public void UpdateSettings(MesenControl.EmulatorSettings settings)
 		{
 			EmulationConfig.RamPowerOnState = settings.RandomPowerOnState ? RamState.Random : RamState.AllZeros;
-			EmulationConfig.EnableMapperRandomPowerOnState = settings.RandomPowerOnState;
+			EmulationConfig.EnableRandomPowerOnState = settings.RandomPowerOnState;
 			VideoConfig.HideBgLayer0 = !settings.ShowBgLayer1;
 			VideoConfig.HideBgLayer1 = !settings.ShowBgLayer2;
 			VideoConfig.HideBgLayer2 = !settings.ShowBgLayer3;
@@ -401,11 +401,7 @@ namespace Brewmaster.Emulation
 
 		private List<SnesBreakpoint> _breakpoints = new List<SnesBreakpoint>();
 
-		private static readonly EmulationConfig EmulationConfig = new EmulationConfig
-		{
-			RamPowerOnState = RamState.Random,
-			AllowInvalidInput = false
-		};
+		private static readonly EmulationConfig EmulationConfig = new EmulationConfig { RamPowerOnState = RamState.Random };
 		private static readonly VideoConfig VideoConfig = new VideoConfig
 		{
 			AspectRatio = SnesAspectRatio.NoStretching,

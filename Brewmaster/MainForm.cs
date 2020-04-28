@@ -18,6 +18,7 @@ using Brewmaster.Modules;
 using Brewmaster.Modules.Breakpoints;
 using Brewmaster.Modules.Build;
 using Brewmaster.Modules.NumberHelper;
+using Brewmaster.Modules.OpcodeHelper;
 using Brewmaster.Modules.SpriteList;
 using Brewmaster.Modules.Watch;
 using Brewmaster.Ppu;
@@ -40,6 +41,7 @@ namespace Brewmaster
 	    public LayoutHandler LayoutHandler { get; private set; }
 	    public BuildHandler BuildHandler { get; private set; }
 	    public string RequestFile { get; set; }
+		public OpcodeHelper OpcodeHelper { get; }
 
 		private readonly Action<LogData> _logHandler;
 		private readonly Action<int> _breakHandler;
@@ -241,14 +243,18 @@ namespace Brewmaster
 				southContainer.AddPanel(memoryPanel);
 
 				westContainer.AddPanel(new IdePanel(ProjectExplorer) { Label = "Project Explorer" });
-				westContainer.AddPanel(new IdePanel(CartridgeExplorer) { Label = "Cartridge Explorer" });
+				//westContainer.AddPanel(new IdePanel(CartridgeExplorer) { Label = "Cartridge Explorer" });
+				var helperPanel = new IdeGroupedPanel();
+				helperPanel.AddPanel(new IdePanel(OpcodeHelper = new OpcodeHelper(_moduleEvents)) { Label = "Opcodes" });
+				helperPanel.AddPanel(new IdePanel(NumberHelper = new NumberHelper()) { Label = "Number Formats" });
+				westContainer.AddPanel(helperPanel);
 
 				LayoutHandler = new LayoutHandler(this);
 				LayoutHandler.SetDockContainers(eastContainer, westContainer, southContainer);
 
-				var nhPanel = new IdePanel(NumberHelper = new NumberHelper()) { Label = "Number Format Helper" };
-
 				AddWindowOption(ProjectExplorer);
+				AddWindowOption(NumberHelper);
+				AddWindowOption(OpcodeHelper);
 				AddWindowOption(mesen);
 				AddWindowOption(OutputWindow);
 				AddWindowOption(TileMap);
@@ -258,7 +264,6 @@ namespace Brewmaster
 				AddWindowOption(WatchValues);
 				AddWindowOption(BreakpointList);
 				AddWindowOption(ErrorList);
-				AddWindowOption(NumberHelper);
 
 				// Setup features
 				BuildHandler = new BuildHandler();
@@ -382,6 +387,8 @@ namespace Brewmaster
 
 			WatchValues.GetSymbol = (exp) => CurrentProject == null || !CurrentProject.DebugSymbols.ContainsKey(exp) ? null : CurrentProject.DebugSymbols[exp];
 		    WatchValues.AddBreakpoint = AddBreakpoint;
+
+		    OpcodeParser.GetOpcodes();
 
 			AddRecentProjects();
 			RefreshView();
@@ -1438,13 +1445,13 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 					case FileType.Text:
 					case FileType.Source:
 					case FileType.Include:
-						var textEditor = new TextEditorWindow(this, file);
+						var textEditor = new TextEditorWindow(this, file, _moduleEvents);
 						textEditor.TextEditor.ContextMenuStrip = textEditorContextMenuStrip;
 						textEditor.RefreshEditorContents();
 						tab = textEditor;
 						break;
 					case FileType.Image:
-						tab = new ImageWindow(this, file);
+						tab = new ImageWindow(this, file, _moduleEvents);
 						break;
 					default:
 						// TODO: "Open with..." dialog

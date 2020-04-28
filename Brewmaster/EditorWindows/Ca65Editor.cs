@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Brewmaster.BuildProcess;
 using Brewmaster.Emulation;
+using Brewmaster.Modules;
+using Brewmaster.Modules.OpcodeHelper;
 using Brewmaster.Modules.Watch;
 using Brewmaster.ProjectModel;
 using Brewmaster.Settings;
@@ -29,6 +31,7 @@ namespace Brewmaster.EditorWindows
 	public class CodeEditor : TextEditor
 	{
 		public AsmProjectFile File { get; private set; }
+		protected Events ModuleEvents { get; private set; }
 		protected CompletionDataProvider _completionDataProvider;
 
 		private CompletionWindow _codeCompletionWindow;
@@ -42,9 +45,10 @@ namespace Brewmaster.EditorWindows
 		public Action<string, Breakpoint.Types> AddSymbolBreakpoint { get; set; }
 		public Func<MemoryState> GetCpuMemory { get; set; }
 
-		public CodeEditor(AsmProjectFile file)
+		public CodeEditor(AsmProjectFile file, Events events)
 		{
 			File = file;
+			ModuleEvents = events;
 			Document.FormattingStrategy = new Ca65Formatting();
 
 			ActiveTextAreaControl.TextArea.InsertLeftMargin(1, 
@@ -183,6 +187,7 @@ namespace Brewmaster.EditorWindows
 
 				_caretLine = ActiveTextAreaControl.Caret.Line;
 				RefreshErrorInfo();
+				HighlightOpcodeOnLine();
 			};
 			
 			ActiveTextAreaControl.TextArea.KeyUp += delegate(object sender, KeyEventArgs e)
@@ -197,6 +202,8 @@ namespace Brewmaster.EditorWindows
 
 														ShowIntellisense((char) e.KeyValue, 1);
 														_forcedAutoCompleteWindow = false;
+
+														HighlightOpcodeOnLine();
 													};
 
 			ActiveTextAreaControl.TextArea.IconBarMargin.MouseDown += (sender, mousepos, buttons) =>
@@ -217,6 +224,15 @@ namespace Brewmaster.EditorWindows
 
 				if (changed) RefreshBreakpointsInProject();
 			};
+		}
+
+		private void HighlightOpcodeOnLine()
+		{
+			var lineSegment = Document.GetLineSegment(_caretLine);
+			if (lineSegment == null) return;
+			var opcode = lineSegment.Words.OfType<AsmWord>().FirstOrDefault(w => w.WordType == AsmWord.AsmWordType.Opcode);
+			var allOpcodes = OpcodeParser.GetOpcodes();
+			if (opcode != null && allOpcodes.ContainsKey(opcode.Word.ToUpper())) ModuleEvents.HighlightOpcode(allOpcodes[opcode.Word.ToUpper()]);
 		}
 
 		private DebugLine GetDebugLine(int lineNumber)
@@ -530,7 +546,7 @@ namespace Brewmaster.EditorWindows
 
 	public class Ca65Editor : CodeEditor
 	{
-		public Ca65Editor(AsmProjectFile file) : base(file)
+		public Ca65Editor(AsmProjectFile file, Events events) : base(file, events)
 		{
 			_completionDataProvider = new Ca65Completion(File.Project, GetSymbolDescription);
 			Document.TextContentChanged += (sender, args) =>
