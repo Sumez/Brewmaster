@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using Brewmaster.Modules.Build;
 using Brewmaster.Modules.SpriteList;
 using Brewmaster.ProjectModel;
+using Brewmaster.Settings;
 using Mesen.GUI;
 using Mesen.GUI.Config;
 using Mesen.GUI.Config.Shortcuts;
@@ -370,31 +371,32 @@ namespace Brewmaster.Emulation
 
 		private void ApplyInputConfig()
 		{
-			UpdateControllerMappings(new Dictionary<int, int>());
+			UpdateControllerMappings(new Dictionary<ControllerButtons, int>());
 		}
-		public void UpdateControllerMappings(Dictionary<int, int> mappings)
+		public void UpdateControllerMappings(Dictionary<ControllerButtons, int> mappings)
 		{
 			var p1Mapping = new KeyMapping
 			{
-				Up = GetMapping(mappings, 328),
-				Down = GetMapping(mappings, 336),
-				Left = GetMapping(mappings, 331),
-				Right = GetMapping(mappings, 333),
-				X = GetMapping(mappings, 45),
-				Y = GetMapping(mappings, 44),
-				A = GetMapping(mappings, 31),
-				B = GetMapping(mappings, 30),
-				Select = GetMapping(mappings, 18),
-				Start = GetMapping(mappings, 32),
-				L = GetMapping(mappings, 16),
-				R = GetMapping(mappings, 17)
+				Up = GetMapping(mappings, ControllerButtons.Up),
+				Down = GetMapping(mappings, ControllerButtons.Down),
+				Left = GetMapping(mappings, ControllerButtons.Left),
+				Right = GetMapping(mappings, ControllerButtons.Right),
+				X = GetMapping(mappings, ControllerButtons.X),
+				Y = GetMapping(mappings, ControllerButtons.Y),
+				A = GetMapping(mappings, ControllerButtons.A),
+				B = GetMapping(mappings, ControllerButtons.B),
+				Select = GetMapping(mappings, ControllerButtons.Select),
+				Start = GetMapping(mappings, ControllerButtons.Start),
+				L = GetMapping(mappings, ControllerButtons.L),
+				R = GetMapping(mappings, ControllerButtons.R)
 			};
 			var config = new InputConfig();
+			config.Controllers[0].Keys.TurboSpeed = 2;
 			config.Controllers[0].Type = ControllerType.SnesController;
 			config.Controllers[0].Keys.Mapping1 = p1Mapping;
 			SnesConfigApi.SetInputConfig(config);
 		}
-		private static uint GetMapping(Dictionary<int, int> mappings, int defaultKey)
+		private static uint GetMapping(Dictionary<ControllerButtons, int> mappings, ControllerButtons defaultKey)
 		{
 			return mappings.ContainsKey(defaultKey) ? (uint)mappings[defaultKey] : (uint)defaultKey;
 		}

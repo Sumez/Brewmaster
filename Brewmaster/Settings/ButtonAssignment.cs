@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using Brewmaster.Emulation;
 
@@ -14,6 +10,7 @@ namespace Brewmaster.Settings
 	{
 		public ButtonAssignment(bool shortcut)
 		{
+			_emulator = new NesEmulatorHandler(this);
 			_shortcut = shortcut;
 			InitializeComponent();
 		}
@@ -96,6 +93,7 @@ namespace Brewmaster.Settings
 		}
 
 		private ToolStripMenuItem testMenu = new ToolStripMenuItem("test");
+		private IEmulatorHandler _emulator;
 
 
 		private const int WM_KEYDOWN = 0x100;
@@ -105,12 +103,17 @@ namespace Brewmaster.Settings
 
 		public bool PreFilterMessage(ref Message m)
 		{
-			if (!this.ContainsFocus) return false;
-			if (m.Msg != WM_SYSKEYDOWN && m.Msg != WM_KEYDOWN) return false;
 
-			KeyCode = (int) m.WParam;
-			Close();
-			return true;
+			var scanCode = (Int32)(((Int64)m.LParam & 0x1FF0000) >> 16);
+			if (m.Msg == WM_KEYUP || m.Msg == WM_SYSKEYUP)
+			{
+				_emulator.SetKeyState(scanCode, false);
+			}
+			else if (ContainsFocus && (m.Msg == WM_SYSKEYDOWN || m.Msg == WM_KEYDOWN))
+			{
+				_emulator.SetKeyState(scanCode, true);
+			}
+			return false;
 		}
 
 

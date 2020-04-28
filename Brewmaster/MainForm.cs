@@ -1624,6 +1624,7 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 					    Settings.SnesMappings = newMappings;
 					    break;
 			    }
+			    mesen.SetButtonMappings(Settings.NesMappings, Settings.SnesMappings);
 				Settings.Save();
 			}
 
