@@ -25,6 +25,7 @@ namespace Brewmaster.StatusView
 			{
 				_moduleEvents = value;
 				_moduleEvents.EmulationStateUpdate += UpdateStates;
+				_moduleEvents.ProjectTypeChanged += SetMode;
 			}
 		}
 

@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
+using System.Xml.Serialization;
+using Brewmaster.ProjectModel;
 using Brewmaster.Properties;
 using HtmlAgilityPack;
 
@@ -18,28 +22,135 @@ namespace Brewmaster.Modules.OpcodeHelper
 	{
 		public string Command;
 		public string Title;
+		[XmlElement(ElementName = "Description")]
 		public List<string> Description = new List<string>();
+		[XmlElement(ElementName = "AddressingMode")]
 		public List<AddressingMode> AddressingModes = new List<AddressingMode>();
 		public AffectedFlag AffectedFlags;
+
+		[XmlIgnore]
 		public Dictionary<AffectedFlag, string> FlagExplanations = new Dictionary<AffectedFlag, string>();
+
+		[XmlElement(ElementName = "FlagExplanation")]
+		public List<FlagExplanation> SerialiazableFlagExplanations;
+	}
+
+	public class FlagExplanation
+	{
+		public string Explanation;
+		public AffectedFlag Flag;
 	}
 
 	public class AddressingMode
 	{
 		public string Name;
-		public int Bytes;
+		public string Bytes;
 		public string Cycles;
 	}
 	public class OpcodeParser
 	{
-		private static Dictionary<string, Opcode> _list;
+		private static Dictionary<ProjectType, Dictionary<string, Opcode>> _list = new Dictionary<ProjectType, Dictionary<string, Opcode>>();
 
 		private static Regex _cleanText = new Regex(@"\s+");
-		public static Dictionary<string, Opcode> GetOpcodes()
+		private static Regex _filterOpcode = new Regex(@"^[A-Z]{3}");
+		public static Dictionary<string, Opcode> GetOpcodes(ProjectType type)
 		{
-			if (_list != null) return _list;
+			if (_list.ContainsKey(type)) return _list[type];
 
-			_list = new Dictionary<string, Opcode>();
+			switch (type)
+			{
+				case ProjectType.Nes:
+					_list[type] = Parse6502Reference();
+					break;
+				case ProjectType.Snes:
+					_list[type] = Parse65826Reference();
+					break;
+				default:
+					return new Dictionary<string, Opcode>();
+			}
+
+#if DEBUG
+			foreach (var opcode in _list[type].Values)
+			{
+				opcode.SerialiazableFlagExplanations = opcode.FlagExplanations.Select(kvp => new FlagExplanation { Explanation = kvp.Value, Flag = kvp.Key }).ToList();
+			}
+			using (var writer = File.OpenWrite(Path.Combine(Program.WorkingDirectory, "Opcodes." + type + ".xml"))) new XmlSerializer(typeof(List<Opcode>), new XmlRootAttribute("Opcodes")).Serialize(writer, _list[type].Values.ToList());
+#endif
+			return _list[type];
+		}
+
+		private static Dictionary<string, Opcode> Parse65826Reference()
+		{
+			var list = new Dictionary<string, Opcode>();
+			var html = new HtmlDocument();
+			html.LoadHtml(Resources._65816);
+			var opcodeTables = html.DocumentNode.SelectNodes("//table");
+			foreach (var table in opcodeTables)
+			{
+				var implied = !table.SelectSingleNode(".//tr/th[2]").InnerText.Equals("Addressing Mode", StringComparison.InvariantCultureIgnoreCase);
+				foreach (var row in table.SelectNodes(".//tr"))
+				{
+					var cells = row.SelectNodes(".//td");
+					if (cells == null || cells.Count < 6) continue;
+
+					var match = _filterOpcode.Match(cells[0].InnerText.Trim());
+					if (!match.Success) continue;
+					var command = match.Value;
+					Opcode opcode;
+					if (!list.ContainsKey(command))
+					{
+						list.Add(command, opcode = new Opcode { Command = command });
+						var element = table.SelectSingleNode("./preceding-sibling::h1[1]");
+						opcode.Title = implied
+							? string.Format("{0} - {1}", command, cells[1].InnerText.Trim())
+							: element.InnerText.Trim();
+
+						var parsedFlags = false;
+						while ((element = element.SelectSingleNode("./following-sibling::*")) != table)
+						{
+							if (element.InnerText.Trim().StartsWith("Flags affected"))
+							{
+
+								foreach (var flagsAffectedLabel in element.SelectNodes(".//strong"))
+								{
+									if (!flagsAffectedLabel.InnerText.Trim().Contains(command) && parsedFlags) continue;
+
+									var flagIndicator = flagsAffectedLabel.SelectSingleNode("./following-sibling::code")
+										.InnerText.ToLower();
+									opcode.AffectedFlags = 0;
+									if (flagIndicator.Contains('c')) opcode.AffectedFlags |= AffectedFlag.C;
+									if (flagIndicator.Contains('z')) opcode.AffectedFlags |= AffectedFlag.Z;
+									if (flagIndicator.Contains('v')) opcode.AffectedFlags |= AffectedFlag.V;
+									if (flagIndicator.Contains('n')) opcode.AffectedFlags |= AffectedFlag.N;
+
+									parsedFlags = true;
+								}
+								continue;
+							}
+
+							if (!implied) opcode.Description.Add(element.InnerText.Trim());
+						}
+					}
+					else  opcode = list[command];
+
+					var addressingMode = new AddressingMode
+					{
+						Name = implied ? "Implied" : cells[1].InnerText.Trim(),
+						Bytes = cells[3].InnerText.Trim(),
+						Cycles = string.IsNullOrWhiteSpace(cells[5].InnerText)
+							? string.Format("{0}", cells[4].InnerText.Trim())
+							: string.Format("{0} ({1})", cells[4].InnerText.Trim(), cells[5].InnerText.Trim())
+					};
+					opcode.AddressingModes.Add(addressingMode);
+				}
+			}
+
+			return list;
+		}
+
+		private static Dictionary<string, Opcode> Parse6502Reference()
+		{
+			var list = new Dictionary<string, Opcode>();
 			var html = new HtmlDocument();
 			html.LoadHtml(Resources._6502);
 			var opcodeTable = html.DocumentNode.SelectSingleNode("//table");
@@ -47,7 +158,7 @@ namespace Brewmaster.Modules.OpcodeHelper
 			foreach (var cell in opcodeCells)
 			{
 				var opcode = new Opcode { Command = cell.InnerText };
-				_list.Add(opcode.Command, opcode);
+				list.Add(opcode.Command, opcode);
 				var element = cell.SelectSingleNode(string.Format("//a[@name='{0}']", cell.GetAttributeValue("href", "#").Substring(1))).ParentNode;
 				opcode.Title = element.InnerText;
 
@@ -101,12 +212,14 @@ namespace Brewmaster.Modules.OpcodeHelper
 					opcode.AddressingModes.Add(new AddressingMode
 					{
 						Name = _cleanText.Replace(addressingRow.SelectSingleNode(".//td[1]").InnerText, " ").Trim(),
-						Bytes = int.Parse(addressingRow.SelectSingleNode(".//td[3]").InnerText.Trim()),
+						//Bytes = int.Parse(addressingRow.SelectSingleNode(".//td[3]").InnerText.Trim()),
+						Bytes = addressingRow.SelectSingleNode(".//td[3]").InnerText.Trim(),
 						Cycles = _cleanText.Replace(addressingRow.SelectSingleNode(".//td[4]").InnerText, " ").Trim()
 					});
 				}
 			}
-			return _list;
+			return list;
+
 		}
 	}
 }

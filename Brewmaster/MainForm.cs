@@ -391,7 +391,8 @@ namespace Brewmaster
 			WatchValues.GetSymbol = (exp) => CurrentProject == null || !CurrentProject.DebugSymbols.ContainsKey(exp) ? null : CurrentProject.DebugSymbols[exp];
 		    WatchValues.AddBreakpoint = AddBreakpoint;
 
-		    OpcodeParser.GetOpcodes();
+		    OpcodeParser.GetOpcodes(ProjectType.Nes);
+		    OpcodeParser.GetOpcodes(ProjectType.Snes);
 		    Ca65Parser.GetCommands();
 
 			AddRecentProjects();
@@ -955,8 +956,8 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 			}
 			SuspendLayout();
 
+			_moduleEvents.SetProjectType(project.Type);
 			LoadEmulator(project.Type);
-			cpuStatus1.SetMode(project.Type);
 			project.GoTo = GoTo;
 			project.BreakpointsChanged += ThreadSafeBreakpointHandler;
 

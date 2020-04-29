@@ -17,7 +17,10 @@ namespace Brewmaster.Modules
 
 		public event Action<EmulationState> EmulationStateUpdate;
 		public int SelectedSprite { get; private set; } = -1;
+		public ProjectType ProjectType { get; private set; } = ProjectType.Nes;
+
 		public event Action<int> SelectedSpriteChanged;
+		public event Action<ProjectType> ProjectTypeChanged;
 		public event Action<Opcode> HighlightedOpcode;
 		public event Action<Ca65Command> HighlightedCommand;
 
@@ -40,6 +43,13 @@ namespace Brewmaster.Modules
 			if (spriteIndex == SelectedSprite) return;
 			SelectedSprite = spriteIndex;
 			if (SelectedSpriteChanged != null) SelectedSpriteChanged(SelectedSprite);
+		}
+
+		public void SetProjectType(ProjectType projectType)
+		{
+			if (projectType == ProjectType) return;
+			ProjectType = projectType;
+			if (ProjectTypeChanged != null) ProjectTypeChanged(projectType);
 		}
 	}
 }

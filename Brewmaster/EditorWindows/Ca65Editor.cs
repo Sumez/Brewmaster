@@ -243,7 +243,7 @@ namespace Brewmaster.EditorWindows
 			var lineSegment = Document.GetLineSegment(_caretLine);
 			if (lineSegment == null) return;
 			var opcode = lineSegment.Words.OfType<AsmWord>().FirstOrDefault(w => w.WordType == AsmWord.AsmWordType.Opcode);
-			var allOpcodes = OpcodeParser.GetOpcodes();
+			var allOpcodes = OpcodeParser.GetOpcodes(File.Project.Type);
 			if (opcode != null && allOpcodes.ContainsKey(opcode.Word.ToUpper())) ModuleEvents.HighlightOpcode(allOpcodes[opcode.Word.ToUpper()]);
 		}
 

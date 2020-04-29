@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.VisualStyles;
+using Brewmaster.ProjectModel;
 
 namespace Brewmaster.Modules.OpcodeHelper
 {
@@ -29,11 +29,14 @@ namespace Brewmaster.Modules.OpcodeHelper
 		private FlowLayoutPanel addressingModesPanel;
 		private readonly Dictionary<Opcode, OpcodeButton> _buttons = new Dictionary<Opcode, OpcodeButton>();
 
-		public OpcodeHelper()
+		private void LoadOpcodes(ProjectType type)
 		{
-			InitializeComponent();
 
-			_opcodes = OpcodeParser.GetOpcodes().Values.ToList();
+			_opcodes = OpcodeParser.GetOpcodes(type).Values.ToList();
+			SuspendLayout();
+			buttonPanel.Visible = false;
+			buttonPanel.Controls.Clear();
+			_buttons.Clear();
 			foreach (var opcode in _opcodes)
 			{
 				var button = new OpcodeButton(opcode) {Margin = new Padding(0, 0, 1, 1)};
@@ -42,13 +45,20 @@ namespace Brewmaster.Modules.OpcodeHelper
 				button.Click += (s, a) => SelectOpcode(opcode);
 				toolTip.SetToolTip(button, opcode.Title);
 			}
-			SelectOpcode(_opcodes.First());
+			SelectOpcode(_opcodes.FirstOrDefault());
+			buttonPanel.Visible = true;
+			ResumeLayout();
 		}
 
-		public OpcodeHelper(Events events) : this()
+		public OpcodeHelper(Events events)
 		{
+			InitializeComponent();
+
 			_events = events;
 			_events.HighlightedOpcode += SelectOpcode;
+			_events.ProjectTypeChanged += LoadOpcodes;
+
+			LoadOpcodes(_events.ProjectType);
 		}
 
 		protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
@@ -92,7 +102,12 @@ namespace Brewmaster.Modules.OpcodeHelper
 		{
 			if (opcode == _selected) return;
 			_selected = opcode;
-			
+			if (opcode == null)
+			{
+				descriptionPanel.Visible = false;	
+				return;
+			}
+
 			var button = _buttons[opcode];
 			button.Selected = true;
 			foreach (var otherButton in buttonPanel.Controls.OfType<OpcodeButton>().Where(b => b != button)) otherButton.Selected = false;
@@ -100,12 +115,17 @@ namespace Brewmaster.Modules.OpcodeHelper
 
 			title.Text = opcode.Title;
 			var stringBuilder = new StringBuilder();
+			var hasSubDescription = false;
 			for (var i = 0; i < opcode.Description.Count; i++)
 			{
-				if (i == 0 && opcode.Description.Count > 1) subDescription.Text = opcode.Description[i];
+				if (i == 0 && opcode.Description.Count > 1 && !opcode.Description[i].Contains('\n'))
+				{
+					hasSubDescription = true;
+					subDescription.Text = opcode.Description[i];
+				}
 				else stringBuilder.AppendLine(opcode.Description[i]);
 			}
-			subDescription.Visible = opcode.Description.Count > 1;
+			subDescription.Visible = hasSubDescription;
 			description.Text = stringBuilder.ToString();
 			flagC.Checked = opcode.AffectedFlags.HasFlag(AffectedFlag.C);
 			flagZ.Checked = opcode.AffectedFlags.HasFlag(AffectedFlag.Z);
@@ -123,6 +143,7 @@ namespace Brewmaster.Modules.OpcodeHelper
 				addressingModesPanel.Controls.Add(new AddressingModeDescription(addressingMode, toolTip) { Margin = Padding.Empty });
 			}
 			addressingModesPanel.ResumeLayout();
+			if (!descriptionPanel.Visible) descriptionPanel.Visible = true;
 		}
 
 		private void InitializeComponent()
@@ -400,7 +421,7 @@ namespace Brewmaster.Modules.OpcodeHelper
 		{
 			base.OnPaint(e);
 			e.Graphics.FillRectangle(Selected ? Brushes.DodgerBlue : _hover ? Brushes.LightGray : Brushes.White, ClientRectangle);
-			e.Graphics.DrawString(_opcode.Command, Font, Selected ? Brushes.White : Brushes.Black, ClientRectangle, new StringFormat { LineAlignment = StringAlignment.Center, Alignment = StringAlignment.Center });
+			e.Graphics.DrawString(_opcode.Command, Font, Selected ? Brushes.White : Brushes.Black, ClientRectangle, new StringFormat { FormatFlags = StringFormatFlags.NoWrap, LineAlignment = StringAlignment.Center, Alignment = StringAlignment.Center });
 		}
 	}
 

@@ -86,6 +86,31 @@ namespace Brewmaster.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &lt;!DOCTYPE html&gt;
+        ///&lt;html&gt;
+        ///&lt;head&gt;
+        ///  &lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=utf-8&quot; /&gt;
+        ///  &lt;meta name=&quot;referrer&quot; content=&quot;none&quot; /&gt;
+        ///  &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot; /&gt;
+        ///  &lt;link rel=&quot;stylesheet&quot; href=&quot;/style.css&quot; type=&quot;text/css&quot; /&gt;
+        ///  &lt;title&gt;65816 Opcodes&lt;/title&gt;
+        ///&lt;/head&gt;
+        ///&lt;body&gt;
+        ///&lt;div class=&quot;wrapper&quot;&gt;
+        ///&lt;header role=&quot;banner&quot; id=&quot;top&quot;&gt;
+        ///    &lt;h1&gt;&lt;a href=&quot;/&quot;&gt;The UnDisbeliever&apos;s Website&lt;/a&gt;&lt;/h1&gt;
+        ///&lt;/header&gt;
+        ///
+        ///&lt;main class=&quot;main with-sidebar&quot;&gt;
+        ///  &lt;div class=&quot;sidebar&quot; role=&quot;com [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _65816 {
+            get {
+                return ResourceManager.GetString("_65816", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap _new {

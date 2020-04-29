@@ -98,8 +98,8 @@ namespace Brewmaster.Modules.OpcodeHelper
 			{
 				var cycleExplanation = match.Groups[2].Value.Trim();
 				var match2 = Regex.Match(cycleExplanation, @"\+[0-9]+(?!.*\+.*)");
-
-				if (match2.Success) cycleText = string.Format("{0} ({1}) cycles", cycleCount, match2.Value);
+				//if (match2.Success) cycleText = string.Format("{0} ({1}) cycles", cycleCount, match2.Value);
+				if (match2.Success) cycleText = string.Format("{0} (+) cycles", cycleCount);
 				toolTip.SetToolTip(cycles, cycleExplanation);
 			}
 			cycles.Text = cycleText;

@@ -89,7 +89,7 @@ namespace Brewmaster.EditorWindows
 
 			}
 
-			foreach (var opcode in OpcodeParser.GetOpcodes().Values)
+			foreach (var opcode in OpcodeParser.GetOpcodes(_project.Type).Values)
 			{
 				if (!opcode.Command.StartsWith(preSelection, true, CultureInfo.InvariantCulture)) continue;
 				returnValues.Add(new OpcodeData(opcode) { Focus = () => _events.HighlightOpcode(opcode) });
