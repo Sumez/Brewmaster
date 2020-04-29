@@ -561,7 +561,7 @@ namespace Brewmaster.EditorWindows
 	{
 		public Ca65Editor(AsmProjectFile file, Events events) : base(file, events)
 		{
-			_completionDataProvider = new Ca65Completion(File.Project, GetSymbolDescription);
+			_completionDataProvider = new Ca65Completion(File.Project, GetSymbolDescription, events);
 			Document.TextContentChanged += (sender, args) =>
 												{
 

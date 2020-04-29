@@ -593,11 +593,14 @@
     <None Include="Resources\Other\collapsed.png" />
     <None Include="Resources\6502.html" />
     <None Include="Resources\ca65.html" />
+    <None Include="Resources\Other\ca65icon.png" />
     <Content Include="Resources\Other\error.png" />
     <None Include="Resources\Other\smallload.png" />
     <None Include="Resources\Other\smallsave.png" />
     <None Include="Resources\Other\logo.png" />
     <None Include="Resources\Other\expanded.png" />
+    <None Include="Resources\Other\label.png" />
+    <None Include="Resources\Other\opcode.png" />
     <Content Include="Resources\Other\warning.png" />
     <None Include="Resources\Toolbar\buildrun.png" />
     <None Include="Resources\Toolbar\config.png" />
