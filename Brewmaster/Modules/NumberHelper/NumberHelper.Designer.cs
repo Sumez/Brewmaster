@@ -72,31 +72,40 @@ namespace Brewmaster.Modules.NumberHelper
 			// 
 			// DecimalNumber
 			// 
+			this.DecimalNumber.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
 			this.DecimalNumber.BorderStyle = System.Windows.Forms.BorderStyle.None;
 			this.DecimalNumber.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.DecimalNumber.Location = new System.Drawing.Point(53, 0);
+			this.DecimalNumber.MaxLength = 15;
 			this.DecimalNumber.Name = "DecimalNumber";
-			this.DecimalNumber.Size = new System.Drawing.Size(100, 13);
+			this.DecimalNumber.Size = new System.Drawing.Size(116, 13);
 			this.DecimalNumber.TabIndex = 3;
 			this.DecimalNumber.Text = "0";
 			// 
 			// HexNumber
 			// 
+			this.HexNumber.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
 			this.HexNumber.BorderStyle = System.Windows.Forms.BorderStyle.None;
 			this.HexNumber.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.HexNumber.Location = new System.Drawing.Point(53, 16);
+			this.HexNumber.MaxLength = 8;
 			this.HexNumber.Name = "HexNumber";
-			this.HexNumber.Size = new System.Drawing.Size(100, 13);
+			this.HexNumber.Size = new System.Drawing.Size(116, 13);
 			this.HexNumber.TabIndex = 4;
 			this.HexNumber.Text = "00";
 			// 
 			// BinaryNumber
 			// 
+			this.BinaryNumber.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
 			this.BinaryNumber.BorderStyle = System.Windows.Forms.BorderStyle.None;
 			this.BinaryNumber.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.BinaryNumber.Location = new System.Drawing.Point(53, 32);
+			this.BinaryNumber.MaxLength = 32;
 			this.BinaryNumber.Name = "BinaryNumber";
-			this.BinaryNumber.Size = new System.Drawing.Size(100, 13);
+			this.BinaryNumber.Size = new System.Drawing.Size(116, 13);
 			this.BinaryNumber.TabIndex = 5;
 			this.BinaryNumber.Text = "00000000";
 			// 
@@ -136,7 +145,7 @@ namespace Brewmaster.Modules.NumberHelper
 			this.Controls.Add(this.label5);
 			this.ForeColor = System.Drawing.SystemColors.WindowText;
 			this.Name = "NumberHelper";
-			this.Size = new System.Drawing.Size(592, 309);
+			this.Size = new System.Drawing.Size(172, 309);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 

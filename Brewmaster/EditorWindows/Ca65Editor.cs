@@ -8,6 +8,7 @@ using System.Windows.Forms;
 using Brewmaster.BuildProcess;
 using Brewmaster.Emulation;
 using Brewmaster.Modules;
+using Brewmaster.Modules.Ca65Helper;
 using Brewmaster.Modules.OpcodeHelper;
 using Brewmaster.Modules.Watch;
 using Brewmaster.ProjectModel;
@@ -182,7 +183,10 @@ namespace Brewmaster.EditorWindows
 				}
 			};
 
-			ActiveTextAreaControl.Caret.PositionChanged += (s, a) => {
+			ActiveTextAreaControl.Caret.PositionChanged += (s, a) =>
+			{
+				HighlightCommandAtCaret();
+
 				if (ActiveTextAreaControl.Caret.Line == _caretLine) return;
 
 				_caretLine = ActiveTextAreaControl.Caret.Line;
@@ -226,6 +230,14 @@ namespace Brewmaster.EditorWindows
 			};
 		}
 
+		private void HighlightCommandAtCaret()
+		{
+			var word = GetAsmWord(ActiveTextAreaControl.Caret.Position);
+			if (word == null || word.WordType != AsmWord.AsmWordType.Command) return;
+
+			var knownCommands = Ca65Parser.GetCommands();
+			if (knownCommands.ContainsKey(word.Word.ToUpper())) ModuleEvents.HighlightCommand(knownCommands[word.Word.ToUpper()]);
+		}
 		private void HighlightOpcodeOnLine()
 		{
 			var lineSegment = Document.GetLineSegment(_caretLine);
@@ -320,6 +332,7 @@ namespace Brewmaster.EditorWindows
 			if (position.Column > 0 && (word == null || word.Type == TextWordType.Space || word.Type == TextWordType.Tab))
 				word = line.GetWord(position.Column - 1);
 
+			if (File.Project.Symbols != null && File.Project.DebugSymbols != null)
 			if (word != null && !(word is AsmWord) && (File.Project.DebugSymbols.ContainsKey(word.Word) || File.Project.Symbols.Any(s => s.Key == word.Word)))
 			{
 				return new AsmWord(Document, line, word.Offset, word.Length, new HighlightColor(Color.Black, false, false), true, AsmWord.AsmWordType.LabelReference);

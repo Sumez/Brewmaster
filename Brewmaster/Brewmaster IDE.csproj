@@ -149,6 +149,10 @@
     <Compile Include="Modules\Breakpoints\BreakpointEditor.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Modules\Ca65Helper\Ca65DocParser.cs" />
+    <Compile Include="Modules\Ca65Helper\Ca65CommandDocumentation.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="Modules\MenuHelper.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -475,6 +479,9 @@
     <EmbeddedResource Include="Modules\Build\OutputWindow.resx">
       <DependentUpon>OutputWindow.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Modules\Ca65Helper\Ca65CommandDocumentation.resx">
+      <DependentUpon>Ca65CommandDocumentation.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Modules\NumberHelper\NumberHelper.resx">
       <DependentUpon>NumberHelper.cs</DependentUpon>
     </EmbeddedResource>
@@ -585,6 +592,7 @@
     <Content Include="nesproject.ico" />
     <None Include="Resources\Other\collapsed.png" />
     <None Include="Resources\6502.html" />
+    <None Include="Resources\ca65.html" />
     <Content Include="Resources\Other\error.png" />
     <None Include="Resources\Other\smallload.png" />
     <None Include="Resources\Other\smallsave.png" />

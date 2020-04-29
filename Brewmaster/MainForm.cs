@@ -17,6 +17,7 @@ using Brewmaster.Ide;
 using Brewmaster.Modules;
 using Brewmaster.Modules.Breakpoints;
 using Brewmaster.Modules.Build;
+using Brewmaster.Modules.Ca65Helper;
 using Brewmaster.Modules.NumberHelper;
 using Brewmaster.Modules.OpcodeHelper;
 using Brewmaster.Modules.SpriteList;
@@ -41,7 +42,8 @@ namespace Brewmaster
 	    public LayoutHandler LayoutHandler { get; private set; }
 	    public BuildHandler BuildHandler { get; private set; }
 	    public string RequestFile { get; set; }
-		public OpcodeHelper OpcodeHelper { get; }
+		public OpcodeHelper OpcodeHelper { get; private set; }
+	    public Ca65CommandDocumentation Ca65Helper { get; private set; }
 
 		private readonly Action<LogData> _logHandler;
 		private readonly Action<int> _breakHandler;
@@ -246,6 +248,7 @@ namespace Brewmaster
 				//westContainer.AddPanel(new IdePanel(CartridgeExplorer) { Label = "Cartridge Explorer" });
 				var helperPanel = new IdeGroupedPanel();
 				helperPanel.AddPanel(new IdePanel(OpcodeHelper = new OpcodeHelper(_moduleEvents)) { Label = "Opcodes" });
+				helperPanel.AddPanel(new IdePanel(Ca65Helper = new Ca65CommandDocumentation(_moduleEvents)) { Label = "Commands" });
 				helperPanel.AddPanel(new IdePanel(NumberHelper = new NumberHelper()) { Label = "Number Formats" });
 				westContainer.AddPanel(helperPanel);
 
@@ -389,6 +392,7 @@ namespace Brewmaster
 		    WatchValues.AddBreakpoint = AddBreakpoint;
 
 		    OpcodeParser.GetOpcodes();
+		    Ca65Parser.GetCommands();
 
 			AddRecentProjects();
 			RefreshView();

@@ -126,6 +126,27 @@ namespace Brewmaster.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &lt;!DOCTYPE html PUBLIC &quot;-//W3C//DTD HTML 3.2 Final//EN&quot;&gt;
+        ///&lt;!-- saved from url=(0040)https://cc65.github.io/doc/ca65.html#s11 --&gt;
+        ///&lt;html&gt;&lt;head&gt;&lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=UTF-8&quot;&gt;
+        /// &lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;./ca65_files/doc.css&quot;&gt;
+        /// &lt;meta name=&quot;GENERATOR&quot; content=&quot;LinuxDoc-Tools 0.9.71&quot;&gt;
+        /// &lt;title&gt;ca65 Users Guide&lt;/title&gt;
+        ///&lt;/head&gt;
+        ///&lt;body&gt;
+        ///&lt;h1&gt;ca65 Users Guide&lt;/h1&gt;
+        ///
+        ///&lt;h2&gt;
+        ///&lt;a href=&quot;mailto:uz@cc65.org&quot;&gt;Ullrich von Bassewitz&lt;/a&gt;,&lt;br&gt;
+        ///&lt;a href=&quot;mailto:greg.king5@verizon.net&quot; [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string ca65 {
+            get {
+                return ResourceManager.GetString("ca65", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap cartridge {
