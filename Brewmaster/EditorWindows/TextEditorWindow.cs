@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Brewmaster.EditorWindows.Text;
 using Brewmaster.Ide;
+using Brewmaster.Modules;
 using Brewmaster.ProjectModel;
 
 namespace Brewmaster.EditorWindows
@@ -21,13 +22,13 @@ namespace Brewmaster.EditorWindows
 
 		public Action ThreadSafeRefreshWarning { get; set; }
 		public Action ThreadSafeRefresh { get; set; }
-		public TextEditorWindow(MainForm form, AsmProjectFile file) : base(form, file)
+		public TextEditorWindow(MainForm form, AsmProjectFile file, Events moduleEvents) : base(form, file, moduleEvents)
 		{
 			switch (file.Type)
 			{
 				case FileType.Source:
 				case FileType.Include:
-					TextEditor = new Ca65Editor(ProjectFile);
+					TextEditor = new Ca65Editor(ProjectFile, moduleEvents);
 					break;
 				case FileType.Text:
 				default:
@@ -107,6 +108,7 @@ namespace Brewmaster.EditorWindows
 			}
 
 			RefreshEditorBreakpoints();
+			RefreshEditorBuildInfo();
 
 			string textType;
 			switch (ProjectFile.File.Extension)
@@ -140,11 +142,13 @@ namespace Brewmaster.EditorWindows
 		public void RefreshEditorBreakpoints()
 		{
 			var codeEditor = TextEditor as CodeEditor;
-			if (codeEditor != null)
-			{
-				codeEditor.UpdateBreakpointsInEditor();
-				if (ProjectFile.DebugLines != null) codeEditor.UpdateBreakpointsWithBuildInfo();
-			}
+			if (codeEditor != null) codeEditor.UpdateBreakpointsInEditor();
+		}
+		public void RefreshEditorBuildInfo()
+		{
+			var codeEditor = TextEditor as CodeEditor;
+			if (codeEditor != null && ProjectFile.DebugLines != null) codeEditor.UpdateBreakpointsWithBuildInfo();
+			// TODO: This requires an editor window to be open for its breakpoints to work. Do we want it to work like that?
 		}
 
 

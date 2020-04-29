@@ -346,14 +346,14 @@ namespace Brewmaster.Settings
 		public static List<KeyboardMapping> NesDefaults { get
 			{
 				return new List<KeyboardMapping>() {
-				new KeyboardMapping { TargetKey = 328, MappedTo = (int)Keys.Up,  Name = "Up" },
-				new KeyboardMapping { TargetKey = 336, MappedTo = (int)Keys.Down, Name = "Down" },
-				new KeyboardMapping { TargetKey = 331, MappedTo = (int)Keys.Left, Name = "Left" },
-				new KeyboardMapping { TargetKey = 333, MappedTo = (int)Keys.Right, Name = "Right" },
-				new KeyboardMapping { TargetKey = 16, MappedTo = (int)Keys.Q, Name = "Select" },
-				new KeyboardMapping { TargetKey = 17, MappedTo = (int)Keys.W, Name = "Start" },
-				new KeyboardMapping { TargetKey = 30, MappedTo = (int)Keys.Z, Name = "B" },
-				new KeyboardMapping { TargetKey = 31, MappedTo = (int)Keys.X, Name = "A" },
+				new KeyboardMapping { TargetKey = (int)ControllerButtons.Up, MappedTo = (int)ControllerButtons.Up,  Name = "Up" },
+				new KeyboardMapping { TargetKey = (int)ControllerButtons.Down, MappedTo = (int)ControllerButtons.Down, Name = "Down" },
+				new KeyboardMapping { TargetKey = (int)ControllerButtons.Left, MappedTo = (int)ControllerButtons.Left, Name = "Left" },
+				new KeyboardMapping { TargetKey = (int)ControllerButtons.Right, MappedTo = (int)ControllerButtons.Right, Name = "Right" },
+				new KeyboardMapping { TargetKey = (int)ControllerButtons.Select, MappedTo = (int)ControllerButtons.Select, Name = "Select" },
+				new KeyboardMapping { TargetKey = (int)ControllerButtons.Start, MappedTo = (int)ControllerButtons.Start, Name = "Start" },
+				new KeyboardMapping { TargetKey = (int)ControllerButtons.B, MappedTo = (int)ControllerButtons.B, Name = "B" },
+				new KeyboardMapping { TargetKey = (int)ControllerButtons.A, MappedTo = (int)ControllerButtons.A, Name = "A" },
 			};
 		} }
 		public static List<KeyboardMapping> SnesDefaults
@@ -361,20 +361,25 @@ namespace Brewmaster.Settings
 			get
 			{
 				return new List<KeyboardMapping>() {
-				new KeyboardMapping { TargetKey = 328, MappedTo = (int)Keys.Up,  Name = "Up" },
-				new KeyboardMapping { TargetKey = 336, MappedTo = (int)Keys.Down, Name = "Down" },
-				new KeyboardMapping { TargetKey = 331, MappedTo = (int)Keys.Left, Name = "Left" },
-				new KeyboardMapping { TargetKey = 333, MappedTo = (int)Keys.Right, Name = "Right" },
-				new KeyboardMapping { TargetKey = 18, MappedTo = (int)Keys.Left, Name = "Select" },
-				new KeyboardMapping { TargetKey = 32, MappedTo = (int)Keys.Left, Name = "Start" },
-				new KeyboardMapping { TargetKey = 44, MappedTo = (int)Keys.Left, Name = "Y" },
-				new KeyboardMapping { TargetKey = 45, MappedTo = (int)Keys.Left, Name = "X" },
-				new KeyboardMapping { TargetKey = 30, MappedTo = (int)Keys.Left, Name = "B" },
-				new KeyboardMapping { TargetKey = 31, MappedTo = (int)Keys.Left, Name = "A" },
-				new KeyboardMapping { TargetKey = 16, MappedTo = (int)Keys.Left, Name = "L" },
-				new KeyboardMapping { TargetKey = 17, MappedTo = (int)Keys.Left, Name = "R" },
+				new KeyboardMapping { TargetKey = (int)ControllerButtons.Up, MappedTo = (int)ControllerButtons.Up,  Name = "Up" },
+				new KeyboardMapping { TargetKey = (int)ControllerButtons.Down, MappedTo = (int)ControllerButtons.Down, Name = "Down" },
+				new KeyboardMapping { TargetKey = (int)ControllerButtons.Left, MappedTo = (int)ControllerButtons.Left, Name = "Left" },
+				new KeyboardMapping { TargetKey = (int)ControllerButtons.Right, MappedTo = (int)ControllerButtons.Right, Name = "Right" },
+				new KeyboardMapping { TargetKey = (int)ControllerButtons.Select, MappedTo = (int)ControllerButtons.Select, Name = "Select" },
+				new KeyboardMapping { TargetKey = (int)ControllerButtons.Start, MappedTo = (int)ControllerButtons.Start, Name = "Start" },
+				new KeyboardMapping { TargetKey = (int)ControllerButtons.Y, MappedTo = (int)ControllerButtons.Y, Name = "Y" },
+				new KeyboardMapping { TargetKey = (int)ControllerButtons.X, MappedTo = (int)ControllerButtons.X, Name = "X" },
+				new KeyboardMapping { TargetKey = (int)ControllerButtons.B, MappedTo = (int)ControllerButtons.B, Name = "B" },
+				new KeyboardMapping { TargetKey = (int)ControllerButtons.A, MappedTo = (int)ControllerButtons.A, Name = "A" },
+				new KeyboardMapping { TargetKey = (int)ControllerButtons.L, MappedTo = (int)ControllerButtons.L, Name = "L" },
+				new KeyboardMapping { TargetKey = (int)ControllerButtons.R, MappedTo = (int)ControllerButtons.R, Name = "R" },
 			};
 			}
 		}
+	}
+
+	public enum ControllerButtons
+	{
+		Up = 294, Down = 296, Left = 293, Right = 295, B = 90, A = 88, Y = 65, X = 83, L = 81, R = 87, Select = 32, Start = 13
 	}
 }

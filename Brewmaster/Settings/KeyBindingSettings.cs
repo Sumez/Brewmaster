@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using System.Windows.Forms;
+using Brewmaster.Emulation;
 
 namespace Brewmaster.Settings
 {
@@ -37,7 +32,7 @@ namespace Brewmaster.Settings
 
 				var label = new Label();
 				label.Location = new System.Drawing.Point(80, 5);
-				label.Text = mapping.MappedToName ?? ButtonAssignment.GetString(mapping.MappedTo);
+				label.Text = mapping.MappedToName ?? NesEmulatorHandler.GetInputName(mapping.MappedTo);
 
 				panel.Controls.Add(label);
 				button.Click += (s, a) =>
@@ -49,7 +44,7 @@ namespace Brewmaster.Settings
 						mapping.MappedTo = keyAssignDialog.KeyCode;
 						mapping.MappedToName = keyAssignDialog.ButtonName;
 					}
-					label.Text = mapping.MappedToName ?? ButtonAssignment.GetString(mapping.MappedTo);
+					label.Text = mapping.MappedToName ?? NesEmulatorHandler.GetInputName(mapping.MappedTo);
 					SelectNextControl(button, true, false, true, true);
 				};
 

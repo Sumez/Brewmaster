@@ -17,7 +17,9 @@ using Brewmaster.Ide;
 using Brewmaster.Modules;
 using Brewmaster.Modules.Breakpoints;
 using Brewmaster.Modules.Build;
+using Brewmaster.Modules.Ca65Helper;
 using Brewmaster.Modules.NumberHelper;
+using Brewmaster.Modules.OpcodeHelper;
 using Brewmaster.Modules.SpriteList;
 using Brewmaster.Modules.Watch;
 using Brewmaster.Ppu;
@@ -40,6 +42,8 @@ namespace Brewmaster
 	    public LayoutHandler LayoutHandler { get; private set; }
 	    public BuildHandler BuildHandler { get; private set; }
 	    public string RequestFile { get; set; }
+		public OpcodeHelper OpcodeHelper { get; private set; }
+	    public Ca65CommandDocumentation Ca65Helper { get; private set; }
 
 		private readonly Action<LogData> _logHandler;
 		private readonly Action<int> _breakHandler;
@@ -217,7 +221,7 @@ namespace Brewmaster
 				memoryPanel.AddPanel(new IdePanel(SpriteList = new SpriteList(_moduleEvents)) { Label = "Sprite list" });
 
 				WatchPanel.AddPanel(new IdePanel(WatchValues = new WatchValues()) { Label = "Watch" });
-				WatchPanel.AddPanel(new IdePanel(BreakpointList = new BreakpointList()) { Label = "Breakpoints" });
+				WatchPanel.AddPanel(new IdePanel(BreakpointList = new BreakpointList(_moduleEvents)) { Label = "Breakpoints" });
 
 				OutputPanel.AddPanel(new IdePanel(OutputWindow = new OutputWindow()) { Label = "Output" });
 				OutputPanel.AddPanel(new IdePanel(ErrorList = new ErrorList()) { Label = "Build Errors" });
@@ -241,14 +245,19 @@ namespace Brewmaster
 				southContainer.AddPanel(memoryPanel);
 
 				westContainer.AddPanel(new IdePanel(ProjectExplorer) { Label = "Project Explorer" });
-				westContainer.AddPanel(new IdePanel(CartridgeExplorer) { Label = "Cartridge Explorer" });
+				//westContainer.AddPanel(new IdePanel(CartridgeExplorer) { Label = "Cartridge Explorer" });
+				var helperPanel = new IdeGroupedPanel();
+				helperPanel.AddPanel(new IdePanel(OpcodeHelper = new OpcodeHelper(_moduleEvents)) { Label = "Opcodes" });
+				helperPanel.AddPanel(new IdePanel(Ca65Helper = new Ca65CommandDocumentation(_moduleEvents)) { Label = "Commands" });
+				helperPanel.AddPanel(new IdePanel(NumberHelper = new NumberHelper()) { Label = "Number Formats" });
+				westContainer.AddPanel(helperPanel);
 
 				LayoutHandler = new LayoutHandler(this);
 				LayoutHandler.SetDockContainers(eastContainer, westContainer, southContainer);
 
-				var nhPanel = new IdePanel(NumberHelper = new NumberHelper()) { Label = "Number Format Helper" };
-
 				AddWindowOption(ProjectExplorer);
+				AddWindowOption(NumberHelper);
+				AddWindowOption(OpcodeHelper);
 				AddWindowOption(mesen);
 				AddWindowOption(OutputWindow);
 				AddWindowOption(TileMap);
@@ -258,7 +267,6 @@ namespace Brewmaster
 				AddWindowOption(WatchValues);
 				AddWindowOption(BreakpointList);
 				AddWindowOption(ErrorList);
-				AddWindowOption(NumberHelper);
 
 				// Setup features
 				BuildHandler = new BuildHandler();
@@ -358,11 +366,12 @@ namespace Brewmaster
 			PpuMemoryViewer.RemoveBreakpoints += RemoveBreakpoints;
 			OamMemoryViewer.RemoveBreakpoints += RemoveBreakpoints;
 
-		    BreakpointList.RemoveBreakpoints = RemoveBreakpoints;
-		    BreakpointList.AddBreakpoint = AddBreakpoint;
-		    BreakpointList.GoTo = (file, line) => FocusOnCodeLine(file, line);
-			BreakpointList.UpdatedBreakpoints = ActivateBreakPointsForCurrentProject;
+		    _moduleEvents.GetCurrentProject = () => CurrentProject;
+		    _moduleEvents.RemoveBreakpoints = RemoveBreakpoints;
+		    _moduleEvents.AddBreakpoint = AddBreakpoint;
+		    _moduleEvents.UpdatedBreakpoints = ActivateBreakPointsForCurrentProject;
 
+		    BreakpointList.GoTo = (file, line) => FocusOnCodeLine(file, line);
 		    OutputWindow.GoTo = (file, line) => FocusOnCodeLine(file, line);
 		    ErrorList.GoTo = (file, line) => FocusOnCodeLine(file, line);
 
@@ -375,12 +384,16 @@ namespace Brewmaster
 			BuildHandler.Log = ThreadSafeLogOutput;
 		    BuildHandler.RefreshErrorList = ThreadSafeBuildErrorUpdate;
 			BuildHandler.Status = SetStatus;
-		    BuildHandler.OnDebugDataUpdated += RefreshBreakpointsToLatestBuild;
+		    BuildHandler.OnDebugDataUpdated += () => BeginInvoke(new Action(RefreshBreakpointsToLatestBuild));
 
 		    configurationSelector.SelectedIndexChanged += (sender, args) => ChangeConfiguration();
 
 			WatchValues.GetSymbol = (exp) => CurrentProject == null || !CurrentProject.DebugSymbols.ContainsKey(exp) ? null : CurrentProject.DebugSymbols[exp];
 		    WatchValues.AddBreakpoint = AddBreakpoint;
+
+		    OpcodeParser.GetOpcodes(ProjectType.Nes);
+		    OpcodeParser.GetOpcodes(ProjectType.Snes);
+		    Ca65Parser.GetCommands();
 
 			AddRecentProjects();
 			RefreshView();
@@ -394,12 +407,7 @@ namespace Brewmaster
 
 	    private void RemoveBreakpoints(IEnumerable<Breakpoint> breakpoints)
 		{
-			if (CurrentProject != null)
-			{
-				CurrentProject.RemoveBreakpoints(breakpoints);
-				foreach (var editor in editorTabs.TabPages.OfType<TextEditorWindow>()) editor.RefreshEditorBreakpoints();
-				// TODO: This foreach causes an avalance of breakpoint updates in all modules. Should only refresh once
-			}
+			if (CurrentProject != null) CurrentProject.RemoveBreakpoints(breakpoints);
 
 		}
 
@@ -425,9 +433,10 @@ namespace Brewmaster
 		private void LoadEmulator(ProjectType projectType)
 	    {
 		    mesen.SwitchSystem(projectType, (e) => InitializeEmulator(e, projectType));
-		    CpuMemoryViewer.DataChanged += mesen.Emulator.SetCpuMemory;
-		    PpuMemoryViewer.DataChanged += mesen.Emulator.SetPpuMemory;
-		    OamMemoryViewer.DataChanged += mesen.Emulator.SetOamMemory;
+			// TODO: Use events object and/or go through mesen control
+		    CpuMemoryViewer.DataChanged = mesen.Emulator.SetCpuMemory;
+		    PpuMemoryViewer.DataChanged = mesen.Emulator.SetPpuMemory;
+		    OamMemoryViewer.DataChanged = mesen.Emulator.SetOamMemory;
 	    }
 
 	    private void InitializeEmulator(IEmulatorHandler emulator, ProjectType projectType)
@@ -701,9 +710,7 @@ namespace Brewmaster
 
 		private void ActivateBreakPointsForCurrentProject()
 		{
-			var breakpoints = CurrentProject.GetAllBreakpoints().ToArray();
-			foreach (var breakpoint in breakpoints.Where(bp => bp.Symbol != null)) breakpoint.UpdateFromSymbols(CurrentProject.DebugSymbols);
-			mesen.Emulator.SetBreakpoints(breakpoints.Where(bp => !bp.Broken && !bp.Disabled));
+			CurrentProject.RefreshBreakpoints();
 		}
 
         public void UpdateTabListInWindowMenu()
@@ -949,8 +956,8 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 			}
 			SuspendLayout();
 
+			_moduleEvents.SetProjectType(project.Type);
 			LoadEmulator(project.Type);
-			cpuStatus1.SetMode(project.Type);
 			project.GoTo = GoTo;
 			project.BreakpointsChanged += ThreadSafeBreakpointHandler;
 
@@ -1027,6 +1034,8 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 		    CpuMemoryViewer.SetBreakpoints(allBreakpoints.Where(bp => bp.AddressType == Breakpoint.AddressTypes.Cpu));
 		    PpuMemoryViewer.SetBreakpoints(allBreakpoints.Where(bp => bp.AddressType == Breakpoint.AddressTypes.Ppu));
 		    OamMemoryViewer.SetBreakpoints(allBreakpoints.Where(bp => bp.AddressType == Breakpoint.AddressTypes.Oam));
+
+		    foreach (var editor in editorTabs.TabPages.OfType<TextEditorWindow>()) editor.RefreshEditorBreakpoints();
 		}
 
 		private bool CloseCurrentProject(bool closingApplication = false)
@@ -1247,8 +1256,8 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 			    if (codeEditor == null) continue;
 				
 			    codeEditor.UpdateBreakpointsWithBuildInfo();
-		    }
-	    }
+			}
+		}
 
 		private void buildToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -1441,13 +1450,13 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 					case FileType.Text:
 					case FileType.Source:
 					case FileType.Include:
-						var textEditor = new TextEditorWindow(this, file);
+						var textEditor = new TextEditorWindow(this, file, _moduleEvents);
 						textEditor.TextEditor.ContextMenuStrip = textEditorContextMenuStrip;
 						textEditor.RefreshEditorContents();
 						tab = textEditor;
 						break;
 					case FileType.Image:
-						tab = new ImageWindow(this, file);
+						tab = new ImageWindow(this, file, _moduleEvents);
 						break;
 					default:
 						// TODO: "Open with..." dialog
@@ -1620,6 +1629,7 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 					    Settings.SnesMappings = newMappings;
 					    break;
 			    }
+			    mesen.SetButtonMappings(Settings.NesMappings, Settings.SnesMappings);
 				Settings.Save();
 			}
 

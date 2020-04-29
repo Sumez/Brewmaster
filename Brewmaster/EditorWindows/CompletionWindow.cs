@@ -170,6 +170,8 @@ namespace Brewmaster.EditorWindows
 			{
 				DeclarationViewWindow.Description = null;
 			}
+
+			if (data is IHasFocusAction focusData) focusData.Focus();
 		}
 		protected void DocumentAboutToBeChanged(object sender, DocumentEventArgs e)
 		{

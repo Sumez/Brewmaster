@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using Brewmaster.Modules.Build;
 using Brewmaster.Modules.SpriteList;
 using Brewmaster.ProjectModel;
+using Brewmaster.Settings;
 
 namespace Brewmaster.Emulation
 {
@@ -259,7 +260,7 @@ namespace Brewmaster.Emulation
 			InteropEmu.DebugGetPpuScroll(out _debugState.TileMaps.ScrollX, out _debugState.TileMaps.ScrollY);
 			for (int i = 0; i < _debugState.TileMaps.NumberOfMaps; i++)
 			{
-				InteropEmu.DebugGetNametable(i, false, out _debugState.TileMaps.PixelData[i], out _debugState.TileMaps.TileData[i], out _debugState.TileMaps.AttributeData[i]);
+				InteropEmu.DebugGetNametable(i, NametableDisplayMode.Normal, out _debugState.TileMaps.PixelData[i], out _debugState.TileMaps.TileData[i], out _debugState.TileMaps.AttributeData[i]);
 			}
 			if (OnTileMapUpdate != null) OnTileMapUpdate(_debugState.TileMaps);
 
@@ -318,7 +319,6 @@ namespace Brewmaster.Emulation
 			InteropEmu.SetFlag(EmulationFlags.UseNes101Hvc101Behavior, false);
 			InteropEmu.SetFlag(EmulationFlags.RandomizeMapperPowerOnState, false);
 
-			InteropEmu.SetOverclockRate(100, true);
 			InteropEmu.SetPpuNmiConfig(0, 0);
 
 			InteropEmu.SetRamPowerOnState(RamPowerOnState.AllZeros);
@@ -425,8 +425,6 @@ namespace Brewmaster.Emulation
 			InteropEmu.SetOsdState(false);
 			InteropEmu.SetGameDatabaseState(true);
 
-			InteropEmu.SetFlag(EmulationFlags.DeveloperMode, false);
-
 			InteropEmu.SetFlag(EmulationFlags.AllowInvalidInput, false);
 			InteropEmu.SetFlag(EmulationFlags.RemoveSpriteLimit, false);
 			InteropEmu.SetFlag(EmulationFlags.FdsAutoLoadDisk, true);
@@ -501,21 +499,21 @@ namespace Brewmaster.Emulation
 			}*/
 		}
 
-		public void UpdateControllerMappings(Dictionary<int, int> mappings)
+		public void UpdateControllerMappings(Dictionary<ControllerButtons, int> mappings)
 		{
 			var newMapping = new InteropEmu.KeyMappingSet();
-			newMapping.Mapping1.A = GetMapping(mappings, 31);
-			newMapping.Mapping1.B = GetMapping(mappings, 30);
-			newMapping.Mapping1.Down = GetMapping(mappings, 336);
-			newMapping.Mapping1.Up = GetMapping(mappings, 328);
-			newMapping.Mapping1.Left = GetMapping(mappings, 331);
-			newMapping.Mapping1.Right = GetMapping(mappings, 333);
-			newMapping.Mapping1.Select = GetMapping(mappings, 16);
-			newMapping.Mapping1.Start = GetMapping(mappings, 17);
+			newMapping.Mapping1.A = GetMapping(mappings, ControllerButtons.A);
+			newMapping.Mapping1.B = GetMapping(mappings, ControllerButtons.B);
+			newMapping.Mapping1.Down = GetMapping(mappings, ControllerButtons.Down);
+			newMapping.Mapping1.Up = GetMapping(mappings, ControllerButtons.Up);
+			newMapping.Mapping1.Left = GetMapping(mappings, ControllerButtons.Left);
+			newMapping.Mapping1.Right = GetMapping(mappings, ControllerButtons.Right);
+			newMapping.Mapping1.Select = GetMapping(mappings, ControllerButtons.Select);
+			newMapping.Mapping1.Start = GetMapping(mappings, ControllerButtons.Start);
 			InteropEmu.SetControllerKeys(0, newMapping);
 		}
 
-		private static uint GetMapping(Dictionary<int, int> mappings, int defaultKey)
+		private static uint GetMapping(Dictionary<ControllerButtons, int> mappings, ControllerButtons defaultKey)
 		{
 			return mappings.ContainsKey(defaultKey) ? (uint)mappings[defaultKey] : (uint)defaultKey;
 		}
@@ -528,7 +526,7 @@ namespace Brewmaster.Emulation
 			InteropEmu.SetFlag(EmulationFlags.HasFourScore, false);
 
 			InteropEmu.SetControllerType(0, InteropEmu.ControllerType.StandardController);
-			UpdateControllerMappings(new Dictionary<int, int>());
+			UpdateControllerMappings(new Dictionary<ControllerButtons, int>());
 
 			for (int i = 1; i < 4; i++) {
 				InteropEmu.SetControllerType(i, InteropEmu.ControllerType.None);
@@ -677,12 +675,17 @@ namespace Brewmaster.Emulation
 
 		public static Tuple<uint, string> GetCurrentInput()
 		{
-			var scanCodes = InteropEmu.GetPressedKeys().Where(code => code >= 0x10000).ToList();
+			var scanCodes = InteropEmu.GetPressedKeys().ToList();
 			if (scanCodes.Count == 0) return null;
 			var key = scanCodes.OrderBy(c => c).Last();
 			var name = InteropEmu.GetKeyName(key);
 
 			return new Tuple<uint, string>(key, name);
+		}
+
+		public static string GetInputName(int code)
+		{
+			return InteropEmu.GetKeyName((uint)code);
 		}
 	}
 	public enum EmulatorStatus

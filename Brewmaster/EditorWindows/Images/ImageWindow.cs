@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using Brewmaster.Modules;
 using Brewmaster.Pipeline;
 using Brewmaster.ProjectModel;
 
@@ -15,7 +15,7 @@ namespace Brewmaster.EditorWindows.Images
 	{
 		private ImageRenderControl _image;
 
-		public ImageWindow(MainForm form, AsmProjectFile file) : base(form, file)
+		public ImageWindow(MainForm form, AsmProjectFile file, Events events) : base(form, file, events)
 		{
 			Pristine = true;
 		}

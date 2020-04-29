@@ -61,6 +61,56 @@ namespace Brewmaster.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &lt;HTML&gt;
+        ///&lt;HEAD&gt;
+        ///  &lt;META NAME=&quot;GENERATOR&quot; CONTENT=&quot;Microsoft FrontPage 4.0&quot;&gt;
+        ///  &lt;META HTTP-EQUIV=&quot;Content-Type&quot; CONTENT=&quot;text/html; charset=iso-8859-1&quot;&gt;
+        ///  &lt;TITLE&gt;6502 Reference&lt;/TITLE&gt;
+        ///  &lt;LINK REL=&quot;StyleSheet&quot; HREF=&quot;../obelisk.css&quot; TYPE=&quot;text/css&quot; media=&quot;screen,print&quot;&gt;
+        ///&lt;/HEAD&gt;
+        ///&lt;BODY&gt;
+        ///&lt;script type=&quot;text/javascript&quot;&gt;&lt;!--
+        ///google_ad_client = &quot;pub-0826595092783671&quot;;
+        ////* 6502 Header */
+        ///google_ad_slot = &quot;9208748029&quot;;
+        ///google_ad_width = 728;
+        ///google_ad_height = 90;
+        /////--&gt;
+        ///&lt;/script&gt;
+        ///&lt;script type=&quot;text/javasc [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _6502 {
+            get {
+                return ResourceManager.GetString("_6502", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;!DOCTYPE html&gt;
+        ///&lt;html&gt;
+        ///&lt;head&gt;
+        ///  &lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=utf-8&quot; /&gt;
+        ///  &lt;meta name=&quot;referrer&quot; content=&quot;none&quot; /&gt;
+        ///  &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot; /&gt;
+        ///  &lt;link rel=&quot;stylesheet&quot; href=&quot;/style.css&quot; type=&quot;text/css&quot; /&gt;
+        ///  &lt;title&gt;65816 Opcodes&lt;/title&gt;
+        ///&lt;/head&gt;
+        ///&lt;body&gt;
+        ///&lt;div class=&quot;wrapper&quot;&gt;
+        ///&lt;header role=&quot;banner&quot; id=&quot;top&quot;&gt;
+        ///    &lt;h1&gt;&lt;a href=&quot;/&quot;&gt;The UnDisbeliever&apos;s Website&lt;/a&gt;&lt;/h1&gt;
+        ///&lt;/header&gt;
+        ///
+        ///&lt;main class=&quot;main with-sidebar&quot;&gt;
+        ///  &lt;div class=&quot;sidebar&quot; role=&quot;com [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _65816 {
+            get {
+                return ResourceManager.GetString("_65816", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap _new {
@@ -96,6 +146,37 @@ namespace Brewmaster.Properties {
         internal static System.Drawing.Bitmap buildrun {
             get {
                 object obj = ResourceManager.GetObject("buildrun", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;!DOCTYPE html PUBLIC &quot;-//W3C//DTD HTML 3.2 Final//EN&quot;&gt;
+        ///&lt;!-- saved from url=(0040)https://cc65.github.io/doc/ca65.html#s11 --&gt;
+        ///&lt;html&gt;&lt;head&gt;&lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=UTF-8&quot;&gt;
+        /// &lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;./ca65_files/doc.css&quot;&gt;
+        /// &lt;meta name=&quot;GENERATOR&quot; content=&quot;LinuxDoc-Tools 0.9.71&quot;&gt;
+        /// &lt;title&gt;ca65 Users Guide&lt;/title&gt;
+        ///&lt;/head&gt;
+        ///&lt;body&gt;
+        ///&lt;h1&gt;ca65 Users Guide&lt;/h1&gt;
+        ///
+        ///&lt;h2&gt;
+        ///&lt;a href=&quot;mailto:uz@cc65.org&quot;&gt;Ullrich von Bassewitz&lt;/a&gt;,&lt;br&gt;
+        ///&lt;a href=&quot;mailto:greg.king5@verizon.net&quot; [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string ca65 {
+            get {
+                return ResourceManager.GetString("ca65", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ca65icon {
+            get {
+                object obj = ResourceManager.GetObject("ca65icon", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -163,9 +244,29 @@ namespace Brewmaster.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap label {
+            get {
+                object obj = ResourceManager.GetObject("label", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap logo {
             get {
                 object obj = ResourceManager.GetObject("logo", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap opcode {
+            get {
+                object obj = ResourceManager.GetObject("opcode", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

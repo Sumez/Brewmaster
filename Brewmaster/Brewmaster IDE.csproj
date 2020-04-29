@@ -105,11 +105,14 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="HtmlAgilityPack, Version=1.11.23.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
+      <HintPath>..\packages\HtmlAgilityPack.1.11.23\lib\Net45\HtmlAgilityPack.dll</HintPath>
+    </Reference>
     <Reference Include="ICSharpCode.TextEditor, Version=3.2.1.6466, Culture=neutral, PublicKeyToken=4d61825e8dd49f1a, processorArchitecture=MSIL">
       <HintPath>..\packages\ICSharpCode.TextEditor.3.2.1.6466\lib\Net20\ICSharpCode.TextEditor.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Mesen-S, Version=0.2.7146.5789, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Mesen-S, Version=0.4.7422.4650, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Mesen\Mesen-S.exe</HintPath>
     </Reference>
@@ -143,9 +146,23 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Emulation\EmulatorHandler.cs" />
+    <Compile Include="Modules\Breakpoints\BreakpointEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Modules\Ca65Helper\Ca65DocParser.cs" />
+    <Compile Include="Modules\Ca65Helper\Ca65CommandDocumentation.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="Modules\MenuHelper.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Modules\OpcodeHelper\AddressingModeDescription.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Modules\OpcodeHelper\OpcodeHelper.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Modules\OpcodeHelper\OpcodeParser.cs" />
     <Compile Include="Modules\SpriteList\Sprite.cs" />
     <Compile Include="Modules\SpriteList\SpriteList.cs">
       <SubType>Component</SubType>
@@ -453,14 +470,26 @@
     <EmbeddedResource Include="Modules\Breakpoints\BreakpointList.resx">
       <DependentUpon>BreakpointList.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Modules\Breakpoints\BreakpointEditor.resx">
+      <DependentUpon>BreakpointEditor.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Modules\Build\ErrorList.resx">
       <DependentUpon>ErrorList.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Modules\Build\OutputWindow.resx">
       <DependentUpon>OutputWindow.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Modules\Ca65Helper\Ca65CommandDocumentation.resx">
+      <DependentUpon>Ca65CommandDocumentation.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Modules\NumberHelper\NumberHelper.resx">
       <DependentUpon>NumberHelper.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Modules\OpcodeHelper\AddressingModeDescription.resx">
+      <DependentUpon>AddressingModeDescription.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Modules\OpcodeHelper\OpcodeHelper.resx">
+      <DependentUpon>OpcodeHelper.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Modules\Watch\WatchList.resx">
       <DependentUpon>WatchList.cs</DependentUpon>
@@ -562,11 +591,17 @@
     <None Include="Resources\Files\cartridge.png" />
     <Content Include="nesproject.ico" />
     <None Include="Resources\Other\collapsed.png" />
+    <None Include="Resources\6502.html" />
+    <None Include="Resources\ca65.html" />
+    <None Include="Resources\Other\ca65icon.png" />
+    <None Include="Resources\65816.html" />
     <Content Include="Resources\Other\error.png" />
     <None Include="Resources\Other\smallload.png" />
     <None Include="Resources\Other\smallsave.png" />
     <None Include="Resources\Other\logo.png" />
     <None Include="Resources\Other\expanded.png" />
+    <None Include="Resources\Other\label.png" />
+    <None Include="Resources\Other\opcode.png" />
     <Content Include="Resources\Other\warning.png" />
     <None Include="Resources\Toolbar\buildrun.png" />
     <None Include="Resources\Toolbar\config.png" />

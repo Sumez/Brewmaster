@@ -4,6 +4,7 @@ using System.Windows.Forms;
 using Brewmaster.Modules.Build;
 using Brewmaster.Modules.SpriteList;
 using Brewmaster.ProjectModel;
+using Brewmaster.Settings;
 
 namespace Brewmaster.Emulation
 {
@@ -44,7 +45,7 @@ namespace Brewmaster.Emulation
 		void SaveState(string file);
 		void LoadState(string file);
 		void UpdateSettings(MesenControl.EmulatorSettings emulatorSettings);
-		void UpdateControllerMappings(Dictionary<int, int> mappings);
+		void UpdateControllerMappings(Dictionary<ControllerButtons, int> mappings);
 	}
 
 	public class EmulationState

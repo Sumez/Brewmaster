@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Brewmaster.BuildProcess;
 using Brewmaster.Emulation;
+using Brewmaster.Modules;
+using Brewmaster.Modules.Ca65Helper;
+using Brewmaster.Modules.OpcodeHelper;
 using Brewmaster.Modules.Watch;
 using Brewmaster.ProjectModel;
 using Brewmaster.Settings;
@@ -29,6 +32,7 @@ namespace Brewmaster.EditorWindows
 	public class CodeEditor : TextEditor
 	{
 		public AsmProjectFile File { get; private set; }
+		protected Events ModuleEvents { get; private set; }
 		protected CompletionDataProvider _completionDataProvider;
 
 		private CompletionWindow _codeCompletionWindow;
@@ -42,9 +46,10 @@ namespace Brewmaster.EditorWindows
 		public Action<string, Breakpoint.Types> AddSymbolBreakpoint { get; set; }
 		public Func<MemoryState> GetCpuMemory { get; set; }
 
-		public CodeEditor(AsmProjectFile file)
+		public CodeEditor(AsmProjectFile file, Events events)
 		{
 			File = file;
+			ModuleEvents = events;
 			Document.FormattingStrategy = new Ca65Formatting();
 
 			ActiveTextAreaControl.TextArea.InsertLeftMargin(1, 
@@ -178,11 +183,15 @@ namespace Brewmaster.EditorWindows
 				}
 			};
 
-			ActiveTextAreaControl.Caret.PositionChanged += (s, a) => {
+			ActiveTextAreaControl.Caret.PositionChanged += (s, a) =>
+			{
+				HighlightCommandAtCaret();
+
 				if (ActiveTextAreaControl.Caret.Line == _caretLine) return;
 
 				_caretLine = ActiveTextAreaControl.Caret.Line;
 				RefreshErrorInfo();
+				HighlightOpcodeOnLine();
 			};
 			
 			ActiveTextAreaControl.TextArea.KeyUp += delegate(object sender, KeyEventArgs e)
@@ -197,6 +206,8 @@ namespace Brewmaster.EditorWindows
 
 														ShowIntellisense((char) e.KeyValue, 1);
 														_forcedAutoCompleteWindow = false;
+
+														HighlightOpcodeOnLine();
 													};
 
 			ActiveTextAreaControl.TextArea.IconBarMargin.MouseDown += (sender, mousepos, buttons) =>
@@ -214,8 +225,26 @@ namespace Brewmaster.EditorWindows
 					if (bp.GlobalBreakpoint.CurrentLine != bp.LineNumber + 1) changed = true;
 					bp.GlobalBreakpoint.CurrentLine = bp.LineNumber + 1;
 				}
+
 				if (changed) RefreshBreakpointsInProject();
 			};
+		}
+
+		private void HighlightCommandAtCaret()
+		{
+			var word = GetAsmWord(ActiveTextAreaControl.Caret.Position);
+			if (word == null || word.WordType != AsmWord.AsmWordType.Command) return;
+
+			var knownCommands = Ca65Parser.GetCommands();
+			if (knownCommands.ContainsKey(word.Word.ToUpper())) ModuleEvents.HighlightCommand(knownCommands[word.Word.ToUpper()]);
+		}
+		private void HighlightOpcodeOnLine()
+		{
+			var lineSegment = Document.GetLineSegment(_caretLine);
+			if (lineSegment == null) return;
+			var opcode = lineSegment.Words.OfType<AsmWord>().FirstOrDefault(w => w.WordType == AsmWord.AsmWordType.Opcode);
+			var allOpcodes = OpcodeParser.GetOpcodes(File.Project.Type);
+			if (opcode != null && allOpcodes.ContainsKey(opcode.Word.ToUpper())) ModuleEvents.HighlightOpcode(allOpcodes[opcode.Word.ToUpper()]);
 		}
 
 		private DebugLine GetDebugLine(int lineNumber)
@@ -303,6 +332,7 @@ namespace Brewmaster.EditorWindows
 			if (position.Column > 0 && (word == null || word.Type == TextWordType.Space || word.Type == TextWordType.Tab))
 				word = line.GetWord(position.Column - 1);
 
+			if (File.Project.Symbols != null && File.Project.DebugSymbols != null)
 			if (word != null && !(word is AsmWord) && (File.Project.DebugSymbols.ContainsKey(word.Word) || File.Project.Symbols.Any(s => s.Key == word.Word)))
 			{
 				return new AsmWord(Document, line, word.Offset, word.Length, new HighlightColor(Color.Black, false, false), true, AsmWord.AsmWordType.LabelReference);
@@ -348,6 +378,7 @@ namespace Brewmaster.EditorWindows
 				breakpoint.EnabledChanged += () => marker.IsEnabled = !breakpoint.Disabled;
 			}
 		}
+
 		private void RefreshBreakpointsInProject()
 		{
 			foreach (var breakpointMarker in Document.BookmarkManager.Marks.OfType<BreakpointMarker>())
@@ -382,6 +413,7 @@ namespace Brewmaster.EditorWindows
 				breakpoint.BuildLine = breakpoint.LineNumber;
 				breakpoint.Healthy = File.DebugLines.ContainsKey(breakpoint.BuildLine + 1);
 			}
+
 			RefreshBreakpointsInProject();
 			ActiveTextAreaControl.TextArea.Invalidate();
 		}
@@ -527,9 +559,9 @@ namespace Brewmaster.EditorWindows
 
 	public class Ca65Editor : CodeEditor
 	{
-		public Ca65Editor(AsmProjectFile file) : base(file)
+		public Ca65Editor(AsmProjectFile file, Events events) : base(file, events)
 		{
-			_completionDataProvider = new Ca65Completion(File.Project, GetSymbolDescription);
+			_completionDataProvider = new Ca65Completion(File.Project, GetSymbolDescription, events);
 			Document.TextContentChanged += (sender, args) =>
 												{
 

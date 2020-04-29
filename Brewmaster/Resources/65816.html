@@ -1,0 +1,3346 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="referrer" content="none" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="/style.css" type="text/css" />
+  <title>65816 Opcodes</title>
+</head>
+<body>
+<div class="wrapper">
+<header role="banner" id="top">
+    <h1><a href="/">The UnDisbeliever's Website</a></h1>
+</header>
+
+<main class="main with-sidebar">
+  <div class="sidebar" role="complementary">
+      <nav id="contents" role="navigation">
+        <h1>Table of Contents</h1>
+        <div class="toc">
+<ul>
+<li><a href="#adc-add-with-carry">ADC - Add with Carry</a></li>
+<li><a href="#and-and-accumulator-with-memory">AND - And Accumulator with Memory</a></li>
+<li><a href="#asl-arithmetic-shift-left">ASL - Arithmetic Shift Left</a></li>
+<li><a href="#branches">Branches</a></li>
+<li><a href="#bit-test-memory-bits-against-accumulator">BIT - Test Memory Bits against Accumulator</a></li>
+<li><a href="#software-interrupts">Software Interrupts</a></li>
+<li><a href="#clear-status-flags">Clear Status Flags</a></li>
+<li><a href="#cmp-compare-accumulator-with-memory">CMP - Compare Accumulator with Memory</a></li>
+<li><a href="#cpx-compare-index-register-x-with-memory">CPX - Compare Index Register X with Memory</a></li>
+<li><a href="#cpy-compare-index-register-y-with-memory">CPY - Compare Index Register Y with Memory</a></li>
+<li><a href="#dec-decrement">DEC - Decrement</a></li>
+<li><a href="#dex-dey-decrement-index-registers">DEX, DEY - Decrement Index Registers</a></li>
+<li><a href="#eor-exclusive-or-accumulator-with-memory">EOR - Exclusive OR Accumulator with Memory</a></li>
+<li><a href="#inc-increment">INC - Increment</a></li>
+<li><a href="#inx-iny-increment-index-registers">INX, INY - Increment Index Registers</a></li>
+<li><a href="#jmp-jml-jump">JMP, JML - Jump</a></li>
+<li><a href="#jsr-jsl-jump-to-subroutine">JSR, JSL - Jump to Subroutine</a></li>
+<li><a href="#lda-load-accumulator-from-memory">LDA - Load Accumulator from Memory</a></li>
+<li><a href="#ldx-load-index-register-x-from-memory">LDX - Load Index Register X from Memory</a></li>
+<li><a href="#ldy-load-index-register-y-from-memory">LDY - Load Index Register Y from Memory</a></li>
+<li><a href="#lsr-logical-shift-right">LSR - Logical Shift Right</a></li>
+<li><a href="#mvn-block-move-next">MVN - Block Move Next</a></li>
+<li><a href="#mvp-block-move-previous">MVP - Block Move Previous</a></li>
+<li><a href="#nop-no-operation">NOP - No Operation</a></li>
+<li><a href="#ora-or-accumulator-with-memory">ORA - OR Accumulator with Memory</a></li>
+<li><a href="#pea-push-effective-absolute-address">PEA - Push Effective Absolute Address</a></li>
+<li><a href="#pei-push-effective-indirect-address">PEI - Push Effective Indirect Address</a></li>
+<li><a href="#per-push-effective-pc-relative-indirect-address">PER - Push Effective PC Relative Indirect Address</a></li>
+<li><a href="#push-to-stack">Push to Stack</a></li>
+<li><a href="#pull-from-stack">Pull from Stack</a></li>
+<li><a href="#rep-reset-status-bits">REP - Reset Status Bits</a></li>
+<li><a href="#rol-rotate-left">ROL - Rotate Left</a></li>
+<li><a href="#ror-rotate-right">ROR - Rotate Right</a></li>
+<li><a href="#rti-return-from-interrupt">RTI - Return From Interrupt</a></li>
+<li><a href="#rts-rtl-return-from-subroutine">RTS, RTL - Return From Subroutine</a></li>
+<li><a href="#sbc-subtract-with-borrow-from-accumulator">SBC - Subtract with Borrow from Accumulator</a></li>
+<li><a href="#set-status-flags">Set Status Flags</a></li>
+<li><a href="#sep-set-status-bits">SEP - Set Status Bits</a></li>
+<li><a href="#sta-store-accumulator-to-memory">STA - Store Accumulator to Memory</a></li>
+<li><a href="#stp-stop-the-processor">STP - Stop the Processor</a></li>
+<li><a href="#stx-store-index-register-x-to-memory">STX - Store Index Register X to Memory</a></li>
+<li><a href="#sty-store-index-register-y-to-memory">STY - Store Index Register Y to Memory</a></li>
+<li><a href="#stz-store-zero-to-memory">STZ - Store Zero to Memory</a></li>
+<li><a href="#transfer-registers">Transfer Registers</a></li>
+<li><a href="#trb-test-and-reset-memory-bits-against-accumulator">TRB - Test and Reset Memory Bits Against Accumulator</a></li>
+<li><a href="#tsb-test-and-set-memory-bits-against-accumulator">TSB - Test and Set Memory Bits Against Accumulator</a></li>
+<li><a href="#wai-wait-for-interrupt">WAI - Wait for Interrupt</a></li>
+<li><a href="#wdm-reserved-for-future-expansion">WDM - Reserved for Future Expansion</a></li>
+<li><a href="#xba-exchange-the-b-and-a-accumulators">XBA - Exchange the B and A Accumulators</a></li>
+<li><a href="#xce-exchange-carry-and-emulation-bits">XCE - Exchange Carry and Emulation Bits</a></li>
+<li><a href="#sources">Sources</a></li>
+</ul>
+</div>
+
+      </nav>
+  </div>
+  <article>
+    <header class="title">
+      <h1><a href="/snesdev/65816-opcodes.html">65816 Opcodes</a></h1>
+        <div class="date-published">Last Modified: <time datetime="2019-04-09">9 April 2019</time></div>
+      <div class="report-bug">If you see a bug on this page,<wbr/> please <a href="https://github.com/undisbeliever/snesdev-notes/issues">report it on GitHub</a></div>
+      <ul class="tag-list">
+        <li><a href="/tags/SnesDev.html">SnesDev</a></li>
+      </ul>
+    </header>
+<div><p>Notes about this document:</p>
+<p>The psuedo-code described in this document does not describe the 65816
+internals but rather the change in machine state.</p>
+<p>The phrase <em>+1 if index crosses page boundary</em> means +1 cycle if:</p>
+<ul>
+<li>The Index register is 16 bits, or</li>
+<li><code>(Addr + Index) &amp; 0xffff00</code> ≠ <code>Addr 0xffff00</code></li>
+</ul>
+<h1 id="adc-add-with-carry"><a class="toclink" href="#adc-add-with-carry">ADC - Add with Carry</a></h1>
+<p><strong>Flags affected</strong>: <code>nv----zc</code></p>
+<p><code>A</code> ← <code>A + M + c</code>
+<br>
+<br><code>n</code> ← Most significant bit of result
+<br><code>v</code> ← Signed overflow of result
+<br><code>z</code> ← Set if the result is zero
+<br><code>c</code> ← Carry from ALU (bit 8/16 of result)</p>
+<table>
+<thead>
+<tr>
+<th>Syntax</th>
+<th>Addressing Mode</th>
+<th>Opcode</th>
+<th>Bytes</th>
+<th>Cycles</th>
+<th>Extra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ADC #const</td>
+<td>Immediate</td>
+<td>69</td>
+<td>2 / 3</td>
+<td>2</td>
+<td>+1 if m=0</td>
+</tr>
+<tr>
+<td>ADC addr</td>
+<td>Absolute</td>
+<td>6D</td>
+<td>3</td>
+<td>4</td>
+<td>+1 if m=0</td>
+</tr>
+<tr>
+<td>ADC long</td>
+<td>Absolute Long</td>
+<td>6F</td>
+<td>4</td>
+<td>5</td>
+<td>+1 if m=0</td>
+</tr>
+<tr>
+<td>ADC dp</td>
+<td>Direct Page</td>
+<td>65</td>
+<td>2</td>
+<td>3</td>
+<td>+1 if m=0, +1 if DP.l ≠ 0</td>
+</tr>
+<tr>
+<td>ADC (dp)</td>
+<td>Direct Page Indirect</td>
+<td>72</td>
+<td>2</td>
+<td>5</td>
+<td>+1 if m=0, +1 if DP.l ≠ 0</td>
+</tr>
+<tr>
+<td>ADC [dp]</td>
+<td>Direct Page Indirect Long</td>
+<td>67</td>
+<td>2</td>
+<td>6</td>
+<td>+1 if m=0, +1 if DP.l ≠ 0</td>
+</tr>
+<tr>
+<td>ADC addr, X</td>
+<td>Absolute Indexed, X</td>
+<td>7D</td>
+<td>3</td>
+<td>4</td>
+<td>+1 if m=0, +1 if index crosses page boundary</td>
+</tr>
+<tr>
+<td>ADC long, X</td>
+<td>Absolute Long Indexed, X</td>
+<td>7F</td>
+<td>4</td>
+<td>5</td>
+<td>+1 if m=0</td>
+</tr>
+<tr>
+<td>ADC addr, Y</td>
+<td>Absolute Indexed, Y</td>
+<td>79</td>
+<td>3</td>
+<td>4</td>
+<td>+1 if m=0, +1 if index crosses page boundary</td>
+</tr>
+<tr>
+<td>ADC dp, X</td>
+<td>Direct Page Indexed, X</td>
+<td>75</td>
+<td>2</td>
+<td>4</td>
+<td>+1 if m=0, +1 if DP.l ≠ 0</td>
+</tr>
+<tr>
+<td>ADC (dp, X)</td>
+<td>Direct Page Indirect, X</td>
+<td>61</td>
+<td>2</td>
+<td>6</td>
+<td>+1 if m=0, +1 if DP.l ≠ 0</td>
+</tr>
+<tr>
+<td>ADC (dp), Y</td>
+<td>DP Indirect Indexed, Y</td>
+<td>71</td>
+<td>2</td>
+<td>5</td>
+<td>+1 if m=0, +1 if DP.l ≠ 0, +1 if index crosses page boundary</td>
+</tr>
+<tr>
+<td>ADC [dp], Y</td>
+<td>DP Indirect Long Indexed, Y</td>
+<td>77</td>
+<td>2</td>
+<td>6</td>
+<td>+1 if m=0, +1 if DP.l ≠ 0</td>
+</tr>
+<tr>
+<td>ADC sr, S</td>
+<td>Stack Relative</td>
+<td>63</td>
+<td>2</td>
+<td>4</td>
+<td>+1 if m=0</td>
+</tr>
+<tr>
+<td>ADC (sr, S), Y</td>
+<td>SR Indirect Indexed, Y</td>
+<td>73</td>
+<td>2</td>
+<td>7</td>
+<td>+1 if m=0</td>
+</tr>
+</tbody>
+</table>
+<h1 id="and-and-accumulator-with-memory"><a class="toclink" href="#and-and-accumulator-with-memory">AND - And Accumulator with Memory</a></h1>
+<p><strong>Flags affected</strong>: <code>n-----z-</code></p>
+<p><code>A</code> ← <code>A &amp; M</code>
+<br>
+<br><code>n</code> ← Most significant bit of result
+<br><code>z</code> ← Set if the result is zero</p>
+<table>
+<thead>
+<tr>
+<th>Syntax</th>
+<th>Addressing Mode</th>
+<th>Opcode</th>
+<th>Bytes</th>
+<th>Cycles</th>
+<th>Extra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AND #const</td>
+<td>Immediate</td>
+<td>29</td>
+<td>2 / 3</td>
+<td>2</td>
+<td>+1 if m=0</td>
+</tr>
+<tr>
+<td>AND addr</td>
+<td>Absolute</td>
+<td>2D</td>
+<td>3</td>
+<td>4</td>
+<td>+1 if m=0</td>
+</tr>
+<tr>
+<td>AND long</td>
+<td>Absolute Long</td>
+<td>2F</td>
+<td>4</td>
+<td>5</td>
+<td>+1 if m=0</td>
+</tr>
+<tr>
+<td>AND dp</td>
+<td>Direct Page</td>
+<td>25</td>
+<td>2</td>
+<td>3</td>
+<td>+1 if m=0, +1 if DP.l ≠ 0</td>
+</tr>
+<tr>
+<td>AND (dp)</td>
+<td>Direct Page Indirect</td>
+<td>32</td>
+<td>2</td>
+<td>5</td>
+<td>+1 if m=0, +1 if DP.l ≠ 0</td>
+</tr>
+<tr>
+<td>AND [dp]</td>
+<td>Direct Page Indirect Long</td>
+<td>27</td>
+<td>2</td>
+<td>6</td>
+<td>+1 if m=0, +1 if DP.l ≠ 0</td>
+</tr>
+<tr>
+<td>AND addr, X</td>
+<td>Absolute Indexed, X</td>
+<td>3D</td>
+<td>3</td>
+<td>4</td>
+<td>+1 if m=0, +1 if index crosses page boundary</td>
+</tr>
+<tr>
+<td>AND long, X</td>
+<td>Absolute Long Indexed, X</td>
+<td>3F</td>
+<td>4</td>
+<td>5</td>
+<td>+1 if m=0</td>
+</tr>
+<tr>
+<td>AND addr, Y</td>
+<td>Absolute Indexed, Y</td>
+<td>39</td>
+<td>3</td>
+<td>4</td>
+<td>+1 if m=0, +1 if index crosses page boundary</td>
+</tr>
+<tr>
+<td>AND dp, X</td>
+<td>Direct Page Indexed, X</td>
+<td>35</td>
+<td>2</td>
+<td>4</td>
+<td>+1 if m=0, +1 if DP.l ≠ 0</td>
+</tr>
+<tr>
+<td>AND (dp, X)</td>
+<td>Direct Page Indirect, X</td>
+<td>21</td>
+<td>2</td>
+<td>6</td>
+<td>+1 if m=0, +1 if DP.l ≠ 0</td>
+</tr>
+<tr>
+<td>AND (dp), Y</td>
+<td>DP Indirect Indexed, Y</td>
+<td>31</td>
+<td>2</td>
+<td>5</td>
+<td>+1 if m=0, +1 if DP.l ≠ 0, +1 if index crosses page boundary</td>
+</tr>
+<tr>
+<td>AND [dp], Y</td>
+<td>DP Indirect Long Indexed, Y</td>
+<td>37</td>
+<td>2</td>
+<td>6</td>
+<td>+1 if m=0, +1 if DP.l ≠ 0</td>
+</tr>
+<tr>
+<td>AND sr, S</td>
+<td>Stack Relative</td>
+<td>23</td>
+<td>2</td>
+<td>4</td>
+<td>+1 if m=0</td>
+</tr>
+<tr>
+<td>AND (sr, S), Y</td>
+<td>SR Indirect Indexed, Y</td>
+<td>33</td>
+<td>2</td>
+<td>7</td>
+<td>+1 if m=0</td>
+</tr>
+</tbody>
+</table>
+<h1 id="asl-arithmetic-shift-left"><a class="toclink" href="#asl-arithmetic-shift-left">ASL - Arithmetic Shift Left</a></h1>
+<p><strong>Flags affected</strong>: <code>n-----zc</code></p>
+<p><code>M</code> ← <code>M + M</code>
+<br>
+<br><code>n</code> ← Most significant bit of result
+<br><code>z</code> ← Set if the result is zero
+<br><code>c</code> ← Most significant bit of original Memory</p>
+<table>
+<thead>
+<tr>
+<th>Syntax</th>
+<th>Addressing Mode</th>
+<th>Opcode</th>
+<th>Bytes</th>
+<th>Cycles</th>
+<th>Extra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ASL</td>
+<td>Accumulator</td>
+<td>0A</td>
+<td>1</td>
+<td>2</td>
+<td></td>
+</tr>
+<tr>
+<td>ASL addr</td>
+<td>Absolute</td>
+<td>0E</td>
+<td>3</td>
+<td>6</td>
+<td>+2 if m=0</td>
+</tr>
+<tr>
+<td>ASL dp</td>
+<td>Direct Page</td>
+<td>06</td>
+<td>2</td>
+<td>5</td>
+<td>+2 if m=0, +1 if DP.l ≠ 0</td>
+</tr>
+<tr>
+<td>ASL addr, X</td>
+<td>Absolute Indexed, X</td>
+<td>1E</td>
+<td>3</td>
+<td>7</td>
+<td>+2 if m=0, +1 if index crosses page boundary</td>
+</tr>
+<tr>
+<td>ASL dp, X</td>
+<td>Direct Page Indexed, X</td>
+<td>16</td>
+<td>2</td>
+<td>6</td>
+<td>+2 if m=0, +1 if DP.l ≠ 0</td>
+</tr>
+</tbody>
+</table>
+<h1 id="branches"><a class="toclink" href="#branches">Branches</a></h1>
+<p><strong>Flags affected</strong>: <code>--------</code></p>
+<p><strong>Brach not taken:</strong>
+<br>—</p>
+<p><strong>Brach taken:</strong>
+<br><code>PC</code> ← <code>PC + sign-extend(near)</code></p>
+<p><strong>Brach taken (BRL):</strong>
+<br><code>PC</code> ← <code>PC + label</code></p>
+<table>
+<thead>
+<tr>
+<th>Syntax</th>
+<th>Name</th>
+<th>Opcode</th>
+<th>Bytes</th>
+<th>Cycles</th>
+<th>Extra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BCC near</td>
+<td>Branch if Carry Clear</td>
+<td>90</td>
+<td>2</td>
+<td>2</td>
+<td>+1 if branch taken, +1 if e=1</td>
+</tr>
+<tr>
+<td>BCS near</td>
+<td>Branch if Carry Set</td>
+<td>B0</td>
+<td>2</td>
+<td>2</td>
+<td>+1 if branch taken, +1 if e=1</td>
+</tr>
+<tr>
+<td>BEQ near</td>
+<td>Branch if Equal (z flag=1)</td>
+<td>F0</td>
+<td>2</td>
+<td>2</td>
+<td>+1 if branch taken, +1 if e=1</td>
+</tr>
+<tr>
+<td>BNE near</td>
+<td>Branch if Not Equal (z=0)</td>
+<td>D0</td>
+<td>2</td>
+<td>2</td>
+<td>+1 if branch taken, +1 if e=1</td>
+</tr>
+<tr>
+<td>BMI near</td>
+<td>Branch if Minus</td>
+<td>30</td>
+<td>2</td>
+<td>2</td>
+<td>+1 if branch taken, +1 if e=1</td>
+</tr>
+<tr>
+<td>BPL near</td>
+<td>Branch if Plus</td>
+<td>10</td>
+<td>2</td>
+<td>2</td>
+<td>+1 if branch taken, +1 if e=1</td>
+</tr>
+<tr>
+<td>BVC near</td>
+<td>Branch if Overflow Clear</td>
+<td>50</td>
+<td>2</td>
+<td>2</td>
+<td>+1 if branch taken, +1 if e=1</td>
+</tr>
+<tr>
+<td>BVS near</td>
+<td>Branch if Overflow Set</td>
+<td>70</td>
+<td>2</td>
+<td>2</td>
+<td>+1 if branch taken, +1 if e=1</td>
+</tr>
+<tr>
+<td>BRA near</td>
+<td>Branch Always</td>
+<td>80</td>
+<td>2</td>
+<td>3</td>
+<td>+1 if e=1</td>
+</tr>
+<tr>
+<td>BRL label</td>
+<td>Branch Always Long</td>
+<td>82</td>
+<td>3</td>
+<td>4</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h1 id="bit-test-memory-bits-against-accumulator"><a class="toclink" href="#bit-test-memory-bits-against-accumulator">BIT - Test Memory Bits against Accumulator</a></h1>
+<p><strong>Flags affected</strong>: <code>nv----z-</code>
+<br><strong>Flags affected (Immediate addressing mode only)</strong>: <code>------z-</code></p>
+<p><code>A &amp; M</code>
+<br>
+<br><code>n</code> ← Most significant bit of memory
+<br><code>v</code> ← Second most significant bit of memory
+<br><code>z</code> ← Set if logical AND of memory and Accumulator is zero</p>
+<table>
+<thead>
+<tr>
+<th>Syntax</th>
+<th>Addressing Mode</th>
+<th>Opcode</th>
+<th>Bytes</th>
+<th>Cycles</th>
+<th>Extra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BIT #const</td>
+<td>Immediate</td>
+<td>89</td>
+<td>2 / 3</td>
+<td>2</td>
+<td>+1 if m=0</td>
+</tr>
+<tr>
+<td>BIT addr</td>
+<td>Absolute</td>
+<td>2C</td>
+<td>3</td>
+<td>4</td>
+<td>+1 if m=0</td>
+</tr>
+<tr>
+<td>BIT dp</td>
+<td>Direct Page</td>
+<td>24</td>
+<td>2</td>
+<td>3</td>
+<td>+1 if m=0, +1 if DP.l ≠ 0</td>
+</tr>
+<tr>
+<td>BIT addr, X</td>
+<td>Absolute Indexed, X</td>
+<td>3C</td>
+<td>3</td>
+<td>4</td>
+<td>+1 if m=0, +1 if index crosses page boundary</td>
+</tr>
+<tr>
+<td>BIT dp, X</td>
+<td>Direct Page Indexed, X</td>
+<td>34</td>
+<td>2</td>
+<td>4</td>
+<td>+1 if m=0, +1 if DP.l ≠ 0</td>
+</tr>
+</tbody>
+</table>
+<h1 id="software-interrupts"><a class="toclink" href="#software-interrupts">Software Interrupts</a></h1>
+<p><strong>Flags affected</strong>: <code>----di--</code></p>
+<p><strong>Native Mode:</strong>
+<br><tt>SP    </tt> ← <code>SP - 4</code>
+<br><tt>[SP+4]</tt> ← <code>PB</code>
+<br><tt>[SP+3]</tt> ← <code>PC.h</code>
+<br><tt>[SP+2]</tt> ← <code>PC.l</code>
+<br><tt>[SP+1]</tt> ← <code>P</code>
+<br><tt>PB    </tt> ← <code>0</code>
+<br><tt>SP    </tt> ← interrupt address
+<br>
+<br><tt>d     </tt> ← <code>0</code>
+<br><tt>i     </tt> ← <code>1</code></p>
+<p><strong>Emulation Mode:</strong>
+<br><tt>SP    </tt> ← <code>SP - 3</code>
+<br><tt>[SP+3]</tt> ← <code>PC.h</code>
+<br><tt>[SP+2]</tt> ← <code>PC.l</code>
+<br><tt>[SP+1]</tt> ← <code>P</code>
+<br><tt>PB    </tt> ← <code>0</code>
+<br><tt>SP    </tt> ← interrupt address
+<br>
+<br><tt>d     </tt> ← <code>0</code>
+<br><tt>i     </tt> ← <code>1</code></p>
+<table>
+<thead>
+<tr>
+<th>Syntax</th>
+<th>Addressing Mode</th>
+<th>Opcode</th>
+<th>Bytes</th>
+<th>Cycles</th>
+<th>Extra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BRK param</td>
+<td>Interrupt</td>
+<td>00</td>
+<td>2</td>
+<td>7</td>
+<td>+1 if e=0</td>
+</tr>
+<tr>
+<td>COP param</td>
+<td>Interrupt</td>
+<td>02</td>
+<td>2</td>
+<td>7</td>
+<td>+1 if e=0</td>
+</tr>
+</tbody>
+</table>
+<h1 id="clear-status-flags"><a class="toclink" href="#clear-status-flags">Clear Status Flags</a></h1>
+<p><strong>Flags affected (<code>CLC</code>)</strong>: <code>-------c</code>
+<br><strong>Flags affected (<code>CLD</code>)</strong>: <code>----d---</code>
+<br><strong>Flags affected (<code>CLI</code>)</strong>: <code>-----i--</code>
+<br><strong>Flags affected (<code>CLV</code>)</strong>: <code>-v------</code></p>
+<p><strong>CEC:</strong>
+<br><code>c</code> ← <code>0</code></p>
+<p><strong>CED:</strong>
+<br><code>d</code> ← <code>0</code></p>
+<p><strong>CEI:</strong>
+<br><code>i</code> ← <code>0</code></p>
+<p><strong>CLV:</strong>
+<br><code>v</code> ← <code>0</code></p>
+<table>
+<thead>
+<tr>
+<th>Syntax</th>
+<th>Name</th>
+<th>Opcode</th>
+<th>Bytes</th>
+<th>Cycles</th>
+<th>Extra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CLC</td>
+<td>Clear Carry Flag</td>
+<td>18</td>
+<td>1</td>
+<td>2</td>
+<td></td>
+</tr>
+<tr>
+<td>CLI</td>
+<td>Clear Interrupt Disable Flag</td>
+<td>58</td>
+<td>1</td>
+<td>2</td>
+<td></td>
+</tr>
+<tr>
+<td>CLD</td>
+<td>Clear Decimal Flag</td>
+<td>D8</td>
+<td>1</td>
+<td>2</td>
+<td></td>
+</tr>
+<tr>
+<td>CLV</td>
+<td>Clear Overflow Flag</td>
+<td>B8</td>
+<td>1</td>
+<td>2</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h1 id="cmp-compare-accumulator-with-memory"><a class="toclink" href="#cmp-compare-accumulator-with-memory">CMP - Compare Accumulator with Memory</a></h1>
+<p><strong>Flags affected</strong>: <code>n-----zc</code></p>
+<p><code>A - M</code>
+<br>
+<br><code>n</code> ← Most significant bit of result
+<br><code>z</code> ← Set if the result is zero (Set if A == M)
+<br><code>c</code> ← Carry from ALU (Set if A &gt;= M)</p>
+<table>
+<thead>
+<tr>
+<th>Syntax</th>
+<th>Addressing Mode</th>
+<th>Opcode</th>
+<th>Bytes</th>
+<th>Cycles</th>
+<th>Extra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CMP #const</td>
+<td>Immediate</td>
+<td>C9</td>
+<td>2 / 3</td>
+<td>2</td>
+<td>+1 if m=0</td>
+</tr>
+<tr>
+<td>CMP addr</td>
+<td>Absolute</td>
+<td>CD</td>
+<td>3</td>
+<td>4</td>
+<td>+1 if m=0</td>
+</tr>
+<tr>
+<td>CMP long</td>
+<td>Absolute Long</td>
+<td>CF</td>
+<td>4</td>
+<td>5</td>
+<td>+1 if m=0</td>
+</tr>
+<tr>
+<td>CMP dp</td>
+<td>Direct Page</td>
+<td>C5</td>
+<td>2</td>
+<td>3</td>
+<td>+1 if m=0, +1 if DP.l ≠ 0</td>
+</tr>
+<tr>
+<td>CMP (dp)</td>
+<td>Direct Page Indirect</td>
+<td>D2</td>
+<td>2</td>
+<td>5</td>
+<td>+1 if m=0, +1 if DP.l ≠ 0</td>
+</tr>
+<tr>
+<td>CMP [dp]</td>
+<td>Direct Page Indirect Long</td>
+<td>C7</td>
+<td>2</td>
+<td>6</td>
+<td>+1 if m=0, +1 if DP.l ≠ 0</td>
+</tr>
+<tr>
+<td>CMP addr, X</td>
+<td>Absolute Indexed, X</td>
+<td>DD</td>
+<td>3</td>
+<td>4</td>
+<td>+1 if m=0, +1 if index crosses page boundary</td>
+</tr>
+<tr>
+<td>CMP long, X</td>
+<td>Absolute Long Indexed, X</td>
+<td>DF</td>
+<td>4</td>
+<td>5</td>
+<td>+1 if m=0</td>
+</tr>
+<tr>
+<td>CMP addr, Y</td>
+<td>Absolute Indexed, Y</td>
+<td>D9</td>
+<td>3</td>
+<td>4</td>
+<td>+1 if m=0, +1 if index crosses page boundary</td>
+</tr>
+<tr>
+<td>CMP dp, X</td>
+<td>Direct Page Indexed, X</td>
+<td>D5</td>
+<td>2</td>
+<td>4</td>
+<td>+1 if m=0, +1 if DP.l ≠ 0</td>
+</tr>
+<tr>
+<td>CMP (dp, X)</td>
+<td>Direct Page Indirect, X</td>
+<td>C1</td>
+<td>2</td>
+<td>6</td>
+<td>+1 if m=0, +1 if DP.l ≠ 0</td>
+</tr>
+<tr>
+<td>CMP (dp), Y</td>
+<td>DP Indirect Indexed, Y</td>
+<td>D1</td>
+<td>2</td>
+<td>5</td>
+<td>+1 if m=0, +1 if DP.l ≠ 0, +1 if index crosses page boundary</td>
+</tr>
+<tr>
+<td>CMP [dp], Y</td>
+<td>DP Indirect Long Indexed, Y</td>
+<td>D7</td>
+<td>2</td>
+<td>6</td>
+<td>+1 if m=0, +1 if DP.l ≠ 0</td>
+</tr>
+<tr>
+<td>CMP sr, S</td>
+<td>Stack Relative</td>
+<td>C3</td>
+<td>2</td>
+<td>4</td>
+<td>+1 if m=0</td>
+</tr>
+<tr>
+<td>CMP (sr, S), Y</td>
+<td>SR Indirect Indexed, Y</td>
+<td>D3</td>
+<td>2</td>
+<td>7</td>
+<td>+1 if m=0</td>
+</tr>
+</tbody>
+</table>
+<h1 id="cpx-compare-index-register-x-with-memory"><a class="toclink" href="#cpx-compare-index-register-x-with-memory">CPX - Compare Index Register X with Memory</a></h1>
+<p><strong>Flags affected</strong>: <code>n-----zc</code></p>
+<p><code>X - M</code>
+<br>
+<br><code>n</code> ← Most significant bit of result
+<br><code>z</code> ← Set if the result is zero (Set if <code>X == M</code>)
+<br><code>c</code> ← Carry from ALU (Set if <code>X &gt;= M</code>)</p>
+<table>
+<thead>
+<tr>
+<th>Syntax</th>
+<th>Addressing Mode</th>
+<th>Opcode</th>
+<th>Bytes</th>
+<th>Cycles</th>
+<th>Extra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CPX #const</td>
+<td>Immediate</td>
+<td>E0</td>
+<td>2 / 3</td>
+<td>2</td>
+<td>+1 if x=0</td>
+</tr>
+<tr>
+<td>CPX addr</td>
+<td>Absolute</td>
+<td>EC</td>
+<td>3</td>
+<td>4</td>
+<td>+1 if x=0</td>
+</tr>
+<tr>
+<td>CPX dp</td>
+<td>Direct Page</td>
+<td>E4</td>
+<td>2</td>
+<td>3</td>
+<td>+1 if x=0, +1 if DP.l ≠ 0</td>
+</tr>
+</tbody>
+</table>
+<h1 id="cpy-compare-index-register-y-with-memory"><a class="toclink" href="#cpy-compare-index-register-y-with-memory">CPY - Compare Index Register Y with Memory</a></h1>
+<p><strong>Flags affected</strong>: <code>n-----zc</code></p>
+<p><code>Y - M</code>
+<br>
+<br><code>n</code> ← Most significant bit of result
+<br><code>z</code> ← Set if the result is zero (Set if <code>Y == M</code>)
+<br><code>c</code> ← Carry from ALU (Set if <code>Y &gt;= M</code>)</p>
+<table>
+<thead>
+<tr>
+<th>Syntax</th>
+<th>Addressing Mode</th>
+<th>Opcode</th>
+<th>Bytes</th>
+<th>Cycles</th>
+<th>Extra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CPY #const</td>
+<td>Immediate</td>
+<td>C0</td>
+<td>2 / 3</td>
+<td>2</td>
+<td>+1 if x=0</td>
+</tr>
+<tr>
+<td>CPY addr</td>
+<td>Absolute</td>
+<td>CC</td>
+<td>3</td>
+<td>4</td>
+<td>+1 if x=0</td>
+</tr>
+<tr>
+<td>CPY dp</td>
+<td>Direct Page</td>
+<td>C4</td>
+<td>2</td>
+<td>3</td>
+<td>+1 if x=0, +1 if DP.l ≠ 0</td>
+</tr>
+</tbody>
+</table>
+<h1 id="dec-decrement"><a class="toclink" href="#dec-decrement">DEC - Decrement</a></h1>
+<p><strong>Flags affected</strong>: <code>n-----z-</code></p>
+<p><code>M</code> ← <code>M - 1</code>
+<br>
+<br><code>n</code> ← Most significant bit of result
+<br><code>z</code> ← Set if the result is zero</p>
+<table>
+<thead>
+<tr>
+<th>Syntax</th>
+<th>Addressing Mode</th>
+<th>Opcode</th>
+<th>Bytes</th>
+<th>Cycles</th>
+<th>Extra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DEC</td>
+<td>Accumulator</td>
+<td>3A</td>
+<td>1</td>
+<td>2</td>
+<td></td>
+</tr>
+<tr>
+<td>DEC addr</td>
+<td>Absolute</td>
+<td>CE</td>
+<td>3</td>
+<td>6</td>
+<td>+2 if m=0</td>
+</tr>
+<tr>
+<td>DEC dp</td>
+<td>Direct Page</td>
+<td>C6</td>
+<td>2</td>
+<td>5</td>
+<td>+2 if m=0, +1 if DP.l ≠ 0</td>
+</tr>
+<tr>
+<td>DEC addr, X</td>
+<td>Absolute Indexed, X</td>
+<td>DE</td>
+<td>3</td>
+<td>7</td>
+<td>+2 if m=0, +1 if index crosses page boundary</td>
+</tr>
+<tr>
+<td>DEC dp, X</td>
+<td>Direct Page Indexed, X</td>
+<td>D6</td>
+<td>2</td>
+<td>6</td>
+<td>+2 if m=0, +1 if DP.l ≠ 0</td>
+</tr>
+</tbody>
+</table>
+<h1 id="dex-dey-decrement-index-registers"><a class="toclink" href="#dex-dey-decrement-index-registers">DEX, DEY - Decrement Index Registers</a></h1>
+<p><strong>Flags affected</strong>: <code>n-----z-</code></p>
+<p><code>R</code> ← <code>R - 1</code>
+<br>
+<br><code>n</code> ← Most significant bit of result
+<br><code>z</code> ← Set if the result is zero</p>
+<table>
+<thead>
+<tr>
+<th>Syntax</th>
+<th>Addressing Mode</th>
+<th>Opcode</th>
+<th>Bytes</th>
+<th>Cycles</th>
+<th>Extra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DEX</td>
+<td>Implied</td>
+<td>CA</td>
+<td>1</td>
+<td>2</td>
+<td></td>
+</tr>
+<tr>
+<td>DEY</td>
+<td>Implied</td>
+<td>88</td>
+<td>1</td>
+<td>2</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h1 id="eor-exclusive-or-accumulator-with-memory"><a class="toclink" href="#eor-exclusive-or-accumulator-with-memory">EOR - Exclusive OR Accumulator with Memory</a></h1>
+<p><strong>Flags affected</strong>: <code>n-----z-</code></p>
+<p><code>A</code> ← <code>A ^ M</code>
+<br>
+<br><code>n</code> ← Most significant bit of result
+<br><code>z</code> ← Set if the result is zero</p>
+<table>
+<thead>
+<tr>
+<th>Syntax</th>
+<th>Addressing Mode</th>
+<th>Opcode</th>
+<th>Bytes</th>
+<th>Cycles</th>
+<th>Extra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>EOR #const</td>
+<td>Immediate</td>
+<td>49</td>
+<td>2 / 3</td>
+<td>2</td>
+<td>+1 if m=0</td>
+</tr>
+<tr>
+<td>EOR addr</td>
+<td>Absolute</td>
+<td>4D</td>
+<td>3</td>
+<td>4</td>
+<td>+1 if m=0</td>
+</tr>
+<tr>
+<td>EOR long</td>
+<td>Absolute Long</td>
+<td>4F</td>
+<td>4</td>
+<td>5</td>
+<td>+1 if m=0</td>
+</tr>
+<tr>
+<td>EOR dp</td>
+<td>Direct Page</td>
+<td>45</td>
+<td>2</td>
+<td>3</td>
+<td>+1 if m=0, +1 if DP.l ≠ 0</td>
+</tr>
+<tr>
+<td>EOR (dp)</td>
+<td>Direct Page Indirect</td>
+<td>42</td>
+<td>2</td>
+<td>5</td>
+<td>+1 if m=0, +1 if DP.l ≠ 0</td>
+</tr>
+<tr>
+<td>EOR [dp]</td>
+<td>Direct Page Indirect Long</td>
+<td>47</td>
+<td>2</td>
+<td>6</td>
+<td>+1 if m=0, +1 if DP.l ≠ 0</td>
+</tr>
+<tr>
+<td>EOR addr, X</td>
+<td>Absolute Indexed, X</td>
+<td>5D</td>
+<td>3</td>
+<td>4</td>
+<td>+1 if m=0, +1 if index crosses page boundary</td>
+</tr>
+<tr>
+<td>EOR long, X</td>
+<td>Absolute Long Indexed, X</td>
+<td>5F</td>
+<td>4</td>
+<td>5</td>
+<td>+1 if m=0</td>
+</tr>
+<tr>
+<td>EOR addr, Y</td>
+<td>Absolute Indexed, Y</td>
+<td>59</td>
+<td>3</td>
+<td>4</td>
+<td>+1 if m=0, +1 if index crosses page boundary</td>
+</tr>
+<tr>
+<td>EOR dp, X</td>
+<td>Direct Page Indexed, X</td>
+<td>55</td>
+<td>2</td>
+<td>4</td>
+<td>+1 if m=0, +1 if DP.l ≠ 0</td>
+</tr>
+<tr>
+<td>EOR (dp, X)</td>
+<td>Direct Page Indirect, X</td>
+<td>41</td>
+<td>2</td>
+<td>6</td>
+<td>+1 if m=0, +1 if DP.l ≠ 0</td>
+</tr>
+<tr>
+<td>EOR (dp), Y</td>
+<td>DP Indirect Indexed, Y</td>
+<td>51</td>
+<td>2</td>
+<td>5</td>
+<td>+1 if m=0, +1 if DP.l ≠ 0, +1 if index crosses page boundary</td>
+</tr>
+<tr>
+<td>EOR [dp], Y</td>
+<td>DP Indirect Long Indexed, Y</td>
+<td>57</td>
+<td>2</td>
+<td>6</td>
+<td>+1 if m=0, +1 if DP.l ≠ 0</td>
+</tr>
+<tr>
+<td>EOR sr, S</td>
+<td>Stack Relative</td>
+<td>43</td>
+<td>2</td>
+<td>4</td>
+<td>+1 if m=0</td>
+</tr>
+<tr>
+<td>EOR (sr, S), Y</td>
+<td>SR Indirect Indexed, Y</td>
+<td>53</td>
+<td>2</td>
+<td>7</td>
+<td>+1 if m=0</td>
+</tr>
+</tbody>
+</table>
+<h1 id="inc-increment"><a class="toclink" href="#inc-increment">INC - Increment</a></h1>
+<p><strong>Flags affected</strong>: <code>n-----z-</code></p>
+<p><code>M</code> ← <code>M + 1</code>
+<br>
+<br><code>n</code> ← Most significant bit of result
+<br><code>z</code> ← Set if the result is zero</p>
+<table>
+<thead>
+<tr>
+<th>Syntax</th>
+<th>Addressing Mode</th>
+<th>Opcode</th>
+<th>Bytes</th>
+<th>Cycles</th>
+<th>Extra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>INC</td>
+<td>Accumulator</td>
+<td>1A</td>
+<td>1</td>
+<td>2</td>
+<td></td>
+</tr>
+<tr>
+<td>INC addr</td>
+<td>Absolute</td>
+<td>EE</td>
+<td>3</td>
+<td>6</td>
+<td>+2 if m=0</td>
+</tr>
+<tr>
+<td>INC dp</td>
+<td>Direct Page</td>
+<td>E6</td>
+<td>2</td>
+<td>5</td>
+<td>+2 if m=0, +1 if DP.l ≠ 0</td>
+</tr>
+<tr>
+<td>INC addr, X</td>
+<td>Absolute Indexed, X</td>
+<td>FE</td>
+<td>3</td>
+<td>7</td>
+<td>+2 if m=0, +1 if index crosses page boundary</td>
+</tr>
+<tr>
+<td>INC dp, X</td>
+<td>Direct Page Indexed, X</td>
+<td>F6</td>
+<td>2</td>
+<td>6</td>
+<td>+2 if m=0, +1 if DP.l ≠ 0</td>
+</tr>
+</tbody>
+</table>
+<h1 id="inx-iny-increment-index-registers"><a class="toclink" href="#inx-iny-increment-index-registers">INX, INY - Increment Index Registers</a></h1>
+<p><strong>Flags affected</strong>: <code>n-----z-</code></p>
+<p><code>R</code> ← <code>R + 1</code>
+<br>
+<br><code>n</code> ← Most significant bit of result
+<br><code>z</code> ← Set if the result is zero</p>
+<table>
+<thead>
+<tr>
+<th>Syntax</th>
+<th>Addressing Mode</th>
+<th>Opcode</th>
+<th>Bytes</th>
+<th>Cycles</th>
+<th>Extra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>INX</td>
+<td>Implied</td>
+<td>E8</td>
+<td>1</td>
+<td>2</td>
+<td></td>
+</tr>
+<tr>
+<td>INY</td>
+<td>Implied</td>
+<td>C8</td>
+<td>1</td>
+<td>2</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h1 id="jmp-jml-jump"><a class="toclink" href="#jmp-jml-jump">JMP, JML - Jump</a></h1>
+<p><strong>Flags affected</strong>: <code>--------</code></p>
+<p><strong>JMP:</strong>
+<br><tt>PC   </tt> ← <code>M</code></p>
+<p><strong>JML:</strong>
+<br><tt>PB:PC</tt> ← <code>M</code></p>
+<table>
+<thead>
+<tr>
+<th>Syntax</th>
+<th>Addressing Mode</th>
+<th>Opcode</th>
+<th>Bytes</th>
+<th>Cycles</th>
+<th>Extra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>JMP addr</td>
+<td>Absolute</td>
+<td>4C</td>
+<td>3</td>
+<td>3</td>
+<td></td>
+</tr>
+<tr>
+<td>JMP (addr)</td>
+<td>Absolute Indirect</td>
+<td>6C</td>
+<td>3</td>
+<td>5</td>
+<td></td>
+</tr>
+<tr>
+<td>JMP (addr, X)</td>
+<td>Absolute Indexed Indirect, X</td>
+<td>7C</td>
+<td>3</td>
+<td>6</td>
+<td></td>
+</tr>
+<tr>
+<td>JMP long</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>JML long</td>
+<td>Absolute Long</td>
+<td>5C</td>
+<td>4</td>
+<td>4</td>
+<td></td>
+</tr>
+<tr>
+<td>JMP [addr]</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>JML [addr]</td>
+<td>Absolute Indirect Long</td>
+<td>DC</td>
+<td>3</td>
+<td>6</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h1 id="jsr-jsl-jump-to-subroutine"><a class="toclink" href="#jsr-jsl-jump-to-subroutine">JSR, JSL - Jump to Subroutine</a></h1>
+<p><strong>Flags affected</strong>: <code>--------</code></p>
+<p><strong>JSR:</strong>
+<br><tt>PC    </tt> ← <code>PC - 1</code>
+<br><tt>SP    </tt> ← <code>SP - 2</code>
+<br><tt>[SP+2]</tt> ← <code>PC.h</code>
+<br><tt>[SP+1]</tt> ← <code>PC.l</code>
+<br><tt>PC    </tt> ← <code>M</code></p>
+<p><strong>JSL:</strong>
+<br><tt>PC    </tt> ← <code>PC - 1</code>
+<br><tt>SP    </tt> ← <code>SP - 3</code>
+<br><tt>[SP+3]</tt> ← <code>PB</code>
+<br><tt>[SP+2]</tt> ← <code>PC.h</code>
+<br><tt>[SP+1]</tt> ← <code>PC.l</code>
+<br><tt>PB:PC </tt> ← <code>M</code></p>
+<table>
+<thead>
+<tr>
+<th>Syntax</th>
+<th>Addressing Mode</th>
+<th>Opcode</th>
+<th>Bytes</th>
+<th>Cycles</th>
+<th>Extra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>JSR addr</td>
+<td>Absolute</td>
+<td>20</td>
+<td>3</td>
+<td>6</td>
+<td></td>
+</tr>
+<tr>
+<td>JSR (addr, X)</td>
+<td>Absolute Indexed Indirect, X</td>
+<td>FC</td>
+<td>3</td>
+<td>8</td>
+<td></td>
+</tr>
+<tr>
+<td>JSL long</td>
+<td>Absolute Long</td>
+<td>22</td>
+<td>4</td>
+<td>8</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h1 id="lda-load-accumulator-from-memory"><a class="toclink" href="#lda-load-accumulator-from-memory">LDA - Load Accumulator from Memory</a></h1>
+<p><strong>Flags affected</strong>: <code>n-----z-</code></p>
+<p><code>A</code> ← <code>M</code>
+<br>
+<br><code>n</code> ← Most significant bit of Accumulator
+<br><code>z</code> ← Set if the Accumulator is zero</p>
+<table>
+<thead>
+<tr>
+<th>Syntax</th>
+<th>Addressing Mode</th>
+<th>Opcode</th>
+<th>Bytes</th>
+<th>Cycles</th>
+<th>Extra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>LDA #const</td>
+<td>Immediate</td>
+<td>A9</td>
+<td>2 / 3</td>
+<td>2</td>
+<td>+1 if m=0</td>
+</tr>
+<tr>
+<td>LDA addr</td>
+<td>Absolute</td>
+<td>AD</td>
+<td>3</td>
+<td>4</td>
+<td>+1 if m=0</td>
+</tr>
+<tr>
+<td>LDA long</td>
+<td>Absolute Long</td>
+<td>AF</td>
+<td>4</td>
+<td>5</td>
+<td>+1 if m=0</td>
+</tr>
+<tr>
+<td>LDA dp</td>
+<td>Direct Page</td>
+<td>A5</td>
+<td>2</td>
+<td>3</td>
+<td>+1 if m=0, +1 if DP.l ≠ 0</td>
+</tr>
+<tr>
+<td>LDA (dp)</td>
+<td>Direct Page Indirect</td>
+<td>B2</td>
+<td>2</td>
+<td>5</td>
+<td>+1 if m=0, +1 if DP.l ≠ 0</td>
+</tr>
+<tr>
+<td>LDA [dp]</td>
+<td>Direct Page Indirect Long</td>
+<td>A7</td>
+<td>2</td>
+<td>6</td>
+<td>+1 if m=0, +1 if DP.l ≠ 0</td>
+</tr>
+<tr>
+<td>LDA addr, X</td>
+<td>Absolute Indexed, X</td>
+<td>BD</td>
+<td>3</td>
+<td>4</td>
+<td>+1 if m=0, +1 if index crosses page boundary</td>
+</tr>
+<tr>
+<td>LDA long, X</td>
+<td>Absolute Long Indexed, X</td>
+<td>BF</td>
+<td>4</td>
+<td>5</td>
+<td>+1 if m=0</td>
+</tr>
+<tr>
+<td>LDA addr, Y</td>
+<td>Absolute Indexed, Y</td>
+<td>B9</td>
+<td>3</td>
+<td>4</td>
+<td>+1 if m=0, +1 if index crosses page boundary</td>
+</tr>
+<tr>
+<td>LDA dp, X</td>
+<td>Direct Page Indexed, X</td>
+<td>B5</td>
+<td>2</td>
+<td>4</td>
+<td>+1 if m=0, +1 if DP.l ≠ 0</td>
+</tr>
+<tr>
+<td>LDA (dp, X)</td>
+<td>Direct Page Indirect, X</td>
+<td>A1</td>
+<td>2</td>
+<td>6</td>
+<td>+1 if m=0, +1 if DP.l ≠ 0</td>
+</tr>
+<tr>
+<td>LDA (dp), Y</td>
+<td>DP Indirect Indexed, Y</td>
+<td>B1</td>
+<td>2</td>
+<td>5</td>
+<td>+1 if m=0, +1 if DP.l ≠ 0, +1 if index crosses page boundary</td>
+</tr>
+<tr>
+<td>LDA [dp], Y</td>
+<td>DP Indirect Long Indexed, Y</td>
+<td>B7</td>
+<td>2</td>
+<td>6</td>
+<td>+1 if m=0, +1 if DP.l ≠ 0</td>
+</tr>
+<tr>
+<td>LDA sr, S</td>
+<td>Stack Relative</td>
+<td>A3</td>
+<td>2</td>
+<td>4</td>
+<td>+1 if m=0</td>
+</tr>
+<tr>
+<td>LDA (sr, S), Y</td>
+<td>SR Indirect Indexed, Y</td>
+<td>B3</td>
+<td>2</td>
+<td>7</td>
+<td>+1 if m=0</td>
+</tr>
+</tbody>
+</table>
+<h1 id="ldx-load-index-register-x-from-memory"><a class="toclink" href="#ldx-load-index-register-x-from-memory">LDX - Load Index Register X from Memory</a></h1>
+<p><strong>Flags affected</strong>: <code>n-----z-</code></p>
+<p><code>X</code> ← <code>M</code>
+<br>
+<br><code>n</code> ← Most significant bit of X
+<br><code>z</code> ← Set if the X is zero</p>
+<table>
+<thead>
+<tr>
+<th>Syntax</th>
+<th>Addressing Mode</th>
+<th>Opcode</th>
+<th>Bytes</th>
+<th>Cycles</th>
+<th>Extra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>LDX #const</td>
+<td>Immediate</td>
+<td>A2</td>
+<td>2 / 3</td>
+<td>2</td>
+<td>+1 if x=0</td>
+</tr>
+<tr>
+<td>LDX addr</td>
+<td>Absolute</td>
+<td>AE</td>
+<td>3</td>
+<td>4</td>
+<td>+1 if x=0</td>
+</tr>
+<tr>
+<td>LDX dp</td>
+<td>Direct Page</td>
+<td>A6</td>
+<td>2</td>
+<td>3</td>
+<td>+1 if x=0, +1 if DP.l ≠ 0</td>
+</tr>
+<tr>
+<td>LDX addr, Y</td>
+<td>Absolute Indexed, Y</td>
+<td>BE</td>
+<td>3</td>
+<td>4</td>
+<td>+1 if x=0, +1 if index crosses page boundary</td>
+</tr>
+<tr>
+<td>LDX dp, Y</td>
+<td>Direct Page Indexed, Y</td>
+<td>B6</td>
+<td>2</td>
+<td>4</td>
+<td>+1 if x=0, +1 if DP.l ≠ 0</td>
+</tr>
+</tbody>
+</table>
+<h1 id="ldy-load-index-register-y-from-memory"><a class="toclink" href="#ldy-load-index-register-y-from-memory">LDY - Load Index Register Y from Memory</a></h1>
+<p><strong>Flags affected</strong>: <code>n-----z-</code></p>
+<p><code>Y</code> ← <code>M</code>
+<br>
+<br><code>n</code> ← Most significant bit of Y
+<br><code>z</code> ← Set if the Y is zero</p>
+<table>
+<thead>
+<tr>
+<th>Syntax</th>
+<th>Addressing Mode</th>
+<th>Opcode</th>
+<th>Bytes</th>
+<th>Cycles</th>
+<th>Extra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>LDY #const</td>
+<td>Immediate</td>
+<td>A0</td>
+<td>2 / 3</td>
+<td>2</td>
+<td>+1 if x=0</td>
+</tr>
+<tr>
+<td>LDY addr</td>
+<td>Absolute</td>
+<td>AC</td>
+<td>3</td>
+<td>4</td>
+<td>+1 if x=0</td>
+</tr>
+<tr>
+<td>LDY dp</td>
+<td>Direct Page</td>
+<td>A4</td>
+<td>2</td>
+<td>3</td>
+<td>+1 if x=0, +1 if DP.l ≠ 0</td>
+</tr>
+<tr>
+<td>LDY addr, X</td>
+<td>Absolute Indexed, X</td>
+<td>BC</td>
+<td>3</td>
+<td>4</td>
+<td>+1 if x=0, +1 if index crosses page boundary</td>
+</tr>
+<tr>
+<td>LDY dp, X</td>
+<td>Direct Page Indexed, X</td>
+<td>B4</td>
+<td>2</td>
+<td>4</td>
+<td>+1 if x=0, +1 if DP.l ≠ 0</td>
+</tr>
+</tbody>
+</table>
+<h1 id="lsr-logical-shift-right"><a class="toclink" href="#lsr-logical-shift-right">LSR - Logical Shift Right</a></h1>
+<p><strong>Flags affected</strong>: <code>n-----zc</code></p>
+<p><code>M</code> ← <code>M &gt;&gt; 1</code>
+<br>
+<br><code>n</code> ← cleared
+<br><code>z</code> ← Set if the result is zero
+<br><code>c</code> ← Bit 0 of original memory</p>
+<p>NOTE: This is an unsigned operation, the MSB of the result is always 0.</p>
+<table>
+<thead>
+<tr>
+<th>Syntax</th>
+<th>Addressing Mode</th>
+<th>Opcode</th>
+<th>Bytes</th>
+<th>Cycles</th>
+<th>Extra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>LSR</td>
+<td>Accumulator</td>
+<td>A4</td>
+<td>1</td>
+<td>2</td>
+<td></td>
+</tr>
+<tr>
+<td>LSR addr</td>
+<td>Absolute</td>
+<td>4E</td>
+<td>3</td>
+<td>6</td>
+<td>+1 if m=0</td>
+</tr>
+<tr>
+<td>LSR dp</td>
+<td>Direct Page</td>
+<td>46</td>
+<td>2</td>
+<td>5</td>
+<td>+1 if m=0, +1 if DP.l ≠ 0</td>
+</tr>
+<tr>
+<td>LSR addr, X</td>
+<td>Absolute Indexed, X</td>
+<td>5E</td>
+<td>3</td>
+<td>7</td>
+<td>+1 if m=0, +1 if index crosses page boundary</td>
+</tr>
+<tr>
+<td>LSR dp, X</td>
+<td>Direct Page Indexed, X</td>
+<td>56</td>
+<td>2</td>
+<td>6</td>
+<td>+1 if m=0, +1 if DP.l ≠ 0</td>
+</tr>
+</tbody>
+</table>
+<h1 id="mvn-block-move-next"><a class="toclink" href="#mvn-block-move-next">MVN - Block Move Next</a></h1>
+<p><strong>Flags affected</strong>: <code>--------</code></p>
+<p><strong>Parameters:</strong>
+<br><code>X</code>: source address
+<br><code>Y</code>: destination address
+<br><code>C</code>: length - 1</p>
+<p><code>DB</code> ← <code>destBank</code>
+<br><code>repeat:</code>
+<br><tt>    <code>T</code></tt> ← <code>srcBank:X</code>
+<br><tt>    <code>DB:Y</code></tt> ← <code>T</code>
+<br><tt>    X</tt> ← <code>X + 1</code>
+<br><tt>    Y</tt> ← <code>Y + 1</code>
+<br><tt>    C</tt> ← <code>C - 1</code>
+<br><code>until C == 0xffff</code></p>
+<p><br>
+NOTES:</p>
+<ul>
+<li>The number of bytes transferred is <code>C + 1</code></li>
+<li>After the transfer is complete:<ul>
+<li><code>DB</code> = destination bank</li>
+<li><code>C</code> = <code>0xFFFF</code></li>
+<li><code>X</code> = the byte after the end of the source block</li>
+<li><code>Y</code> = the byte after the end of the destination block.</li>
+</ul>
+</li>
+<li>If bit 4 (x) of the status register is set, <code>MVN</code> will only be able
+   to access the first page of the source and destination banks.</li>
+<li><code>MVN</code> should be used if the blocks do not overlap or if the
+   destination address is less than the source address.</li>
+<li><code>MVN</code> can be used to fill an array or memory block:<pre><code>set value of first element
+
+set X = array_start
+set Y = array_start + element_size
+set C = (array_count - 1) * element_size - 1
+
+MVN array_bank array_bank
+</code></pre>
+</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Syntax</th>
+<th>Addressing Mode</th>
+<th>Opcode</th>
+<th>Bytes</th>
+<th>Cycles</th>
+<th>Extra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MVN srcBank, destBank</td>
+<td>Block Move</td>
+<td>54</td>
+<td>3</td>
+<td></td>
+<td>7 per byte moved</td>
+</tr>
+</tbody>
+</table>
+<h1 id="mvp-block-move-previous"><a class="toclink" href="#mvp-block-move-previous">MVP - Block Move Previous</a></h1>
+<p><strong>Flags affected</strong>: <code>--------</code></p>
+<p><strong>Parameters:</strong>
+<br><code>X</code>: address of last source byte
+<br><code>Y</code>: address of last destination byte
+<br><code>C</code>: length - 1</p>
+<p><code>DB</code> ← <code>destBank</code>
+<br><code>repeat:</code>
+<br><tt>    <code>T</code></tt> ← <code>srcBank:X</code>
+<br><tt>    <code>DB:Y</code></tt> ← <code>T</code>
+<br><tt>    X</tt> ← <code>X - 1</code>
+<br><tt>    Y</tt> ← <code>Y - 1</code>
+<br><tt>    C</tt> ← <code>C - 1</code>
+<br><code>until C == 0xffff</code></p>
+<p><br>
+NOTES:</p>
+<ul>
+<li>The number of bytes transferred is <code>C + 1</code>.</li>
+<li>After the transfer is complete:<ul>
+<li><code>DB</code> = destination bank</li>
+<li><code>C</code> = <code>0xFFFF</code></li>
+<li><code>X</code> = the byte before the start of the source block</li>
+<li><code>Y</code> = the byte before the start of the destination block.</li>
+</ul>
+</li>
+<li>If bit 4 (x) of the status register is set, <code>MVP</code> will only be able
+   to access the first page of the source and destination banks.</li>
+<li><code>MVP</code> should be used if the blocks could overlap and the source
+   address is less than the destination address.</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Syntax</th>
+<th>Addressing Mode</th>
+<th>Opcode</th>
+<th>Bytes</th>
+<th>Cycles</th>
+<th>Extra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MVP srcBank, destBank</td>
+<td>Block Move</td>
+<td>44</td>
+<td>3</td>
+<td></td>
+<td>7 per byte moved</td>
+</tr>
+</tbody>
+</table>
+<h1 id="nop-no-operation"><a class="toclink" href="#nop-no-operation">NOP - No Operation</a></h1>
+<p><strong>Flags affected</strong>: <code>--------</code></p>
+<p>—</p>
+<table>
+<thead>
+<tr>
+<th>Syntax</th>
+<th>Addressing Mode</th>
+<th>Opcode</th>
+<th>Bytes</th>
+<th>Cycles</th>
+<th>Extra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NOP</td>
+<td>Implied</td>
+<td>EA</td>
+<td>1</td>
+<td>2</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h1 id="ora-or-accumulator-with-memory"><a class="toclink" href="#ora-or-accumulator-with-memory">ORA - OR Accumulator with Memory</a></h1>
+<p><strong>Flags affected</strong>: <code>n-----z-</code></p>
+<p><code>A</code> ← <code>A | M</code>
+<br>
+<br><code>n</code> ← Most significant bit of result
+<br><code>z</code> ← Set if the result is zero</p>
+<table>
+<thead>
+<tr>
+<th>Syntax</th>
+<th>Addressing Mode</th>
+<th>Opcode</th>
+<th>Bytes</th>
+<th>Cycles</th>
+<th>Extra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ORA #const</td>
+<td>Immediate</td>
+<td>09</td>
+<td>2 / 3</td>
+<td>2</td>
+<td>+1 if m=0</td>
+</tr>
+<tr>
+<td>ORA addr</td>
+<td>Absolute</td>
+<td>0D</td>
+<td>3</td>
+<td>4</td>
+<td>+1 if m=0</td>
+</tr>
+<tr>
+<td>ORA long</td>
+<td>Absolute Long</td>
+<td>0F</td>
+<td>4</td>
+<td>5</td>
+<td>+1 if m=0</td>
+</tr>
+<tr>
+<td>ORA dp</td>
+<td>Direct Page</td>
+<td>05</td>
+<td>2</td>
+<td>3</td>
+<td>+1 if m=0, +1 if DP.l ≠ 0</td>
+</tr>
+<tr>
+<td>ORA (dp)</td>
+<td>Direct Page Indirect</td>
+<td>12</td>
+<td>2</td>
+<td>5</td>
+<td>+1 if m=0, +1 if DP.l ≠ 0</td>
+</tr>
+<tr>
+<td>ORA [dp]</td>
+<td>Direct Page Indirect Long</td>
+<td>07</td>
+<td>2</td>
+<td>6</td>
+<td>+1 if m=0, +1 if DP.l ≠ 0</td>
+</tr>
+<tr>
+<td>ORA addr, X</td>
+<td>Absolute Indexed, X</td>
+<td>1D</td>
+<td>3</td>
+<td>4</td>
+<td>+1 if m=0, +1 if index crosses page boundary</td>
+</tr>
+<tr>
+<td>ORA long, X</td>
+<td>Absolute Long Indexed, X</td>
+<td>1F</td>
+<td>4</td>
+<td>5</td>
+<td>+1 if m=0</td>
+</tr>
+<tr>
+<td>ORA addr, Y</td>
+<td>Absolute Indexed, Y</td>
+<td>19</td>
+<td>3</td>
+<td>4</td>
+<td>+1 if m=0, +1 if index crosses page boundary</td>
+</tr>
+<tr>
+<td>ORA dp, X</td>
+<td>Direct Page Indexed, X</td>
+<td>15</td>
+<td>2</td>
+<td>4</td>
+<td>+1 if m=0, +1 if DP.l ≠ 0</td>
+</tr>
+<tr>
+<td>ORA (dp, X)</td>
+<td>Direct Page Indirect, X</td>
+<td>01</td>
+<td>2</td>
+<td>6</td>
+<td>+1 if m=0, +1 if DP.l ≠ 0</td>
+</tr>
+<tr>
+<td>ORA (dp), Y</td>
+<td>DP Indirect Indexed, Y</td>
+<td>11</td>
+<td>2</td>
+<td>5</td>
+<td>+1 if m=0, +1 if DP.l ≠ 0, +1 if index crosses page boundary</td>
+</tr>
+<tr>
+<td>ORA [dp], Y</td>
+<td>DP Indirect Long Indexed, Y</td>
+<td>17</td>
+<td>2</td>
+<td>6</td>
+<td>+1 if m=0, +1 if DP.l ≠ 0</td>
+</tr>
+<tr>
+<td>ORA sr, S</td>
+<td>Stack Relative</td>
+<td>03</td>
+<td>2</td>
+<td>4</td>
+<td>+1 if m=0</td>
+</tr>
+<tr>
+<td>ORA (sr, S), Y</td>
+<td>SR Indirect Indexed, Y</td>
+<td>13</td>
+<td>2</td>
+<td>7</td>
+<td>+1 if m=0</td>
+</tr>
+</tbody>
+</table>
+<h1 id="pea-push-effective-absolute-address"><a class="toclink" href="#pea-push-effective-absolute-address">PEA - Push Effective Absolute Address</a></h1>
+<p><strong>Flags affected</strong>: <code>--------</code></p>
+<p><tt>SP    </tt> ← <code>SP - 2</code>
+<br><tt>[SP+2]</tt> ← <code>addr.h</code>
+<br><tt>[SP+1]</tt> ← <code>addr.l</code></p>
+<table>
+<thead>
+<tr>
+<th>Syntax</th>
+<th>Addressing Mode</th>
+<th>Opcode</th>
+<th>Bytes</th>
+<th>Cycles</th>
+<th>Extra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PEA addr</td>
+<td>Stack (Absolute)</td>
+<td>F4</td>
+<td>3</td>
+<td>5</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h1 id="pei-push-effective-indirect-address"><a class="toclink" href="#pei-push-effective-indirect-address">PEI - Push Effective Indirect Address</a></h1>
+<p><strong>Flags affected</strong>: <code>--------</code></p>
+<p><tt>SP    </tt> ← <code>SP - 2</code>
+<br><tt>[SP+2]</tt> ← <code>[0:D+dp+1]</code>
+<br><tt>[SP+1]</tt> ← <code>[0:D+dp]</code></p>
+<table>
+<thead>
+<tr>
+<th>Syntax</th>
+<th>Addressing Mode</th>
+<th>Opcode</th>
+<th>Bytes</th>
+<th>Cycles</th>
+<th>Extra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PEI (dp)</td>
+<td>Stack (DP Indirect)</td>
+<td>D4</td>
+<td>2</td>
+<td>6</td>
+<td>+1 if DP.l ≠ 0</td>
+</tr>
+</tbody>
+</table>
+<h1 id="per-push-effective-pc-relative-indirect-address"><a class="toclink" href="#per-push-effective-pc-relative-indirect-address">PER - Push Effective PC Relative Indirect Address</a></h1>
+<p><strong>Flags affected</strong>: <code>--------</code></p>
+<p><tt>SP    </tt> ← <code>SP - 2</code>
+<br><tt>T     </tt> ← <code>PC + Label</code>
+<br><tt>[SP+2]</tt> ← <code>T.h</code>
+<br><tt>[SP+1]</tt> ← <code>T.l</code></p>
+<table>
+<thead>
+<tr>
+<th>Syntax</th>
+<th>Addressing Mode</th>
+<th>Opcode</th>
+<th>Bytes</th>
+<th>Cycles</th>
+<th>Extra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PER label</td>
+<td>Stack (PC Relative Long)</td>
+<td>62</td>
+<td>3</td>
+<td>6</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h1 id="push-to-stack"><a class="toclink" href="#push-to-stack">Push to Stack</a></h1>
+<p><strong>Flags affected</strong>: <code>--------</code></p>
+<p><strong>8 bit register:</strong>
+<br><tt>SP    </tt> ← <code>SP - 1</code>
+<br><tt>[SP+1]</tt> ← <code>R</code></p>
+<p><strong>16 bit register:</strong>
+<br><tt>SP    </tt> ← <code>SP - 2</code>
+<br><tt>[SP+2]</tt> ← <code>R.h</code>
+<br><tt>[SP+1]</tt> ← <code>R.l</code></p>
+<table>
+<thead>
+<tr>
+<th>Syntax</th>
+<th>Name</th>
+<th>Opcode</th>
+<th>Bytes</th>
+<th>Cycles</th>
+<th>Extra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PHA</td>
+<td>Push Accumulator</td>
+<td>48</td>
+<td>1</td>
+<td>3</td>
+<td>+1 if m=0</td>
+</tr>
+<tr>
+<td>PHB</td>
+<td>Push Data Bank</td>
+<td>48</td>
+<td>1</td>
+<td>3</td>
+<td></td>
+</tr>
+<tr>
+<td>PHD</td>
+<td>Push Direct Page Register</td>
+<td>0B</td>
+<td>1</td>
+<td>4</td>
+<td></td>
+</tr>
+<tr>
+<td>PHK</td>
+<td>Push Program Bank Register</td>
+<td>4B</td>
+<td>1</td>
+<td>3</td>
+<td></td>
+</tr>
+<tr>
+<td>PHP</td>
+<td>Push Processor Status Register</td>
+<td>08</td>
+<td>1</td>
+<td>3</td>
+<td></td>
+</tr>
+<tr>
+<td>PHX</td>
+<td>Push Index Register X</td>
+<td>DA</td>
+<td>1</td>
+<td>3</td>
+<td>+1 if x=0</td>
+</tr>
+<tr>
+<td>PHY</td>
+<td>Push Index Register Y</td>
+<td>5A</td>
+<td>1</td>
+<td>3</td>
+<td>+1 if x=0</td>
+</tr>
+</tbody>
+</table>
+<h1 id="pull-from-stack"><a class="toclink" href="#pull-from-stack">Pull from Stack</a></h1>
+<p><strong>Flags affected</strong>: <code>n-----z-</code>
+<br><strong>Flags affected (<code>PLP</code>)</strong>: <code>nvmxdizc</code></p>
+<p><strong>8 bit register:</strong>
+<br><tt>R  </tt> ← <code>[SP+1]</code>
+<br><tt>SP </tt> ← <code>SP + 1</code>
+<br>
+<br><tt>n  </tt> ← Most significant bit of register
+<br><tt>z  </tt> ← Set if the register is zero</p>
+<p><strong>16 bit register:</strong>
+<br><tt>R.l</tt> ← <code>[SP+1]</code>
+<br><tt>R.h</tt> ← <code>[SP+2]</code>
+<br><tt>SP </tt> ← <code>SP + 2</code>
+<br>
+<br><tt>n  </tt> ← Most significant bit of register
+<br><tt>z  </tt> ← Set if the register is zero</p>
+<p><strong>PLP (Native Mode):</strong>
+<br><tt>P  </tt> ← <code>[SP+1]</code>
+<br><tt>SP </tt> ← <code>SP + 1</code></p>
+<p><strong>PLP (Emulation Mode):</strong>
+<br><tt>P  </tt> ← <code>[SP+1]</code>
+<br><tt>SP </tt> ← <code>SP + 1</code>
+<br><tt>x  </tt> ← <code>1</code>
+<br><tt>m  </tt> ← <code>1</code></p>
+<p>Note about PLP: If bit 4 (x) of the status register is set, then the high
+byte of the index registers will be set to 0.</p>
+<table>
+<thead>
+<tr>
+<th>Syntax</th>
+<th>Name</th>
+<th>Opcode</th>
+<th>Bytes</th>
+<th>Cycles</th>
+<th>Extra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PLA</td>
+<td>Pull Accumulator</td>
+<td>68</td>
+<td>1</td>
+<td>4</td>
+<td>+1 if m=0</td>
+</tr>
+<tr>
+<td>PLB</td>
+<td>Pull Data Bank</td>
+<td>AB</td>
+<td>1</td>
+<td>4</td>
+<td></td>
+</tr>
+<tr>
+<td>PLD</td>
+<td>Pull Direct Page Register</td>
+<td>2B</td>
+<td>1</td>
+<td>5</td>
+<td></td>
+</tr>
+<tr>
+<td>PLP</td>
+<td>Pull Processor Status Register</td>
+<td>28</td>
+<td>1</td>
+<td>4</td>
+<td></td>
+</tr>
+<tr>
+<td>PLX</td>
+<td>Pull Index Register X</td>
+<td>FA</td>
+<td>1</td>
+<td>4</td>
+<td>+1 if x=0</td>
+</tr>
+<tr>
+<td>PLY</td>
+<td>Pull Index Register Y</td>
+<td>7A</td>
+<td>1</td>
+<td>4</td>
+<td>+1 if x=0</td>
+</tr>
+</tbody>
+</table>
+<h1 id="rep-reset-status-bits"><a class="toclink" href="#rep-reset-status-bits">REP - Reset Status Bits</a></h1>
+<p><strong>Flags affected</strong>: <code>nvmxdizc</code></p>
+<p><strong>Native Mode:</strong>
+<br><code>P</code> ← <code>P &amp; (~M)</code></p>
+<p><strong>Emulation Mode:</strong>
+<br><code>P</code> ← <code>P &amp; (~M)</code>
+<br><code>x</code> ← <code>1</code>
+<br><code>m</code> ← <code>1</code></p>
+<table>
+<thead>
+<tr>
+<th>Syntax</th>
+<th>Addressing Mode</th>
+<th>Opcode</th>
+<th>Bytes</th>
+<th>Cycles</th>
+<th>Extra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>REP #const</td>
+<td>Immediate</td>
+<td>C2</td>
+<td>2</td>
+<td>3</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h1 id="rol-rotate-left"><a class="toclink" href="#rol-rotate-left">ROL - Rotate Left</a></h1>
+<p><strong>Flags affected</strong>: <code>n-----zc</code></p>
+<p><code>M</code> ← <code>M + M + c</code>
+<br>
+<br><code>n</code> ← Most significant bit of result
+<br><code>z</code> ← Set if the result is zero
+<br><code>c</code> ← Most significant bit of original Memory</p>
+<table>
+<thead>
+<tr>
+<th>Syntax</th>
+<th>Addressing Mode</th>
+<th>Opcode</th>
+<th>Bytes</th>
+<th>Cycles</th>
+<th>Extra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ROL</td>
+<td>Accumulator</td>
+<td>2A</td>
+<td>1</td>
+<td>2</td>
+<td></td>
+</tr>
+<tr>
+<td>ROL addr</td>
+<td>Absolute</td>
+<td>2E</td>
+<td>3</td>
+<td>6</td>
+<td>+1 if m=0</td>
+</tr>
+<tr>
+<td>ROL dp</td>
+<td>Direct Page</td>
+<td>26</td>
+<td>2</td>
+<td>5</td>
+<td>+1 if m=0, +1 if DP.l ≠ 0</td>
+</tr>
+<tr>
+<td>ROL addr, X</td>
+<td>Absolute Indexed, X</td>
+<td>3E</td>
+<td>3</td>
+<td>7</td>
+<td>+1 if m=0, +1 if index crosses page boundary</td>
+</tr>
+<tr>
+<td>ROL dp, X</td>
+<td>Direct Page Indexed, X</td>
+<td>36</td>
+<td>2</td>
+<td>6</td>
+<td>+1 if m=0, +1 if DP.l ≠ 0</td>
+</tr>
+</tbody>
+</table>
+<h1 id="ror-rotate-right"><a class="toclink" href="#ror-rotate-right">ROR - Rotate Right</a></h1>
+<p><strong>Flags affected</strong>: <code>n-----zc</code></p>
+<p><code>M</code> ← <code>(c &lt;&lt; (m ? 7 : 15)) | (M &gt;&gt; 1)</code>
+<br>
+<br><code>n</code> ← Most significant bit of result
+<br><code>z</code> ← Set if the result is zero
+<br><code>c</code> ← Bit 0 of original memory</p>
+<table>
+<thead>
+<tr>
+<th>Syntax</th>
+<th>Addressing Mode</th>
+<th>Opcode</th>
+<th>Bytes</th>
+<th>Cycles</th>
+<th>Extra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ROR</td>
+<td>Accumulator</td>
+<td>6A</td>
+<td>1</td>
+<td>2</td>
+<td></td>
+</tr>
+<tr>
+<td>ROR addr</td>
+<td>Absolute</td>
+<td>6E</td>
+<td>3</td>
+<td>6</td>
+<td>+1 if m=0</td>
+</tr>
+<tr>
+<td>ROR dp</td>
+<td>Direct Page</td>
+<td>66</td>
+<td>2</td>
+<td>5</td>
+<td>+1 if m=0, +1 if DP.l ≠ 0</td>
+</tr>
+<tr>
+<td>ROR addr, X</td>
+<td>Absolute Indexed, X</td>
+<td>7E</td>
+<td>3</td>
+<td>7</td>
+<td>+1 if m=0, +1 if index crosses page boundary</td>
+</tr>
+<tr>
+<td>ROR dp, X</td>
+<td>Direct Page Indexed, X</td>
+<td>76</td>
+<td>2</td>
+<td>6</td>
+<td>+1 if m=0, +1 if DP.l ≠ 0</td>
+</tr>
+</tbody>
+</table>
+<h1 id="rti-return-from-interrupt"><a class="toclink" href="#rti-return-from-interrupt">RTI - Return From Interrupt</a></h1>
+<p><strong>Flags affected</strong>: <code>nvmxdizc</code></p>
+<p><strong>Native Mode:</strong>
+<br><tt>P   </tt> ← <code>[SP+1]</code>
+<br><tt>PC.l</tt> ← <code>[SP+2]</code>
+<br><tt>PC.h</tt> ← <code>[SP+3]</code>
+<br><tt>DB  </tt> ← <code>[SP+4]</code>
+<br><tt>SP  </tt> ← <code>SP + 4</code></p>
+<p><strong>Emulation Mode:</strong>
+<br><tt>P   </tt> ← <code>[SP+1]</code>
+<br><tt>x   </tt> ← <code>1</code>
+<br><tt>m   </tt> ← <code>1</code>
+<br><tt>PC.l</tt> ← <code>[SP+2]</code>
+<br><tt>PC.h</tt> ← <code>[SP+3]</code>
+<br><tt>SP  </tt> ← <code>SP + 3</code></p>
+<p>Note: If bit 4 (x) of the status register is set, then the high byte of
+the index registers will be set to 0.</p>
+<table>
+<thead>
+<tr>
+<th>Syntax</th>
+<th>Addressing Mode</th>
+<th>Opcode</th>
+<th>Bytes</th>
+<th>Cycles</th>
+<th>Extra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RTI</td>
+<td>Stack (return interrupt)</td>
+<td>40</td>
+<td>1</td>
+<td>6</td>
+<td>+1 if e=0</td>
+</tr>
+</tbody>
+</table>
+<h1 id="rts-rtl-return-from-subroutine"><a class="toclink" href="#rts-rtl-return-from-subroutine">RTS, RTL - Return From Subroutine</a></h1>
+<p><strong>Flags affected</strong>: <code>--------</code></p>
+<p><strong>RTS:</strong>
+<br><tt>PC.l</tt> ← <code>[SP+1]</code>
+<br><tt>PC.h</tt> ← <code>[SP+2]</code>
+<br><tt>SP  </tt> ← <code>SP + 2</code>
+<br><tt>PC  </tt> ← <code>PC + 1</code></p>
+<p><strong>RTL:</strong>
+<br><tt>PC.l</tt> ← <code>[SP+1]</code>
+<br><tt>PC.h</tt> ← <code>[SP+2]</code>
+<br><tt>DB  </tt> ← <code>[SP+3]</code>
+<br><tt>SP  </tt> ← <code>SP + 3</code>
+<br><tt>PC  </tt> ← <code>PC + 1</code></p>
+<table>
+<thead>
+<tr>
+<th>Syntax</th>
+<th>Addressing Mode</th>
+<th>Opcode</th>
+<th>Bytes</th>
+<th>Cycles</th>
+<th>Extra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RTS</td>
+<td>Stack (return)</td>
+<td>6B</td>
+<td>1</td>
+<td>6</td>
+<td></td>
+</tr>
+<tr>
+<td>RTL</td>
+<td>Stack (return long)</td>
+<td>60</td>
+<td>1</td>
+<td>6</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h1 id="sbc-subtract-with-borrow-from-accumulator"><a class="toclink" href="#sbc-subtract-with-borrow-from-accumulator">SBC - Subtract with Borrow from Accumulator</a></h1>
+<p><strong>Flags affected</strong>: <code>nv----zc</code></p>
+<p><code>A</code> ← <code>A + (~M) + c</code>
+<br>
+<br><code>n</code> ← Most significant bit of result
+<br><code>v</code> ← Signed overflow of result
+<br><code>z</code> ← Set if the Accumulator is zero
+<br><code>c</code> ← Carry from ALU (bit 8/16 of result) (set if borrow not required)</p>
+<table>
+<thead>
+<tr>
+<th>Syntax</th>
+<th>Addressing Mode</th>
+<th>Opcode</th>
+<th>Bytes</th>
+<th>Cycles</th>
+<th>Extra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SBC #const</td>
+<td>Immediate</td>
+<td>E9</td>
+<td>2 / 3</td>
+<td>2</td>
+<td>+1 if m=0</td>
+</tr>
+<tr>
+<td>SBC addr</td>
+<td>Absolute</td>
+<td>ED</td>
+<td>3</td>
+<td>4</td>
+<td>+1 if m=0</td>
+</tr>
+<tr>
+<td>SBC long</td>
+<td>Absolute Long</td>
+<td>EF</td>
+<td>4</td>
+<td>5</td>
+<td>+1 if m=0</td>
+</tr>
+<tr>
+<td>SBC dp</td>
+<td>Direct Page</td>
+<td>E5</td>
+<td>2</td>
+<td>3</td>
+<td>+1 if m=0, +1 if DP.l ≠ 0</td>
+</tr>
+<tr>
+<td>SBC (dp)</td>
+<td>Direct Page Indirect</td>
+<td>F2</td>
+<td>2</td>
+<td>5</td>
+<td>+1 if m=0, +1 if DP.l ≠ 0</td>
+</tr>
+<tr>
+<td>SBC [dp]</td>
+<td>Direct Page Indirect Long</td>
+<td>E7</td>
+<td>2</td>
+<td>6</td>
+<td>+1 if m=0, +1 if DP.l ≠ 0</td>
+</tr>
+<tr>
+<td>SBC addr, X</td>
+<td>Absolute Indexed, X</td>
+<td>FD</td>
+<td>3</td>
+<td>4</td>
+<td>+1 if m=0, +1 if index crosses page boundary</td>
+</tr>
+<tr>
+<td>SBC long, X</td>
+<td>Absolute Long Indexed, X</td>
+<td>FF</td>
+<td>4</td>
+<td>5</td>
+<td>+1 if m=0</td>
+</tr>
+<tr>
+<td>SBC addr, Y</td>
+<td>Absolute Indexed, Y</td>
+<td>F9</td>
+<td>3</td>
+<td>4</td>
+<td>+1 if m=0, +1 if index crosses page boundary</td>
+</tr>
+<tr>
+<td>SBC dp, X</td>
+<td>Direct Page Indexed, X</td>
+<td>F5</td>
+<td>2</td>
+<td>4</td>
+<td>+1 if m=0, +1 if DP.l ≠ 0</td>
+</tr>
+<tr>
+<td>SBC (dp, X)</td>
+<td>Direct Page Indirect, X</td>
+<td>E1</td>
+<td>2</td>
+<td>6</td>
+<td>+1 if m=0, +1 if DP.l ≠ 0</td>
+</tr>
+<tr>
+<td>SBC (dp), Y</td>
+<td>DP Indirect Indexed, Y</td>
+<td>F1</td>
+<td>2</td>
+<td>5</td>
+<td>+1 if m=0, +1 if DP.l ≠ 0, +1 if index crosses page boundary</td>
+</tr>
+<tr>
+<td>SBC [dp], Y</td>
+<td>DP Indirect Long Indexed, Y</td>
+<td>F7</td>
+<td>2</td>
+<td>6</td>
+<td>+1 if m=0, +1 if DP.l ≠ 0</td>
+</tr>
+<tr>
+<td>SBC sr, S</td>
+<td>Stack Relative</td>
+<td>E3</td>
+<td>2</td>
+<td>4</td>
+<td>+1 if m=0</td>
+</tr>
+<tr>
+<td>SBC (sr, S), Y</td>
+<td>SR Indirect Indexed, Y</td>
+<td>F3</td>
+<td>2</td>
+<td>7</td>
+<td>+1 if m=0</td>
+</tr>
+</tbody>
+</table>
+<h1 id="set-status-flags"><a class="toclink" href="#set-status-flags">Set Status Flags</a></h1>
+<p><strong>Flags affected (<code>SEC</code>)</strong>: <code>-------c</code>
+<br><strong>Flags affected (<code>SED</code>)</strong>: <code>----d---</code>
+<br><strong>Flags affected (<code>SEI</code>)</strong>: <code>-----i--</code></p>
+<p><strong>SEC:</strong>
+<br><code>c</code> ← <code>1</code></p>
+<p><strong>SED:</strong>
+<br><code>d</code> ← <code>1</code></p>
+<p><strong>SEI:</strong>
+<br><code>i</code> ← <code>1</code></p>
+<table>
+<thead>
+<tr>
+<th>Syntax</th>
+<th>Name</th>
+<th>Opcode</th>
+<th>Bytes</th>
+<th>Cycles</th>
+<th>Extra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SEC</td>
+<td>Set Carry Flag</td>
+<td>38</td>
+<td>1</td>
+<td>2</td>
+<td></td>
+</tr>
+<tr>
+<td>SEI</td>
+<td>Set Interrupt Disable Flag</td>
+<td>78</td>
+<td>1</td>
+<td>2</td>
+<td></td>
+</tr>
+<tr>
+<td>SED</td>
+<td>Set Decimal Flag</td>
+<td>F8</td>
+<td>1</td>
+<td>2</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h1 id="sep-set-status-bits"><a class="toclink" href="#sep-set-status-bits">SEP - Set Status Bits</a></h1>
+<p><strong>Flags affected</strong>: <code>nvmxdizc</code></p>
+<p><code>P</code> ← <code>P | M</code></p>
+<p>NOTE: If bit 4 (x) of the status register is set, then the high byte of
+the index registers will be set to 0.</p>
+<table>
+<thead>
+<tr>
+<th>Syntax</th>
+<th>Addressing Mode</th>
+<th>Opcode</th>
+<th>Bytes</th>
+<th>Cycles</th>
+<th>Extra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SEP #const</td>
+<td>Immediate</td>
+<td>E2</td>
+<td>2</td>
+<td>3</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h1 id="sta-store-accumulator-to-memory"><a class="toclink" href="#sta-store-accumulator-to-memory">STA - Store Accumulator to Memory</a></h1>
+<p><strong>Flags affected</strong>: <code>--------</code></p>
+<p><code>M</code> ← <code>A</code></p>
+<table>
+<thead>
+<tr>
+<th>Syntax</th>
+<th>Addressing Mode</th>
+<th>Opcode</th>
+<th>Bytes</th>
+<th>Cycles</th>
+<th>Extra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>STA addr</td>
+<td>Absolute</td>
+<td>8D</td>
+<td>3</td>
+<td>4</td>
+<td>+1 if m=0</td>
+</tr>
+<tr>
+<td>STA long</td>
+<td>Absolute Long</td>
+<td>8F</td>
+<td>4</td>
+<td>5</td>
+<td>+1 if m=0</td>
+</tr>
+<tr>
+<td>STA dp</td>
+<td>Direct Page</td>
+<td>85</td>
+<td>2</td>
+<td>3</td>
+<td>+1 if m=0, +1 if DP.l ≠ 0</td>
+</tr>
+<tr>
+<td>STA (dp)</td>
+<td>Direct Page Indirect</td>
+<td>92</td>
+<td>2</td>
+<td>5</td>
+<td>+1 if m=0, +1 if DP.l ≠ 0</td>
+</tr>
+<tr>
+<td>STA [dp]</td>
+<td>Direct Page Indirect Long</td>
+<td>87</td>
+<td>2</td>
+<td>6</td>
+<td>+1 if m=0, +1 if DP.l ≠ 0</td>
+</tr>
+<tr>
+<td>STA addr, X</td>
+<td>Absolute Indexed, X</td>
+<td>9D</td>
+<td>3</td>
+<td>5</td>
+<td>+1 if m=0</td>
+</tr>
+<tr>
+<td>STA long, X</td>
+<td>Absolute Long Indexed, X</td>
+<td>9F</td>
+<td>4</td>
+<td>5</td>
+<td>+1 if m=0</td>
+</tr>
+<tr>
+<td>STA addr, Y</td>
+<td>Absolute Indexed, Y</td>
+<td>99</td>
+<td>3</td>
+<td>5</td>
+<td>+1 if m=0</td>
+</tr>
+<tr>
+<td>STA dp, X</td>
+<td>Direct Page Indexed, X</td>
+<td>95</td>
+<td>2</td>
+<td>4</td>
+<td>+1 if m=0, +1 if DP.l ≠ 0</td>
+</tr>
+<tr>
+<td>STA (dp, X)</td>
+<td>Direct Page Indirect, X</td>
+<td>81</td>
+<td>2</td>
+<td>6</td>
+<td>+1 if m=0, +1 if DP.l ≠ 0</td>
+</tr>
+<tr>
+<td>STA (dp), Y</td>
+<td>DP Indirect Indexed, Y</td>
+<td>91</td>
+<td>2</td>
+<td>6</td>
+<td>+1 if m=0, +1 if DP.l ≠ 0</td>
+</tr>
+<tr>
+<td>STA [dp], Y</td>
+<td>DP Indirect Long Indexed, Y</td>
+<td>97</td>
+<td>2</td>
+<td>6</td>
+<td>+1 if m=0, +1 if DP.l ≠ 0</td>
+</tr>
+<tr>
+<td>STA sr, S</td>
+<td>Stack Relative</td>
+<td>83</td>
+<td>2</td>
+<td>4</td>
+<td>+1 if m=0</td>
+</tr>
+<tr>
+<td>STA (sr, S), Y</td>
+<td>SR Indirect Indexed, Y</td>
+<td>93</td>
+<td>2</td>
+<td>7</td>
+<td>+1 if m=0</td>
+</tr>
+</tbody>
+</table>
+<h1 id="stp-stop-the-processor"><a class="toclink" href="#stp-stop-the-processor">STP - Stop the Processor</a></h1>
+<p><strong>Flags affected</strong>: <code>--------</code></p>
+<p><code>CPU clock enabled</code> ← <code>0</code></p>
+<p>Note, this instruction can cause some builds of snes9x to freeze.</p>
+<table>
+<thead>
+<tr>
+<th>Syntax</th>
+<th>Addressing Mode</th>
+<th>Opcode</th>
+<th>Bytes</th>
+<th>Cycles</th>
+<th>Extra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>STP</td>
+<td>Implied</td>
+<td>DB</td>
+<td>1</td>
+<td>3</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h1 id="stx-store-index-register-x-to-memory"><a class="toclink" href="#stx-store-index-register-x-to-memory">STX - Store Index Register X to Memory</a></h1>
+<p><strong>Flags affected</strong>: <code>--------</code></p>
+<p><code>M</code> ← <code>X</code></p>
+<table>
+<thead>
+<tr>
+<th>Syntax</th>
+<th>Addressing Mode</th>
+<th>Opcode</th>
+<th>Bytes</th>
+<th>Cycles</th>
+<th>Extra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>STX addr</td>
+<td>Absolute</td>
+<td>8E</td>
+<td>3</td>
+<td>4</td>
+<td>+1 if x=0</td>
+</tr>
+<tr>
+<td>STX dp</td>
+<td>Direct Page</td>
+<td>86</td>
+<td>2</td>
+<td>3</td>
+<td>+1 if x=0, +1 if DP.l ≠ 0</td>
+</tr>
+<tr>
+<td>STX dp, Y</td>
+<td>Direct Page Indexed, Y</td>
+<td>96</td>
+<td>2</td>
+<td>4</td>
+<td>+1 if x=0, +1 if DP.l ≠ 0</td>
+</tr>
+</tbody>
+</table>
+<h1 id="sty-store-index-register-y-to-memory"><a class="toclink" href="#sty-store-index-register-y-to-memory">STY - Store Index Register Y to Memory</a></h1>
+<p><strong>Flags affected</strong>: <code>--------</code></p>
+<p><code>M</code> ← <code>Y</code></p>
+<table>
+<thead>
+<tr>
+<th>Syntax</th>
+<th>Addressing Mode</th>
+<th>Opcode</th>
+<th>Bytes</th>
+<th>Cycles</th>
+<th>Extra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>STY addr</td>
+<td>Absolute</td>
+<td>8C</td>
+<td>3</td>
+<td>4</td>
+<td>+1 if x=0</td>
+</tr>
+<tr>
+<td>STY dp</td>
+<td>Direct Page</td>
+<td>84</td>
+<td>2</td>
+<td>3</td>
+<td>+1 if x=0, +1 if DP.l ≠ 0</td>
+</tr>
+<tr>
+<td>STY dp, X</td>
+<td>Direct Page Indexed, X</td>
+<td>94</td>
+<td>2</td>
+<td>4</td>
+<td>+1 if x=0, +1 if DP.l ≠ 0</td>
+</tr>
+</tbody>
+</table>
+<h1 id="stz-store-zero-to-memory"><a class="toclink" href="#stz-store-zero-to-memory">STZ - Store Zero to Memory</a></h1>
+<p><strong>Flags affected</strong>: <code>--------</code></p>
+<p><code>M</code> ← <code>0</code></p>
+<table>
+<thead>
+<tr>
+<th>Syntax</th>
+<th>Addressing Mode</th>
+<th>Opcode</th>
+<th>Bytes</th>
+<th>Cycles</th>
+<th>Extra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>STZ addr</td>
+<td>Absolute</td>
+<td>9C</td>
+<td>3</td>
+<td>4</td>
+<td>+1 if m=0</td>
+</tr>
+<tr>
+<td>STZ dp</td>
+<td>Direct Page</td>
+<td>64</td>
+<td>2</td>
+<td>3</td>
+<td>+1 if m=0, +1 if DP.l ≠ 0</td>
+</tr>
+<tr>
+<td>STZ addr, X</td>
+<td>Absolute Indexed, X</td>
+<td>9E</td>
+<td>3</td>
+<td>5</td>
+<td>+1 if m=0</td>
+</tr>
+<tr>
+<td>STZ dp, X</td>
+<td>Direct Page Indexed, X</td>
+<td>74</td>
+<td>2</td>
+<td>4</td>
+<td>+1 if m=0, +1 if DP.l ≠ 0</td>
+</tr>
+</tbody>
+</table>
+<h1 id="transfer-registers"><a class="toclink" href="#transfer-registers">Transfer Registers</a></h1>
+<p><strong>Flags affected</strong>: <code>n-----z-</code>
+<br><strong>Flags affected (TCS, TXS)</strong>: <code>--------</code></p>
+<p><code>Rd</code> ← <code>Rs</code>
+<br>
+<br><code>n</code> ← Most significant bit of register
+<br><code>z</code> ← Set if the register is zero</p>
+<p>The number of bits transferred depends on the state of the m, x and e
+flags:</p>
+<ul>
+<li>Accumulator to Index:<ul>
+<li>8 bit Index (x=1): 8 bits transferred, high byte of Accumulator is
+  unchanged</li>
+<li>16 bit Index (x=0): 16 bits transferred, no matter the state of m</li>
+</ul>
+</li>
+<li>Accumulator to/from Direct Page: 16 bits transferred</li>
+<li>Index to Accumulator:<ul>
+<li>8 bit A (m=1): 8 bits transferred</li>
+<li>16 bit A (m=0): 16 bits transferred (when x=0, the high byte is 0)</li>
+</ul>
+</li>
+<li>Stack Pointer to X:<ul>
+<li>8 bit Index (x=1): 8 bits transferred, high byte of X = 0</li>
+<li>16 bit Index (x=0): 16 bits transferred</li>
+</ul>
+</li>
+<li>Stack Pointer to Accumulator: 16 bits transferred</li>
+<li>A/X to Stack Pointer:<ul>
+<li>Native mode: 16 bits transferred</li>
+<li>Emulation mode: 8 bits transferred, high byte of SP = 1</li>
+</ul>
+</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Syntax</th>
+<th>Name</th>
+<th>Opcode</th>
+<th>Bytes</th>
+<th>Cycles</th>
+<th>Extra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>TAX</td>
+<td>Transfer A to X</td>
+<td>AA</td>
+<td>1</td>
+<td>2</td>
+<td></td>
+</tr>
+<tr>
+<td>TAY</td>
+<td>Transfer A to Y</td>
+<td>A8</td>
+<td>1</td>
+<td>2</td>
+<td></td>
+</tr>
+<tr>
+<td>TCD</td>
+<td>Transfer 16 bit A to DP</td>
+<td>5B</td>
+<td>1</td>
+<td>2</td>
+<td></td>
+</tr>
+<tr>
+<td>TCS</td>
+<td>Transfer 16 bit A to SP</td>
+<td>1B</td>
+<td>1</td>
+<td>2</td>
+<td></td>
+</tr>
+<tr>
+<td>TDC</td>
+<td>Transfer DP to 16 bit A</td>
+<td>7B</td>
+<td>1</td>
+<td>2</td>
+<td></td>
+</tr>
+<tr>
+<td>TSC</td>
+<td>Transfer SP to 16 bit A</td>
+<td>3B</td>
+<td>1</td>
+<td>2</td>
+<td></td>
+</tr>
+<tr>
+<td>TSX</td>
+<td>Transfer SP to X</td>
+<td>BA</td>
+<td>1</td>
+<td>2</td>
+<td></td>
+</tr>
+<tr>
+<td>TXA</td>
+<td>Transfer X to A</td>
+<td>8A</td>
+<td>1</td>
+<td>2</td>
+<td></td>
+</tr>
+<tr>
+<td>TXS</td>
+<td>Transfer X to SP</td>
+<td>9A</td>
+<td>1</td>
+<td>2</td>
+<td></td>
+</tr>
+<tr>
+<td>TXY</td>
+<td>Transfer X to Y</td>
+<td>9B</td>
+<td>1</td>
+<td>2</td>
+<td></td>
+</tr>
+<tr>
+<td>TYA</td>
+<td>Transfer Y to A</td>
+<td>98</td>
+<td>1</td>
+<td>2</td>
+<td></td>
+</tr>
+<tr>
+<td>TYX</td>
+<td>Transfer Y to X</td>
+<td>BB</td>
+<td>1</td>
+<td>2</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h1 id="trb-test-and-reset-memory-bits-against-accumulator"><a class="toclink" href="#trb-test-and-reset-memory-bits-against-accumulator">TRB - Test and Reset Memory Bits Against Accumulator</a></h1>
+<p><strong>Flags affected</strong>: <code>------z-</code></p>
+<p><code>M</code> ← <code>M &amp; (~A)</code>
+<br>
+<br><code>z</code> ← Set if logical AND of memory and Accumulator is zero</p>
+<table>
+<thead>
+<tr>
+<th>Syntax</th>
+<th>Addressing Mode</th>
+<th>Opcode</th>
+<th>Bytes</th>
+<th>Cycles</th>
+<th>Extra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>TRB addr</td>
+<td>Absolute</td>
+<td>1C</td>
+<td>3</td>
+<td>6</td>
+<td>+2 if m=0</td>
+</tr>
+<tr>
+<td>TRB dp</td>
+<td>Direct Page</td>
+<td>14</td>
+<td>2</td>
+<td>5</td>
+<td>+2 if m=0, +1 if DP.l ≠ 0</td>
+</tr>
+</tbody>
+</table>
+<h1 id="tsb-test-and-set-memory-bits-against-accumulator"><a class="toclink" href="#tsb-test-and-set-memory-bits-against-accumulator">TSB - Test and Set Memory Bits Against Accumulator</a></h1>
+<p><strong>Flags affected</strong>: <code>------z-</code></p>
+<p><code>M</code> ← <code>M | A</code>
+<br>
+<br><code>z</code> ← Set if logical AND of memory and Accumulator is zero</p>
+<table>
+<thead>
+<tr>
+<th>Syntax</th>
+<th>Addressing Mode</th>
+<th>Opcode</th>
+<th>Bytes</th>
+<th>Cycles</th>
+<th>Extra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>TSB addr</td>
+<td>Absolute</td>
+<td>0C</td>
+<td>3</td>
+<td>6</td>
+<td>+2 if m=0</td>
+</tr>
+<tr>
+<td>TSB dp</td>
+<td>Direct Page</td>
+<td>04</td>
+<td>2</td>
+<td>5</td>
+<td>+2 if m=0, +1 if DP.l ≠ 0</td>
+</tr>
+</tbody>
+</table>
+<h1 id="wai-wait-for-interrupt"><a class="toclink" href="#wai-wait-for-interrupt">WAI - Wait for Interrupt</a></h1>
+<p><strong>Flags affected</strong>: <code>--------</code></p>
+<p><code>RDY pin</code> ← <code>0</code>
+<br><code>wait for NMI, IRQ or ABORT signal</code>
+<br><code>execute interrupt handler if interrupt is not masked</code>
+<br><code>RDY pin</code> ← <code>1</code></p>
+<p>When the <code>RDY</code> (Ready) pin is pulled low the processor enters a low
+power mode.</p>
+<p>This instruction is useful when you want as little delay as possible
+between the interrupt signal and the processor executing the interrupt
+handler.</p>
+<table>
+<thead>
+<tr>
+<th>Syntax</th>
+<th>Addressing Mode</th>
+<th>Opcode</th>
+<th>Bytes</th>
+<th>Cycles</th>
+<th>Extra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>WAI</td>
+<td>Implied</td>
+<td>CB</td>
+<td>1</td>
+<td>3</td>
+<td>additional cycles needed by interrupt handler to restart the processor</td>
+</tr>
+</tbody>
+</table>
+<h1 id="wdm-reserved-for-future-expansion"><a class="toclink" href="#wdm-reserved-for-future-expansion">WDM - Reserved for Future Expansion</a></h1>
+<p><strong>Flags affected</strong>: <code>--------</code></p>
+<p>—</p>
+<p>On the SNES it does nothing. This instruction should not be used in your
+program.</p>
+<p>Note, the bsnes-plus debugger can set a breakpoint on this instruction.</p>
+<table>
+<thead>
+<tr>
+<th>Syntax</th>
+<th>Addressing Mode</th>
+<th>Opcode</th>
+<th>Bytes</th>
+<th>Cycles</th>
+<th>Extra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>WDM</td>
+<td>Implied</td>
+<td>42</td>
+<td>2</td>
+<td>2</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h1 id="xba-exchange-the-b-and-a-accumulators"><a class="toclink" href="#xba-exchange-the-b-and-a-accumulators">XBA - Exchange the B and A Accumulators</a></h1>
+<p><strong>Flags affected</strong>: <code>n-----z-</code></p>
+<p><tt>T </tt> ← <code>Ah</code>
+<br><code>Ah</code> ← <code>Al</code>
+<br><code>Al</code> ← <code>T</code>
+<br>
+<br><tt>n </tt> ← Value of bit 7 of the new Accumulator (even in 16 bit mode)
+<br><tt>z </tt> ← Set if bits 0-7 of the new Accumulator are 0 (even in 16 bit mode)</p>
+<table>
+<thead>
+<tr>
+<th>Syntax</th>
+<th>Addressing Mode</th>
+<th>Opcode</th>
+<th>Bytes</th>
+<th>Cycles</th>
+<th>Extra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>XBA</td>
+<td>Implied</td>
+<td>EB</td>
+<td>1</td>
+<td>3</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h1 id="xce-exchange-carry-and-emulation-bits"><a class="toclink" href="#xce-exchange-carry-and-emulation-bits">XCE - Exchange Carry and Emulation Bits</a></h1>
+<p><strong>Flags affected</strong>: <code>--mx---c : e</code></p>
+<p><code>c</code> ← Previous e flag
+<br><code>e</code> ← Previous c flag
+<br><code>m</code> set if enabling native mode
+<br><code>x</code> set if enabling native mode</p>
+<p>Note: If bit 4 (x) of the status register is set, then the high byte of
+the index registers will be set to 0.</p>
+<table>
+<thead>
+<tr>
+<th>Syntax</th>
+<th>Addressing Mode</th>
+<th>Opcode</th>
+<th>Bytes</th>
+<th>Cycles</th>
+<th>Extra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>XCE</td>
+<td>Implied</td>
+<td>FB</td>
+<td>1</td>
+<td>2</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h1 id="sources"><a class="toclink" href="#sources">Sources</a></h1>
+<ul>
+<li>65816info.txt (author unknown)</li>
+<li>Programming the 65816, by David Eyes and Ron Lichty</li>
+<li><a href="http://www.unusedino.de/ec64/technical/aay/c64/ebmain.htm">All_About_Your_64 - 65816 Reference</a>,
+   by Ninja/The Dreams in 1995-2005</li>
+<li><a href="https://gitlab.com/higan/higan/tree/master/higan/processor/wdc65816">higan source code</a>, by <a href="https://byuu.org/">byuu</a></li>
+</ul></div>
+  </article>
+</main>
+<footer role="contentinfo">
+  <div>© 2016-2020 The UnDisbeliever</div>
+  <div>
+    <a href="/">Home</a>
+  </div>
+  <div><a class="back-to-top" href="#top">Back to top</a></div>
+</footer>
+</div>
+</body>
+</html>

@@ -305,7 +305,7 @@ namespace Brewmaster.Emulation
 
 			Emulator.UpdateSettings(_emulatorSettings);
 			currentMapping = mappings[projectType];
-			Emulator.UpdateControllerMappings(currentMapping.Where(m => m.Key >= 0x10000).ToDictionary(m => m.Value, m => m.Key));
+			Emulator.UpdateControllerMappings(currentMapping);
 			_currentProjectType = projectType;
 		}
 
@@ -349,10 +349,7 @@ namespace Brewmaster.Emulation
 		{
 			if (Emulator == null) return false;
 
-			var wParam = (int)((Int64)m.WParam & 0xFF);
-			if (!currentMapping.ContainsKey(wParam)) return false;
-			var scanCode = currentMapping[wParam];
-
+			var scanCode = (Int32)(((Int64)m.LParam & 0x1FF0000) >> 16);
 			if (m.Msg == WM_KEYUP || m.Msg == WM_SYSKEYUP)
 			{
 				Emulator.SetKeyState(scanCode, false);
@@ -365,21 +362,21 @@ namespace Brewmaster.Emulation
 			return false;
 		}
 
-		private Dictionary<ProjectType, Dictionary<int, int>> mappings = new Dictionary<ProjectType, Dictionary<int, int>>();
-		private Dictionary<int, int> currentMapping = new Dictionary<int, int>();
+		private Dictionary<ProjectType, Dictionary<ControllerButtons, int>> mappings = new Dictionary<ProjectType, Dictionary<ControllerButtons, int>>();
+		private Dictionary<ControllerButtons, int> currentMapping = new Dictionary<ControllerButtons, int>();
 
 		public void SetButtonMappings(List<KeyboardMapping> nes, List<KeyboardMapping> snes)
 		{
-			var nesMappings = new Dictionary<int, int>();
-			var snesMappings = new Dictionary<int, int>();
-			foreach (var mapping in nes) nesMappings[mapping.MappedTo] = mapping.TargetKey;
-			foreach (var mapping in snes) snesMappings[mapping.MappedTo] = mapping.TargetKey;
+			var nesMappings = new Dictionary<ControllerButtons, int>();
+			var snesMappings = new Dictionary<ControllerButtons, int>();
+			foreach (var mapping in nes) nesMappings[(ControllerButtons)mapping.TargetKey] = mapping.MappedTo;
+			foreach (var mapping in snes) snesMappings[(ControllerButtons)mapping.TargetKey] = mapping.MappedTo;
 
 			mappings[ProjectType.Nes] = nesMappings;
 			mappings[ProjectType.Snes] = snesMappings;
 
 			currentMapping = mappings[_currentProjectType];
-			if (Emulator != null) Emulator.UpdateControllerMappings(currentMapping.Where(m => m.Key >= 0x10000).ToDictionary(m => m.Value, m => m.Key));
+			if (Emulator != null) Emulator.UpdateControllerMappings(currentMapping);
 		}
 
 		public void UnloadEmulator()

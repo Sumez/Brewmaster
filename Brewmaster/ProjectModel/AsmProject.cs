@@ -292,7 +292,7 @@ namespace Brewmaster.ProjectModel
 		public void AddBreakpoint(Breakpoint breakpoint)
 		{
 			var existingBreakpoint = Breakpoints.FirstOrDefault(bp =>
-				(bp.StartAddress == breakpoint.StartAddress || (bp.Symbol != null && bp.Symbol == breakpoint.Symbol)) &&
+				((bp.StartAddress == breakpoint.StartAddress && bp.StartAddress >= 0) || (bp.Symbol != null && bp.Symbol == breakpoint.Symbol)) &&
 				bp.EndAddress == breakpoint.EndAddress &&
 				bp.CurrentLine == breakpoint.CurrentLine &&
 				bp.File == breakpoint.File &&

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -26,8 +27,10 @@ namespace Brewmaster.Emulation
 		[DllImport(DLLPath)] public static extern void HistoryViewerRelease();
 		[DllImport(DLLPath)] public static extern void HistoryViewerRun();
 		[DllImport(DLLPath)] public static extern void HistoryViewerStop();
+
 		[DllImport(DLLPath)] public static extern UInt32 HistoryViewerGetHistoryLength();
 		[DllImport(DLLPath)] [return: MarshalAs(UnmanagedType.I1)] public static extern bool HistoryViewerSaveMovie([MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(UTF8Marshaler))]string movieFile, UInt32 startPosition, UInt32 endPosition);
+		[DllImport(DLLPath)] [return: MarshalAs(UnmanagedType.I1)] public static extern bool HistoryViewerCreateSaveState([MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(UTF8Marshaler))]string outfileFile, UInt32 position);
 		[DllImport(DLLPath)] public static extern void HistoryViewerSetPosition(UInt32 seekPosition);
 		[DllImport(DLLPath)] public static extern void HistoryViewerResumeGameplay(UInt32 seekPosition);
 		[DllImport(DLLPath)] public static extern UInt32 HistoryViewerGetPosition();
@@ -56,6 +59,7 @@ namespace Brewmaster.Emulation
 		[DllImport(DLLPath)] public static extern void SetControllerType(int port, ControllerType type);
 		[DllImport(DLLPath)] public static extern void SetControllerKeys(int port, KeyMappingSet mapping);
 		[DllImport(DLLPath)] public static extern void SetZapperDetectionRadius(UInt32 detectionRadius);
+		[DllImport(DLLPath)] public static extern void SetControllerDeadzoneSize(UInt32 deadzoneSize);
 		[DllImport(DLLPath)] public static extern void SetExpansionDevice(ExpansionPortDevice device);
 		[DllImport(DLLPath)] public static extern void SetConsoleType(ConsoleType type);
 		[DllImport(DLLPath)] public static extern void SetMouseSensitivity(MouseDevice device, double sensitivity);
@@ -68,6 +72,7 @@ namespace Brewmaster.Emulation
 
 		[DllImport(DLLPath)] public static extern void UpdateInputDevices();
 
+		[DllImport(DLLPath)] [return: MarshalAs(UnmanagedType.I1)] public static extern bool IsKeyboardMode();
 		[DllImport(DLLPath)] public static extern ConsoleFeatures GetAvailableFeatures();
 
 		[DllImport(DLLPath, EntryPoint = "GetPressedKeys")] private static extern void GetPressedKeysWrapper(IntPtr keyBuffer);
@@ -85,6 +90,7 @@ namespace Brewmaster.Emulation
 
 		[DllImport(DLLPath, EntryPoint = "GetRomInfo")] private static extern UInt32 GetRomInfoWrapper(ref InteropRomInfo romInfo, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(UTF8Marshaler))]string filename = "");
 
+		[DllImport(DLLPath)] public static extern void ReloadRom();
 		[DllImport(DLLPath)] public static extern void PowerCycle();
 		[DllImport(DLLPath)] public static extern void Reset();
 		[DllImport(DLLPath)] public static extern void ResetLagCounter();
@@ -136,7 +142,25 @@ namespace Brewmaster.Emulation
 		[DllImport(DLLPath)] public static extern void LoadState(UInt32 stateIndex);
 		[DllImport(DLLPath)] public static extern void SaveStateFile([MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(UTF8Marshaler))]string filepath);
 		[DllImport(DLLPath)] public static extern void LoadStateFile([MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(UTF8Marshaler))]string filepath);
-		[DllImport(DLLPath)] public static extern Int64 GetStateInfo(UInt32 stateIndex);
+
+		[DllImport(DLLPath, EntryPoint = "GetSaveStatePreview")] private static extern Int32 GetSaveStatePreviewWrapper([MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(UTF8Marshaler))]string saveStatePath, [Out]byte[] imgData);
+		public static Image GetSaveStatePreview(string saveStatePath)
+		{
+			if (File.Exists(saveStatePath))
+			{
+				byte[] buffer = new byte[128000];
+				Int32 size = InteropEmu.GetSaveStatePreviewWrapper(saveStatePath, buffer);
+				if (size > 0)
+				{
+					Array.Resize(ref buffer, size);
+					using (MemoryStream stream = new MemoryStream(buffer))
+					{
+						return Image.FromStream(stream);
+					}
+				}
+			}
+			return null;
+		}
 
 		[DllImport(DLLPath)] [return: MarshalAs(UnmanagedType.I1)] public static extern bool IsNsf();
 		[DllImport(DLLPath)] public static extern void NsfSelectTrack(Byte trackNumber);
@@ -155,6 +179,7 @@ namespace Brewmaster.Emulation
 		[DllImport(DLLPath)] [return: MarshalAs(UnmanagedType.I1)] public static extern bool IsVsDualSystem();
 		[DllImport(DLLPath)] public static extern void VsInsertCoin(UInt32 port);
 
+		[DllImport(DLLPath)] public static extern UInt32 GetDipSwitchCount();
 		[DllImport(DLLPath)] public static extern void SetDipSwitches(UInt32 dipSwitches);
 
 		[DllImport(DLLPath)] public static extern void InputBarcode(UInt64 barcode, Int32 digitCount);
@@ -182,6 +207,7 @@ namespace Brewmaster.Emulation
 		[DllImport(DLLPath)] public static extern void SetSampleRate(UInt32 sampleRate);
 		[DllImport(DLLPath)] public static extern void SetAudioLatency(UInt32 msLatency);
 		[DllImport(DLLPath)] public static extern void SetAudioFilterSettings(AudioFilterSettings settings);
+		[DllImport(DLLPath)] public static extern void SetRunAheadFrames(UInt32 frameCount);
 
 		[DllImport(DLLPath)] public static extern NesModel GetNesModel();
 		[DllImport(DLLPath)] public static extern void SetNesModel(NesModel model);
@@ -192,7 +218,6 @@ namespace Brewmaster.Emulation
 		[DllImport(DLLPath)] public static extern void SetTurboRewindSpeed(UInt32 turboSpeed, UInt32 rewindSpeed);
 		[DllImport(DLLPath)] public static extern void SetRewindBufferSize(UInt32 seconds);
 		[DllImport(DLLPath)] [return: MarshalAs(UnmanagedType.I1)] public static extern bool IsRewinding();
-		[DllImport(DLLPath)] public static extern void SetOverclockRate(UInt32 overclockRate, [MarshalAs(UnmanagedType.I1)]bool adjustApu);
 		[DllImport(DLLPath)] public static extern void SetPpuNmiConfig(UInt32 extraScanlinesBeforeNmi, UInt32 extraScanlineAfterNmi);
 		[DllImport(DLLPath)] public static extern void SetOverscanDimensions(UInt32 left, UInt32 right, UInt32 top, UInt32 bottom);
 		[DllImport(DLLPath)] public static extern void SetVideoScale(double scale, ConsoleId consoleId = ConsoleId.Master);
@@ -201,7 +226,7 @@ namespace Brewmaster.Emulation
 		[DllImport(DLLPath)] public static extern void SetVideoAspectRatio(VideoAspectRatio aspectRatio, double customRatio);
 		[DllImport(DLLPath)] public static extern void SetVideoFilter(VideoFilterType filter);
 		[DllImport(DLLPath)] public static extern void SetVideoResizeFilter(VideoResizeFilter filter);
-		[DllImport(DLLPath)] public static extern void SetRgbPalette(byte[] palette);
+		[DllImport(DLLPath)] public static extern void SetRgbPalette(byte[] palette, UInt32 paletteSize);
 		[DllImport(DLLPath)] public static extern void SetPictureSettings(double brightness, double contrast, double saturation, double hue, double scanlineIntensity);
 		[DllImport(DLLPath)] public static extern void SetNtscFilterSettings(double artifacts, double bleed, double fringing, double gamma, double resolution, double sharpness, [MarshalAs(UnmanagedType.I1)]bool mergeFields, double yFilterLength, double iFilterLength, double qFilterLength, [MarshalAs(UnmanagedType.I1)]bool verticalBlend);
 		[DllImport(DLLPath)] public static extern void SetInputDisplaySettings(byte visiblePorts, InputDisplayPosition displayPosition, [MarshalAs(UnmanagedType.I1)]bool displayHorizontally);
@@ -240,11 +265,14 @@ namespace Brewmaster.Emulation
 		[DllImport(DLLPath)] public static extern Int32 DebugFindSubEntryPoint(UInt16 relativeAddr);
 		[DllImport(DLLPath)] public static extern Int32 DebugGetAbsoluteAddress(UInt32 relativeAddr);
 		[DllImport(DLLPath)] public static extern Int32 DebugGetAbsoluteChrAddress(UInt32 relativeAddr);
-		[DllImport(DLLPath)] public static extern Int32 DebugGetRelativeChrAddress(UInt32 absoluteAddr);
+		[DllImport(DLLPath)] public static extern Int32 DebugGetRelativePpuAddress(UInt32 absoluteAddr, PpuAddressType type);
 		[DllImport(DLLPath)] public static extern Int32 DebugGetMemorySize(DebugMemoryType type);
 		[DllImport(DLLPath)] public static extern Byte DebugGetMemoryValue(DebugMemoryType type, UInt32 address);
 		[DllImport(DLLPath)] public static extern void DebugSetMemoryValue(DebugMemoryType type, UInt32 address, byte value);
 		[DllImport(DLLPath)] public static extern void DebugSetInputOverride(Int32 port, Int32 state);
+
+		[DllImport(DLLPath)] public static extern PerfTrackerMode DebugGetPerformanceTrackerMode();
+		[DllImport(DLLPath)] public static extern void DebugSetPerformanceTracker(Int32 address, AddressType type, PerfTrackerMode mode);
 
 		[DllImport(DLLPath)] public static extern void DebugSetScriptTimeout(UInt32 timeout);
 		[DllImport(DLLPath)] public static extern Int32 DebugLoadScript([MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(UTF8Marshaler))]string name, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(UTF8Marshaler))]string content, Int32 scriptId = -1);
@@ -256,9 +284,12 @@ namespace Brewmaster.Emulation
 		public static void DebugStartCodeRunner(byte[] data)
 		{
 			GCHandle handle = GCHandle.Alloc(data, GCHandleType.Pinned);
-			try {
+			try
+			{
 				InteropEmu.DebugStartCodeRunnerWrapper(handle.AddrOfPinnedObject(), data.Length);
-			} finally {
+			}
+			finally
+			{
 				handle.Free();
 			}
 		}
@@ -267,14 +298,26 @@ namespace Brewmaster.Emulation
 		public static void DebugSetMemoryValues(DebugMemoryType type, UInt32 address, byte[] data)
 		{
 			GCHandle handle = GCHandle.Alloc(data, GCHandleType.Pinned);
-			try {
+			try
+			{
 				InteropEmu.DebugSetMemoryValuesWrapper(type, address, handle.AddrOfPinnedObject(), data.Length);
-			} finally {
+			}
+			finally
+			{
 				handle.Free();
 			}
 		}
 
 		[DllImport(DLLPath)] public static extern void DebugGetAbsoluteAddressAndType(UInt32 relativeAddr, AddressTypeInfo addressTypeInfo);
+
+		[DllImport(DLLPath, EntryPoint = "DebugGetPpuAbsoluteAddressAndType")] private static extern void DebugGetPpuAbsoluteAddressAndTypeWrapper(UInt32 relativeAddr, PpuAddressTypeInfo addressTypeInfo);
+		public static PpuAddressTypeInfo DebugGetPpuAbsoluteAddressAndType(UInt32 relativeAddr)
+		{
+			PpuAddressTypeInfo addressTypeInfo = new PpuAddressTypeInfo();
+			InteropEmu.DebugGetPpuAbsoluteAddressAndTypeWrapper(relativeAddr, addressTypeInfo);
+			return addressTypeInfo;
+		}
+
 		[DllImport(DLLPath)] public static extern void DebugSetPpuViewerScanlineCycle(Int32 ppuViewerId, Int32 scanline, Int32 cycle);
 		[DllImport(DLLPath)] public static extern void DebugClearPpuViewerSettings(Int32 ppuViewerId);
 
@@ -285,6 +328,7 @@ namespace Brewmaster.Emulation
 
 		[DllImport(DLLPath)] public static extern void DebugStartTraceLogger([MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(UTF8Marshaler))]string filename);
 		[DllImport(DLLPath)] public static extern void DebugStopTraceLogger();
+		[DllImport(DLLPath)] public static extern void DebugClearTraceLog();
 		[DllImport(DLLPath)] public static extern void DebugSetTraceOptions(InteropTraceLoggerOptions options);
 		[DllImport(DLLPath, EntryPoint = "DebugGetExecutionTrace")] private static extern IntPtr DebugGetExecutionTraceWrapper(UInt32 lineCount);
 		public static string DebugGetExecutionTrace(UInt32 lineCount) { return PtrToStringUtf8(InteropEmu.DebugGetExecutionTraceWrapper(lineCount)); }
@@ -308,9 +352,12 @@ namespace Brewmaster.Emulation
 		{
 			byte[] header = new byte[16];
 			GCHandle handle = GCHandle.Alloc(header, GCHandleType.Pinned);
-			try {
+			try
+			{
 				InteropEmu.DebugGetNesHeaderWrapper(handle.AddrOfPinnedObject());
-			} finally {
+			}
+			finally
+			{
 				handle.Free();
 			}
 			return header;
@@ -319,14 +366,20 @@ namespace Brewmaster.Emulation
 		[DllImport(DLLPath, EntryPoint = "DebugSaveRomToDisk")] public static extern void DebugSaveRomToDiskWrapper([MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(UTF8Marshaler))]string filename, [MarshalAs(UnmanagedType.I1)]bool saveAsIps, IntPtr headerBuffer, CdlStripFlag cdlStripFlag);
 		public static void DebugSaveRomToDisk(string filename, bool saveAsIps = false, byte[] header = null, CdlStripFlag cdlStripFlag = CdlStripFlag.StripNone)
 		{
-			if(header != null) {
+			if (header != null)
+			{
 				GCHandle handle = GCHandle.Alloc(header, GCHandleType.Pinned);
-				try {
+				try
+				{
 					InteropEmu.DebugSaveRomToDiskWrapper(filename, saveAsIps, handle.AddrOfPinnedObject(), cdlStripFlag);
-				} finally {
+				}
+				finally
+				{
 					handle.Free();
 				}
-			} else {
+			}
+			else
+			{
 				InteropEmu.DebugSaveRomToDiskWrapper(filename, saveAsIps, IntPtr.Zero, cdlStripFlag);
 			}
 		}
@@ -336,9 +389,12 @@ namespace Brewmaster.Emulation
 		{
 			UInt32 length = forceRefresh ? UInt32.MaxValue : 0;
 			IntPtr ptrCodeString = InteropEmu.DebugGetCodeWrapper(ref length);
-			if(ptrCodeString == IntPtr.Zero) {
+			if (ptrCodeString == IntPtr.Zero)
+			{
 				return null;
-			} else {
+			}
+			else
+			{
 				return PtrToStringUtf8(ptrCodeString, length);
 			}
 		}
@@ -353,9 +409,12 @@ namespace Brewmaster.Emulation
 			UInt32 size = 0;
 
 			GCHandle hAssembledCode = GCHandle.Alloc(assembledCode, GCHandleType.Pinned);
-			try {
+			try
+			{
 				size = InteropEmu.DebugAssembleCodeWrapper(code, startAddress, hAssembledCode.AddrOfPinnedObject());
-			} finally {
+			}
+			finally
+			{
 				hAssembledCode.Free();
 			}
 
@@ -368,22 +427,28 @@ namespace Brewmaster.Emulation
 		{
 			byte[] buffer = new byte[InteropEmu.DebugGetMemorySize(type)];
 			GCHandle handle = GCHandle.Alloc(buffer, GCHandleType.Pinned);
-			try {
+			try
+			{
 				UInt32 memorySize = InteropEmu.DebugGetMemoryStateWrapper(type, handle.AddrOfPinnedObject());
 				Array.Resize(ref buffer, (int)memorySize);
-			} finally {
+			}
+			finally
+			{
 				handle.Free();
 			}
 			return buffer;
 		}
 
-		[DllImport(DLLPath, EntryPoint = "DebugSetMemoryState")] private static extern void DebugSetMemoryStateWrapper(DebugMemoryType type, IntPtr buffer);
+		[DllImport(DLLPath, EntryPoint = "DebugSetMemoryState")] private static extern void DebugSetMemoryStateWrapper(DebugMemoryType type, IntPtr buffer, Int32 length);
 		public static void DebugSetMemoryState(DebugMemoryType type, byte[] data)
 		{
 			GCHandle handle = GCHandle.Alloc(data, GCHandleType.Pinned);
-			try {
-				InteropEmu.DebugSetMemoryStateWrapper(type, handle.AddrOfPinnedObject());
-			} finally {
+			try
+			{
+				InteropEmu.DebugSetMemoryStateWrapper(type, handle.AddrOfPinnedObject(), data.Length);
+			}
+			finally
+			{
 				handle.Free();
 			}
 		}
@@ -392,28 +457,34 @@ namespace Brewmaster.Emulation
 		{
 			byte[] buffer = new byte[0x800];
 			GCHandle handle = GCHandle.Alloc(buffer, GCHandleType.Pinned);
-			try {
+			try
+			{
 				UInt32 memorySize = InteropEmu.DebugGetMemoryStateWrapper(DebugMemoryType.InternalRam, handle.AddrOfPinnedObject());
 				Array.Resize(ref buffer, (int)memorySize);
-			} finally {
+			}
+			finally
+			{
 				handle.Free();
 			}
 			return buffer;
 		}
 
-		[DllImport(DLLPath, EntryPoint = "DebugGetNametable")] private static extern void DebugGetNametableWrapper(UInt32 nametableIndex, [MarshalAs(UnmanagedType.I1)]bool useGrayscalePalette, IntPtr frameBuffer, IntPtr tileData, IntPtr attributeData);
-		public static void DebugGetNametable(int nametableIndex, bool useGrayscalePalette, out byte[] frameData, out byte[] tileData, out byte[] attributeData)
+		[DllImport(DLLPath, EntryPoint = "DebugGetNametable")] private static extern void DebugGetNametableWrapper(UInt32 nametableIndex, NametableDisplayMode mode, IntPtr frameBuffer, IntPtr tileData, IntPtr attributeData);
+		public static void DebugGetNametable(int nametableIndex, NametableDisplayMode mode, out byte[] frameData, out byte[] tileData, out byte[] attributeData)
 		{
-			frameData = new byte[256*240*4];
-			tileData = new byte[32*30];
-			attributeData = new byte[32*30];
+			frameData = new byte[256 * 240 * 4];
+			tileData = new byte[32 * 30];
+			attributeData = new byte[32 * 30];
 
 			GCHandle hFrameData = GCHandle.Alloc(frameData, GCHandleType.Pinned);
 			GCHandle hTileData = GCHandle.Alloc(tileData, GCHandleType.Pinned);
 			GCHandle hAttributeData = GCHandle.Alloc(attributeData, GCHandleType.Pinned);
-			try {
-				InteropEmu.DebugGetNametableWrapper((UInt32)nametableIndex, useGrayscalePalette, hFrameData.AddrOfPinnedObject(), hTileData.AddrOfPinnedObject(), hAttributeData.AddrOfPinnedObject());
-			} finally {
+			try
+			{
+				InteropEmu.DebugGetNametableWrapper((UInt32)nametableIndex, mode, hFrameData.AddrOfPinnedObject(), hTileData.AddrOfPinnedObject(), hAttributeData.AddrOfPinnedObject());
+			}
+			finally
+			{
 				hFrameData.Free();
 				hTileData.Free();
 				hAttributeData.Free();
@@ -423,14 +494,17 @@ namespace Brewmaster.Emulation
 		[DllImport(DLLPath, EntryPoint = "DebugGetChrBank")] private static extern void DebugGetChrBankWrapper(UInt32 bankIndex, IntPtr frameBuffer, Byte palette, [MarshalAs(UnmanagedType.I1)]bool largeSprites, CdlHighlightType highlightType, [MarshalAs(UnmanagedType.I1)]bool useAutoPalette, [MarshalAs(UnmanagedType.I1)]bool showSingleColorTilesInGrayscale, IntPtr paletteBuffer);
 		public static byte[] DebugGetChrBank(int bankIndex, int palette, bool largeSprites, CdlHighlightType highlightType, bool useAutoPalette, bool showSingleColorTilesInGrayscale, out UInt32[] paletteData)
 		{
-			byte[] frameData = new byte[128*128*4];
-			paletteData = new UInt32[16*16];
+			byte[] frameData = new byte[128 * 128 * 4];
+			paletteData = new UInt32[16 * 16];
 
 			GCHandle hFrameData = GCHandle.Alloc(frameData, GCHandleType.Pinned);
 			GCHandle hPaletteData = GCHandle.Alloc(paletteData, GCHandleType.Pinned);
-			try {
+			try
+			{
 				InteropEmu.DebugGetChrBankWrapper((UInt32)bankIndex, hFrameData.AddrOfPinnedObject(), (Byte)palette, largeSprites, highlightType, useAutoPalette, showSingleColorTilesInGrayscale, hPaletteData.AddrOfPinnedObject());
-			} finally {
+			}
+			finally
+			{
 				hFrameData.Free();
 				hPaletteData.Free();
 			}
@@ -441,12 +515,15 @@ namespace Brewmaster.Emulation
 		[DllImport(DLLPath, EntryPoint = "DebugGetSprites")] private static extern void DebugGetSpritesWrapper(IntPtr frameBuffer);
 		public static byte[] DebugGetSprites()
 		{
-			byte[] frameData = new byte[64*128*4];
+			byte[] frameData = new byte[64 * 128 * 4];
 
 			GCHandle hFrameData = GCHandle.Alloc(frameData, GCHandleType.Pinned);
-			try {
+			try
+			{
 				InteropEmu.DebugGetSpritesWrapper(hFrameData.AddrOfPinnedObject());
-			} finally {
+			}
+			finally
+			{
 				hFrameData.Free();
 			}
 
@@ -456,109 +533,98 @@ namespace Brewmaster.Emulation
 		[DllImport(DLLPath, EntryPoint = "DebugGetPalette")] private static extern void DebugGetPaletteWrapper(IntPtr frameBuffer);
 		public static int[] DebugGetPalette()
 		{
-			int[] frameData = new int[4*8];
+			int[] frameData = new int[4 * 8];
 
 			GCHandle hFrameData = GCHandle.Alloc(frameData, GCHandleType.Pinned);
-			try {
+			try
+			{
 				InteropEmu.DebugGetPaletteWrapper(hFrameData.AddrOfPinnedObject());
-			} finally {
+			}
+			finally
+			{
 				hFrameData.Free();
+			}
+
+			for (int i = 4; i < 4 * 8; i += 4)
+			{
+				//Override color 0 in each palette with the background color
+				frameData[i] = frameData[0];
 			}
 
 			return frameData;
 		}
 
-		[DllImport(DLLPath)] private static extern UInt32 DebugGetDebugEventCount([MarshalAs(UnmanagedType.I1)]bool returnPreviousFrameData);
-		[DllImport(DLLPath, EntryPoint = "DebugGetDebugEvents")] private static extern void DebugGetDebugEventsWrapper(IntPtr frameBuffer, IntPtr infoArray, ref UInt32 maxEventCount, [MarshalAs(UnmanagedType.I1)]bool returnPreviousFrameData);
-		public static void DebugGetDebugEvents(bool returnPreviousFrameData, out byte[] pictureData, out DebugEventInfo[] debugEvents)
+		[DllImport(DLLPath)] private static extern UInt32 GetDebugEventCount([MarshalAs(UnmanagedType.I1)]bool getPreviousFrameData);
+		[DllImport(DLLPath, EntryPoint = "GetDebugEvents")] private static extern void GetDebugEventsWrapper([In, Out]DebugEventInfo[] eventArray, ref UInt32 maxEventCount, [MarshalAs(UnmanagedType.I1)]bool getPreviousFrameData);
+		public static DebugEventInfo[] GetDebugEvents(bool getPreviousFrameData)
 		{
-			pictureData = new byte[256 * 240 * 4];
-			UInt32 maxEventCount = DebugGetDebugEventCount(returnPreviousFrameData);
-			debugEvents = new DebugEventInfo[maxEventCount];
+			UInt32 maxEventCount = GetDebugEventCount(getPreviousFrameData);
+			DebugEventInfo[] debugEvents = new DebugEventInfo[maxEventCount];
 
-			GCHandle hPictureData = GCHandle.Alloc(pictureData, GCHandleType.Pinned);
-			GCHandle hDebugEvents = GCHandle.Alloc(debugEvents, GCHandleType.Pinned);
-			try {
-				InteropEmu.DebugGetDebugEventsWrapper(hPictureData.AddrOfPinnedObject(), hDebugEvents.AddrOfPinnedObject(), ref maxEventCount, returnPreviousFrameData);
-			} finally {
-				hPictureData.Free();
-				hDebugEvents.Free();
-			}
-
-			if(maxEventCount < debugEvents.Length) {
+			InteropEmu.GetDebugEventsWrapper(debugEvents, ref maxEventCount, getPreviousFrameData);
+			if (maxEventCount < debugEvents.Length)
+			{
 				//Remove the excess from the array if needed
 				Array.Resize(ref debugEvents, (int)maxEventCount);
 			}
+
+			return debugEvents;
 		}
 
-		[DllImport(DLLPath, EntryPoint = "DebugGetProfilerData")] private static extern void DebugGetProfilerDataWrapper(IntPtr profilerData, ProfilerDataType dataType);
-		public static Int64[] DebugGetProfilerData(ProfilerDataType dataType)
+		[DllImport(DLLPath)] public static extern void GetEventViewerEvent(ref DebugEventInfo evtInfo, Int16 scanline, UInt16 cycle, EventViewerDisplayOptions options);
+		[DllImport(DLLPath)] public static extern UInt32 TakeEventSnapshot(EventViewerDisplayOptions options);
+
+		[DllImport(DLLPath, EntryPoint = "GetEventViewerOutput")] private static extern void GetEventViewerOutputWrapper([In, Out]UInt32[] buffer, EventViewerDisplayOptions options);
+		public static UInt32[] GetEventViewerOutput(UInt32 scanlineCount, EventViewerDisplayOptions options)
 		{
-			Int64[] profileData = new Int64[InteropEmu.DebugGetMemorySize(DebugMemoryType.PrgRom) + 2];
-
-			GCHandle hProfilerData = GCHandle.Alloc(profileData, GCHandleType.Pinned);
-			try {
-				InteropEmu.DebugGetProfilerDataWrapper(hProfilerData.AddrOfPinnedObject(), dataType);
-			} finally {
-				hProfilerData.Free();
-			}
-
-			return profileData;
+			UInt32[] buffer = new UInt32[341 * 2 * scanlineCount * 2];
+			InteropEmu.GetEventViewerOutputWrapper(buffer, options);
+			return buffer;
 		}
 
-		[DllImport(DLLPath, EntryPoint = "DebugGetMemoryAccessCounts")] private static extern void DebugGetMemoryAccessCountsWrapper(AddressType type, MemoryOperationType operationType, IntPtr counts, [MarshalAs(UnmanagedType.I1)]bool forUninitReads);
-		public static Int32[] DebugGetMemoryAccessCounts(AddressType type, MemoryOperationType operationType, bool forUninitReads)
+		[DllImport(DLLPath, EntryPoint = "DebugGetProfilerData")] private static extern void GetProfilerDataWrapper([In, Out]ProfiledFunction[] profilerData, ref UInt32 functionCount);
+		public static ProfiledFunction[] DebugGetProfilerData()
 		{
-			int size = 0;
-			switch(type) {
-				case AddressType.InternalRam: size = 0x2000; break;
-				case AddressType.PrgRom: size = InteropEmu.DebugGetMemorySize(DebugMemoryType.PrgRom); break;
-				case AddressType.WorkRam: size = InteropEmu.DebugGetMemorySize(DebugMemoryType.WorkRam); break;
-				case AddressType.SaveRam: size = InteropEmu.DebugGetMemorySize(DebugMemoryType.SaveRam); break;
-			}
+			ProfiledFunction[] profilerData = new ProfiledFunction[100000];
+			UInt32 functionCount = 0;
 
-			Int32[] counts = new Int32[size];
+			InteropEmu.GetProfilerDataWrapper(profilerData, ref functionCount);
+			Array.Resize(ref profilerData, (int)functionCount);
 
-			if(size > 0) {
-				GCHandle hCounts = GCHandle.Alloc(counts, GCHandleType.Pinned);
-				try {
-					InteropEmu.DebugGetMemoryAccessCountsWrapper(type, operationType, hCounts.AddrOfPinnedObject(), forUninitReads);
-				} finally {
-					hCounts.Free();
-				}
-			}
+			return profilerData;
+		}
 
+		public static void DebugGetMemoryAccessCounts(DebugMemoryType type, ref AddressCounters[] counters)
+		{
+			int size = InteropEmu.DebugGetMemorySize(type);
+			Array.Resize(ref counters, size);
+			InteropEmu.DebugGetMemoryAccessCountsWrapper(0, (uint)size, type, counters);
+		}
+
+		[DllImport(DLLPath, EntryPoint = "DebugGetMemoryAccessCounts")] private static extern void DebugGetMemoryAccessCountsWrapper(UInt32 offset, UInt32 length, DebugMemoryType type, [In, Out]AddressCounters[] counts);
+		public static AddressCounters[] DebugGetMemoryAccessCounts(UInt32 offset, UInt32 length, DebugMemoryType type)
+		{
+			AddressCounters[] counts = new AddressCounters[length];
+			InteropEmu.DebugGetMemoryAccessCountsWrapper(offset, length, type, counts);
 			return counts;
 		}
 
-		[DllImport(DLLPath, EntryPoint = "DebugGetMemoryAccessStamps")] private static extern void DebugGetMemoryAccessStampsWrapper(UInt32 offset, UInt32 length, DebugMemoryType type, MemoryOperationType operationType, IntPtr stamps);
-		public static Int32[] DebugGetMemoryAccessStamps(UInt32 offset, UInt32 length, DebugMemoryType type, MemoryOperationType operationType)
+		[DllImport(DLLPath, EntryPoint = "DebugGetNametableChangedData")] private static extern void DebugGetNametableChangedDataWrapper(IntPtr ntChangedData);
+		public static bool[] DebugGetNametableChangedData()
 		{
-			Int32[] stamps = new Int32[length];
+			bool[] ntChangedData = new bool[0x1000];
 
-			GCHandle hStamps = GCHandle.Alloc(stamps, GCHandleType.Pinned);
-			try {
-				InteropEmu.DebugGetMemoryAccessStampsWrapper(offset, length, type, operationType, hStamps.AddrOfPinnedObject());
-			} finally {
-				hStamps.Free();
+			GCHandle hNtChangedData = GCHandle.Alloc(ntChangedData, GCHandleType.Pinned);
+			try
+			{
+				InteropEmu.DebugGetNametableChangedDataWrapper(hNtChangedData.AddrOfPinnedObject());
+			}
+			finally
+			{
+				hNtChangedData.Free();
 			}
 
-			return stamps;
-		}
-
-		[DllImport(DLLPath, EntryPoint = "DebugGetMemoryAccessCountsEx")] private static extern void DebugGetMemoryAccessCountsExWrapper(UInt32 offset, UInt32 length, DebugMemoryType type, MemoryOperationType operationType, IntPtr counts);
-		public static Int32[] DebugGetMemoryAccessCountsEx(UInt32 offset, UInt32 length, DebugMemoryType type, MemoryOperationType operationType)
-		{
-			Int32[] counts = new Int32[length];
-
-			GCHandle hResult = GCHandle.Alloc(counts, GCHandleType.Pinned);
-			try {
-				InteropEmu.DebugGetMemoryAccessCountsExWrapper(offset, length, type, operationType, hResult.AddrOfPinnedObject());
-			} finally {
-				hResult.Free();
-			}
-
-			return counts;
+			return ntChangedData;
 		}
 
 		[DllImport(DLLPath, EntryPoint = "DebugGetFreezeState")] private static extern void DebugGetFreezeStateWrapper(UInt16 startAddress, UInt16 length, IntPtr freezeState);
@@ -567,9 +633,12 @@ namespace Brewmaster.Emulation
 			bool[] freezeState = new bool[length];
 
 			GCHandle hFreezeState = GCHandle.Alloc(freezeState, GCHandleType.Pinned);
-			try {
+			try
+			{
 				InteropEmu.DebugGetFreezeStateWrapper(startAddress, length, hFreezeState.AddrOfPinnedObject());
-			} finally {
+			}
+			finally
+			{
 				hFreezeState.Free();
 			}
 
@@ -580,9 +649,12 @@ namespace Brewmaster.Emulation
 		public static void DebugSetCdlData(byte[] cdlData)
 		{
 			GCHandle hResult = GCHandle.Alloc(cdlData, GCHandleType.Pinned);
-			try {
+			try
+			{
 				InteropEmu.DebugSetCdlDataWrapper(hResult.AddrOfPinnedObject(), (UInt32)cdlData.Length);
-			} finally {
+			}
+			finally
+			{
 				hResult.Free();
 			}
 		}
@@ -593,15 +665,18 @@ namespace Brewmaster.Emulation
 		{
 			return DebugGetCdlData(0, (uint)InteropEmu.DebugGetMemorySize(DebugMemoryType.PrgRom), DebugMemoryType.PrgRom);
 		}
-		
+
 		public static byte[] DebugGetCdlData(UInt32 offset, UInt32 length, DebugMemoryType type)
 		{
 			byte[] cdlData = new byte[length];
 
 			GCHandle hResult = GCHandle.Alloc(cdlData, GCHandleType.Pinned);
-			try {
+			try
+			{
 				InteropEmu.DebugGetCdlDataWrapper(offset, length, type, hResult.AddrOfPinnedObject());
-			} finally {
+			}
+			finally
+			{
 				hResult.Free();
 			}
 
@@ -615,9 +690,12 @@ namespace Brewmaster.Emulation
 			UInt32 callstackSize = 0;
 
 			GCHandle hCallstack = GCHandle.Alloc(callstack, GCHandleType.Pinned);
-			try {
+			try
+			{
 				InteropEmu.DebugGetCallstackWrapper(hCallstack.AddrOfPinnedObject(), ref callstackSize);
-			} finally {
+			}
+			finally
+			{
 				hCallstack.Free();
 			}
 			Array.Resize(ref callstack, (int)callstackSize);
@@ -630,12 +708,15 @@ namespace Brewmaster.Emulation
 		public static Int32[] DebugGetFunctionEntryPoints()
 		{
 			int maxCount = DebugGetFunctionEntryPointCount();
-			Int32[] entryPoints = new Int32[maxCount+1];
+			Int32[] entryPoints = new Int32[maxCount + 1];
 
 			GCHandle hEntryPoints = GCHandle.Alloc(entryPoints, GCHandleType.Pinned);
-			try {
-				InteropEmu.DebugGetFunctionEntryPointsWrapper(hEntryPoints.AddrOfPinnedObject(), maxCount+1);
-			} finally {
+			try
+			{
+				InteropEmu.DebugGetFunctionEntryPointsWrapper(hEntryPoints.AddrOfPinnedObject(), maxCount + 1);
+			}
+			finally
+			{
 				hEntryPoints.Free();
 			}
 
@@ -652,7 +733,8 @@ namespace Brewmaster.Emulation
 
 		[DllImport(DLLPath)] [return: MarshalAs(UnmanagedType.I1)] public static extern bool IsHdPpu();
 
-		[DllImport(DLLPath)] public static extern void HdBuilderStartRecording(
+		[DllImport(DLLPath)]
+		public static extern void HdBuilderStartRecording(
 			[MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(UTF8Marshaler))]string saveFolder,
 			ScaleFilterType filterType,
 			UInt32 scale,
@@ -664,12 +746,15 @@ namespace Brewmaster.Emulation
 		[DllImport(DLLPath, EntryPoint = "HdBuilderGetBankPreview")] private static extern void HdBuilderGetBankPreviewWrapper(UInt32 bankNumber, UInt32 pageNumber, IntPtr rgbBuffer);
 		public static byte[] HdBuilderGetBankPreview(UInt32 bankNumber, int scale, UInt32 pageNumber)
 		{
-			byte[] frameData = new byte[128*128*4*scale*scale];
+			byte[] frameData = new byte[128 * 128 * 4 * scale * scale];
 
 			GCHandle hFrameData = GCHandle.Alloc(frameData, GCHandleType.Pinned);
-			try {
+			try
+			{
 				InteropEmu.HdBuilderGetBankPreviewWrapper(bankNumber, pageNumber, hFrameData.AddrOfPinnedObject());
-			} finally {
+			}
+			finally
+			{
 				hFrameData.Free();
 			}
 
@@ -681,15 +766,20 @@ namespace Brewmaster.Emulation
 		{
 			UInt32[] bankList = new UInt32[1024];
 			GCHandle hBankList = GCHandle.Alloc(bankList, GCHandleType.Pinned);
-			try {
+			try
+			{
 				InteropEmu.HdBuilderGetChrBankListWrapper(hBankList.AddrOfPinnedObject());
-				for(int i = 0; i < bankList.Length; i++) {
-					if(bankList[i] == UInt32.MaxValue) {
+				for (int i = 0; i < bankList.Length; i++)
+				{
+					if (bankList[i] == UInt32.MaxValue)
+					{
 						Array.Resize(ref bankList, i);
 						break;
 					}
 				}
-			} finally {
+			}
+			finally
+			{
 				hBankList.Free();
 			}
 
@@ -700,15 +790,20 @@ namespace Brewmaster.Emulation
 		{
 			UInt32[] keyBuffer = new UInt32[3];
 			GCHandle handle = GCHandle.Alloc(keyBuffer, GCHandleType.Pinned);
-			try {
+			try
+			{
 				InteropEmu.GetPressedKeysWrapper(handle.AddrOfPinnedObject());
-			} finally {
+			}
+			finally
+			{
 				handle.Free();
 			}
 
 			List<UInt32> keys = new List<UInt32>();
-			for(int i = 0; i < 3; i++) {
-				if(keyBuffer[i] != 0) {
+			for (int i = 0; i < 3; i++)
+			{
+				if (keyBuffer[i] != 0)
+				{
 					keys.Add(keyBuffer[i]);
 				}
 			}
@@ -743,9 +838,12 @@ namespace Brewmaster.Emulation
 			UInt32 bufferSize = (UInt32)segmentBuffer.Length;
 
 			GCHandle hSegmentBuffer = GCHandle.Alloc(segmentBuffer, GCHandleType.Pinned);
-			try {
+			try
+			{
 				InteropEmu.HistoryViewerGetSegmentsWrapper(hSegmentBuffer.AddrOfPinnedObject(), ref bufferSize);
-			} finally {
+			}
+			finally
+			{
 				hSegmentBuffer.Free();
 			}
 			Array.Resize(ref segmentBuffer, (int)bufferSize);
@@ -755,9 +853,12 @@ namespace Brewmaster.Emulation
 
 		public static void SetFlag(EmulationFlags flag, bool value)
 		{
-			if(value) {
+			if (value)
+			{
 				InteropEmu.SetFlags(flag);
-			} else {
+			}
+			else
+			{
 				InteropEmu.ClearFlags(flag);
 			}
 		}
@@ -773,12 +874,15 @@ namespace Brewmaster.Emulation
 
 		public static Int32[] GetRgbPalette()
 		{
-			Int32[] paleteData = new Int32[64];
+			Int32[] paleteData = new Int32[512];
 
 			GCHandle hPaletteData = GCHandle.Alloc(paleteData, GCHandleType.Pinned);
-			try {
+			try
+			{
 				InteropEmu.GetRgbPaletteWrapper(hPaletteData.AddrOfPinnedObject());
-			} finally {
+			}
+			finally
+			{
 				hPaletteData.Free();
 			}
 
@@ -809,18 +913,24 @@ namespace Brewmaster.Emulation
 			byte[] buffer = PtrToByteArray(InteropEmu.GetArchiveRomListWrapper(filename));
 			List<List<byte>> filenames = new List<List<byte>>();
 			List<byte> filenameBytes = new List<byte>();
-			for(int i = 0; i < buffer.Length - 5; i++) {
-				if(buffer[i] == '[' && buffer[i+1] == '!' && buffer[i+2] == '|' && buffer[i+3] == '!' && buffer[i+4] == ']') {
-					if(filenameBytes.Count > 0) {
+			for (int i = 0; i < buffer.Length - 5; i++)
+			{
+				if (buffer[i] == '[' && buffer[i + 1] == '!' && buffer[i + 2] == '|' && buffer[i + 3] == '!' && buffer[i + 4] == ']')
+				{
+					if (filenameBytes.Count > 0)
+					{
 						filenames.Add(filenameBytes);
 					}
 					filenameBytes = new List<byte>();
-					i+=4;
-				} else {
+					i += 4;
+				}
+				else
+				{
 					filenameBytes.Add(buffer[i]);
 				}
 			}
-			if(filenameBytes.Count > 0) {
+			if (filenameBytes.Count > 0)
+			{
 				filenames.Add(filenameBytes);
 			}
 
@@ -828,26 +938,35 @@ namespace Brewmaster.Emulation
 
 			//Check whether or not each string is a valid utf8 filename, if not decode it using the system's default encoding.
 			//This is necessary because zip files do not have any rules when it comes to encoding filenames
-			for(int i = 0; i < filenames.Count; i++) {
+			for (int i = 0; i < filenames.Count; i++)
+			{
 				byte[] originalBytes = filenames[i].ToArray();
 				string utf8Filename = Encoding.UTF8.GetString(originalBytes);
 				byte[] convertedBytes = Encoding.UTF8.GetBytes(utf8Filename);
 				bool equal = true;
-				if(originalBytes.Length == convertedBytes.Length) {
-					for(int j = 0; j < convertedBytes.Length; j++) {
-						if(convertedBytes[j] != originalBytes[j]) {
+				if (originalBytes.Length == convertedBytes.Length)
+				{
+					for (int j = 0; j < convertedBytes.Length; j++)
+					{
+						if (convertedBytes[j] != originalBytes[j])
+						{
 							equal = false;
 							break;
 						}
 					}
-				} else {
+				}
+				else
+				{
 					equal = false;
 				}
 
-				if(!equal) {
+				if (!equal)
+				{
 					//String doesn't appear to be an utf8 string, use the system's default encoding
 					entries.Add(new ArchiveRomEntry() { Filename = Encoding.Default.GetString(originalBytes), IsUtf8 = false });
-				} else {
+				}
+				else
+				{
 					entries.Add(new ArchiveRomEntry() { Filename = utf8Filename, IsUtf8 = true });
 				}
 			}
@@ -858,30 +977,40 @@ namespace Brewmaster.Emulation
 		private static byte[] _codeByteArray = new byte[0];
 		private static string PtrToStringUtf8(IntPtr ptr, UInt32 length = 0)
 		{
-			if(ptr == IntPtr.Zero) {
+			if (ptr == IntPtr.Zero)
+			{
 				return "";
 			}
 
 			int len = 0;
-			if(length == 0) {
-				while(System.Runtime.InteropServices.Marshal.ReadByte(ptr, len) != 0) {
+			if (length == 0)
+			{
+				while (System.Runtime.InteropServices.Marshal.ReadByte(ptr, len) != 0)
+				{
 					len++;
 				}
-			} else {
+			}
+			else
+			{
 				len = (int)length;
 			}
 
-			if(len == 0) {
+			if (len == 0)
+			{
 				return "";
 			}
 
-			if(length == 0) {
+			if (length == 0)
+			{
 				byte[] array = new byte[len];
 				System.Runtime.InteropServices.Marshal.Copy(ptr, array, 0, len);
 				return System.Text.Encoding.UTF8.GetString(array);
-			} else {
+			}
+			else
+			{
 				//For the code window, reuse the same buffer to reduce allocations
-				if(_codeByteArray.Length < len) {
+				if (_codeByteArray.Length < len)
+				{
 					Array.Resize(ref _codeByteArray, len);
 				}
 				System.Runtime.InteropServices.Marshal.Copy(ptr, _codeByteArray, 0, len);
@@ -891,12 +1020,14 @@ namespace Brewmaster.Emulation
 
 		private static byte[] PtrToByteArray(IntPtr ptr)
 		{
-			if(ptr == IntPtr.Zero) {
+			if (ptr == IntPtr.Zero)
+			{
 				return new byte[0];
 			}
 
 			int len = 0;
-			while(System.Runtime.InteropServices.Marshal.ReadByte(ptr, len) != 0) {
+			while (System.Runtime.InteropServices.Marshal.ReadByte(ptr, len) != 0)
+			{
 				len++;
 			}
 
@@ -920,7 +1051,7 @@ namespace Brewmaster.Emulation
 			PpuFrameDone = 9,
 			MovieEnded = 10,
 			ResolutionChanged = 11,
-			FdsBiosNotFound = 12,
+			BiosNotFound = 12,
 			ConfigChanged = 13,
 			DisconnectedFromServer = 14,
 			PpuViewerDisplayFrame = 15,
@@ -930,6 +1061,7 @@ namespace Brewmaster.Emulation
 			BeforeEmulationStop = 19,
 			VsDualSystemStarted = 20,
 			VsDualSystemStopped = 21,
+			GameInitCompleted = 22
 		}
 
 		public enum ControllerType
@@ -942,6 +1074,8 @@ namespace Brewmaster.Emulation
 			PowerPad = 5,
 			SnesMouse = 6,
 			SuborMouse = 7,
+			VsZapper = 8,
+			VbController = 9,
 		}
 
 		public enum ExpansionPortDevice
@@ -1050,6 +1184,9 @@ namespace Brewmaster.Emulation
 
 			[MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)]
 			public UInt32[] BandaiMicrophoneButtons;
+
+			[MarshalAs(UnmanagedType.ByValArray, SizeConst = 14)]
+			public UInt32[] VirtualBoyButtons;
 		}
 
 		public enum StereoFilter
@@ -1126,8 +1263,10 @@ namespace Brewmaster.Emulation
 
 			public void ProcessNotification(int type, IntPtr parameter)
 			{
-				if(this.OnNotification != null) {
-					this.OnNotification(new NotificationEventArgs() {
+				if (this.OnNotification != null)
+				{
+					this.OnNotification(new NotificationEventArgs()
+					{
 						NotificationType = (ConsoleNotificationType)type,
 						Parameter = parameter
 					});
@@ -1186,17 +1325,22 @@ namespace Brewmaster.Emulation
 		PpuRegisterRead,
 		MapperRegisterWrite,
 		MapperRegisterRead,
+		ApuRegisterWrite,
+		ApuRegisterRead,
+		ControlRegisterWrite,
+		ControlRegisterRead,
 		Nmi,
 		Irq,
 		SpriteZeroHit,
-		Breakpoint
+		Breakpoint,
+		DmcDmaRead,
 	}
 
 	public struct DebugEventInfo
 	{
 		public UInt16 Cycle;
 		public Int16 Scanline;
-		public UInt16 ProgramCounter;
+		public UInt32 ProgramCounter;
 		public UInt16 Address;
 		public Int16 BreakpointId;
 		public DebugEventType Type;
@@ -1222,7 +1366,8 @@ namespace Brewmaster.Emulation
 	{
 		Default,
 		ChrRom,
-		ChrRam
+		ChrRam,
+		NametableRam
 	}
 
 	public enum MemoryAccessType
@@ -1233,7 +1378,7 @@ namespace Brewmaster.Emulation
 		Write = 0x02,
 		ReadWrite = 0x03
 	}
-	
+
 	public struct StackFrameInfo
 	{
 		public Int32 JumpSourceAbsolute;
@@ -1278,15 +1423,13 @@ namespace Brewmaster.Emulation
 
 		public UInt32 ChrPageCount;
 		public UInt32 ChrPageSize;
+		public UInt32 ChrRamPageSize;
 		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x40)]
 		public Int32[] ChrMemoryOffset;
 		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x40)]
 		public ChrMemoryType[] ChrMemoryType;
 		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x40)]
 		public MemoryAccessType[] ChrMemoryAccess;
-
-		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 8)]
-		public UInt32[] Nametables;
 
 		public UInt32 WorkRamPageSize;
 		public UInt32 SaveRamPageSize;
@@ -1358,25 +1501,25 @@ namespace Brewmaster.Emulation
 		public Byte GetMask()
 		{
 			byte mask = 0;
-			if(Grayscale != 0) mask |= 0x01;
-			if(BackgroundMask != 0) mask |= 0x02;
-			if(SpriteMask != 0) mask |= 0x04;
-			if(BackgroundEnabled != 0) mask |= 0x08;
-			if(SpritesEnabled != 0) mask |= 0x10;
-			if(IntensifyBlue != 0) mask |= 0x80;
-			if(IntensifyRed != 0) mask |= 0x20;
-			if(IntensifyGreen != 0) mask |= 0x40;
+			if (Grayscale != 0) mask |= 0x01;
+			if (BackgroundMask != 0) mask |= 0x02;
+			if (SpriteMask != 0) mask |= 0x04;
+			if (BackgroundEnabled != 0) mask |= 0x08;
+			if (SpritesEnabled != 0) mask |= 0x10;
+			if (IntensifyBlue != 0) mask |= 0x80;
+			if (IntensifyRed != 0) mask |= 0x20;
+			if (IntensifyGreen != 0) mask |= 0x40;
 			return mask;
 		}
 
 		public Byte GetControl()
 		{
 			byte control = 0;
-			if(VerticalWrite != 0) control |= 0x04;
-			if(SpritePatternAddr == 0x1000) control |= 0x08;
-			if(BackgroundPatternAddr != 0x1000) control |= 0x10;
-			if(LargeSprites != 0) control |= 0x20;
-			if(VBlank != 0) control |= 0x80;
+			if (VerticalWrite != 0) control |= 0x04;
+			if (SpritePatternAddr == 0x1000) control |= 0x08;
+			if (BackgroundPatternAddr != 0x1000) control |= 0x10;
+			if (LargeSprites != 0) control |= 0x20;
+			if (VBlank != 0) control |= 0x80;
 			return control;
 		}
 	}
@@ -1390,9 +1533,9 @@ namespace Brewmaster.Emulation
 		public Byte GetStatus()
 		{
 			byte status = 0;
-			if(SpriteOverflow != 0) status |= 0x20;
-			if(Sprite0Hit != 0) status |= 0x40;
-			if(VerticalBlank != 0) status |= 0x80;
+			if (SpriteOverflow != 0) status |= 0x20;
+			if (Sprite0Hit != 0) status |= 0x40;
+			if (VerticalBlank != 0) status |= 0x80;
 			return status;
 		}
 	}
@@ -1406,12 +1549,13 @@ namespace Brewmaster.Emulation
 		public Byte Y;
 		public Byte PS;
 		public IRQSource IRQFlag;
-		public Int32 CycleCount;
+		public UInt64 CycleCount;
 
 		[MarshalAs(UnmanagedType.I1)]
 		public bool NMIFlag;
 
 		public UInt16 DebugPC;
+		public UInt16 PreviousDebugPC;
 	}
 
 	public struct ApuLengthCounterState
@@ -1547,6 +1691,8 @@ namespace Brewmaster.Emulation
 		FunctionInclusive = 1,
 		Instructions = 2,
 		FunctionCallCount = 3,
+		MinCycles = 4,
+		MaxCycles = 5,
 	}
 
 	[Flags]
@@ -1585,8 +1731,6 @@ namespace Brewmaster.Emulation
 
 		PauseOnMovieEnd = 0x0100,
 
-		DeveloperMode = 0x0200,
-
 		AllowBackgroundInput = 0x0400,
 		ReduceSoundInBackground = 0x0800,
 		MuteSoundInBackground = 0x1000,
@@ -1596,6 +1740,8 @@ namespace Brewmaster.Emulation
 		Mmc3IrqAltBehavior = 0x8000,
 
 		SwapDutyCycles = 0x10000,
+
+		DisableGameSelectionScreen = 0x20000,
 
 		AutoConfigureInput = 0x40000,
 
@@ -1633,7 +1779,8 @@ namespace Brewmaster.Emulation
 
 		AdaptiveSpriteLimit = 0x80000000000,
 
-		DisableGameSelectionScreen = 0x200000000000,
+		EnablePpu2006ScrollGlitch = 0x100000000000,
+		EnablePpu2000ScrollGlitch = 0x200000000000,
 
 		ConfirmExitResetPower = 0x400000000000,
 
@@ -1656,6 +1803,8 @@ namespace Brewmaster.Emulation
 
 		VsDualMuteMaster = 0x200000000000000,
 		VsDualMuteSlave = 0x400000000000000,
+
+		RandomizeCpuPpuAlignment = 0x800000000000000,
 
 		ForceMaxSpeed = 0x4000000000000000,
 		ConsoleMode = 0x8000000000000000,
@@ -1689,6 +1838,9 @@ namespace Brewmaster.Emulation
 		BreakOnPlay = 0x8000,
 
 		BreakOnFirstCycle = 0x10000,
+
+		BreakOnPpu2006ScrollGlitch = 0x20000,
+		BreakOnBusConflict = 0x40000,
 	}
 
 	public struct InteropRomInfo
@@ -1700,6 +1852,9 @@ namespace Brewmaster.Emulation
 
 		[MarshalAs(UnmanagedType.I1)]
 		public bool IsChrRam;
+
+		[MarshalAs(UnmanagedType.I1)]
+		public bool HasBusConflicts;
 
 		public UInt16 MapperId;
 		public UInt32 FilePrgOffset;
@@ -1715,28 +1870,29 @@ namespace Brewmaster.Emulation
 		Unif = 2,
 		Fds = 3,
 		Nsf = 4,
+		StudyBox = 5
 	}
 
 	public class RomInfo
 	{
-		//public ResourcePath RomFile;
-		public string FileName;
+		public string RomFile;
 		public UInt32 Crc32;
 		public UInt32 PrgCrc32;
 		public RomFormat Format;
 		public bool IsChrRam;
+		public bool HasBusConflicts;
 		public UInt16 MapperId;
 		public UInt32 FilePrgOffset;
 		public string Sha1;
 
 		public RomInfo(InteropRomInfo romInfo)
 		{
-			//this.RomFile = (ResourcePath)UTF8Marshaler.GetStringFromIntPtr(romInfo.RomNamePointer);
-			this.FileName = UTF8Marshaler.GetStringFromIntPtr(romInfo.RomNamePointer);
+			this.RomFile = UTF8Marshaler.GetStringFromIntPtr(romInfo.RomNamePointer);
 			this.Crc32 = romInfo.Crc32;
 			this.PrgCrc32 = romInfo.PrgCrc32;
 			this.Format = romInfo.Format;
 			this.IsChrRam = romInfo.IsChrRam;
+			this.HasBusConflicts = romInfo.HasBusConflicts;
 			this.MapperId = romInfo.MapperId;
 			this.FilePrgOffset = romInfo.FilePrgOffset;
 			this.Sha1 = Encoding.UTF8.GetString(romInfo.Sha1);
@@ -1744,8 +1900,7 @@ namespace Brewmaster.Emulation
 
 		public string GetRomName()
 		{
-			//return Path.GetFileNameWithoutExtension(this.RomFile.FileName);
-			return Path.GetFileNameWithoutExtension(this.FileName);
+			return Path.GetFileNameWithoutExtension(this.RomFile);
 		}
 
 		public string GetCrcString()
@@ -1769,17 +1924,22 @@ namespace Brewmaster.Emulation
 
 		public override string ToString()
 		{
-			if(IsEmpty) {
+			if (IsEmpty)
+			{
 				return "";
-			} else {
+			}
+			else
+			{
 				return GetKeyNames();
 			}
 		}
 
 		public KeyCombination(List<UInt32> scanCodes = null)
 		{
-			if(scanCodes != null) {
-				if(scanCodes.Any(code => code > 0xFFFF)) {
+			if (scanCodes != null)
+			{
+				if (scanCodes.Any(code => code > 0xFFFF))
+				{
 					//If both keyboard & gamepad codes exist, only use the gamepad codes
 					//This fixes an issue with Steam where Steam can remap gamepad buttons to send keyboard keys
 					//See: Settings -> Controller Settings -> General Controller Settings -> Checking the Xbox/PS4/Generic/etc controller checkboxes will cause this
@@ -1789,7 +1949,9 @@ namespace Brewmaster.Emulation
 				Key1 = scanCodes.Count > 0 ? scanCodes[0] : 0;
 				Key2 = scanCodes.Count > 1 ? scanCodes[1] : 0;
 				Key3 = scanCodes.Count > 2 ? scanCodes[2] : 0;
-			} else {
+			}
+			else
+			{
 				Key1 = 0;
 				Key2 = 0;
 				Key3 = 0;
@@ -1801,25 +1963,35 @@ namespace Brewmaster.Emulation
 			List<UInt32> scanCodes = new List<uint>() { Key1, Key2, Key3 };
 			List<string> keyNames = scanCodes.Select((UInt32 scanCode) => InteropEmu.GetKeyName(scanCode)).Where((keyName) => !string.IsNullOrWhiteSpace(keyName)).ToList();
 			keyNames.Sort((string a, string b) => {
-				if(a == b) {
+				if (a == b)
+				{
 					return 0;
 				}
 
-				if(a == "Ctrl") {
+				if (a == "Ctrl")
+				{
 					return -1;
-				} else if(b == "Ctrl") {
+				}
+				else if (b == "Ctrl")
+				{
 					return 1;
 				}
 
-				if(a == "Alt") {
+				if (a == "Alt")
+				{
 					return -1;
-				} else if(b == "Alt") {
+				}
+				else if (b == "Alt")
+				{
 					return 1;
 				}
 
-				if(a == "Shift") {
+				if (a == "Shift")
+				{
 					return -1;
-				} else if(b == "Shift") {
+				}
+				else if (b == "Shift")
+				{
 					return 1;
 				}
 
@@ -1837,6 +2009,16 @@ namespace Brewmaster.Emulation
 		RewindTenSecs,
 		RewindOneMin,
 
+		SelectSaveSlot1,
+		SelectSaveSlot2,
+		SelectSaveSlot3,
+		SelectSaveSlot4,
+		SelectSaveSlot5,
+		SelectSaveSlot6,
+		SelectSaveSlot7,
+		SelectSaveSlot8,
+		SelectSaveSlot9,
+		SelectSaveSlot10,
 		MoveToNextStateSlot,
 		MoveToPreviousStateSlot,
 		SaveState,
@@ -1845,9 +2027,8 @@ namespace Brewmaster.Emulation
 		InsertNextDisk,
 		VsServiceButton,
 		VsServiceButton2,
-		
+
 		ToggleCheats,
-		ToggleAudio,
 		ToggleFastForward,
 		ToggleRewind,
 		ToggleKeyboardMode,
@@ -1874,6 +2055,7 @@ namespace Brewmaster.Emulation
 		Pause,
 		Reset,
 		PowerCycle,
+		ReloadRom,
 		PowerOff,
 		Exit,
 
@@ -1893,6 +2075,9 @@ namespace Brewmaster.Emulation
 		ToggleSprites,
 		ToggleBackground,
 		ToggleDebugInfo,
+		ToggleAudio,
+		IncreaseVolume,
+		DecreaseVolume,
 
 		LoadRandomGame,
 		SaveStateSlot1,
@@ -1906,6 +2091,7 @@ namespace Brewmaster.Emulation
 		SaveStateSlot9,
 		SaveStateSlot10,
 		SaveStateToFile,
+		SaveStateDialog,
 
 		LoadStateSlot1,
 		LoadStateSlot2,
@@ -1919,12 +2105,12 @@ namespace Brewmaster.Emulation
 		LoadStateSlot10,
 		LoadStateSlotAuto,
 		LoadStateFromFile,
+		LoadStateDialog,
 
 		LoadLastSession,
 
 		OpenFile,
 
-		
 		//Deprecated shortcuts
 		OpenDebugger = 0xFFFF,
 		OpenAssembler,
@@ -1936,16 +2122,9 @@ namespace Brewmaster.Emulation
 		OpenEventViewer,
 	}
 
-	public enum CheatType
-	{
-		GameGenie = 0,
-		ProActionRocky = 1,
-		Custom = 2
-	}
-
 	public struct InteropCheatInfo
 	{
-		public CheatType CheatType;
+		public int CheatType;
 		public UInt32 ProActionRockyCode;
 		public UInt32 Address;
 		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 9)]
@@ -1981,7 +2160,7 @@ namespace Brewmaster.Emulation
 
 	public struct NsfHeader
 	{
-		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 5)]
+		[MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 5)]
 		public Byte[] Header;
 
 		public Byte Version;
@@ -1991,83 +2170,66 @@ namespace Brewmaster.Emulation
 		public UInt16 InitAddress;
 		public UInt16 PlayAddress;
 
-		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 256)]
+		[MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 256)]
 		public Byte[] SongName;
 
-		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 256)]
+		[MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 256)]
 		public Byte[] ArtistName;
 
-		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 256)]
+		[MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 256)]
 		public Byte[] CopyrightHolder;
 
 		public UInt16 PlaySpeedNtsc;
 
-		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 8)]
+		[MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 8)]
 		public Byte[] BankSetup;
 
 		public UInt16 PlaySpeedPal;
 		public Byte Flags;
 		public Byte SoundChips;
 
-		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
+		[MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 4)]
 		public Byte[] Padding;
 
-		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 256)]
+		[MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 256)]
 		public Byte[] RipperName;
 
-		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 20000)]
+		[MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 20000)]
 		public Byte[] TrackName;
 
-		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 256)]
+		[MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 256)]
 		public Int32[] TrackLength;
 
-		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 256)]
+		[MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 256)]
 		public Int32[] TrackFade;
-
-		private string ConvertString(Byte[] input)
-		{
-			string output = Encoding.UTF8.GetString(input, 0, Array.IndexOf(input, (Byte)0));
-			if(output.Length == 0 || output == "<?>")
-			{
-				//return ResourceHelper.GetMessage("NsfUnknownField");
-				return "NsfUnknownField";
-			}
-
-			if(output[0] == 0xFFFD) {
-				//Patch to convert an invalid character at index 0 to a copyright sign
-				//This is usually the case for NSFe files (not sure what the encoding for NSF/NSFe is meant to be.  Is it properly defined?)
-				return "©" + output.Substring(1);
-			}
-
-			return output;
-		}
-
-		public bool HasSongName { get { return this.GetSongName() != "NsfUnknownField"; } }
-
-		public string GetSongName()
-		{
-			return ConvertString(this.SongName);
-		}
-
-		public string GetArtistName()
-		{
-			return ConvertString(this.ArtistName);
-		}
-
-		public string GetCopyrightHolder()
-		{
-			return ConvertString(this.CopyrightHolder);
-		}
-
-		public string GetRipperName()
-		{
-			return ConvertString(this.RipperName);
-		}
 
 		public string[] GetTrackNames()
 		{
 			return Encoding.UTF8.GetString(this.TrackName, 0, Array.IndexOf(this.TrackName, (Byte)0)).Split(new string[] { "[!|!]" }, StringSplitOptions.None);
 		}
+	}
+
+	public struct ProfiledFunction
+	{
+		public UInt64 ExclusiveCycles;
+		public UInt64 InclusiveCycles;
+		public UInt64 CallCount;
+		public UInt64 MinCycles;
+		public UInt64 MaxCycles;
+		public AddressTypeInfo Address;
+	}
+
+	[StructLayout(LayoutKind.Sequential)]
+	public struct AddressCounters
+	{
+		public UInt32 Address;
+		public UInt32 ReadCount;
+		public UInt64 ReadStamp;
+		public byte UninitRead;
+		public UInt32 WriteCount;
+		public UInt64 WriteStamp;
+		public UInt32 ExecCount;
+		public UInt64 ExecStamp;
 	}
 
 	public enum RecordMovieFrom
@@ -2087,15 +2249,15 @@ namespace Brewmaster.Emulation
 		{
 			Author = Encoding.UTF8.GetBytes(author);
 			Array.Resize(ref Author, AuthorMaxSize);
-			Author[AuthorMaxSize-1] = 0;
+			Author[AuthorMaxSize - 1] = 0;
 
 			Description = Encoding.UTF8.GetBytes(description.Replace("\r", ""));
 			Array.Resize(ref Description, DescriptionMaxSize);
-			Description[DescriptionMaxSize-1] = 0;
+			Description[DescriptionMaxSize - 1] = 0;
 
 			Filename = Encoding.UTF8.GetBytes(filename);
 			Array.Resize(ref Filename, FilenameMaxSize);
-			Filename[FilenameMaxSize-1] = 0;
+			Filename[FilenameMaxSize - 1] = 0;
 
 			RecordFrom = recordFrom;
 		}
@@ -2111,7 +2273,50 @@ namespace Brewmaster.Emulation
 
 		public RecordMovieFrom RecordFrom;
 	}
-	
+
+	public struct EventViewerDisplayOptions
+	{
+		public UInt32 IrqColor;
+		public UInt32 NmiColor;
+		public UInt32 DmcDmaReadColor;
+		public UInt32 SpriteZeroHitColor;
+		public UInt32 BreakpointColor;
+		public UInt32 MapperRegisterReadColor;
+		public UInt32 MapperRegisterWriteColor;
+		public UInt32 ApuRegisterReadColor;
+		public UInt32 ApuRegisterWriteColor;
+		public UInt32 ControlRegisterReadColor;
+		public UInt32 ControlRegisterWriteColor;
+
+		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 8)]
+		public UInt32[] PpuRegisterReadColors;
+
+		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 8)]
+		public UInt32[] PpuRegisterWriteColor;
+
+		[MarshalAs(UnmanagedType.I1)] public bool ShowMapperRegisterWrites;
+		[MarshalAs(UnmanagedType.I1)] public bool ShowMapperRegisterReads;
+		[MarshalAs(UnmanagedType.I1)] public bool ShowApuRegisterWrites;
+		[MarshalAs(UnmanagedType.I1)] public bool ShowApuRegisterReads;
+		[MarshalAs(UnmanagedType.I1)] public bool ShowControlRegisterWrites;
+		[MarshalAs(UnmanagedType.I1)] public bool ShowControlRegisterReads;
+
+		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 8)]
+		public byte[] ShowPpuRegisterWrites;
+
+		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 8)]
+		public byte[] ShowPpuRegisterReads;
+
+		[MarshalAs(UnmanagedType.I1)] public bool ShowNmi;
+		[MarshalAs(UnmanagedType.I1)] public bool ShowIrq;
+		[MarshalAs(UnmanagedType.I1)] public bool ShowDmcDmaReads;
+		[MarshalAs(UnmanagedType.I1)] public bool ShowSpriteZeroHit;
+
+		[MarshalAs(UnmanagedType.I1)] public bool ShowMarkedBreakpoints;
+		[MarshalAs(UnmanagedType.I1)] public bool ShowPreviousFrameEvents;
+		[MarshalAs(UnmanagedType.I1)] public bool ShowNtscBorders;
+	}
+
 	public enum BreakpointType
 	{
 		Global = 0,
@@ -2140,7 +2345,8 @@ namespace Brewmaster.Emulation
 		Numeric = 0,
 		Boolean = 1,
 		Invalid = 2,
-		DivideBy0 = 3
+		DivideBy0 = 3,
+		OutOfScope = 4
 	}
 
 	public enum NesModel
@@ -2192,6 +2398,7 @@ namespace Brewmaster.Emulation
 		None = 0,
 		ZMBV = 1,
 		CSCD = 2,
+		GIF = 3,
 	}
 
 	public enum ScaleFilterType
@@ -2282,6 +2489,13 @@ namespace Brewmaster.Emulation
 		_270Degrees = 270
 	}
 
+	public enum NametableDisplayMode
+	{
+		Normal = 0,
+		Grayscale = 1,
+		AttributeView = 2
+	}
+
 	public enum DebugMemoryType
 	{
 		CpuMemory = 0,
@@ -2294,7 +2508,8 @@ namespace Brewmaster.Emulation
 		ChrRam = 7,
 		WorkRam = 8,
 		SaveRam = 9,
-		InternalRam = 10
+		InternalRam = 10,
+		NametableRam = 11
 	}
 
 	public enum BreakSource
@@ -2312,6 +2527,16 @@ namespace Brewmaster.Emulation
 		BreakOnCpuCrash = 9,
 		Pause = 10,
 		BreakAfterSuspend = 11,
+		BreakOnPpu2006ScrollGlitch = 12,
+		BreakOnBusConflict = 13
+	}
+
+	public enum PpuAddressType
+	{
+		ChrRom = 0,
+		ChrRam = 1,
+		PaletteRam = 2,
+		NametableRam = 3
 	}
 
 	public enum AddressType
@@ -2327,7 +2552,8 @@ namespace Brewmaster.Emulation
 	{
 		public static DebugMemoryType ToMemoryType(this AddressType type)
 		{
-			switch(type) {
+			switch (type)
+			{
 				case AddressType.InternalRam: return DebugMemoryType.InternalRam;
 				case AddressType.Register: return DebugMemoryType.CpuMemory;
 				case AddressType.PrgRom: return DebugMemoryType.PrgRom;
@@ -2337,9 +2563,22 @@ namespace Brewmaster.Emulation
 			return DebugMemoryType.CpuMemory;
 		}
 
+		public static DebugMemoryType ToMemoryType(this PpuAddressType type)
+		{
+			switch (type)
+			{
+				case PpuAddressType.ChrRom: return DebugMemoryType.ChrRom;
+				case PpuAddressType.ChrRam: return DebugMemoryType.ChrRam;
+				case PpuAddressType.NametableRam: return DebugMemoryType.NametableRam;
+				case PpuAddressType.PaletteRam: return DebugMemoryType.PaletteMemory;
+			}
+			throw new Exception("Invalid memory type");
+		}
+
 		public static AddressType ToAddressType(this DebugMemoryType type)
 		{
-			switch(type) {
+			switch (type)
+			{
 				case DebugMemoryType.InternalRam: return AddressType.InternalRam;
 				case DebugMemoryType.CpuMemory: return AddressType.Register;
 				case DebugMemoryType.PrgRom: return AddressType.PrgRom;
@@ -2348,6 +2587,26 @@ namespace Brewmaster.Emulation
 			}
 			return AddressType.Register;
 		}
+
+		public static PpuAddressType ToPpuAddressType(this DebugMemoryType type)
+		{
+			switch (type)
+			{
+				case DebugMemoryType.ChrRom: return PpuAddressType.ChrRom;
+				case DebugMemoryType.ChrRam: return PpuAddressType.ChrRam;
+				case DebugMemoryType.NametableRam: return PpuAddressType.NametableRam;
+				case DebugMemoryType.PaletteMemory: return PpuAddressType.PaletteRam;
+			}
+			throw new Exception("Invalid memory type");
+		}
+	}
+
+	public enum PerfTrackerMode
+	{
+		Disabled = 0,
+		Fullscreen = 1,
+		Compact = 2,
+		TextOnly = 3
 	}
 
 	public enum InteropMemoryOperationType
@@ -2386,12 +2645,20 @@ namespace Brewmaster.Emulation
 		public Int32 Address;
 		public AddressType Type;
 	}
-	
+
+	[StructLayout(LayoutKind.Sequential)]
+	public class PpuAddressTypeInfo
+	{
+		public Int32 Address;
+		public PpuAddressType Type;
+	}
+
 	public class MD5Helper
 	{
 		public static string GetMD5Hash(string filename)
 		{
-			if(File.Exists(filename)) {
+			if (File.Exists(filename))
+			{
 				var md5 = System.Security.Cryptography.MD5.Create();
 				return BitConverter.ToString(md5.ComputeHash(File.ReadAllBytes(filename))).Replace("-", "");
 			}
@@ -2405,10 +2672,12 @@ namespace Brewmaster.Emulation
 
 		public IntPtr MarshalManagedToNative(object managedObj)
 		{
-			if(managedObj == null) {
+			if (managedObj == null)
+			{
 				return IntPtr.Zero;
 			}
-			if(!(managedObj is string)) {
+			if (!(managedObj is string))
+			{
 				throw new MarshalDirectiveException("UTF8Marshaler must be used on a string.");
 			}
 
@@ -2443,7 +2712,8 @@ namespace Brewmaster.Emulation
 
 		public static ICustomMarshaler GetInstance(string cookie)
 		{
-			if(_instance == null) {
+			if (_instance == null)
+			{
 				return _instance = new UTF8Marshaler();
 			}
 			return _instance;
@@ -2453,10 +2723,11 @@ namespace Brewmaster.Emulation
 		{
 			int offset = 0;
 			byte b = 0;
-			do {
+			do
+			{
 				b = Marshal.ReadByte(pNativeData, offset);
 				offset++;
-			} while(b != 0);
+			} while (b != 0);
 
 			int length = offset - 1;
 
