@@ -22,6 +22,7 @@ namespace Brewmaster.Modules
 		public Action UpdatedBreakpoints;
 		public Func<AsmProject> GetCurrentProject;
 		public Func<TextEditorWindow> GetCurrentTextEditor;
+		public Action<AsmProjectFile, int?, int?, int?> OpenFileAction { private get; set; }
 
 		public event Action<EmulationState> EmulationStateUpdate;
 		public int SelectedSprite { get; private set; } = -1;
@@ -58,6 +59,11 @@ namespace Brewmaster.Modules
 			if (projectType == ProjectType) return;
 			ProjectType = projectType;
 			if (ProjectTypeChanged != null) ProjectTypeChanged(projectType);
+		}
+
+		public void OpenFile(AsmProjectFile file, int? line = null, int? column = null, int? length = null)
+		{
+			if (OpenFileAction != null) OpenFileAction(file, line, column, length);
 		}
 	}
 }

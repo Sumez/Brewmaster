@@ -133,7 +133,7 @@ namespace Brewmaster
 			else filenameLabel.Text = editorTab.ProjectFile.File.FullName;
 
 			if (editorTab is TextEditorWindow textEditorWindow) SetCaretInformation(textEditorWindow);
-			else lineLabel.Text = fpsLabel.Text = "";
+			else lineLabel.Text = charLabel.Text = "";
 
 			UpdateTabListInWindowMenu();
 		}
@@ -142,7 +142,7 @@ namespace Brewmaster
 	    {
 			var caret = textEditorWindow.TextEditor.ActiveTextAreaControl.Caret;
 		    lineLabel.Text = (caret.Line + 1).ToString();
-		    fpsLabel.Text = (caret.Column + 1).ToString();
+			charLabel.Text = (caret.Column + 1).ToString();
 		}
 
 	    private void BuildErrorUpdate(List<BuildHandler.BuildError> list)
@@ -376,6 +376,11 @@ namespace Brewmaster
 		    _moduleEvents.AddBreakpoint = AddBreakpoint;
 		    _moduleEvents.UpdatedBreakpoints = ActivateBreakPointsForCurrentProject;
 		    _moduleEvents.GetCurrentTextEditor = GetCurrentTextEditor;
+			_moduleEvents.OpenFileAction = (file, line, column, length) =>
+			{
+				if (line.HasValue) GoTo(file.File.FullName, line.Value, column.HasValue ? column.Value : 0, length);
+				else OpenFileInTab(file);
+			};
 
 
 			_moduleEvents.Cut = Cut;
@@ -936,13 +941,13 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 	        recentProjectsMenuItem.Enabled = (recentProjectsMenuItem.DropDownItems.Count > 0);
         }
 		
-	    private void GoTo(string file, int line, int character)
+	    private void GoTo(string file, int line, int character, int? length = null)
 	    {
 		    if (CurrentProject == null) return;
 		    var goToFile = CurrentProject.Files.SingleOrDefault(f => f.File.FullName == file);
 		    if (goToFile == null) throw new Exception("Could not find file in project: " + file);
 		    var tab = OpenFileInTab(goToFile) as TextEditorWindow;
-			if (tab != null) tab.TextEditor.GoToWordAt(line, character);
+			if (tab != null) tab.TextEditor.GoToWordAt(line, character, length);
 		}
 
 		private void LoadProject(string projectFilename)
@@ -972,7 +977,7 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 
 			_moduleEvents.SetProjectType(project.Type);
 			LoadEmulator(project.Type);
-			project.GoTo = GoTo;
+			project.GoTo = (file, length, ch) => GoTo(file, length, ch);
 			project.BreakpointsChanged += ThreadSafeBreakpointHandler;
 
 			AddFileToRecentProjects(projectFilename);

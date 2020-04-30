@@ -103,6 +103,7 @@ namespace Brewmaster
 			this.Edit_RedoMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.toolStripSeparator11 = new System.Windows.Forms.ToolStripSeparator();
 			this.findMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.findInFilesMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.findNextMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.replaceMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.toolStripSeparator12 = new System.Windows.Forms.ToolStripSeparator();
@@ -201,7 +202,7 @@ namespace Brewmaster
 			this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
 			this.lineLabel = new System.Windows.Forms.ToolStripStatusLabel();
 			this.toolStripStatusLabel2 = new System.Windows.Forms.ToolStripStatusLabel();
-			this.toolStripStatusLabel4 = new System.Windows.Forms.ToolStripStatusLabel();
+			this.charLabel = new System.Windows.Forms.ToolStripStatusLabel();
 			this.toolStripStatusLabel3 = new System.Windows.Forms.ToolStripStatusLabel();
 			this.fpsLabel = new System.Windows.Forms.ToolStripStatusLabel();
 			this.New_ProjExplorerContextMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -231,7 +232,6 @@ namespace Brewmaster
 			this.CodeItemImages = new System.Windows.Forms.ImageList(this.components);
 			this.MainEastContainer2 = new Brewmaster.Ide.MultiSplitContainer();
 			this._menuHelper = new Brewmaster.Modules.MenuHelper(this.components);
-			this.findInFilesMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			availableIdePanels = new System.Windows.Forms.Panel();
 			toolStripSeparator14 = new System.Windows.Forms.ToolStripSeparator();
 			toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
@@ -491,7 +491,7 @@ namespace Brewmaster
 			// toolStripSeparator25
 			// 
 			toolStripSeparator25.Name = "toolStripSeparator25";
-			toolStripSeparator25.Size = new System.Drawing.Size(138, 6);
+			toolStripSeparator25.Size = new System.Drawing.Size(137, 6);
 			// 
 			// toolStripSeparator26
 			// 
@@ -537,7 +537,7 @@ namespace Brewmaster
 			// toolStripSeparator27
 			// 
 			toolStripSeparator27.Name = "toolStripSeparator27";
-			toolStripSeparator27.Size = new System.Drawing.Size(212, 6);
+			toolStripSeparator27.Size = new System.Drawing.Size(211, 6);
 			toolStripSeparator27.Visible = false;
 			// 
 			// MainWindowMenu
@@ -874,6 +874,15 @@ namespace Brewmaster
 			this.findMenuItem.Size = new System.Drawing.Size(217, 22);
 			this.findMenuItem.Text = "Find...";
 			this.findMenuItem.Click += new System.EventHandler(this.Edit_FindMenuItem_Click);
+			// 
+			// findInFilesMenuItem
+			// 
+			this.findInFilesMenuItem.Name = "findInFilesMenuItem";
+			this.findInFilesMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+            | System.Windows.Forms.Keys.F)));
+			this.findInFilesMenuItem.Size = new System.Drawing.Size(217, 22);
+			this.findInFilesMenuItem.Text = "Find in Files...";
+			this.findInFilesMenuItem.Click += new System.EventHandler(this.findInFilesMenuItem_Click);
 			// 
 			// findNextMenuItem
 			// 
@@ -1258,7 +1267,7 @@ namespace Brewmaster
 			this.playAudioMenuItem.CheckOnClick = true;
 			this.playAudioMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.playAudioMenuItem.Name = "playAudioMenuItem";
-			this.playAudioMenuItem.Size = new System.Drawing.Size(141, 22);
+			this.playAudioMenuItem.Size = new System.Drawing.Size(140, 22);
 			this.playAudioMenuItem.Text = "Play Audio";
 			this.playAudioMenuItem.Click += new System.EventHandler(this.playAudioToolStripMenuItem_Click);
 			// 
@@ -1268,7 +1277,7 @@ namespace Brewmaster
 			this.playPulse1MenuItem.CheckOnClick = true;
 			this.playPulse1MenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.playPulse1MenuItem.Name = "playPulse1MenuItem";
-			this.playPulse1MenuItem.Size = new System.Drawing.Size(141, 22);
+			this.playPulse1MenuItem.Size = new System.Drawing.Size(140, 22);
 			this.playPulse1MenuItem.Text = "Play Pulse 1";
 			this.playPulse1MenuItem.Click += new System.EventHandler(this.playPulse1ToolStripMenuItem_Click);
 			// 
@@ -1278,7 +1287,7 @@ namespace Brewmaster
 			this.playPulse2MenuItem.CheckOnClick = true;
 			this.playPulse2MenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.playPulse2MenuItem.Name = "playPulse2MenuItem";
-			this.playPulse2MenuItem.Size = new System.Drawing.Size(141, 22);
+			this.playPulse2MenuItem.Size = new System.Drawing.Size(140, 22);
 			this.playPulse2MenuItem.Text = "Play Pulse 2";
 			this.playPulse2MenuItem.Click += new System.EventHandler(this.playPulse2ToolStripMenuItem_Click);
 			// 
@@ -1288,7 +1297,7 @@ namespace Brewmaster
 			this.playTriangleMenuItem.CheckOnClick = true;
 			this.playTriangleMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.playTriangleMenuItem.Name = "playTriangleMenuItem";
-			this.playTriangleMenuItem.Size = new System.Drawing.Size(141, 22);
+			this.playTriangleMenuItem.Size = new System.Drawing.Size(140, 22);
 			this.playTriangleMenuItem.Text = "Play Triangle";
 			this.playTriangleMenuItem.Click += new System.EventHandler(this.playTriangleToolStripMenuItem_Click);
 			// 
@@ -1298,7 +1307,7 @@ namespace Brewmaster
 			this.playNoiseMenuItem.CheckOnClick = true;
 			this.playNoiseMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.playNoiseMenuItem.Name = "playNoiseMenuItem";
-			this.playNoiseMenuItem.Size = new System.Drawing.Size(141, 22);
+			this.playNoiseMenuItem.Size = new System.Drawing.Size(140, 22);
 			this.playNoiseMenuItem.Text = "Play Noise";
 			this.playNoiseMenuItem.Click += new System.EventHandler(this.playNoiseToolStripMenuItem_Click);
 			// 
@@ -1308,7 +1317,7 @@ namespace Brewmaster
 			this.playPcmMenuItem.CheckOnClick = true;
 			this.playPcmMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.playPcmMenuItem.Name = "playPcmMenuItem";
-			this.playPcmMenuItem.Size = new System.Drawing.Size(141, 22);
+			this.playPcmMenuItem.Size = new System.Drawing.Size(140, 22);
 			this.playPcmMenuItem.Text = "Play PCM";
 			this.playPcmMenuItem.Click += new System.EventHandler(this.playPCMToolStripMenuItem_Click);
 			// 
@@ -1454,7 +1463,7 @@ namespace Brewmaster
 			// viewHelpTopicsMenuItem
 			// 
 			this.viewHelpTopicsMenuItem.Name = "viewHelpTopicsMenuItem";
-			this.viewHelpTopicsMenuItem.Size = new System.Drawing.Size(215, 22);
+			this.viewHelpTopicsMenuItem.Size = new System.Drawing.Size(214, 22);
 			this.viewHelpTopicsMenuItem.Text = "View Help Topics                 ";
 			this.viewHelpTopicsMenuItem.Visible = false;
 			this.viewHelpTopicsMenuItem.Click += new System.EventHandler(this.Help_ViewHelpTopicsMenuItem_Click);
@@ -1462,7 +1471,7 @@ namespace Brewmaster
 			// aboutMenuItem
 			// 
 			this.aboutMenuItem.Name = "aboutMenuItem";
-			this.aboutMenuItem.Size = new System.Drawing.Size(215, 22);
+			this.aboutMenuItem.Size = new System.Drawing.Size(214, 22);
 			this.aboutMenuItem.Text = "About";
 			this.aboutMenuItem.Click += new System.EventHandler(this.Help_AboutMenuItem_Click);
 			// 
@@ -1752,7 +1761,7 @@ namespace Brewmaster
             this.toolStripStatusLabel1,
             this.lineLabel,
             this.toolStripStatusLabel2,
-            this.toolStripStatusLabel4,
+            this.charLabel,
             this.toolStripStatusLabel3,
             this.fpsLabel});
 			this.statusBar.Location = new System.Drawing.Point(0, 539);
@@ -1802,13 +1811,13 @@ namespace Brewmaster
 			this.toolStripStatusLabel2.Size = new System.Drawing.Size(32, 17);
 			this.toolStripStatusLabel2.Text = "Char";
 			// 
-			// toolStripStatusLabel4
+			// charLabel
 			// 
-			this.toolStripStatusLabel4.AutoSize = false;
-			this.toolStripStatusLabel4.ForeColor = System.Drawing.Color.White;
-			this.toolStripStatusLabel4.Name = "toolStripStatusLabel4";
-			this.toolStripStatusLabel4.Size = new System.Drawing.Size(50, 17);
-			this.toolStripStatusLabel4.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.charLabel.AutoSize = false;
+			this.charLabel.ForeColor = System.Drawing.Color.White;
+			this.charLabel.Name = "charLabel";
+			this.charLabel.Size = new System.Drawing.Size(50, 17);
+			this.charLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
 			// toolStripStatusLabel3
 			// 
@@ -1967,15 +1976,6 @@ namespace Brewmaster
 			this.MainEastContainer2.Size = new System.Drawing.Size(1287, 489);
 			this.MainEastContainer2.TabIndex = 1;
 			this.MainEastContainer2.Text = "multiSplitContainer2";
-			// 
-			// findInFilesMenuItem
-			// 
-			this.findInFilesMenuItem.Name = "findInFilesMenuItem";
-			this.findInFilesMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
-            | System.Windows.Forms.Keys.F)));
-			this.findInFilesMenuItem.Size = new System.Drawing.Size(217, 22);
-			this.findInFilesMenuItem.Text = "Find in Files...";
-			this.findInFilesMenuItem.Click += new System.EventHandler(this.findInFilesMenuItem_Click);
 			// 
 			// MainForm
 			// 
@@ -2198,7 +2198,7 @@ namespace Brewmaster
 		public ToolStripStatusLabel toolStripStatusLabel1;
 		public ToolStripStatusLabel toolStripStatusLabel2;
 		private ToolStripMenuItem emulatorSettingsMenuItem;
-		public ToolStripStatusLabel toolStripStatusLabel4;
+		public ToolStripStatusLabel charLabel;
 		public ToolStripStatusLabel toolStripStatusLabel3;
 		private ToolStripMenuItem findInFilesMenuItem;
 	}

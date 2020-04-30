@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using Brewmaster.Modules;
 using ICSharpCode.TextEditor;
@@ -10,6 +13,7 @@ namespace Brewmaster.EditorWindows.Text
 {
 	public partial class FindWindow : Form
     {
+		private Action _cancelFindFiles;
 		private static string _storedQuery;
 	    private FindMode _mode;
 	    private FindResults _resultsWindow;
@@ -38,7 +42,8 @@ namespace Brewmaster.EditorWindows.Text
 
 		    if (GetTargetEditor() == null && mode == FindMode.FindInCurrentFile) mode = FindMode.FindInAllFiles;
 		    Mode = mode;
-	    }
+			ReplaceButton.Enabled = ReplaceAllButton.Enabled = FindNextButton.Enabled = !string.IsNullOrEmpty(SearchQuery.Text);
+		}
 
 		private void SearchQuery_TextChanged(object sender, EventArgs e)
         {
@@ -55,14 +60,72 @@ namespace Brewmaster.EditorWindows.Text
 	    private void FindInFiles()
 	    {
 		    var query = SearchQuery.Text;
-		    if (_resultsWindow == null)
+			if (string.IsNullOrEmpty(query)) return;
+			
+			if (_resultsWindow == null || _resultsWindow.IsDisposed)
 		    {
 				_resultsWindow = new FindResults();
 				_resultsWindow.Show(this);
 		    }
 
-		    var project = _events.GetCurrentProject();
+			var resultsWindow = _resultsWindow;
+			var projectFiles = _events.GetCurrentProject().Files.Where(f => f.IsTextFile && f.File != null).ToList();
 
+			if (_cancelFindFiles != null) _cancelFindFiles();
+			var tokenSource = new CancellationTokenSource();
+			_cancelFindFiles = () => tokenSource.Cancel();
+			var token = tokenSource.Token;
+			resultsWindow.Text = string.Format("Find Results: '{0}'", query);
+			resultsWindow.Clear();
+			Task.Run(() =>
+			{
+				var max = projectFiles.Count;
+				var count = 0;
+				var queryLength = query.Length;
+				foreach (var file in projectFiles)
+				{
+					var path = file.File.FullName;
+					if (!File.Exists(path)) continue;
+					resultsWindow.SetStatus((int)((count / (float)max) * 100), string.Format(@"Searching in {0}...", path));
+
+					var results = new List<SearchResult>();
+					using (var reader = new StreamReader(path))
+					{
+						var index = 0;
+						var line = 0;
+						var lastLineIndex = 0;
+						var contents = reader.ReadToEnd();
+						while (index < contents.Length)
+						{
+							if (token.IsCancellationRequested) return;
+							var qIndex = contents.IndexOf(query, index, StringComparison.InvariantCultureIgnoreCase); // TODO "case sensitive" option?
+						var lineIndex = contents.IndexOf('\n', index);
+							if (qIndex < 0) break;
+							if (lineIndex < qIndex && lineIndex >= 0)
+							{
+								line++;
+								index = lastLineIndex = lineIndex + 1;
+							}
+							else
+							{
+								results.Add(new SearchResult(
+									qIndex - lastLineIndex, 
+									line + 1, 
+									lineIndex >= 0 ? contents.Substring(lastLineIndex, lineIndex - lastLineIndex) : contents.Substring(lastLineIndex),
+									(l, c) => { _events.OpenFile(file, l, c, queryLength); }
+								));
+								index = qIndex + queryLength;
+							}
+						}
+					}
+					if (results.Count > 0)
+					{
+						resultsWindow.AddResult(file, results, query);
+					}
+					count++;
+				}
+				resultsWindow.SetStatus(100, "Done");
+			}, token);
 			_storedQuery = query;
 		}
 
