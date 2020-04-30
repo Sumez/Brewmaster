@@ -3,15 +3,17 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
+using Brewmaster.Modules;
 using ICSharpCode.TextEditor;
 
 namespace Brewmaster.EditorWindows.Text
 {
 	public partial class FindWindow : Form
     {
-		private static string StoredQuery;
-		private readonly Func<TextEditorWindow> _getTargetEditor;
+		private static string _storedQuery;
 	    private FindMode _mode;
+	    private FindResults _resultsWindow;
+	    private Events _events;
 
 	    public FindMode Mode
 	    {
@@ -22,16 +24,19 @@ namespace Brewmaster.EditorWindows.Text
 			    StatusLabel.Visible = AllFiles.Visible = _mode != FindMode.Replace;
 			    ReplaceButton.Visible = ReplaceAllButton.Visible = ReplaceLabel.Visible = ReplaceWith.Visible = _mode == FindMode.Replace;
 			    AllFiles.Checked = _mode == FindMode.FindInAllFiles;
+			    FindNextButton.Text = _mode == FindMode.FindInAllFiles ? "Find All" : "Find Next";
 		    }
 	    }
 
-	    public FindWindow(Func<TextEditorWindow> getTargetEditor, FindMode mode)
+		private TextEditorWindow GetTargetEditor() { return _events.GetCurrentTextEditor(); }
+
+		public FindWindow(Events events, FindMode mode)
 	    {
 		    InitializeComponent();
-			_getTargetEditor = getTargetEditor;
-			if (!string.IsNullOrEmpty(StoredQuery)) SearchQuery.Text = StoredQuery;
+			_events = events;
+			if (!string.IsNullOrEmpty(_storedQuery)) SearchQuery.Text = _storedQuery;
 
-		    if (getTargetEditor() == null && mode == FindMode.FindInCurrentFile) mode = FindMode.FindInAllFiles;
+		    if (GetTargetEditor() == null && mode == FindMode.FindInCurrentFile) mode = FindMode.FindInAllFiles;
 		    Mode = mode;
 	    }
 
@@ -42,23 +47,43 @@ namespace Brewmaster.EditorWindows.Text
         }
 
 		private void FindNextButton_Click(object sender, EventArgs e)
-        {
-	        var query = SearchQuery.Text;
-	        var editor = _getTargetEditor();
+		{
+			if (Mode == FindMode.FindInAllFiles) FindInFiles();
+			else FindNextOccurence();
+		}
 
-	        if (string.IsNullOrEmpty(query) || editor == null) return;
-	        var results = FindNext(SearchQuery.Text, editor.TextEditor);
-
-
-			StatusLabel.Text = string.Format("Found {0} result{1}", results.Count, results.Count == 1 ? "" : "s");
-	        StatusLabel.ForeColor = results.Any() ? SystemColors.ControlText : Color.Red;
-			StoredQuery = query;
-        }
-
-	    public static void FindNext(TextEditorControl textEditor)
+	    private void FindInFiles()
 	    {
-		    if (string.IsNullOrEmpty(StoredQuery)) return;
-		    FindNext(StoredQuery, textEditor);
+		    var query = SearchQuery.Text;
+		    if (_resultsWindow == null)
+		    {
+				_resultsWindow = new FindResults();
+				_resultsWindow.Show(this);
+		    }
+
+		    var project = _events.GetCurrentProject();
+
+			_storedQuery = query;
+		}
+
+	    private void FindNextOccurence()
+	    {
+			var query = SearchQuery.Text;
+		    var editor = GetTargetEditor();
+
+		    if (string.IsNullOrEmpty(query) || editor == null) return;
+		    var results = FindNext(SearchQuery.Text, editor.TextEditor);
+
+
+		    StatusLabel.Text = string.Format("Found {0} result{1}", results.Count, results.Count == 1 ? "" : "s");
+		    StatusLabel.ForeColor = results.Any() ? SystemColors.ControlText : Color.Red;
+		    _storedQuery = query;
+		}
+
+		public static void FindNext(TextEditorControl textEditor)
+	    {
+		    if (string.IsNullOrEmpty(_storedQuery)) return;
+		    FindNext(_storedQuery, textEditor);
 	    }
 		private static List<int> FindNext(string query, TextEditorControl textEditor)
 	    {
@@ -124,7 +149,7 @@ namespace Brewmaster.EditorWindows.Text
 		private void ReplaceButton_Click(object sender, EventArgs e)
 		{
 			var query = SearchQuery.Text;
-			var editor = _getTargetEditor();
+			var editor = GetTargetEditor();
 			var replaced = false;
 
 			if (string.IsNullOrEmpty(query) || editor == null) return;
@@ -134,14 +159,14 @@ namespace Brewmaster.EditorWindows.Text
 				replaced = true;
 			}
 
-			FindNextButton.PerformClick();
+			FindNextOccurence();
 			if (!replaced && StatusLabel.ForeColor == Color.Red) StatusAlert("Replace text");
 		}
 
 	    private void ReplaceAllButton_Click(object sender, EventArgs e)
 	    {
 		    var query = SearchQuery.Text;
-		    var editor = _getTargetEditor();
+		    var editor = GetTargetEditor();
 		    if (string.IsNullOrEmpty(query) || editor == null) return;
 
 		    var textArea = editor.TextEditor.ActiveTextAreaControl;

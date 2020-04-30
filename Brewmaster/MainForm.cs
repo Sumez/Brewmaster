@@ -375,8 +375,10 @@ namespace Brewmaster
 		    _moduleEvents.RemoveBreakpoints = RemoveBreakpoints;
 		    _moduleEvents.AddBreakpoint = AddBreakpoint;
 		    _moduleEvents.UpdatedBreakpoints = ActivateBreakPointsForCurrentProject;
+		    _moduleEvents.GetCurrentTextEditor = GetCurrentTextEditor;
 
-		    _moduleEvents.Cut = Cut;
+
+			_moduleEvents.Cut = Cut;
 		    _moduleEvents.Copy = Copy;
 		    _moduleEvents.Paste = Paste;
 		    _moduleEvents.Delete = Delete;
@@ -694,7 +696,7 @@ namespace Brewmaster
 			    _findForm.Focus();
 			    return;
 		    }
-		    _findForm = new FindWindow(GetCurrentTextEditor, mode);
+		    _findForm = new FindWindow(_moduleEvents, mode);
 		    _findForm.Show(this);
 	    }
 	    private void GoToLine()

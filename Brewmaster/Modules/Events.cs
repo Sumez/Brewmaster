@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Brewmaster.EditorWindows;
 using Brewmaster.Emulation;
 using Brewmaster.Modules.Ca65Helper;
 using Brewmaster.Modules.OpcodeHelper;
@@ -20,6 +21,7 @@ namespace Brewmaster.Modules
 		public Action<Breakpoint> AddBreakpoint;
 		public Action UpdatedBreakpoints;
 		public Func<AsmProject> GetCurrentProject;
+		public Func<TextEditorWindow> GetCurrentTextEditor;
 
 		public event Action<EmulationState> EmulationStateUpdate;
 		public int SelectedSprite { get; private set; } = -1;

@@ -42,7 +42,7 @@ namespace Brewmaster.ProjectModel
 		private FileType _type = FileType.Unknown;
 		public FileType Type { get
 			{
-				if (_type != FileType.Unknown) return FileType.Unknown;
+				if (_type != FileType.Unknown) return _type;
 				var extension = File.Extension.ToLower();
 				if (Mode == CompileMode.IncludeInAssembly) return FileType.Source;
 				if (Mode == CompileMode.LinkerConfig) return FileType.Text;
@@ -53,6 +53,11 @@ namespace Brewmaster.ProjectModel
 				return FileType.Unknown;
 			}
 			set { _type = value; }
+		}
+
+		public bool IsTextFile
+		{
+			get { return Type == FileType.Text || Type == FileType.Source || Type == FileType.Include; }
 		}
 
 		public override string ToString()
