@@ -121,6 +121,10 @@ namespace Brewmaster
 				saveToolStripButton.Enabled = 
 				File_SaveMenuItem.Enabled = File_SaveAsMenuItem.Enabled = false;
 			}
+			Edit_CutMenuItem.Enabled = Edit_CopyMenuItem.Enabled = Edit_PasteMenuItem.Enabled =
+			selectAllMenuItem.Enabled = insertMenuItem.Enabled =
+			Edit_UndoMenuItem.Enabled = Edit_RedoMenuItem.Enabled =
+			findMenuItem.Enabled = findNextMenuItem.Enabled = replaceMenuItem.Enabled = Edit_GoToMenuItem.Enabled = // TODO: Find in files
 			File_PrintMenuItem.Enabled = File_PrintPreviewMenuItem.Enabled = currentTab is TextEditorWindow;
 			File_CloseMenuItem.Enabled = File_CloseAllMenuItem.Enabled = closeAllWindowsMenuItem.Enabled = editorTabs.TabCount > 0;
 
@@ -370,6 +374,12 @@ namespace Brewmaster
 		    _moduleEvents.RemoveBreakpoints = RemoveBreakpoints;
 		    _moduleEvents.AddBreakpoint = AddBreakpoint;
 		    _moduleEvents.UpdatedBreakpoints = ActivateBreakPointsForCurrentProject;
+
+		    _moduleEvents.Cut = Cut;
+		    _moduleEvents.Copy = Copy;
+		    _moduleEvents.Paste = Paste;
+		    _moduleEvents.Delete = Delete;
+		    _moduleEvents.SelectAll = SelectAll;
 
 		    BreakpointList.GoTo = (file, line) => FocusOnCodeLine(file, line);
 		    OutputWindow.GoTo = (file, line) => FocusOnCodeLine(file, line);
@@ -1140,27 +1150,51 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
             Close();
         }
 
-        private void Edit_CutMenuItem_Click(object s, EventArgs e)
+	    public void Cut()
+	    {
+		    if (!(editorTabs.SelectedTab is TextEditorWindow textEditorWindow)) return;
+		    textEditorWindow.TextEditor.Cut(this, null);
+	    }
+		public void Copy()
+	    {
+		    if (!(editorTabs.SelectedTab is TextEditorWindow textEditorWindow)) return;
+		    textEditorWindow.TextEditor.Copy(this, null);
+		}
+		public void Paste()
+	    {
+		    if (!(editorTabs.SelectedTab is TextEditorWindow textEditorWindow)) return;
+		    textEditorWindow.TextEditor.Paste(this, null);
+		}
+		public void Delete()
+	    {
+		    if (!(editorTabs.SelectedTab is TextEditorWindow textEditorWindow)) return;
+		    textEditorWindow.TextEditor.ActiveTextAreaControl.TextArea.InsertString("");
+	    }
+	    public void SelectAll()
+	    {
+		    if (!(editorTabs.SelectedTab is TextEditorWindow textEditorWindow)) return;
+		    textEditorWindow.TextEditor.SelectAll(this, null);
+		}
+
+
+		private void Edit_CutMenuItem_Click(object s, EventArgs e)
         {
-	        if (!(editorTabs.SelectedTab is TextEditorWindow textEditorWindow)) return;
-	        textEditorWindow.TextEditor.Cut(s, e);
+	        _moduleEvents.Cut();
         }
 
         private void Edit_CopyMenuItem_Click(object s, EventArgs e)
         {
-	        if (!(editorTabs.SelectedTab is TextEditorWindow textEditorWindow)) return;
-	        textEditorWindow.TextEditor.Copy(s, e);
+	        _moduleEvents.Copy();
         }
 
         private void Edit_PasteMenuItem_Click(object s, EventArgs e)
         {
-	        if (!(editorTabs.SelectedTab is TextEditorWindow textEditorWindow)) return;
-	        textEditorWindow.TextEditor.Paste(s, e);
+	        _moduleEvents.Paste();
         }
 
 	    private void Edit_UndoMenuItem_Click(object sender, EventArgs e)
         {
-	        if (!(editorTabs.SelectedTab is TextEditorWindow textEditorWindow)) return;
+			if (!(editorTabs.SelectedTab is TextEditorWindow textEditorWindow)) return;
 	        textEditorWindow.TextEditor.Undo();
         }
 
@@ -1186,8 +1220,7 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 
 		private void Edit_SelectAllMenuItem_Click(object s, EventArgs e)
         {
-	        if (!(editorTabs.SelectedTab is TextEditorWindow textEditorWindow)) return;
-	        textEditorWindow.TextEditor.SelectAll(s, e);
+	        _moduleEvents.SelectAll();
         }
 
 		private void Edit_ReplaceMenuItem_Click(object sender, EventArgs e)
@@ -1451,7 +1484,6 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 					case FileType.Source:
 					case FileType.Include:
 						var textEditor = new TextEditorWindow(this, file, _moduleEvents);
-						textEditor.TextEditor.ContextMenuStrip = textEditorContextMenuStrip;
 						textEditor.RefreshEditorContents();
 						tab = textEditor;
 						break;
@@ -1495,32 +1527,6 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 			editorTabs.SelectedTab = tab;
 		    return tab;
 	    }
-
-	    private void textEditorContextMenu_DeleteMenuItem_Click(object sender, EventArgs e)
-	    {
-		    if (!(editorTabs.SelectedTab is TextEditorWindow textEditorWindow)) return;
-		    textEditorWindow.TextEditor.ActiveTextAreaControl.TextArea.InsertString("");
-	    }
-
-		private void textEditorContextMenu_CutMenuItem_Click(object sender, EventArgs e)
-        {
-            Edit_CutMenuItem.PerformClick();
-        }
-
-        private void textEditorContextMenu_CopyMenuItem_Click(object sender, EventArgs e)
-        {
-            Edit_CopyMenuItem.PerformClick();
-        }
-
-        private void textEditorContextMenu_PasteMenuItem_Click(object sender, EventArgs e)
-        {
-            Edit_PasteMenuItem.PerformClick();
-        }
-
-        private void textEditorContextMenu_SelectAllMenuItem_Click(object sender, EventArgs e)
-        {
-            selectAllMenuItem.PerformClick();
-        }
 
 	    private void runNewBuild_Click(object sender, EventArgs e)
 		{

@@ -10,6 +10,12 @@ namespace Brewmaster.Modules
 	// TODO: More organized handling of global events (breakpoints, watch values, status, etc)
 	public class Events
 	{
+		public Action Cut;
+		public Action Copy;
+		public Action Paste;
+		public Action Delete;
+		public Action SelectAll;
+
 		public Action<IEnumerable<Breakpoint>> RemoveBreakpoints;
 		public Action<Breakpoint> AddBreakpoint;
 		public Action UpdatedBreakpoints;

@@ -33,6 +33,7 @@ namespace Brewmaster.EditorWindows
 				case FileType.Text:
 				default:
 					TextEditor = new TextEditor();
+					TextEditor.ContextMenuStrip = new TextEditorMenu(moduleEvents);
 					break;
 			}
 			

@@ -1,18 +1,21 @@
 ﻿using System;
 using System.Windows.Forms;
+using Brewmaster.Modules;
 using Brewmaster.ProjectModel;
 using Brewmaster.Settings;
 
 namespace Brewmaster.EditorWindows
 {
-	public class CodeMenu : ContextMenuStrip
+	public class CodeMenu : TextEditorMenu
 	{
 		public Action GoToDefinition;
 		public Action ToggleBreakpoint;
 		public Action AddToWatch;
 		public Action<Breakpoint.Types> BreakOnAccess;
 
-		public CodeMenu()
+		public CodeMenu(Events events) : base(events) { }
+
+		protected override void InitializeComponent()
 		{
 			Items.Add(GoToDefinitionOption = new ToolStripMenuItem("Go To Definition", null, GoToDefinition_Click));
 			Items.Add(AddToWatchOption = new ToolStripMenuItem("Add To Watch", null, AddToWatch_Click));
@@ -25,6 +28,9 @@ namespace Brewmaster.EditorWindows
 			Program.BindKey(Feature.AddToWatch, (keys) => AddToWatchOption.ShortcutKeys = keys);
 
 			Closing += (sender, args) => { AddToWatchOption.Enabled = GoToDefinitionOption.Enabled = true; };
+			Items.Add(new ToolStripSeparator());
+
+			base.InitializeComponent();
 		}
 
 		private void AddBreakpoint_Click(object sender, EventArgs e)

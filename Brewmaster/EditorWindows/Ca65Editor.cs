@@ -57,7 +57,7 @@ namespace Brewmaster.EditorWindows
 					GetDebugLine,
 					file.Project.Type == ProjectType.Snes ? 6 : 4));
 
-			Menu = new CodeMenu();
+			Menu = new CodeMenu(events);
 			Menu.Enabled = true;
 			Menu.Name = "Menu";
 			Menu.Size = new Size(108, 70);

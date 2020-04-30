@@ -145,6 +145,9 @@
     <Compile Include="CartridgeExplorer\CartridgeExplorer.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="EditorWindows\TextEditorMenu.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Emulation\EmulatorHandler.cs" />
     <Compile Include="Modules\Breakpoints\BreakpointEditor.cs">
       <SubType>Form</SubType>
