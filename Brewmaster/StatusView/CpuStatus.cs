@@ -78,10 +78,12 @@ namespace Brewmaster.StatusView
 				case ProjectType.Nes:
 					EditA.Width = EditX.Width = EditY.Width = EditSP.Width = 22;
 					EditPC.Width = 34;
+					panelDB.Visible = panelDP.Visible = false;
 					break;
 				case ProjectType.Snes:
 					EditA.Width = EditX.Width = EditY.Width = EditSP.Width = 34;
 					EditPC.Width = 50;
+					panelDB.Visible = panelDP.Visible = true;
 					break;
 			}
 		}
@@ -107,6 +109,8 @@ namespace Brewmaster.StatusView
 			UpdateTextBox(EditA, state.Cpu.A, (state.Cpu.PS & ProcFlags.MemoryMode8) != 0 ? 1 : 2);
 			UpdateTextBox(EditX, state.Cpu.X, (state.Cpu.PS & ProcFlags.IndexMode8) != 0 ? 1 : 2);
 			UpdateTextBox(EditY, state.Cpu.Y, (state.Cpu.PS & ProcFlags.IndexMode8) != 0 ? 1 : 2);
+			UpdateTextBox(EditDB, state.Cpu.DBR, 1);
+			UpdateTextBox(EditDP, state.Cpu.D, 2);
 			UpdateTextBox(EditSP, state.Cpu.SP, 2);
 			_stackPointer = state.Cpu.SP;
 
@@ -224,6 +228,13 @@ namespace Brewmaster.StatusView
 			if (StateEdited != null) StateEdited(_lastState);
 		}
 
+		private void UpdateStateValue(TextBox textBox, ref byte nesRegister, ref byte snesRegister)
+		{
+			if (_loading || _lastState == null) return;
+			if (_lastState.Type == ProjectType.Nes) Parse(textBox.Text, out nesRegister);
+			if (_lastState.Type == ProjectType.Snes) Parse(textBox.Text, out snesRegister);
+			PushStateChanges();
+		}
 		private void UpdateStateValue(TextBox textBox, ref byte nesRegister, ref ushort snesRegister)
 		{
 			if (_loading || _lastState == null) return;
@@ -262,6 +273,17 @@ namespace Brewmaster.StatusView
 		private void EditSP_TextChanged(object sender, EventArgs e)
 		{
 			UpdateStateValue(EditSP, ref _lastState.NesState.CPU.SP, ref _lastState.SnesState.Cpu.SP);
+		}
+		private void EditDP_TextChanged(object sender, EventArgs e)
+		{
+			ushort dummy = 0;
+			UpdateStateValue(EditDP, ref dummy, ref _lastState.SnesState.Cpu.D);
+		}
+
+		private void EditDB_TextChanged(object sender, EventArgs e)
+		{
+			byte dummy = 0;
+			UpdateStateValue(EditDB, ref dummy, ref _lastState.SnesState.Cpu.DBR);
 		}
 
 		private void EditP_TextChanged(object sender, EventArgs e)
