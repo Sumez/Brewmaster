@@ -19,8 +19,8 @@ namespace Brewmaster.EditorWindows.Text
 		    set
 		    {
 			    _mode = value;
-			    AllFiles.Visible = _mode != FindMode.Replace;
-			    ReplaceButton.Visible = ReplaceLabel.Visible = ReplaceWith.Visible = _mode == FindMode.Replace;
+			    StatusLabel.Visible = AllFiles.Visible = _mode != FindMode.Replace;
+			    ReplaceButton.Visible = ReplaceAllButton.Visible = ReplaceLabel.Visible = ReplaceWith.Visible = _mode == FindMode.Replace;
 			    AllFiles.Checked = _mode == FindMode.FindInAllFiles;
 		    }
 	    }
@@ -38,12 +38,11 @@ namespace Brewmaster.EditorWindows.Text
 		private void SearchQuery_TextChanged(object sender, EventArgs e)
         {
             StatusLabel.Text = "";
-            ReplaceButton.Enabled = FindNextButton.Enabled = !string.IsNullOrEmpty(SearchQuery.Text);
+            ReplaceButton.Enabled = ReplaceAllButton.Enabled = FindNextButton.Enabled = !string.IsNullOrEmpty(SearchQuery.Text);
         }
 
 		private void FindNextButton_Click(object sender, EventArgs e)
         {
-			//TODO: Move into own method + remember search string for next occurance!
 	        var query = SearchQuery.Text;
 	        var editor = _getTargetEditor();
 
@@ -60,7 +59,6 @@ namespace Brewmaster.EditorWindows.Text
 	    {
 		    if (string.IsNullOrEmpty(StoredQuery)) return;
 		    FindNext(StoredQuery, textEditor);
-
 	    }
 		private static List<int> FindNext(string query, TextEditorControl textEditor)
 	    {
@@ -125,8 +123,46 @@ namespace Brewmaster.EditorWindows.Text
 
 		private void ReplaceButton_Click(object sender, EventArgs e)
 		{
+			var query = SearchQuery.Text;
+			var editor = _getTargetEditor();
+			var replaced = false;
 
+			if (string.IsNullOrEmpty(query) || editor == null) return;
+			if (editor.TextEditor.ActiveTextAreaControl.SelectionManager.SelectedText == query)
+			{
+				editor.TextEditor.ActiveTextAreaControl.TextArea.InsertString(ReplaceWith.Text);
+				replaced = true;
+			}
+
+			FindNextButton.PerformClick();
+			if (!replaced && StatusLabel.ForeColor == Color.Red) StatusAlert("Replace text");
 		}
+
+	    private void ReplaceAllButton_Click(object sender, EventArgs e)
+	    {
+		    var query = SearchQuery.Text;
+		    var editor = _getTargetEditor();
+		    if (string.IsNullOrEmpty(query) || editor == null) return;
+
+		    var textArea = editor.TextEditor.ActiveTextAreaControl;
+		    var results = GetOccurrences(query, editor.TextEditor);
+		    foreach (var offset in results)
+		    {
+			    var selectFrom = editor.TextEditor.Document.OffsetToPosition(offset);
+			    var selectTo = editor.TextEditor.Document.OffsetToPosition(offset + query.Length);
+			    textArea.SelectionManager.SetSelection(selectFrom, selectTo);
+			    textArea.TextArea.InsertString(ReplaceWith.Text);
+			}
+			StatusLabel.Text = string.Format("Replaced {0} occurence{1}", results.Count, results.Count == 1 ? "" : "s");
+		    StatusLabel.ForeColor = results.Any() ? SystemColors.ControlText : Color.Red;
+			StatusAlert("Replace text");
+		}
+		
+		private void StatusAlert(string caption)
+	    {
+		    if (string.IsNullOrWhiteSpace(StatusLabel.Text)) return;
+		    MessageBox.Show(StatusLabel.Text, caption, MessageBoxButtons.OK, MessageBoxIcon.Information);
+	    }
 	}
 
 	public enum FindMode

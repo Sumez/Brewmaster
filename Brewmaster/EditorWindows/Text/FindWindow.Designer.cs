@@ -39,6 +39,7 @@
 			this.AllFiles = new System.Windows.Forms.CheckBox();
 			this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
 			this.ReplaceButton = new System.Windows.Forms.Button();
+			this.ReplaceAllButton = new System.Windows.Forms.Button();
 			label1 = new System.Windows.Forms.Label();
 			this.flowLayoutPanel1.SuspendLayout();
 			this.SuspendLayout();
@@ -54,7 +55,7 @@
 			// 
 			// panel1
 			// 
-			this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+			this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.panel1.BackColor = System.Drawing.Color.Silver;
 			this.panel1.Location = new System.Drawing.Point(10, 62);
@@ -66,7 +67,7 @@
 			// 
 			this.StatusLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.StatusLabel.AutoSize = true;
-			this.StatusLabel.Location = new System.Drawing.Point(7, 69);
+			this.StatusLabel.Location = new System.Drawing.Point(7, 76);
 			this.StatusLabel.Name = "StatusLabel";
 			this.StatusLabel.Size = new System.Drawing.Size(0, 13);
 			this.StatusLabel.TabIndex = 10;
@@ -75,19 +76,19 @@
 			// 
 			this.CancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.CancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.CancelButton.Location = new System.Drawing.Point(168, 3);
+			this.CancelButton.Location = new System.Drawing.Point(246, 3);
 			this.CancelButton.Margin = new System.Windows.Forms.Padding(3, 3, 0, 3);
 			this.CancelButton.Name = "CancelButton";
 			this.CancelButton.Size = new System.Drawing.Size(75, 23);
 			this.CancelButton.TabIndex = 6;
-			this.CancelButton.Text = "Cancel";
+			this.CancelButton.Text = "Close";
 			this.CancelButton.UseVisualStyleBackColor = true;
 			this.CancelButton.Click += new System.EventHandler(this.CancelButton_Click);
 			// 
 			// FindNextButton
 			// 
 			this.FindNextButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.FindNextButton.Location = new System.Drawing.Point(6, 3);
+			this.FindNextButton.Location = new System.Drawing.Point(3, 3);
 			this.FindNextButton.Name = "FindNextButton";
 			this.FindNextButton.Size = new System.Drawing.Size(75, 23);
 			this.FindNextButton.TabIndex = 4;
@@ -139,19 +140,20 @@
 			this.flowLayoutPanel1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.flowLayoutPanel1.AutoSize = true;
 			this.flowLayoutPanel1.Controls.Add(this.CancelButton);
+			this.flowLayoutPanel1.Controls.Add(this.ReplaceAllButton);
 			this.flowLayoutPanel1.Controls.Add(this.ReplaceButton);
 			this.flowLayoutPanel1.Controls.Add(this.FindNextButton);
 			this.flowLayoutPanel1.FlowDirection = System.Windows.Forms.FlowDirection.RightToLeft;
-			this.flowLayoutPanel1.Location = new System.Drawing.Point(139, 69);
+			this.flowLayoutPanel1.Location = new System.Drawing.Point(61, 68);
 			this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-			this.flowLayoutPanel1.Size = new System.Drawing.Size(243, 29);
+			this.flowLayoutPanel1.Size = new System.Drawing.Size(321, 29);
 			this.flowLayoutPanel1.TabIndex = 15;
 			this.flowLayoutPanel1.WrapContents = false;
 			// 
 			// ReplaceButton
 			// 
 			this.ReplaceButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.ReplaceButton.Location = new System.Drawing.Point(87, 3);
+			this.ReplaceButton.Location = new System.Drawing.Point(84, 3);
 			this.ReplaceButton.Name = "ReplaceButton";
 			this.ReplaceButton.Size = new System.Drawing.Size(75, 23);
 			this.ReplaceButton.TabIndex = 5;
@@ -159,19 +161,30 @@
 			this.ReplaceButton.UseVisualStyleBackColor = true;
 			this.ReplaceButton.Click += new System.EventHandler(this.ReplaceButton_Click);
 			// 
+			// ReplaceAllButton
+			// 
+			this.ReplaceAllButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.ReplaceAllButton.Location = new System.Drawing.Point(165, 3);
+			this.ReplaceAllButton.Name = "ReplaceAllButton";
+			this.ReplaceAllButton.Size = new System.Drawing.Size(75, 23);
+			this.ReplaceAllButton.TabIndex = 7;
+			this.ReplaceAllButton.Text = "Replace All";
+			this.ReplaceAllButton.UseVisualStyleBackColor = true;
+			this.ReplaceAllButton.Click += new System.EventHandler(this.ReplaceAllButton_Click);
+			// 
 			// FindWindow
 			// 
 			this.AcceptButton = this.FindNextButton;
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.AutoSize = true;
-			this.ClientSize = new System.Drawing.Size(398, 105);
+			this.ClientSize = new System.Drawing.Size(398, 106);
+			this.Controls.Add(this.StatusLabel);
 			this.Controls.Add(this.flowLayoutPanel1);
 			this.Controls.Add(this.AllFiles);
 			this.Controls.Add(this.ReplaceWith);
 			this.Controls.Add(this.ReplaceLabel);
 			this.Controls.Add(this.panel1);
-			this.Controls.Add(this.StatusLabel);
 			this.Controls.Add(this.SearchQuery);
 			this.Controls.Add(label1);
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
@@ -200,5 +213,6 @@
 		private System.Windows.Forms.CheckBox AllFiles;
 		private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
 		private System.Windows.Forms.Button ReplaceButton;
+		private System.Windows.Forms.Button ReplaceAllButton;
 	}
 }
