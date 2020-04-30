@@ -26,6 +26,7 @@ namespace Brewmaster.Ppu
 			set
 			{
 				_events = value;
+				if (_events == null) return;
 				_events.EmulationStateUpdate += (state) => UpdateSpriteData(state.Sprites, state.Type);
 				_events.SelectedSpriteChanged += index => RefreshImage();
 			}

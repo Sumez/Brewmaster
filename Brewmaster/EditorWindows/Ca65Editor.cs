@@ -57,7 +57,7 @@ namespace Brewmaster.EditorWindows
 					GetDebugLine,
 					file.Project.Type == ProjectType.Snes ? 6 : 4));
 
-			Menu = new CodeMenu();
+			Menu = new CodeMenu(events);
 			Menu.Enabled = true;
 			Menu.Name = "Menu";
 			Menu.Size = new Size(108, 70);
@@ -753,12 +753,16 @@ namespace Brewmaster.EditorWindows
 
 		public static ITextEditorProperties DefaultCodeProperties = new DefaultBrewmasterCodeProperties();
 
-		public void GoToWordAt(int line, int column)
+		public void GoToWordAt(int line, int column, int? length)
 		{
 			var lineSegment = Document.GetLineSegment(line - 1);
-			var word = lineSegment.GetWord(column);
-			if (word == null) throw new Exception("Word not fount at Line " + line + ", column " + column);
-			ActiveTextAreaControl.SelectionManager.SetSelection(new TextLocation(column, line - 1), new TextLocation(column + word.Length, line - 1));
+			if (!length.HasValue)
+			{
+				var word = lineSegment.GetWord(column);
+				if (word == null) throw new Exception("Word not fount at Line " + line + ", column " + column);
+				length = word.Length;
+			}
+			if (length > 0) ActiveTextAreaControl.SelectionManager.SetSelection(new TextLocation(column, line - 1), new TextLocation(column + length.Value, line - 1));
 			ActiveTextAreaControl.Caret.Position = new TextLocation(column, line - 1);
 			return;
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Brewmaster.EditorWindows;
 using Brewmaster.Emulation;
 using Brewmaster.Modules.Ca65Helper;
 using Brewmaster.Modules.OpcodeHelper;
@@ -10,10 +11,18 @@ namespace Brewmaster.Modules
 	// TODO: More organized handling of global events (breakpoints, watch values, status, etc)
 	public class Events
 	{
+		public Action Cut;
+		public Action Copy;
+		public Action Paste;
+		public Action Delete;
+		public Action SelectAll;
+
 		public Action<IEnumerable<Breakpoint>> RemoveBreakpoints;
 		public Action<Breakpoint> AddBreakpoint;
 		public Action UpdatedBreakpoints;
 		public Func<AsmProject> GetCurrentProject;
+		public Func<TextEditorWindow> GetCurrentTextEditor;
+		public Action<AsmProjectFile, int?, int?, int?> OpenFileAction { private get; set; }
 
 		public event Action<EmulationState> EmulationStateUpdate;
 		public int SelectedSprite { get; private set; } = -1;
@@ -50,6 +59,11 @@ namespace Brewmaster.Modules
 			if (projectType == ProjectType) return;
 			ProjectType = projectType;
 			if (ProjectTypeChanged != null) ProjectTypeChanged(projectType);
+		}
+
+		public void OpenFile(AsmProjectFile file, int? line = null, int? column = null, int? length = null)
+		{
+			if (OpenFileAction != null) OpenFileAction(file, line, column, length);
 		}
 	}
 }
