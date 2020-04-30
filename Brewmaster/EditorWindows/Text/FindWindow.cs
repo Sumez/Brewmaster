@@ -11,21 +11,34 @@ namespace Brewmaster.EditorWindows.Text
     {
 		private static string StoredQuery;
 		private readonly Func<TextEditorWindow> _getTargetEditor;
+	    private FindMode _mode;
 
-	    public FindWindow(Func<TextEditorWindow> getTargetEditor)
+	    public FindMode Mode
+	    {
+		    get { return _mode; }
+		    set
+		    {
+			    _mode = value;
+			    AllFiles.Visible = _mode != FindMode.Replace;
+			    ReplaceButton.Visible = ReplaceLabel.Visible = ReplaceWith.Visible = _mode == FindMode.Replace;
+			    AllFiles.Checked = _mode == FindMode.FindInAllFiles;
+		    }
+	    }
+
+	    public FindWindow(Func<TextEditorWindow> getTargetEditor, FindMode mode)
 	    {
 		    InitializeComponent();
 			_getTargetEditor = getTargetEditor;
 			if (!string.IsNullOrEmpty(StoredQuery)) SearchQuery.Text = StoredQuery;
-		    
-		    // TODO: Allow the option "find in all files", and use that if no files are currently open
-		    var currentEditor = getTargetEditor();
+
+		    if (getTargetEditor() == null && mode == FindMode.FindInCurrentFile) mode = FindMode.FindInAllFiles;
+		    Mode = mode;
 	    }
 
 		private void SearchQuery_TextChanged(object sender, EventArgs e)
         {
             StatusLabel.Text = "";
-            FindNextButton.Enabled = !string.IsNullOrEmpty(SearchQuery.Text);
+            ReplaceButton.Enabled = FindNextButton.Enabled = !string.IsNullOrEmpty(SearchQuery.Text);
         }
 
 		private void FindNextButton_Click(object sender, EventArgs e)
@@ -103,5 +116,21 @@ namespace Brewmaster.EditorWindows.Text
         {
             Close();
         }
-    }
+
+		private void AllFiles_CheckedChanged(object sender, EventArgs e)
+		{
+			if (Mode == FindMode.Replace) return;
+			Mode = AllFiles.Checked ? FindMode.FindInAllFiles : FindMode.FindInCurrentFile;
+		}
+
+		private void ReplaceButton_Click(object sender, EventArgs e)
+		{
+
+		}
+	}
+
+	public enum FindMode
+	{
+		FindInCurrentFile, FindInAllFiles, Replace
+	}
 }

@@ -124,7 +124,8 @@ namespace Brewmaster
 			Edit_CutMenuItem.Enabled = Edit_CopyMenuItem.Enabled = Edit_PasteMenuItem.Enabled =
 			selectAllMenuItem.Enabled = insertMenuItem.Enabled =
 			Edit_UndoMenuItem.Enabled = Edit_RedoMenuItem.Enabled =
-			findMenuItem.Enabled = findNextMenuItem.Enabled = replaceMenuItem.Enabled = Edit_GoToMenuItem.Enabled = // TODO: Find in files
+			findMenuItem.Enabled = findNextMenuItem.Enabled = 
+			replaceMenuItem.Enabled = Edit_GoToMenuItem.Enabled =
 			File_PrintMenuItem.Enabled = File_PrintPreviewMenuItem.Enabled = currentTab is TextEditorWindow;
 			File_CloseMenuItem.Enabled = File_CloseAllMenuItem.Enabled = closeAllWindowsMenuItem.Enabled = editorTabs.TabCount > 0;
 
@@ -685,14 +686,15 @@ namespace Brewmaster
 		}
 
 	    private FindWindow _findForm;
-	    private void FindInFiles()
+	    private void FindInFiles(FindMode mode)
 	    {
 		    if (_findForm != null && _findForm.Visible)
 		    {
+			    _findForm.Mode = mode;
 			    _findForm.Focus();
 			    return;
 		    }
-		    _findForm = new FindWindow(GetCurrentTextEditor);
+		    _findForm = new FindWindow(GetCurrentTextEditor, mode);
 		    _findForm.Show(this);
 	    }
 	    private void GoToLine()
@@ -1206,7 +1208,7 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 
 		private void Edit_FindMenuItem_Click(object sender, EventArgs e)
         {
-			FindInFiles();
+			FindInFiles(FindMode.FindInCurrentFile);
         }
 	    private void findNextToolStripMenuItem_Click(object sender, EventArgs e)
 	    {
@@ -1225,8 +1227,13 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 
 		private void Edit_ReplaceMenuItem_Click(object sender, EventArgs e)
 	    {
-		    // TODO
+			FindInFiles(FindMode.Replace);
+		}
+	    private void findInFilesMenuItem_Click(object sender, EventArgs e)
+	    {
+		    FindInFiles(FindMode.FindInAllFiles);
 	    }
+
 
 		private void statusBarMenuItem_Click(object sender, EventArgs e)
         {
