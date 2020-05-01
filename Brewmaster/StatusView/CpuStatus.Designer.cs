@@ -41,10 +41,10 @@
 			System.Windows.Forms.Label labelP;
 			System.Windows.Forms.Panel FlagGroup;
 			System.Windows.Forms.Panel TimingGroup;
+			System.Windows.Forms.Label label9;
+			System.Windows.Forms.Label label6;
 			System.Windows.Forms.Label label7;
 			System.Windows.Forms.Label label8;
-			System.Windows.Forms.Label label6;
-			System.Windows.Forms.Label label9;
 			System.Windows.Forms.ToolTip RegisterToolTip;
 			System.Windows.Forms.Panel PpuGroup;
 			System.Windows.Forms.Panel panel4;
@@ -83,12 +83,16 @@
 			this.CheckC = new System.Windows.Forms.CheckBox();
 			this.CheckZ = new System.Windows.Forms.CheckBox();
 			this.CheckIrq = new System.Windows.Forms.CheckBox();
-			this.ResetCycle = new System.Windows.Forms.Button();
+			this.flowLayoutPanel4 = new System.Windows.Forms.FlowLayoutPanel();
+			this.panel9 = new System.Windows.Forms.Panel();
+			this.EditPixel = new System.Windows.Forms.TextBox();
+			this.panel10 = new System.Windows.Forms.Panel();
+			this.EditScanline = new System.Windows.Forms.TextBox();
+			this.panel11 = new System.Windows.Forms.Panel();
 			this.ResetFrame = new System.Windows.Forms.Button();
+			this.ResetCycle = new System.Windows.Forms.Button();
 			this.EditCycle = new System.Windows.Forms.TextBox();
 			this.EditFrame = new System.Windows.Forms.TextBox();
-			this.EditScanline = new System.Windows.Forms.TextBox();
-			this.EditPixel = new System.Windows.Forms.TextBox();
 			this.nesEnableNmi = new System.Windows.Forms.CheckBox();
 			this.nesLargeSprites = new System.Windows.Forms.CheckBox();
 			this.nesVramDown = new System.Windows.Forms.CheckBox();
@@ -122,15 +126,15 @@
 			this.stack24bit = new System.Windows.Forms.RadioButton();
 			this.topOfStack = new System.Windows.Forms.TextBox();
 			this.label16 = new System.Windows.Forms.Label();
-			this.flowLayoutPanel4 = new System.Windows.Forms.FlowLayoutPanel();
-			this.panel9 = new System.Windows.Forms.Panel();
-			this.panel10 = new System.Windows.Forms.Panel();
-			this.panel11 = new System.Windows.Forms.Panel();
 			this.expandPpu = new Brewmaster.StatusView.ExpandButton();
 			this.expandStack = new Brewmaster.StatusView.ExpandButton();
 			this.expandTiming = new Brewmaster.StatusView.ExpandButton();
 			this.expandFlags = new Brewmaster.StatusView.ExpandButton();
 			this.expandCpu = new Brewmaster.StatusView.ExpandButton();
+			this.snesFlags = new System.Windows.Forms.Panel();
+			this.CheckEmu = new System.Windows.Forms.CheckBox();
+			this.CheckX = new System.Windows.Forms.CheckBox();
+			this.CheckM = new System.Windows.Forms.CheckBox();
 			RegisterGroup = new System.Windows.Forms.Panel();
 			label1 = new System.Windows.Forms.Label();
 			label2 = new System.Windows.Forms.Label();
@@ -142,10 +146,10 @@
 			labelP = new System.Windows.Forms.Label();
 			FlagGroup = new System.Windows.Forms.Panel();
 			TimingGroup = new System.Windows.Forms.Panel();
+			label9 = new System.Windows.Forms.Label();
+			label6 = new System.Windows.Forms.Label();
 			label7 = new System.Windows.Forms.Label();
 			label8 = new System.Windows.Forms.Label();
-			label6 = new System.Windows.Forms.Label();
-			label9 = new System.Windows.Forms.Label();
 			RegisterToolTip = new System.Windows.Forms.ToolTip(this.components);
 			PpuGroup = new System.Windows.Forms.Panel();
 			panel4 = new System.Windows.Forms.Panel();
@@ -173,6 +177,10 @@
 			this.panel7.SuspendLayout();
 			this.panel8.SuspendLayout();
 			TimingGroup.SuspendLayout();
+			this.flowLayoutPanel4.SuspendLayout();
+			this.panel9.SuspendLayout();
+			this.panel10.SuspendLayout();
+			this.panel11.SuspendLayout();
 			PpuGroup.SuspendLayout();
 			this.nesPpuPanel.SuspendLayout();
 			panel4.SuspendLayout();
@@ -180,10 +188,7 @@
 			this.panel6.SuspendLayout();
 			this.panel5.SuspendLayout();
 			this.flowLayoutPanel1.SuspendLayout();
-			this.flowLayoutPanel4.SuspendLayout();
-			this.panel9.SuspendLayout();
-			this.panel10.SuspendLayout();
-			this.panel11.SuspendLayout();
+			this.snesFlags.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// RegisterGroup
@@ -194,7 +199,7 @@
 			RegisterGroup.Location = new System.Drawing.Point(2, 20);
 			RegisterGroup.Name = "RegisterGroup";
 			RegisterGroup.Padding = new System.Windows.Forms.Padding(0, 5, 0, 0);
-			RegisterGroup.Size = new System.Drawing.Size(479, 26);
+			RegisterGroup.Size = new System.Drawing.Size(647, 26);
 			RegisterGroup.TabIndex = 0;
 			RegisterGroup.Text = "Registers";
 			// 
@@ -214,7 +219,7 @@
 			this.flowLayoutPanel2.Location = new System.Drawing.Point(0, 3);
 			this.flowLayoutPanel2.Margin = new System.Windows.Forms.Padding(0);
 			this.flowLayoutPanel2.Name = "flowLayoutPanel2";
-			this.flowLayoutPanel2.Size = new System.Drawing.Size(479, 23);
+			this.flowLayoutPanel2.Size = new System.Drawing.Size(647, 23);
 			this.flowLayoutPanel2.TabIndex = 12;
 			// 
 			// panelA
@@ -528,7 +533,7 @@
 			FlagGroup.Dock = System.Windows.Forms.DockStyle.Top;
 			FlagGroup.Location = new System.Drawing.Point(2, 67);
 			FlagGroup.Name = "FlagGroup";
-			FlagGroup.Size = new System.Drawing.Size(479, 29);
+			FlagGroup.Size = new System.Drawing.Size(647, 29);
 			FlagGroup.TabIndex = 0;
 			FlagGroup.Text = "Flags";
 			// 
@@ -539,9 +544,10 @@
 			this.flowLayoutPanel3.AutoSize = true;
 			this.flowLayoutPanel3.Controls.Add(this.panel7);
 			this.flowLayoutPanel3.Controls.Add(this.panel8);
+			this.flowLayoutPanel3.Controls.Add(this.snesFlags);
 			this.flowLayoutPanel3.Location = new System.Drawing.Point(0, 6);
 			this.flowLayoutPanel3.Name = "flowLayoutPanel3";
-			this.flowLayoutPanel3.Size = new System.Drawing.Size(479, 20);
+			this.flowLayoutPanel3.Size = new System.Drawing.Size(647, 20);
 			this.flowLayoutPanel3.TabIndex = 1;
 			// 
 			// panel7
@@ -654,21 +660,109 @@
 			TimingGroup.Location = new System.Drawing.Point(2, 117);
 			TimingGroup.Name = "TimingGroup";
 			TimingGroup.Padding = new System.Windows.Forms.Padding(0, 5, 0, 0);
-			TimingGroup.Size = new System.Drawing.Size(479, 52);
+			TimingGroup.Size = new System.Drawing.Size(647, 52);
 			TimingGroup.TabIndex = 1;
 			TimingGroup.Text = "Timing";
 			// 
-			// ResetCycle
+			// flowLayoutPanel4
 			// 
-			this.ResetCycle.Font = new System.Drawing.Font("Microsoft Sans Serif", 6F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.ResetCycle.Location = new System.Drawing.Point(138, 22);
-			this.ResetCycle.Margin = new System.Windows.Forms.Padding(0);
-			this.ResetCycle.Name = "ResetCycle";
-			this.ResetCycle.Size = new System.Drawing.Size(69, 21);
-			this.ResetCycle.TabIndex = 1;
-			this.ResetCycle.Text = "Reset";
-			this.ResetCycle.UseVisualStyleBackColor = true;
-			this.ResetCycle.Click += new System.EventHandler(this.ResetCycle_Click);
+			this.flowLayoutPanel4.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.flowLayoutPanel4.AutoSize = true;
+			this.flowLayoutPanel4.Controls.Add(this.panel9);
+			this.flowLayoutPanel4.Controls.Add(this.panel10);
+			this.flowLayoutPanel4.Controls.Add(this.panel11);
+			this.flowLayoutPanel4.Location = new System.Drawing.Point(0, 3);
+			this.flowLayoutPanel4.Name = "flowLayoutPanel4";
+			this.flowLayoutPanel4.Size = new System.Drawing.Size(647, 46);
+			this.flowLayoutPanel4.TabIndex = 4;
+			// 
+			// panel9
+			// 
+			this.panel9.AutoSize = true;
+			this.panel9.Controls.Add(this.EditPixel);
+			this.panel9.Controls.Add(label9);
+			this.panel9.Location = new System.Drawing.Point(0, 0);
+			this.panel9.Margin = new System.Windows.Forms.Padding(0, 0, 0, 3);
+			this.panel9.MinimumSize = new System.Drawing.Size(0, 20);
+			this.panel9.Name = "panel9";
+			this.panel9.Size = new System.Drawing.Size(78, 20);
+			this.panel9.TabIndex = 0;
+			// 
+			// EditPixel
+			// 
+			this.EditPixel.BackColor = System.Drawing.SystemColors.Window;
+			this.EditPixel.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
+			this.EditPixel.Dock = System.Windows.Forms.DockStyle.Left;
+			this.EditPixel.ImeMode = System.Windows.Forms.ImeMode.Alpha;
+			this.EditPixel.Location = new System.Drawing.Point(39, 0);
+			this.EditPixel.MaxLength = 2;
+			this.EditPixel.Name = "EditPixel";
+			this.EditPixel.ReadOnly = true;
+			this.EditPixel.Size = new System.Drawing.Size(39, 20);
+			this.EditPixel.TabIndex = 19;
+			this.EditPixel.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+			// 
+			// label9
+			// 
+			label9.Dock = System.Windows.Forms.DockStyle.Left;
+			label9.Location = new System.Drawing.Point(0, 0);
+			label9.Name = "label9";
+			label9.Padding = new System.Windows.Forms.Padding(3, 3, 0, 0);
+			label9.Size = new System.Drawing.Size(39, 20);
+			label9.TabIndex = 18;
+			label9.Text = "Pixel";
+			// 
+			// panel10
+			// 
+			this.panel10.AutoSize = true;
+			this.panel10.Controls.Add(this.EditScanline);
+			this.panel10.Controls.Add(label6);
+			this.panel10.Location = new System.Drawing.Point(78, 0);
+			this.panel10.Margin = new System.Windows.Forms.Padding(0, 0, 0, 3);
+			this.panel10.MinimumSize = new System.Drawing.Size(0, 20);
+			this.panel10.Name = "panel10";
+			this.panel10.Size = new System.Drawing.Size(99, 20);
+			this.panel10.TabIndex = 1;
+			// 
+			// EditScanline
+			// 
+			this.EditScanline.BackColor = System.Drawing.SystemColors.Window;
+			this.EditScanline.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
+			this.EditScanline.Dock = System.Windows.Forms.DockStyle.Left;
+			this.EditScanline.ImeMode = System.Windows.Forms.ImeMode.Alpha;
+			this.EditScanline.Location = new System.Drawing.Point(60, 0);
+			this.EditScanline.MaxLength = 2;
+			this.EditScanline.Name = "EditScanline";
+			this.EditScanline.ReadOnly = true;
+			this.EditScanline.Size = new System.Drawing.Size(39, 20);
+			this.EditScanline.TabIndex = 17;
+			this.EditScanline.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+			// 
+			// label6
+			// 
+			label6.Dock = System.Windows.Forms.DockStyle.Left;
+			label6.Location = new System.Drawing.Point(0, 0);
+			label6.Name = "label6";
+			label6.Padding = new System.Windows.Forms.Padding(3, 3, 0, 0);
+			label6.Size = new System.Drawing.Size(60, 20);
+			label6.TabIndex = 14;
+			label6.Text = "Scanline";
+			// 
+			// panel11
+			// 
+			this.panel11.AutoSize = true;
+			this.panel11.Controls.Add(this.ResetFrame);
+			this.panel11.Controls.Add(this.ResetCycle);
+			this.panel11.Controls.Add(this.EditCycle);
+			this.panel11.Controls.Add(label7);
+			this.panel11.Controls.Add(this.EditFrame);
+			this.panel11.Controls.Add(label8);
+			this.panel11.Location = new System.Drawing.Point(177, 0);
+			this.panel11.Margin = new System.Windows.Forms.Padding(0, 0, 0, 3);
+			this.panel11.Name = "panel11";
+			this.panel11.Size = new System.Drawing.Size(207, 43);
+			this.panel11.TabIndex = 2;
 			// 
 			// ResetFrame
 			// 
@@ -681,6 +775,18 @@
 			this.ResetFrame.Text = "Reset";
 			this.ResetFrame.UseVisualStyleBackColor = true;
 			this.ResetFrame.Click += new System.EventHandler(this.ResetFrame_Click);
+			// 
+			// ResetCycle
+			// 
+			this.ResetCycle.Font = new System.Drawing.Font("Microsoft Sans Serif", 6F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.ResetCycle.Location = new System.Drawing.Point(138, 22);
+			this.ResetCycle.Margin = new System.Windows.Forms.Padding(0);
+			this.ResetCycle.Name = "ResetCycle";
+			this.ResetCycle.Size = new System.Drawing.Size(69, 21);
+			this.ResetCycle.TabIndex = 1;
+			this.ResetCycle.Text = "Reset";
+			this.ResetCycle.UseVisualStyleBackColor = true;
+			this.ResetCycle.Click += new System.EventHandler(this.ResetCycle_Click);
 			// 
 			// EditCycle
 			// 
@@ -731,54 +837,6 @@
 			label8.Size = new System.Drawing.Size(39, 16);
 			label8.TabIndex = 12;
 			label8.Text = "Frame";
-			// 
-			// EditScanline
-			// 
-			this.EditScanline.BackColor = System.Drawing.SystemColors.Window;
-			this.EditScanline.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
-			this.EditScanline.Dock = System.Windows.Forms.DockStyle.Left;
-			this.EditScanline.ImeMode = System.Windows.Forms.ImeMode.Alpha;
-			this.EditScanline.Location = new System.Drawing.Point(60, 0);
-			this.EditScanline.MaxLength = 2;
-			this.EditScanline.Name = "EditScanline";
-			this.EditScanline.ReadOnly = true;
-			this.EditScanline.Size = new System.Drawing.Size(39, 20);
-			this.EditScanline.TabIndex = 17;
-			this.EditScanline.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-			// 
-			// label6
-			// 
-			label6.Dock = System.Windows.Forms.DockStyle.Left;
-			label6.Location = new System.Drawing.Point(0, 0);
-			label6.Name = "label6";
-			label6.Padding = new System.Windows.Forms.Padding(3, 3, 0, 0);
-			label6.Size = new System.Drawing.Size(60, 20);
-			label6.TabIndex = 14;
-			label6.Text = "Scanline";
-			// 
-			// EditPixel
-			// 
-			this.EditPixel.BackColor = System.Drawing.SystemColors.Window;
-			this.EditPixel.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
-			this.EditPixel.Dock = System.Windows.Forms.DockStyle.Left;
-			this.EditPixel.ImeMode = System.Windows.Forms.ImeMode.Alpha;
-			this.EditPixel.Location = new System.Drawing.Point(39, 0);
-			this.EditPixel.MaxLength = 2;
-			this.EditPixel.Name = "EditPixel";
-			this.EditPixel.ReadOnly = true;
-			this.EditPixel.Size = new System.Drawing.Size(39, 20);
-			this.EditPixel.TabIndex = 19;
-			this.EditPixel.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-			// 
-			// label9
-			// 
-			label9.Dock = System.Windows.Forms.DockStyle.Left;
-			label9.Location = new System.Drawing.Point(0, 0);
-			label9.Name = "label9";
-			label9.Padding = new System.Windows.Forms.Padding(3, 3, 0, 0);
-			label9.Size = new System.Drawing.Size(39, 20);
-			label9.TabIndex = 18;
-			label9.Text = "Pixel";
 			// 
 			// RegisterToolTip
 			// 
@@ -1251,67 +1309,55 @@
 			this.label16.TabIndex = 0;
 			this.label16.Text = "Top of stack";
 			// 
-			// flowLayoutPanel4
-			// 
-			this.flowLayoutPanel4.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.flowLayoutPanel4.AutoSize = true;
-			this.flowLayoutPanel4.Controls.Add(this.panel9);
-			this.flowLayoutPanel4.Controls.Add(this.panel10);
-			this.flowLayoutPanel4.Controls.Add(this.panel11);
-			this.flowLayoutPanel4.Location = new System.Drawing.Point(0, 3);
-			this.flowLayoutPanel4.Name = "flowLayoutPanel4";
-			this.flowLayoutPanel4.Size = new System.Drawing.Size(479, 46);
-			this.flowLayoutPanel4.TabIndex = 4;
-			// 
-			// panel9
-			// 
-			this.panel9.AutoSize = true;
-			this.panel9.Controls.Add(this.EditPixel);
-			this.panel9.Controls.Add(label9);
-			this.panel9.Location = new System.Drawing.Point(0, 0);
-			this.panel9.Margin = new System.Windows.Forms.Padding(0, 0, 0, 3);
-			this.panel9.MinimumSize = new System.Drawing.Size(0, 20);
-			this.panel9.Name = "panel9";
-			this.panel9.Size = new System.Drawing.Size(78, 20);
-			this.panel9.TabIndex = 0;
-			// 
-			// panel10
-			// 
-			this.panel10.AutoSize = true;
-			this.panel10.Controls.Add(this.EditScanline);
-			this.panel10.Controls.Add(label6);
-			this.panel10.Location = new System.Drawing.Point(78, 0);
-			this.panel10.Margin = new System.Windows.Forms.Padding(0, 0, 0, 3);
-			this.panel10.MinimumSize = new System.Drawing.Size(0, 20);
-			this.panel10.Name = "panel10";
-			this.panel10.Size = new System.Drawing.Size(99, 20);
-			this.panel10.TabIndex = 1;
-			// 
-			// panel11
-			// 
-			this.panel11.AutoSize = true;
-			this.panel11.Controls.Add(this.ResetFrame);
-			this.panel11.Controls.Add(this.ResetCycle);
-			this.panel11.Controls.Add(this.EditCycle);
-			this.panel11.Controls.Add(label7);
-			this.panel11.Controls.Add(this.EditFrame);
-			this.panel11.Controls.Add(label8);
-			this.panel11.Location = new System.Drawing.Point(177, 0);
-			this.panel11.Margin = new System.Windows.Forms.Padding(0, 0, 0, 3);
-			this.panel11.Name = "panel11";
-			this.panel11.Size = new System.Drawing.Size(207, 43);
-			this.panel11.TabIndex = 2;
-			// 
 			// horizontalLine5
 			// 
 			horizontalLine5.Dock = System.Windows.Forms.DockStyle.Top;
 			horizontalLine5.LineColor = System.Drawing.SystemColors.ButtonShadow;
 			horizontalLine5.Location = new System.Drawing.Point(2, 211);
 			horizontalLine5.Name = "horizontalLine5";
-			horizontalLine5.Size = new System.Drawing.Size(479, 1);
+			horizontalLine5.Size = new System.Drawing.Size(647, 1);
 			horizontalLine5.TabIndex = 14;
 			horizontalLine5.Text = "horizontalLine5";
+			// 
+			// horizontalLine4
+			// 
+			horizontalLine4.Dock = System.Windows.Forms.DockStyle.Top;
+			horizontalLine4.LineColor = System.Drawing.SystemColors.ButtonShadow;
+			horizontalLine4.Location = new System.Drawing.Point(2, 190);
+			horizontalLine4.Name = "horizontalLine4";
+			horizontalLine4.Size = new System.Drawing.Size(647, 1);
+			horizontalLine4.TabIndex = 10;
+			horizontalLine4.Text = "horizontalLine4";
+			// 
+			// horizontalLine3
+			// 
+			horizontalLine3.Dock = System.Windows.Forms.DockStyle.Top;
+			horizontalLine3.LineColor = System.Drawing.SystemColors.ButtonShadow;
+			horizontalLine3.Location = new System.Drawing.Point(2, 169);
+			horizontalLine3.Name = "horizontalLine3";
+			horizontalLine3.Size = new System.Drawing.Size(647, 1);
+			horizontalLine3.TabIndex = 9;
+			horizontalLine3.Text = "horizontalLine3";
+			// 
+			// horizontalLine2
+			// 
+			horizontalLine2.Dock = System.Windows.Forms.DockStyle.Top;
+			horizontalLine2.LineColor = System.Drawing.SystemColors.ButtonShadow;
+			horizontalLine2.Location = new System.Drawing.Point(2, 96);
+			horizontalLine2.Name = "horizontalLine2";
+			horizontalLine2.Size = new System.Drawing.Size(647, 1);
+			horizontalLine2.TabIndex = 8;
+			horizontalLine2.Text = "horizontalLine2";
+			// 
+			// horizontalLine1
+			// 
+			horizontalLine1.Dock = System.Windows.Forms.DockStyle.Top;
+			horizontalLine1.LineColor = System.Drawing.SystemColors.ButtonShadow;
+			horizontalLine1.Location = new System.Drawing.Point(2, 46);
+			horizontalLine1.Name = "horizontalLine1";
+			horizontalLine1.Size = new System.Drawing.Size(647, 1);
+			horizontalLine1.TabIndex = 7;
+			horizontalLine1.Text = "horizontalLine1";
 			// 
 			// expandPpu
 			// 
@@ -1323,19 +1369,9 @@
 			this.expandPpu.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
 			this.expandPpu.Location = new System.Drawing.Point(2, 191);
 			this.expandPpu.Name = "expandPpu";
-			this.expandPpu.Size = new System.Drawing.Size(479, 20);
+			this.expandPpu.Size = new System.Drawing.Size(647, 20);
 			this.expandPpu.TabIndex = 6;
 			this.expandPpu.UseVisualStyleBackColor = true;
-			// 
-			// horizontalLine4
-			// 
-			horizontalLine4.Dock = System.Windows.Forms.DockStyle.Top;
-			horizontalLine4.LineColor = System.Drawing.SystemColors.ButtonShadow;
-			horizontalLine4.Location = new System.Drawing.Point(2, 190);
-			horizontalLine4.Name = "horizontalLine4";
-			horizontalLine4.Size = new System.Drawing.Size(479, 1);
-			horizontalLine4.TabIndex = 10;
-			horizontalLine4.Text = "horizontalLine4";
 			// 
 			// expandStack
 			// 
@@ -1347,19 +1383,9 @@
 			this.expandStack.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
 			this.expandStack.Location = new System.Drawing.Point(2, 170);
 			this.expandStack.Name = "expandStack";
-			this.expandStack.Size = new System.Drawing.Size(479, 20);
+			this.expandStack.Size = new System.Drawing.Size(647, 20);
 			this.expandStack.TabIndex = 13;
 			this.expandStack.UseVisualStyleBackColor = true;
-			// 
-			// horizontalLine3
-			// 
-			horizontalLine3.Dock = System.Windows.Forms.DockStyle.Top;
-			horizontalLine3.LineColor = System.Drawing.SystemColors.ButtonShadow;
-			horizontalLine3.Location = new System.Drawing.Point(2, 169);
-			horizontalLine3.Name = "horizontalLine3";
-			horizontalLine3.Size = new System.Drawing.Size(479, 1);
-			horizontalLine3.TabIndex = 9;
-			horizontalLine3.Text = "horizontalLine3";
 			// 
 			// expandTiming
 			// 
@@ -1371,19 +1397,9 @@
 			this.expandTiming.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
 			this.expandTiming.Location = new System.Drawing.Point(2, 97);
 			this.expandTiming.Name = "expandTiming";
-			this.expandTiming.Size = new System.Drawing.Size(479, 20);
+			this.expandTiming.Size = new System.Drawing.Size(647, 20);
 			this.expandTiming.TabIndex = 3;
 			this.expandTiming.UseVisualStyleBackColor = true;
-			// 
-			// horizontalLine2
-			// 
-			horizontalLine2.Dock = System.Windows.Forms.DockStyle.Top;
-			horizontalLine2.LineColor = System.Drawing.SystemColors.ButtonShadow;
-			horizontalLine2.Location = new System.Drawing.Point(2, 96);
-			horizontalLine2.Name = "horizontalLine2";
-			horizontalLine2.Size = new System.Drawing.Size(479, 1);
-			horizontalLine2.TabIndex = 8;
-			horizontalLine2.Text = "horizontalLine2";
 			// 
 			// expandFlags
 			// 
@@ -1395,19 +1411,9 @@
 			this.expandFlags.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
 			this.expandFlags.Location = new System.Drawing.Point(2, 47);
 			this.expandFlags.Name = "expandFlags";
-			this.expandFlags.Size = new System.Drawing.Size(479, 20);
+			this.expandFlags.Size = new System.Drawing.Size(647, 20);
 			this.expandFlags.TabIndex = 5;
 			this.expandFlags.UseVisualStyleBackColor = true;
-			// 
-			// horizontalLine1
-			// 
-			horizontalLine1.Dock = System.Windows.Forms.DockStyle.Top;
-			horizontalLine1.LineColor = System.Drawing.SystemColors.ButtonShadow;
-			horizontalLine1.Location = new System.Drawing.Point(2, 46);
-			horizontalLine1.Name = "horizontalLine1";
-			horizontalLine1.Size = new System.Drawing.Size(479, 1);
-			horizontalLine1.TabIndex = 7;
-			horizontalLine1.Text = "horizontalLine1";
 			// 
 			// expandCpu
 			// 
@@ -1419,9 +1425,58 @@
 			this.expandCpu.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
 			this.expandCpu.Location = new System.Drawing.Point(2, 0);
 			this.expandCpu.Name = "expandCpu";
-			this.expandCpu.Size = new System.Drawing.Size(479, 20);
+			this.expandCpu.Size = new System.Drawing.Size(647, 20);
 			this.expandCpu.TabIndex = 4;
 			this.expandCpu.UseVisualStyleBackColor = true;
+			// 
+			// snesFlags
+			// 
+			this.snesFlags.AutoSize = true;
+			this.snesFlags.Controls.Add(this.CheckEmu);
+			this.snesFlags.Controls.Add(this.CheckX);
+			this.snesFlags.Controls.Add(this.CheckM);
+			this.snesFlags.Location = new System.Drawing.Point(394, 0);
+			this.snesFlags.Margin = new System.Windows.Forms.Padding(0);
+			this.snesFlags.MinimumSize = new System.Drawing.Size(0, 20);
+			this.snesFlags.Name = "snesFlags";
+			this.snesFlags.Size = new System.Drawing.Size(212, 20);
+			this.snesFlags.TabIndex = 2;
+			// 
+			// CheckEmu
+			// 
+			this.CheckEmu.AutoSize = true;
+			this.CheckEmu.Dock = System.Windows.Forms.DockStyle.Left;
+			this.CheckEmu.Location = new System.Drawing.Point(140, 0);
+			this.CheckEmu.Name = "CheckEmu";
+			this.CheckEmu.Size = new System.Drawing.Size(72, 20);
+			this.CheckEmu.TabIndex = 8;
+			this.CheckEmu.Text = "Emulation";
+			RegisterToolTip.SetToolTip(this.CheckEmu, "The Emulation setting makes most instructions behave like their 6502 equivalents");
+			this.CheckEmu.UseVisualStyleBackColor = true;
+			// 
+			// CheckX
+			// 
+			this.CheckX.Dock = System.Windows.Forms.DockStyle.Left;
+			this.CheckX.Location = new System.Drawing.Point(70, 0);
+			this.CheckX.Name = "CheckX";
+			this.CheckX.Size = new System.Drawing.Size(70, 20);
+			this.CheckX.TabIndex = 7;
+			this.CheckX.Text = "8-bit X/Y";
+			RegisterToolTip.SetToolTip(this.CheckX, "When set, the X and Y registers work as 8-bit registers, otherwise all 16 bits ar" +
+        "e used");
+			this.CheckX.UseVisualStyleBackColor = true;
+			// 
+			// CheckM
+			// 
+			this.CheckM.Dock = System.Windows.Forms.DockStyle.Left;
+			this.CheckM.Location = new System.Drawing.Point(0, 0);
+			this.CheckM.Name = "CheckM";
+			this.CheckM.Size = new System.Drawing.Size(70, 20);
+			this.CheckM.TabIndex = 6;
+			this.CheckM.Text = "8-bit A";
+			RegisterToolTip.SetToolTip(this.CheckM, "When set, the A registers work as an 8-bit register, otherwise all 16 bits are us" +
+        "ed");
+			this.CheckM.UseVisualStyleBackColor = true;
 			// 
 			// CpuStatus
 			// 
@@ -1447,7 +1502,7 @@
 			this.MinimumSize = new System.Drawing.Size(100, 0);
 			this.Name = "CpuStatus";
 			this.Padding = new System.Windows.Forms.Padding(2, 0, 0, 0);
-			this.Size = new System.Drawing.Size(481, 622);
+			this.Size = new System.Drawing.Size(649, 622);
 			RegisterGroup.ResumeLayout(false);
 			RegisterGroup.PerformLayout();
 			this.flowLayoutPanel2.ResumeLayout(false);
@@ -1478,6 +1533,14 @@
 			this.panel8.PerformLayout();
 			TimingGroup.ResumeLayout(false);
 			TimingGroup.PerformLayout();
+			this.flowLayoutPanel4.ResumeLayout(false);
+			this.flowLayoutPanel4.PerformLayout();
+			this.panel9.ResumeLayout(false);
+			this.panel9.PerformLayout();
+			this.panel10.ResumeLayout(false);
+			this.panel10.PerformLayout();
+			this.panel11.ResumeLayout(false);
+			this.panel11.PerformLayout();
 			PpuGroup.ResumeLayout(false);
 			this.nesPpuPanel.ResumeLayout(false);
 			this.nesPpuPanel.PerformLayout();
@@ -1490,14 +1553,8 @@
 			this.panel5.ResumeLayout(false);
 			this.panel5.PerformLayout();
 			this.flowLayoutPanel1.ResumeLayout(false);
-			this.flowLayoutPanel4.ResumeLayout(false);
-			this.flowLayoutPanel4.PerformLayout();
-			this.panel9.ResumeLayout(false);
-			this.panel9.PerformLayout();
-			this.panel10.ResumeLayout(false);
-			this.panel10.PerformLayout();
-			this.panel11.ResumeLayout(false);
-			this.panel11.PerformLayout();
+			this.snesFlags.ResumeLayout(false);
+			this.snesFlags.PerformLayout();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -1579,5 +1636,9 @@
 		private System.Windows.Forms.Panel panel9;
 		private System.Windows.Forms.Panel panel10;
 		private System.Windows.Forms.Panel panel11;
+		private System.Windows.Forms.Panel snesFlags;
+		private System.Windows.Forms.CheckBox CheckEmu;
+		private System.Windows.Forms.CheckBox CheckX;
+		private System.Windows.Forms.CheckBox CheckM;
 	}
 }

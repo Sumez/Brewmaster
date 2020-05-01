@@ -39,6 +39,10 @@ namespace Brewmaster.StatusView
 			CheckV.CheckedChanged += FlagChanged;
 			CheckN.CheckedChanged += FlagChanged;
 
+			CheckM.CheckedChanged += FlagChanged;
+			CheckX.CheckedChanged += FlagChanged;
+			CheckEmu.CheckedChanged += FlagChanged;
+
 			nesEnableNmi.CheckedChanged += NesPpuCtrlChanged;
 			nesLargeSprites.CheckedChanged += NesPpuCtrlChanged;
 			nesVramDown.CheckedChanged += NesPpuCtrlChanged;
@@ -120,6 +124,10 @@ namespace Brewmaster.StatusView
 			CheckDec.Checked = (state.Cpu.PS & ProcFlags.Decimal) != 0;
 			CheckV.Checked = (state.Cpu.PS & ProcFlags.Overflow) != 0;
 			CheckN.Checked = (state.Cpu.PS & ProcFlags.Negative) != 0;
+
+			CheckM.Checked = (state.Cpu.PS & ProcFlags.MemoryMode8) != 0;
+			CheckX.Checked = (state.Cpu.PS & ProcFlags.IndexMode8) != 0;
+			CheckEmu.Checked = state.Cpu.EmulationMode;
 
 			_lastCycle = state.Cpu.CycleCount;
 			_lastFrame = state.Ppu.FrameCount;
@@ -316,7 +324,8 @@ namespace Brewmaster.StatusView
 			if (_lastState.Type == ProjectType.Snes)
 			{
 				_lastState.SnesState.Cpu.PS = (
-					(_lastState.SnesState.Cpu.PS & (ProcFlags.IndexMode8 | ProcFlags.MemoryMode8)) // ignored flags
+					(CheckM.Checked ? ProcFlags.MemoryMode8 : 0)
+					| (CheckX.Checked ? ProcFlags.IndexMode8 : 0)
 					| (CheckC.Checked ? ProcFlags.Carry : 0)
 					| (CheckZ.Checked ? ProcFlags.Zero : 0)
 					| (CheckIrq.Checked ? ProcFlags.IrqDisable : 0)
@@ -324,6 +333,7 @@ namespace Brewmaster.StatusView
 					| (CheckV.Checked ? ProcFlags.Overflow : 0)
 					| (CheckN.Checked ? ProcFlags.Negative : 0)
 				);
+				_lastState.SnesState.Cpu.EmulationMode = CheckEmu.Checked;
 			}
 			UpdateStates(_lastState);
 			PushStateChanges();
