@@ -429,6 +429,9 @@
     <Compile Include="StatusView\HorizontalLine.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="StatusView\RegisterValue.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Templates\TemplateModule.cs" />
     <EmbeddedResource Include="AboutWindow.resx">
       <DependentUpon>AboutWindow.cs</DependentUpon>

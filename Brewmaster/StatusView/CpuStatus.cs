@@ -38,10 +38,19 @@ namespace Brewmaster.StatusView
 			CheckDec.CheckedChanged += FlagChanged;
 			CheckV.CheckedChanged += FlagChanged;
 			CheckN.CheckedChanged += FlagChanged;
-
+			
 			CheckM.CheckedChanged += FlagChanged;
 			CheckX.CheckedChanged += FlagChanged;
 			CheckEmu.CheckedChanged += FlagChanged;
+
+			RegisterA.ValueChangedByUser += EditA_ValueChanged;
+			RegisterX.ValueChangedByUser += EditX_ValueChanged;
+			RegisterY.ValueChangedByUser += EditY_ValueChanged;
+			RegisterSP.ValueChangedByUser += EditSP_ValueChanged;
+			RegisterPC.ValueChangedByUser += EditPC_ValueChanged;
+			RegisterDB.ValueChangedByUser += EditDB_ValueChanged;
+			RegisterDP.ValueChangedByUser += EditDP_ValueChanged;
+			RegisterP.ValueChangedByUser += EditP_ValueChanged;
 
 			nesEnableNmi.CheckedChanged += NesPpuCtrlChanged;
 			nesLargeSprites.CheckedChanged += NesPpuCtrlChanged;
@@ -77,19 +86,31 @@ namespace Brewmaster.StatusView
 
 		public void SetMode(ProjectType type)
 		{
+			flagPanel.SuspendLayout();
+			registerPanel.SuspendLayout();
 			switch (type)
 			{
 				case ProjectType.Nes:
-					EditA.Width = EditX.Width = EditY.Width = EditSP.Width = 22;
-					EditPC.Width = 34;
+					RegisterA.RegisterSize =
+					RegisterX.RegisterSize =
+					RegisterY.RegisterSize = RegisterSize.EightBit;
+
+					RegisterPC.RegisterSize = RegisterSize.SixteenBit;
+
 					panelDB.Visible = panelDP.Visible = false;
 					break;
 				case ProjectType.Snes:
-					EditA.Width = EditX.Width = EditY.Width = EditSP.Width = 34;
-					EditPC.Width = 50;
+					RegisterA.RegisterSize =
+					RegisterX.RegisterSize =
+					RegisterY.RegisterSize = RegisterSize.SixteenBit;
+
+					RegisterPC.RegisterSize = RegisterSize.TwentyfourBit;
+
 					panelDB.Visible = panelDP.Visible = true;
 					break;
 			}
+			registerPanel.ResumeLayout();
+			flagPanel.ResumeLayout();
 		}
 
 		private EmulationState _lastState = null;
@@ -108,14 +129,16 @@ namespace Brewmaster.StatusView
 
 		private void UpdateSnesState(Mesen.GUI.DebugState state)
 		{
-			EditPC.Text = string.Format("{0}:{1}", ParseNumber(state.Cpu.K, 1), ParseNumber(state.Cpu.PC, 2));
-			UpdateTextBox(EditP, (int)state.Cpu.PS, 1);
-			UpdateTextBox(EditA, state.Cpu.A, (state.Cpu.PS & ProcFlags.MemoryMode8) != 0 ? 1 : 2);
-			UpdateTextBox(EditX, state.Cpu.X, (state.Cpu.PS & ProcFlags.IndexMode8) != 0 ? 1 : 2);
-			UpdateTextBox(EditY, state.Cpu.Y, (state.Cpu.PS & ProcFlags.IndexMode8) != 0 ? 1 : 2);
-			UpdateTextBox(EditDB, state.Cpu.DBR, 1);
-			UpdateTextBox(EditDP, state.Cpu.D, 2);
-			UpdateTextBox(EditSP, state.Cpu.SP, 2);
+			RegisterPC.Value = state.Cpu.K << 16 | state.Cpu.PC;
+			RegisterP.Value = (int)state.Cpu.PS;
+
+			RegisterA.Value = state.Cpu.A;
+			RegisterX.Value = state.Cpu.X;
+			RegisterY.Value = state.Cpu.Y;
+			RegisterDB.Value = state.Cpu.DBR;
+			RegisterDP.Value = state.Cpu.D;
+			RegisterSP.Value = state.Cpu.SP;
+
 			_stackPointer = state.Cpu.SP;
 
 			CheckC.Checked = (state.Cpu.PS & ProcFlags.Carry) != 0;
@@ -142,12 +165,13 @@ namespace Brewmaster.StatusView
 
 		private void UpdateNesState(Emulation.DebugState state)
 		{
-			UpdateTextBox(EditPC, state.CPU.PC, 2);
-			UpdateTextBox(EditP, state.CPU.PS, 1);
-			UpdateTextBox(EditA, state.CPU.A, 1);
-			UpdateTextBox(EditX, state.CPU.X, 1);
-			UpdateTextBox(EditY, state.CPU.Y, 1);
-			UpdateTextBox(EditSP, state.CPU.SP, 1);
+			RegisterPC.Value = state.CPU.PC;
+			RegisterP.Value = state.CPU.PS;
+			RegisterA.Value = state.CPU.A;
+			RegisterX.Value = state.CPU.X;
+			RegisterY.Value = state.CPU.Y;
+			RegisterSP.Value = state.CPU.SP;
+
 			_stackPointer = state.CPU.SP | 0x100;
 
 			CheckC.Checked = (state.CPU.PS & (1 << 0)) != 0;
@@ -236,73 +260,70 @@ namespace Brewmaster.StatusView
 			if (StateEdited != null) StateEdited(_lastState);
 		}
 
-		private void UpdateStateValue(TextBox textBox, ref byte nesRegister, ref byte snesRegister)
+		private void UpdateStateValue(RegisterValue textBox, ref byte nesRegister, ref byte snesRegister)
 		{
 			if (_loading || _lastState == null) return;
-			if (_lastState.Type == ProjectType.Nes) Parse(textBox.Text, out nesRegister);
-			if (_lastState.Type == ProjectType.Snes) Parse(textBox.Text, out snesRegister);
+			if (_lastState.Type == ProjectType.Nes) nesRegister = (byte)textBox.Value;
+			if (_lastState.Type == ProjectType.Snes) snesRegister = (byte)textBox.Value;
 			PushStateChanges();
 		}
-		private void UpdateStateValue(TextBox textBox, ref byte nesRegister, ref ushort snesRegister)
+		private void UpdateStateValue(RegisterValue textBox, ref byte nesRegister, ref ushort snesRegister)
 		{
 			if (_loading || _lastState == null) return;
-			if (_lastState.Type == ProjectType.Nes) Parse(textBox.Text, out nesRegister);
-			if (_lastState.Type == ProjectType.Snes) Parse(textBox.Text, out snesRegister);
+			if (_lastState.Type == ProjectType.Nes) nesRegister = (byte)textBox.Value;
+			if (_lastState.Type == ProjectType.Snes) snesRegister = (ushort)textBox.Value;
 			PushStateChanges();
 		}
-		private void UpdateStateValue(TextBox textBox, ref ushort nesRegister, ref ushort snesRegister)
+		private void UpdateStateValue(RegisterValue textBox, ref ushort nesRegister, ref ushort snesRegister)
 		{
 			if (_loading || _lastState == null) return;
-			if (_lastState.Type == ProjectType.Nes) Parse(textBox.Text, out nesRegister);
-			if (_lastState.Type == ProjectType.Snes) Parse(textBox.Text, out snesRegister);
+			if (_lastState.Type == ProjectType.Nes) nesRegister = (ushort)textBox.Value;
+			if (_lastState.Type == ProjectType.Snes) snesRegister = (ushort)textBox.Value;
 			PushStateChanges();
 		}
-		private void EditA_TextChanged(object sender, EventArgs e)
+		private void EditA_ValueChanged(object sender, EventArgs e)
 		{
-			UpdateStateValue(EditA, ref _lastState.NesState.CPU.A, ref _lastState.SnesState.Cpu.A);
+			UpdateStateValue(RegisterA, ref _lastState.NesState.CPU.A, ref _lastState.SnesState.Cpu.A);
 		}
 
-		private void EditX_TextChanged(object sender, EventArgs e)
+		private void EditX_ValueChanged(object sender, EventArgs e)
 		{
-			UpdateStateValue(EditX, ref _lastState.NesState.CPU.X, ref _lastState.SnesState.Cpu.X);
+			UpdateStateValue(RegisterX, ref _lastState.NesState.CPU.X, ref _lastState.SnesState.Cpu.X);
 		}
 
-		private void EditY_TextChanged(object sender, EventArgs e)
+		private void EditY_ValueChanged(object sender, EventArgs e)
 		{
-			UpdateStateValue(EditY, ref _lastState.NesState.CPU.Y, ref _lastState.SnesState.Cpu.Y);
+			UpdateStateValue(RegisterY, ref _lastState.NesState.CPU.Y, ref _lastState.SnesState.Cpu.Y);
 		}
 
-		private void EditPC_TextChanged(object sender, EventArgs e)
+		private void EditPC_ValueChanged(object sender, EventArgs e)
 		{
 			ushort dummy = 0;
-			UpdateStateValue(EditPC, ref _lastState.NesState.CPU.PC, ref dummy);
+			UpdateStateValue(RegisterPC, ref _lastState.NesState.CPU.PC, ref dummy);
 		}
 
-		private void EditSP_TextChanged(object sender, EventArgs e)
+		private void EditSP_ValueChanged(object sender, EventArgs e)
 		{
-			UpdateStateValue(EditSP, ref _lastState.NesState.CPU.SP, ref _lastState.SnesState.Cpu.SP);
+			UpdateStateValue(RegisterSP, ref _lastState.NesState.CPU.SP, ref _lastState.SnesState.Cpu.SP);
 		}
-		private void EditDP_TextChanged(object sender, EventArgs e)
+		private void EditDP_ValueChanged(object sender, EventArgs e)
 		{
 			ushort dummy = 0;
-			UpdateStateValue(EditDP, ref dummy, ref _lastState.SnesState.Cpu.D);
+			UpdateStateValue(RegisterDP, ref dummy, ref _lastState.SnesState.Cpu.D);
 		}
 
-		private void EditDB_TextChanged(object sender, EventArgs e)
+		private void EditDB_ValueChanged(object sender, EventArgs e)
 		{
 			byte dummy = 0;
-			UpdateStateValue(EditDB, ref dummy, ref _lastState.SnesState.Cpu.DBR);
+			UpdateStateValue(RegisterDB, ref dummy, ref _lastState.SnesState.Cpu.DBR);
 		}
 
-		private void EditP_TextChanged(object sender, EventArgs e)
+		private void EditP_ValueChanged(object sender, EventArgs e)
 		{
 			if (_loading || _lastState == null) return;
-			if (_lastState.Type == ProjectType.Nes) Parse(EditP.Text, out _lastState.NesState.CPU.PS);
-			if (_lastState.Type == ProjectType.Snes)
-			{
-				byte snesP;
-				if (Parse(EditP.Text, out snesP)) _lastState.SnesState.Cpu.PS = (ProcFlags)snesP;
-			}
+			if (_lastState.Type == ProjectType.Nes) _lastState.NesState.CPU.PS = (byte)RegisterP.Value;
+			if (_lastState.Type == ProjectType.Snes) _lastState.SnesState.Cpu.PS = (ProcFlags)RegisterP.Value;
+
 			UpdateStates(_lastState);
 			PushStateChanges();
 		}
