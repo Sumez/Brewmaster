@@ -43,7 +43,6 @@
 			System.Windows.Forms.Panel TimingGroup;
 			System.Windows.Forms.Label label7;
 			System.Windows.Forms.Label label8;
-			System.Windows.Forms.Panel panel3;
 			System.Windows.Forms.Label label6;
 			System.Windows.Forms.Label label9;
 			System.Windows.Forms.ToolTip RegisterToolTip;
@@ -75,16 +74,17 @@
 			this.EditDP = new System.Windows.Forms.TextBox();
 			this.panelP = new System.Windows.Forms.Panel();
 			this.EditP = new System.Windows.Forms.TextBox();
-			this.CheckN = new System.Windows.Forms.CheckBox();
-			this.CheckV = new System.Windows.Forms.CheckBox();
+			this.flowLayoutPanel3 = new System.Windows.Forms.FlowLayoutPanel();
+			this.panel7 = new System.Windows.Forms.Panel();
 			this.CheckDec = new System.Windows.Forms.CheckBox();
-			this.CheckIrq = new System.Windows.Forms.CheckBox();
-			this.CheckZ = new System.Windows.Forms.CheckBox();
+			this.CheckV = new System.Windows.Forms.CheckBox();
+			this.CheckN = new System.Windows.Forms.CheckBox();
+			this.panel8 = new System.Windows.Forms.Panel();
 			this.CheckC = new System.Windows.Forms.CheckBox();
-			this.panel2 = new System.Windows.Forms.Panel();
+			this.CheckZ = new System.Windows.Forms.CheckBox();
+			this.CheckIrq = new System.Windows.Forms.CheckBox();
 			this.ResetCycle = new System.Windows.Forms.Button();
 			this.ResetFrame = new System.Windows.Forms.Button();
-			this.panel1 = new System.Windows.Forms.Panel();
 			this.EditCycle = new System.Windows.Forms.TextBox();
 			this.EditFrame = new System.Windows.Forms.TextBox();
 			this.EditScanline = new System.Windows.Forms.TextBox();
@@ -122,14 +122,15 @@
 			this.stack24bit = new System.Windows.Forms.RadioButton();
 			this.topOfStack = new System.Windows.Forms.TextBox();
 			this.label16 = new System.Windows.Forms.Label();
+			this.flowLayoutPanel4 = new System.Windows.Forms.FlowLayoutPanel();
+			this.panel9 = new System.Windows.Forms.Panel();
+			this.panel10 = new System.Windows.Forms.Panel();
+			this.panel11 = new System.Windows.Forms.Panel();
 			this.expandPpu = new Brewmaster.StatusView.ExpandButton();
 			this.expandStack = new Brewmaster.StatusView.ExpandButton();
 			this.expandTiming = new Brewmaster.StatusView.ExpandButton();
 			this.expandFlags = new Brewmaster.StatusView.ExpandButton();
 			this.expandCpu = new Brewmaster.StatusView.ExpandButton();
-			this.flowLayoutPanel3 = new System.Windows.Forms.FlowLayoutPanel();
-			this.panel7 = new System.Windows.Forms.Panel();
-			this.panel8 = new System.Windows.Forms.Panel();
 			RegisterGroup = new System.Windows.Forms.Panel();
 			label1 = new System.Windows.Forms.Label();
 			label2 = new System.Windows.Forms.Label();
@@ -143,7 +144,6 @@
 			TimingGroup = new System.Windows.Forms.Panel();
 			label7 = new System.Windows.Forms.Label();
 			label8 = new System.Windows.Forms.Label();
-			panel3 = new System.Windows.Forms.Panel();
 			label6 = new System.Windows.Forms.Label();
 			label9 = new System.Windows.Forms.Label();
 			RegisterToolTip = new System.Windows.Forms.ToolTip(this.components);
@@ -169,10 +169,10 @@
 			this.panelDP.SuspendLayout();
 			this.panelP.SuspendLayout();
 			FlagGroup.SuspendLayout();
+			this.flowLayoutPanel3.SuspendLayout();
+			this.panel7.SuspendLayout();
+			this.panel8.SuspendLayout();
 			TimingGroup.SuspendLayout();
-			this.panel2.SuspendLayout();
-			this.panel1.SuspendLayout();
-			panel3.SuspendLayout();
 			PpuGroup.SuspendLayout();
 			this.nesPpuPanel.SuspendLayout();
 			panel4.SuspendLayout();
@@ -180,9 +180,10 @@
 			this.panel6.SuspendLayout();
 			this.panel5.SuspendLayout();
 			this.flowLayoutPanel1.SuspendLayout();
-			this.flowLayoutPanel3.SuspendLayout();
-			this.panel7.SuspendLayout();
-			this.panel8.SuspendLayout();
+			this.flowLayoutPanel4.SuspendLayout();
+			this.panel9.SuspendLayout();
+			this.panel10.SuspendLayout();
+			this.panel11.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// RegisterGroup
@@ -193,7 +194,7 @@
 			RegisterGroup.Location = new System.Drawing.Point(2, 20);
 			RegisterGroup.Name = "RegisterGroup";
 			RegisterGroup.Padding = new System.Windows.Forms.Padding(0, 5, 0, 0);
-			RegisterGroup.Size = new System.Drawing.Size(418, 23);
+			RegisterGroup.Size = new System.Drawing.Size(479, 26);
 			RegisterGroup.TabIndex = 0;
 			RegisterGroup.Text = "Registers";
 			// 
@@ -210,10 +211,10 @@
 			this.flowLayoutPanel2.Controls.Add(this.panelSP);
 			this.flowLayoutPanel2.Controls.Add(this.panelDP);
 			this.flowLayoutPanel2.Controls.Add(this.panelP);
-			this.flowLayoutPanel2.Location = new System.Drawing.Point(0, 0);
+			this.flowLayoutPanel2.Location = new System.Drawing.Point(0, 3);
 			this.flowLayoutPanel2.Margin = new System.Windows.Forms.Padding(0);
 			this.flowLayoutPanel2.Name = "flowLayoutPanel2";
-			this.flowLayoutPanel2.Size = new System.Drawing.Size(418, 23);
+			this.flowLayoutPanel2.Size = new System.Drawing.Size(479, 23);
 			this.flowLayoutPanel2.TabIndex = 12;
 			// 
 			// panelA
@@ -525,35 +526,36 @@
 			FlagGroup.AutoSize = true;
 			FlagGroup.Controls.Add(this.flowLayoutPanel3);
 			FlagGroup.Dock = System.Windows.Forms.DockStyle.Top;
-			FlagGroup.Location = new System.Drawing.Point(2, 64);
+			FlagGroup.Location = new System.Drawing.Point(2, 67);
 			FlagGroup.Name = "FlagGroup";
-			FlagGroup.Size = new System.Drawing.Size(418, 29);
+			FlagGroup.Size = new System.Drawing.Size(479, 29);
 			FlagGroup.TabIndex = 0;
 			FlagGroup.Text = "Flags";
 			// 
-			// CheckN
+			// flowLayoutPanel3
 			// 
-			this.CheckN.Dock = System.Windows.Forms.DockStyle.Left;
-			this.CheckN.Location = new System.Drawing.Point(0, 0);
-			this.CheckN.Name = "CheckN";
-			this.CheckN.Size = new System.Drawing.Size(70, 20);
-			this.CheckN.TabIndex = 3;
-			this.CheckN.Text = "Negative";
-			RegisterToolTip.SetToolTip(this.CheckN, "Indicates a negative value (given two\'s complement). Typically gets set when the " +
-        "result of the last operation sets bit 7 of a register");
-			this.CheckN.UseVisualStyleBackColor = true;
+			this.flowLayoutPanel3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.flowLayoutPanel3.AutoSize = true;
+			this.flowLayoutPanel3.Controls.Add(this.panel7);
+			this.flowLayoutPanel3.Controls.Add(this.panel8);
+			this.flowLayoutPanel3.Location = new System.Drawing.Point(0, 6);
+			this.flowLayoutPanel3.Name = "flowLayoutPanel3";
+			this.flowLayoutPanel3.Size = new System.Drawing.Size(479, 20);
+			this.flowLayoutPanel3.TabIndex = 1;
 			// 
-			// CheckV
+			// panel7
 			// 
-			this.CheckV.Dock = System.Windows.Forms.DockStyle.Left;
-			this.CheckV.Location = new System.Drawing.Point(70, 0);
-			this.CheckV.Name = "CheckV";
-			this.CheckV.Size = new System.Drawing.Size(70, 20);
-			this.CheckV.TabIndex = 4;
-			this.CheckV.Text = "Overflow";
-			RegisterToolTip.SetToolTip(this.CheckV, "A very complex flag that I can\'t explain in a single tool tip. Look it up, or jus" +
-        "t ignore that it exists");
-			this.CheckV.UseVisualStyleBackColor = true;
+			this.panel7.AutoSize = true;
+			this.panel7.Controls.Add(this.CheckDec);
+			this.panel7.Controls.Add(this.CheckV);
+			this.panel7.Controls.Add(this.CheckN);
+			this.panel7.Location = new System.Drawing.Point(0, 0);
+			this.panel7.Margin = new System.Windows.Forms.Padding(0);
+			this.panel7.MinimumSize = new System.Drawing.Size(0, 20);
+			this.panel7.Name = "panel7";
+			this.panel7.Size = new System.Drawing.Size(204, 20);
+			this.panel7.TabIndex = 0;
 			// 
 			// CheckDec
 			// 
@@ -568,30 +570,42 @@
         " Coded Decimal (doesn\'t work on NES)");
 			this.CheckDec.UseVisualStyleBackColor = true;
 			// 
-			// CheckIrq
+			// CheckV
 			// 
-			this.CheckIrq.Dock = System.Windows.Forms.DockStyle.Left;
-			this.CheckIrq.Location = new System.Drawing.Point(0, 0);
-			this.CheckIrq.Name = "CheckIrq";
-			this.CheckIrq.Size = new System.Drawing.Size(70, 20);
-			this.CheckIrq.TabIndex = 6;
-			this.CheckIrq.Text = "Interrupt";
-			RegisterToolTip.SetToolTip(this.CheckIrq, "Get set when an IRQ occurs, and cleared when returning from it. Non-NMI IRQs are " +
-        "prevented while flag is set");
-			this.CheckIrq.UseVisualStyleBackColor = true;
+			this.CheckV.Dock = System.Windows.Forms.DockStyle.Left;
+			this.CheckV.Location = new System.Drawing.Point(70, 0);
+			this.CheckV.Name = "CheckV";
+			this.CheckV.Size = new System.Drawing.Size(70, 20);
+			this.CheckV.TabIndex = 4;
+			this.CheckV.Text = "Overflow";
+			RegisterToolTip.SetToolTip(this.CheckV, "A very complex flag that I can\'t explain in a single tool tip. Look it up, or jus" +
+        "t ignore that it exists");
+			this.CheckV.UseVisualStyleBackColor = true;
 			// 
-			// CheckZ
+			// CheckN
 			// 
-			this.CheckZ.Dock = System.Windows.Forms.DockStyle.Left;
-			this.CheckZ.Location = new System.Drawing.Point(70, 0);
-			this.CheckZ.Name = "CheckZ";
-			this.CheckZ.Size = new System.Drawing.Size(70, 20);
-			this.CheckZ.TabIndex = 7;
-			this.CheckZ.Text = "Zero";
-			RegisterToolTip.SetToolTip(this.CheckZ, "Zero flag gets set when a comparison results in equal values, or a load, math or " +
-        "logical operation results in 0. If the result is the opposite, the flag gets cle" +
-        "ared");
-			this.CheckZ.UseVisualStyleBackColor = true;
+			this.CheckN.Dock = System.Windows.Forms.DockStyle.Left;
+			this.CheckN.Location = new System.Drawing.Point(0, 0);
+			this.CheckN.Name = "CheckN";
+			this.CheckN.Size = new System.Drawing.Size(70, 20);
+			this.CheckN.TabIndex = 3;
+			this.CheckN.Text = "Negative";
+			RegisterToolTip.SetToolTip(this.CheckN, "Indicates a negative value (given two\'s complement). Typically gets set when the " +
+        "result of the last operation sets bit 7 of a register");
+			this.CheckN.UseVisualStyleBackColor = true;
+			// 
+			// panel8
+			// 
+			this.panel8.AutoSize = true;
+			this.panel8.Controls.Add(this.CheckC);
+			this.panel8.Controls.Add(this.CheckZ);
+			this.panel8.Controls.Add(this.CheckIrq);
+			this.panel8.Location = new System.Drawing.Point(204, 0);
+			this.panel8.Margin = new System.Windows.Forms.Padding(0);
+			this.panel8.MinimumSize = new System.Drawing.Size(0, 20);
+			this.panel8.Name = "panel8";
+			this.panel8.Size = new System.Drawing.Size(190, 20);
+			this.panel8.TabIndex = 1;
 			// 
 			// CheckC
 			// 
@@ -607,34 +621,48 @@
         "s after a comparison");
 			this.CheckC.UseVisualStyleBackColor = true;
 			// 
+			// CheckZ
+			// 
+			this.CheckZ.Dock = System.Windows.Forms.DockStyle.Left;
+			this.CheckZ.Location = new System.Drawing.Point(70, 0);
+			this.CheckZ.Name = "CheckZ";
+			this.CheckZ.Size = new System.Drawing.Size(70, 20);
+			this.CheckZ.TabIndex = 7;
+			this.CheckZ.Text = "Zero";
+			RegisterToolTip.SetToolTip(this.CheckZ, "Zero flag gets set when a comparison results in equal values, or a load, math or " +
+        "logical operation results in 0. If the result is the opposite, the flag gets cle" +
+        "ared");
+			this.CheckZ.UseVisualStyleBackColor = true;
+			// 
+			// CheckIrq
+			// 
+			this.CheckIrq.Dock = System.Windows.Forms.DockStyle.Left;
+			this.CheckIrq.Location = new System.Drawing.Point(0, 0);
+			this.CheckIrq.Name = "CheckIrq";
+			this.CheckIrq.Size = new System.Drawing.Size(70, 20);
+			this.CheckIrq.TabIndex = 6;
+			this.CheckIrq.Text = "Interrupt";
+			RegisterToolTip.SetToolTip(this.CheckIrq, "Get set when an IRQ occurs, and cleared when returning from it. Non-NMI IRQs are " +
+        "prevented while flag is set");
+			this.CheckIrq.UseVisualStyleBackColor = true;
+			// 
 			// TimingGroup
 			// 
 			TimingGroup.AutoSize = true;
-			TimingGroup.Controls.Add(this.panel2);
-			TimingGroup.Controls.Add(this.panel1);
-			TimingGroup.Controls.Add(panel3);
+			TimingGroup.Controls.Add(this.flowLayoutPanel4);
 			TimingGroup.Dock = System.Windows.Forms.DockStyle.Top;
-			TimingGroup.Location = new System.Drawing.Point(2, 114);
+			TimingGroup.Location = new System.Drawing.Point(2, 117);
 			TimingGroup.Name = "TimingGroup";
 			TimingGroup.Padding = new System.Windows.Forms.Padding(0, 5, 0, 0);
-			TimingGroup.Size = new System.Drawing.Size(418, 78);
+			TimingGroup.Size = new System.Drawing.Size(479, 52);
 			TimingGroup.TabIndex = 1;
 			TimingGroup.Text = "Timing";
-			// 
-			// panel2
-			// 
-			this.panel2.Controls.Add(this.ResetCycle);
-			this.panel2.Controls.Add(this.ResetFrame);
-			this.panel2.Dock = System.Windows.Forms.DockStyle.Top;
-			this.panel2.Location = new System.Drawing.Point(0, 57);
-			this.panel2.Name = "panel2";
-			this.panel2.Size = new System.Drawing.Size(418, 21);
-			this.panel2.TabIndex = 2;
 			// 
 			// ResetCycle
 			// 
 			this.ResetCycle.Font = new System.Drawing.Font("Microsoft Sans Serif", 6F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.ResetCycle.Location = new System.Drawing.Point(138, 0);
+			this.ResetCycle.Location = new System.Drawing.Point(138, 22);
+			this.ResetCycle.Margin = new System.Windows.Forms.Padding(0);
 			this.ResetCycle.Name = "ResetCycle";
 			this.ResetCycle.Size = new System.Drawing.Size(69, 21);
 			this.ResetCycle.TabIndex = 1;
@@ -645,25 +673,14 @@
 			// ResetFrame
 			// 
 			this.ResetFrame.Font = new System.Drawing.Font("Microsoft Sans Serif", 6F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.ResetFrame.Location = new System.Drawing.Point(39, 0);
+			this.ResetFrame.Location = new System.Drawing.Point(39, 22);
+			this.ResetFrame.Margin = new System.Windows.Forms.Padding(0);
 			this.ResetFrame.Name = "ResetFrame";
 			this.ResetFrame.Size = new System.Drawing.Size(39, 21);
 			this.ResetFrame.TabIndex = 0;
 			this.ResetFrame.Text = "Reset";
 			this.ResetFrame.UseVisualStyleBackColor = true;
 			this.ResetFrame.Click += new System.EventHandler(this.ResetFrame_Click);
-			// 
-			// panel1
-			// 
-			this.panel1.Controls.Add(this.EditCycle);
-			this.panel1.Controls.Add(label7);
-			this.panel1.Controls.Add(this.EditFrame);
-			this.panel1.Controls.Add(label8);
-			this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
-			this.panel1.Location = new System.Drawing.Point(0, 31);
-			this.panel1.Name = "panel1";
-			this.panel1.Size = new System.Drawing.Size(418, 26);
-			this.panel1.TabIndex = 0;
 			// 
 			// EditCycle
 			// 
@@ -715,25 +732,13 @@
 			label8.TabIndex = 12;
 			label8.Text = "Frame";
 			// 
-			// panel3
-			// 
-			panel3.Controls.Add(this.EditScanline);
-			panel3.Controls.Add(label6);
-			panel3.Controls.Add(this.EditPixel);
-			panel3.Controls.Add(label9);
-			panel3.Dock = System.Windows.Forms.DockStyle.Top;
-			panel3.Location = new System.Drawing.Point(0, 5);
-			panel3.Name = "panel3";
-			panel3.Size = new System.Drawing.Size(418, 26);
-			panel3.TabIndex = 3;
-			// 
 			// EditScanline
 			// 
 			this.EditScanline.BackColor = System.Drawing.SystemColors.Window;
 			this.EditScanline.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
 			this.EditScanline.Dock = System.Windows.Forms.DockStyle.Left;
 			this.EditScanline.ImeMode = System.Windows.Forms.ImeMode.Alpha;
-			this.EditScanline.Location = new System.Drawing.Point(138, 0);
+			this.EditScanline.Location = new System.Drawing.Point(60, 0);
 			this.EditScanline.MaxLength = 2;
 			this.EditScanline.Name = "EditScanline";
 			this.EditScanline.ReadOnly = true;
@@ -744,10 +749,10 @@
 			// label6
 			// 
 			label6.Dock = System.Windows.Forms.DockStyle.Left;
-			label6.Location = new System.Drawing.Point(78, 0);
+			label6.Location = new System.Drawing.Point(0, 0);
 			label6.Name = "label6";
 			label6.Padding = new System.Windows.Forms.Padding(3, 3, 0, 0);
-			label6.Size = new System.Drawing.Size(60, 26);
+			label6.Size = new System.Drawing.Size(60, 20);
 			label6.TabIndex = 14;
 			label6.Text = "Scanline";
 			// 
@@ -771,7 +776,7 @@
 			label9.Location = new System.Drawing.Point(0, 0);
 			label9.Name = "label9";
 			label9.Padding = new System.Windows.Forms.Padding(3, 3, 0, 0);
-			label9.Size = new System.Drawing.Size(39, 26);
+			label9.Size = new System.Drawing.Size(39, 20);
 			label9.TabIndex = 18;
 			label9.Text = "Pixel";
 			// 
@@ -1246,55 +1251,67 @@
 			this.label16.TabIndex = 0;
 			this.label16.Text = "Top of stack";
 			// 
+			// flowLayoutPanel4
+			// 
+			this.flowLayoutPanel4.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.flowLayoutPanel4.AutoSize = true;
+			this.flowLayoutPanel4.Controls.Add(this.panel9);
+			this.flowLayoutPanel4.Controls.Add(this.panel10);
+			this.flowLayoutPanel4.Controls.Add(this.panel11);
+			this.flowLayoutPanel4.Location = new System.Drawing.Point(0, 3);
+			this.flowLayoutPanel4.Name = "flowLayoutPanel4";
+			this.flowLayoutPanel4.Size = new System.Drawing.Size(479, 46);
+			this.flowLayoutPanel4.TabIndex = 4;
+			// 
+			// panel9
+			// 
+			this.panel9.AutoSize = true;
+			this.panel9.Controls.Add(this.EditPixel);
+			this.panel9.Controls.Add(label9);
+			this.panel9.Location = new System.Drawing.Point(0, 0);
+			this.panel9.Margin = new System.Windows.Forms.Padding(0, 0, 0, 3);
+			this.panel9.MinimumSize = new System.Drawing.Size(0, 20);
+			this.panel9.Name = "panel9";
+			this.panel9.Size = new System.Drawing.Size(78, 20);
+			this.panel9.TabIndex = 0;
+			// 
+			// panel10
+			// 
+			this.panel10.AutoSize = true;
+			this.panel10.Controls.Add(this.EditScanline);
+			this.panel10.Controls.Add(label6);
+			this.panel10.Location = new System.Drawing.Point(78, 0);
+			this.panel10.Margin = new System.Windows.Forms.Padding(0, 0, 0, 3);
+			this.panel10.MinimumSize = new System.Drawing.Size(0, 20);
+			this.panel10.Name = "panel10";
+			this.panel10.Size = new System.Drawing.Size(99, 20);
+			this.panel10.TabIndex = 1;
+			// 
+			// panel11
+			// 
+			this.panel11.AutoSize = true;
+			this.panel11.Controls.Add(this.ResetFrame);
+			this.panel11.Controls.Add(this.ResetCycle);
+			this.panel11.Controls.Add(this.EditCycle);
+			this.panel11.Controls.Add(label7);
+			this.panel11.Controls.Add(this.EditFrame);
+			this.panel11.Controls.Add(label8);
+			this.panel11.Location = new System.Drawing.Point(177, 0);
+			this.panel11.Margin = new System.Windows.Forms.Padding(0, 0, 0, 3);
+			this.panel11.Name = "panel11";
+			this.panel11.Size = new System.Drawing.Size(207, 43);
+			this.panel11.TabIndex = 2;
+			// 
 			// horizontalLine5
 			// 
 			horizontalLine5.Dock = System.Windows.Forms.DockStyle.Top;
 			horizontalLine5.LineColor = System.Drawing.SystemColors.ButtonShadow;
-			horizontalLine5.Location = new System.Drawing.Point(2, 234);
+			horizontalLine5.Location = new System.Drawing.Point(2, 211);
 			horizontalLine5.Name = "horizontalLine5";
-			horizontalLine5.Size = new System.Drawing.Size(418, 1);
+			horizontalLine5.Size = new System.Drawing.Size(479, 1);
 			horizontalLine5.TabIndex = 14;
 			horizontalLine5.Text = "horizontalLine5";
-			// 
-			// horizontalLine4
-			// 
-			horizontalLine4.Dock = System.Windows.Forms.DockStyle.Top;
-			horizontalLine4.LineColor = System.Drawing.SystemColors.ButtonShadow;
-			horizontalLine4.Location = new System.Drawing.Point(2, 213);
-			horizontalLine4.Name = "horizontalLine4";
-			horizontalLine4.Size = new System.Drawing.Size(418, 1);
-			horizontalLine4.TabIndex = 10;
-			horizontalLine4.Text = "horizontalLine4";
-			// 
-			// horizontalLine3
-			// 
-			horizontalLine3.Dock = System.Windows.Forms.DockStyle.Top;
-			horizontalLine3.LineColor = System.Drawing.SystemColors.ButtonShadow;
-			horizontalLine3.Location = new System.Drawing.Point(2, 192);
-			horizontalLine3.Name = "horizontalLine3";
-			horizontalLine3.Size = new System.Drawing.Size(418, 1);
-			horizontalLine3.TabIndex = 9;
-			horizontalLine3.Text = "horizontalLine3";
-			// 
-			// horizontalLine2
-			// 
-			horizontalLine2.Dock = System.Windows.Forms.DockStyle.Top;
-			horizontalLine2.LineColor = System.Drawing.SystemColors.ButtonShadow;
-			horizontalLine2.Location = new System.Drawing.Point(2, 93);
-			horizontalLine2.Name = "horizontalLine2";
-			horizontalLine2.Size = new System.Drawing.Size(418, 1);
-			horizontalLine2.TabIndex = 8;
-			horizontalLine2.Text = "horizontalLine2";
-			// 
-			// horizontalLine1
-			// 
-			horizontalLine1.Dock = System.Windows.Forms.DockStyle.Top;
-			horizontalLine1.LineColor = System.Drawing.SystemColors.ButtonShadow;
-			horizontalLine1.Location = new System.Drawing.Point(2, 43);
-			horizontalLine1.Name = "horizontalLine1";
-			horizontalLine1.Size = new System.Drawing.Size(418, 1);
-			horizontalLine1.TabIndex = 7;
-			horizontalLine1.Text = "horizontalLine1";
 			// 
 			// expandPpu
 			// 
@@ -1304,11 +1321,21 @@
 			this.expandPpu.ExpandPanel = PpuGroup;
 			this.expandPpu.FlatAppearance.BorderSize = 0;
 			this.expandPpu.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.expandPpu.Location = new System.Drawing.Point(2, 214);
+			this.expandPpu.Location = new System.Drawing.Point(2, 191);
 			this.expandPpu.Name = "expandPpu";
-			this.expandPpu.Size = new System.Drawing.Size(418, 20);
+			this.expandPpu.Size = new System.Drawing.Size(479, 20);
 			this.expandPpu.TabIndex = 6;
 			this.expandPpu.UseVisualStyleBackColor = true;
+			// 
+			// horizontalLine4
+			// 
+			horizontalLine4.Dock = System.Windows.Forms.DockStyle.Top;
+			horizontalLine4.LineColor = System.Drawing.SystemColors.ButtonShadow;
+			horizontalLine4.Location = new System.Drawing.Point(2, 190);
+			horizontalLine4.Name = "horizontalLine4";
+			horizontalLine4.Size = new System.Drawing.Size(479, 1);
+			horizontalLine4.TabIndex = 10;
+			horizontalLine4.Text = "horizontalLine4";
 			// 
 			// expandStack
 			// 
@@ -1318,11 +1345,21 @@
 			this.expandStack.ExpandPanel = stackGroup;
 			this.expandStack.FlatAppearance.BorderSize = 0;
 			this.expandStack.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.expandStack.Location = new System.Drawing.Point(2, 193);
+			this.expandStack.Location = new System.Drawing.Point(2, 170);
 			this.expandStack.Name = "expandStack";
-			this.expandStack.Size = new System.Drawing.Size(418, 20);
+			this.expandStack.Size = new System.Drawing.Size(479, 20);
 			this.expandStack.TabIndex = 13;
 			this.expandStack.UseVisualStyleBackColor = true;
+			// 
+			// horizontalLine3
+			// 
+			horizontalLine3.Dock = System.Windows.Forms.DockStyle.Top;
+			horizontalLine3.LineColor = System.Drawing.SystemColors.ButtonShadow;
+			horizontalLine3.Location = new System.Drawing.Point(2, 169);
+			horizontalLine3.Name = "horizontalLine3";
+			horizontalLine3.Size = new System.Drawing.Size(479, 1);
+			horizontalLine3.TabIndex = 9;
+			horizontalLine3.Text = "horizontalLine3";
 			// 
 			// expandTiming
 			// 
@@ -1332,11 +1369,21 @@
 			this.expandTiming.ExpandPanel = TimingGroup;
 			this.expandTiming.FlatAppearance.BorderSize = 0;
 			this.expandTiming.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.expandTiming.Location = new System.Drawing.Point(2, 94);
+			this.expandTiming.Location = new System.Drawing.Point(2, 97);
 			this.expandTiming.Name = "expandTiming";
-			this.expandTiming.Size = new System.Drawing.Size(418, 20);
+			this.expandTiming.Size = new System.Drawing.Size(479, 20);
 			this.expandTiming.TabIndex = 3;
 			this.expandTiming.UseVisualStyleBackColor = true;
+			// 
+			// horizontalLine2
+			// 
+			horizontalLine2.Dock = System.Windows.Forms.DockStyle.Top;
+			horizontalLine2.LineColor = System.Drawing.SystemColors.ButtonShadow;
+			horizontalLine2.Location = new System.Drawing.Point(2, 96);
+			horizontalLine2.Name = "horizontalLine2";
+			horizontalLine2.Size = new System.Drawing.Size(479, 1);
+			horizontalLine2.TabIndex = 8;
+			horizontalLine2.Text = "horizontalLine2";
 			// 
 			// expandFlags
 			// 
@@ -1346,11 +1393,21 @@
 			this.expandFlags.ExpandPanel = FlagGroup;
 			this.expandFlags.FlatAppearance.BorderSize = 0;
 			this.expandFlags.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.expandFlags.Location = new System.Drawing.Point(2, 44);
+			this.expandFlags.Location = new System.Drawing.Point(2, 47);
 			this.expandFlags.Name = "expandFlags";
-			this.expandFlags.Size = new System.Drawing.Size(418, 20);
+			this.expandFlags.Size = new System.Drawing.Size(479, 20);
 			this.expandFlags.TabIndex = 5;
 			this.expandFlags.UseVisualStyleBackColor = true;
+			// 
+			// horizontalLine1
+			// 
+			horizontalLine1.Dock = System.Windows.Forms.DockStyle.Top;
+			horizontalLine1.LineColor = System.Drawing.SystemColors.ButtonShadow;
+			horizontalLine1.Location = new System.Drawing.Point(2, 46);
+			horizontalLine1.Name = "horizontalLine1";
+			horizontalLine1.Size = new System.Drawing.Size(479, 1);
+			horizontalLine1.TabIndex = 7;
+			horizontalLine1.Text = "horizontalLine1";
 			// 
 			// expandCpu
 			// 
@@ -1362,47 +1419,9 @@
 			this.expandCpu.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
 			this.expandCpu.Location = new System.Drawing.Point(2, 0);
 			this.expandCpu.Name = "expandCpu";
-			this.expandCpu.Size = new System.Drawing.Size(418, 20);
+			this.expandCpu.Size = new System.Drawing.Size(479, 20);
 			this.expandCpu.TabIndex = 4;
 			this.expandCpu.UseVisualStyleBackColor = true;
-			// 
-			// flowLayoutPanel3
-			// 
-			this.flowLayoutPanel3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.flowLayoutPanel3.AutoSize = true;
-			this.flowLayoutPanel3.Controls.Add(this.panel7);
-			this.flowLayoutPanel3.Controls.Add(this.panel8);
-			this.flowLayoutPanel3.Location = new System.Drawing.Point(0, 6);
-			this.flowLayoutPanel3.Name = "flowLayoutPanel3";
-			this.flowLayoutPanel3.Size = new System.Drawing.Size(418, 20);
-			this.flowLayoutPanel3.TabIndex = 1;
-			// 
-			// panel7
-			// 
-			this.panel7.AutoSize = true;
-			this.panel7.Controls.Add(this.CheckDec);
-			this.panel7.Controls.Add(this.CheckV);
-			this.panel7.Controls.Add(this.CheckN);
-			this.panel7.Location = new System.Drawing.Point(0, 0);
-			this.panel7.Margin = new System.Windows.Forms.Padding(0);
-			this.panel7.MinimumSize = new System.Drawing.Size(0, 20);
-			this.panel7.Name = "panel7";
-			this.panel7.Size = new System.Drawing.Size(204, 20);
-			this.panel7.TabIndex = 0;
-			// 
-			// panel8
-			// 
-			this.panel8.AutoSize = true;
-			this.panel8.Controls.Add(this.CheckC);
-			this.panel8.Controls.Add(this.CheckZ);
-			this.panel8.Controls.Add(this.CheckIrq);
-			this.panel8.Location = new System.Drawing.Point(204, 0);
-			this.panel8.Margin = new System.Windows.Forms.Padding(0);
-			this.panel8.MinimumSize = new System.Drawing.Size(0, 20);
-			this.panel8.Name = "panel8";
-			this.panel8.Size = new System.Drawing.Size(190, 20);
-			this.panel8.TabIndex = 1;
 			// 
 			// CpuStatus
 			// 
@@ -1428,7 +1447,7 @@
 			this.MinimumSize = new System.Drawing.Size(100, 0);
 			this.Name = "CpuStatus";
 			this.Padding = new System.Windows.Forms.Padding(2, 0, 0, 0);
-			this.Size = new System.Drawing.Size(420, 622);
+			this.Size = new System.Drawing.Size(481, 622);
 			RegisterGroup.ResumeLayout(false);
 			RegisterGroup.PerformLayout();
 			this.flowLayoutPanel2.ResumeLayout(false);
@@ -1451,12 +1470,14 @@
 			this.panelP.PerformLayout();
 			FlagGroup.ResumeLayout(false);
 			FlagGroup.PerformLayout();
+			this.flowLayoutPanel3.ResumeLayout(false);
+			this.flowLayoutPanel3.PerformLayout();
+			this.panel7.ResumeLayout(false);
+			this.panel7.PerformLayout();
+			this.panel8.ResumeLayout(false);
+			this.panel8.PerformLayout();
 			TimingGroup.ResumeLayout(false);
-			this.panel2.ResumeLayout(false);
-			this.panel1.ResumeLayout(false);
-			this.panel1.PerformLayout();
-			panel3.ResumeLayout(false);
-			panel3.PerformLayout();
+			TimingGroup.PerformLayout();
 			PpuGroup.ResumeLayout(false);
 			this.nesPpuPanel.ResumeLayout(false);
 			this.nesPpuPanel.PerformLayout();
@@ -1469,12 +1490,14 @@
 			this.panel5.ResumeLayout(false);
 			this.panel5.PerformLayout();
 			this.flowLayoutPanel1.ResumeLayout(false);
-			this.flowLayoutPanel3.ResumeLayout(false);
-			this.flowLayoutPanel3.PerformLayout();
-			this.panel7.ResumeLayout(false);
-			this.panel7.PerformLayout();
-			this.panel8.ResumeLayout(false);
-			this.panel8.PerformLayout();
+			this.flowLayoutPanel4.ResumeLayout(false);
+			this.flowLayoutPanel4.PerformLayout();
+			this.panel9.ResumeLayout(false);
+			this.panel9.PerformLayout();
+			this.panel10.ResumeLayout(false);
+			this.panel10.PerformLayout();
+			this.panel11.ResumeLayout(false);
+			this.panel11.PerformLayout();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -1494,11 +1517,9 @@
 		private System.Windows.Forms.CheckBox CheckIrq;
 		private System.Windows.Forms.CheckBox CheckZ;
 		private System.Windows.Forms.CheckBox CheckC;
-		private System.Windows.Forms.Panel panel1;
 		private System.Windows.Forms.TextBox EditScanline;
 		private System.Windows.Forms.TextBox EditCycle;
 		private System.Windows.Forms.TextBox EditFrame;
-		private System.Windows.Forms.Panel panel2;
 		private System.Windows.Forms.Button ResetCycle;
 		private System.Windows.Forms.Button ResetFrame;
 		private System.Windows.Forms.TextBox EditPixel;
@@ -1554,5 +1575,9 @@
 		private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel3;
 		private System.Windows.Forms.Panel panel7;
 		private System.Windows.Forms.Panel panel8;
+		private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel4;
+		private System.Windows.Forms.Panel panel9;
+		private System.Windows.Forms.Panel panel10;
+		private System.Windows.Forms.Panel panel11;
 	}
 }
