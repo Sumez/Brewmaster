@@ -61,12 +61,19 @@
 			this.panelA = new System.Windows.Forms.Panel();
 			this.RegisterA = new Brewmaster.StatusView.RegisterValue();
 			this.panelX = new System.Windows.Forms.Panel();
+			this.RegisterX = new Brewmaster.StatusView.RegisterValue();
 			this.panelY = new System.Windows.Forms.Panel();
+			this.RegisterY = new Brewmaster.StatusView.RegisterValue();
 			this.panelPC = new System.Windows.Forms.Panel();
+			this.RegisterPC = new Brewmaster.StatusView.RegisterValue();
 			this.panelDB = new System.Windows.Forms.Panel();
+			this.RegisterDB = new Brewmaster.StatusView.RegisterValue();
 			this.panelSP = new System.Windows.Forms.Panel();
+			this.RegisterSP = new Brewmaster.StatusView.RegisterValue();
 			this.panelDP = new System.Windows.Forms.Panel();
+			this.RegisterDP = new Brewmaster.StatusView.RegisterValue();
 			this.panelP = new System.Windows.Forms.Panel();
+			this.RegisterP = new Brewmaster.StatusView.RegisterValue();
 			this.flagPanel = new System.Windows.Forms.FlowLayoutPanel();
 			this.panel7 = new System.Windows.Forms.Panel();
 			this.CheckDec = new System.Windows.Forms.CheckBox();
@@ -128,13 +135,6 @@
 			this.expandTiming = new Brewmaster.StatusView.ExpandButton();
 			this.expandFlags = new Brewmaster.StatusView.ExpandButton();
 			this.expandCpu = new Brewmaster.StatusView.ExpandButton();
-			this.RegisterX = new Brewmaster.StatusView.RegisterValue();
-			this.RegisterY = new Brewmaster.StatusView.RegisterValue();
-			this.RegisterPC = new Brewmaster.StatusView.RegisterValue();
-			this.RegisterDB = new Brewmaster.StatusView.RegisterValue();
-			this.RegisterSP = new Brewmaster.StatusView.RegisterValue();
-			this.RegisterDP = new Brewmaster.StatusView.RegisterValue();
-			this.RegisterP = new Brewmaster.StatusView.RegisterValue();
 			RegisterGroup = new System.Windows.Forms.Panel();
 			label1 = new System.Windows.Forms.Label();
 			label2 = new System.Windows.Forms.Label();
@@ -231,7 +231,7 @@
 			this.panelA.Margin = new System.Windows.Forms.Padding(0, 0, 0, 3);
 			this.panelA.MinimumSize = new System.Drawing.Size(0, 20);
 			this.panelA.Name = "panelA";
-			this.panelA.Size = new System.Drawing.Size(48, 20);
+			this.panelA.Size = new System.Drawing.Size(37, 20);
 			this.panelA.TabIndex = 0;
 			// 
 			// RegisterA
@@ -241,9 +241,11 @@
 			this.RegisterA.Font = new System.Drawing.Font("Consolas", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
 			this.RegisterA.Location = new System.Drawing.Point(17, 0);
 			this.RegisterA.Name = "RegisterA";
+			this.RegisterA.ReadOnly = false;
 			this.RegisterA.RegisterSize = Brewmaster.StatusView.RegisterSize.EightBit;
-			this.RegisterA.TabIndex = 10;
-			this.RegisterA.Text = null;
+			this.RegisterA.Size = new System.Drawing.Size(20, 20);
+			this.RegisterA.TabIndex = 1;
+			this.RegisterA.Text = "00";
 			this.RegisterA.Value = 0;
 			// 
 			// label1
@@ -263,12 +265,26 @@
 			this.panelX.AutoSize = true;
 			this.panelX.Controls.Add(this.RegisterX);
 			this.panelX.Controls.Add(label2);
-			this.panelX.Location = new System.Drawing.Point(48, 0);
+			this.panelX.Location = new System.Drawing.Point(37, 0);
 			this.panelX.Margin = new System.Windows.Forms.Padding(0, 0, 0, 3);
 			this.panelX.MinimumSize = new System.Drawing.Size(0, 20);
 			this.panelX.Name = "panelX";
-			this.panelX.Size = new System.Drawing.Size(48, 20);
-			this.panelX.TabIndex = 10;
+			this.panelX.Size = new System.Drawing.Size(37, 20);
+			this.panelX.TabIndex = 1;
+			// 
+			// RegisterX
+			// 
+			this.RegisterX.Cursor = System.Windows.Forms.Cursors.IBeam;
+			this.RegisterX.Dock = System.Windows.Forms.DockStyle.Left;
+			this.RegisterX.Font = new System.Drawing.Font("Consolas", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
+			this.RegisterX.Location = new System.Drawing.Point(17, 0);
+			this.RegisterX.Name = "RegisterX";
+			this.RegisterX.ReadOnly = false;
+			this.RegisterX.RegisterSize = Brewmaster.StatusView.RegisterSize.EightBit;
+			this.RegisterX.Size = new System.Drawing.Size(20, 20);
+			this.RegisterX.TabIndex = 2;
+			this.RegisterX.Text = "00";
+			this.RegisterX.Value = 0;
 			// 
 			// label2
 			// 
@@ -289,12 +305,26 @@
 			this.panelY.AutoSize = true;
 			this.panelY.Controls.Add(this.RegisterY);
 			this.panelY.Controls.Add(label3);
-			this.panelY.Location = new System.Drawing.Point(96, 0);
+			this.panelY.Location = new System.Drawing.Point(74, 0);
 			this.panelY.Margin = new System.Windows.Forms.Padding(0, 0, 0, 3);
 			this.panelY.MinimumSize = new System.Drawing.Size(0, 20);
 			this.panelY.Name = "panelY";
-			this.panelY.Size = new System.Drawing.Size(48, 20);
-			this.panelY.TabIndex = 11;
+			this.panelY.Size = new System.Drawing.Size(37, 20);
+			this.panelY.TabIndex = 2;
+			// 
+			// RegisterY
+			// 
+			this.RegisterY.Cursor = System.Windows.Forms.Cursors.IBeam;
+			this.RegisterY.Dock = System.Windows.Forms.DockStyle.Left;
+			this.RegisterY.Font = new System.Drawing.Font("Consolas", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
+			this.RegisterY.Location = new System.Drawing.Point(17, 0);
+			this.RegisterY.Name = "RegisterY";
+			this.RegisterY.ReadOnly = false;
+			this.RegisterY.RegisterSize = Brewmaster.StatusView.RegisterSize.EightBit;
+			this.RegisterY.Size = new System.Drawing.Size(20, 20);
+			this.RegisterY.TabIndex = 3;
+			this.RegisterY.Text = "00";
+			this.RegisterY.Value = 0;
 			// 
 			// label3
 			// 
@@ -315,12 +345,27 @@
 			this.panelPC.AutoSize = true;
 			this.panelPC.Controls.Add(this.RegisterPC);
 			this.panelPC.Controls.Add(label4);
-			this.panelPC.Location = new System.Drawing.Point(144, 0);
+			this.panelPC.Location = new System.Drawing.Point(111, 0);
 			this.panelPC.Margin = new System.Windows.Forms.Padding(0, 0, 0, 3);
 			this.panelPC.MinimumSize = new System.Drawing.Size(0, 20);
 			this.panelPC.Name = "panelPC";
-			this.panelPC.Size = new System.Drawing.Size(55, 20);
-			this.panelPC.TabIndex = 12;
+			this.panelPC.Size = new System.Drawing.Size(44, 20);
+			this.panelPC.TabIndex = 3;
+			// 
+			// RegisterPC
+			// 
+			this.RegisterPC.Cursor = System.Windows.Forms.Cursors.IBeam;
+			this.RegisterPC.Dock = System.Windows.Forms.DockStyle.Left;
+			this.RegisterPC.Font = new System.Drawing.Font("Consolas", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
+			this.RegisterPC.Location = new System.Drawing.Point(24, 0);
+			this.RegisterPC.Name = "RegisterPC";
+			this.RegisterPC.ReadOnly = true;
+			this.RegisterPC.RegisterSize = Brewmaster.StatusView.RegisterSize.EightBit;
+			this.RegisterPC.Size = new System.Drawing.Size(20, 20);
+			this.RegisterPC.TabIndex = 4;
+			this.RegisterPC.TabStop = false;
+			this.RegisterPC.Text = "00";
+			this.RegisterPC.Value = 0;
 			// 
 			// label4
 			// 
@@ -341,13 +386,27 @@
 			this.panelDB.AutoSize = true;
 			this.panelDB.Controls.Add(this.RegisterDB);
 			this.panelDB.Controls.Add(label18);
-			this.panelDB.Location = new System.Drawing.Point(199, 0);
+			this.panelDB.Location = new System.Drawing.Point(155, 0);
 			this.panelDB.Margin = new System.Windows.Forms.Padding(0, 0, 0, 3);
 			this.panelDB.MinimumSize = new System.Drawing.Size(0, 20);
 			this.panelDB.Name = "panelDB";
-			this.panelDB.Size = new System.Drawing.Size(56, 20);
-			this.panelDB.TabIndex = 15;
+			this.panelDB.Size = new System.Drawing.Size(45, 20);
+			this.panelDB.TabIndex = 4;
 			this.panelDB.Visible = false;
+			// 
+			// RegisterDB
+			// 
+			this.RegisterDB.Cursor = System.Windows.Forms.Cursors.IBeam;
+			this.RegisterDB.Dock = System.Windows.Forms.DockStyle.Left;
+			this.RegisterDB.Font = new System.Drawing.Font("Consolas", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
+			this.RegisterDB.Location = new System.Drawing.Point(25, 0);
+			this.RegisterDB.Name = "RegisterDB";
+			this.RegisterDB.ReadOnly = false;
+			this.RegisterDB.RegisterSize = Brewmaster.StatusView.RegisterSize.EightBit;
+			this.RegisterDB.Size = new System.Drawing.Size(20, 20);
+			this.RegisterDB.TabIndex = 5;
+			this.RegisterDB.Text = "00";
+			this.RegisterDB.Value = 0;
 			// 
 			// label18
 			// 
@@ -366,12 +425,26 @@
 			this.panelSP.AutoSize = true;
 			this.panelSP.Controls.Add(this.RegisterSP);
 			this.panelSP.Controls.Add(label5);
-			this.panelSP.Location = new System.Drawing.Point(255, 0);
+			this.panelSP.Location = new System.Drawing.Point(200, 0);
 			this.panelSP.Margin = new System.Windows.Forms.Padding(0, 0, 0, 3);
 			this.panelSP.MinimumSize = new System.Drawing.Size(0, 20);
 			this.panelSP.Name = "panelSP";
-			this.panelSP.Size = new System.Drawing.Size(55, 20);
-			this.panelSP.TabIndex = 13;
+			this.panelSP.Size = new System.Drawing.Size(44, 20);
+			this.panelSP.TabIndex = 5;
+			// 
+			// RegisterSP
+			// 
+			this.RegisterSP.Cursor = System.Windows.Forms.Cursors.IBeam;
+			this.RegisterSP.Dock = System.Windows.Forms.DockStyle.Left;
+			this.RegisterSP.Font = new System.Drawing.Font("Consolas", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
+			this.RegisterSP.Location = new System.Drawing.Point(24, 0);
+			this.RegisterSP.Name = "RegisterSP";
+			this.RegisterSP.ReadOnly = false;
+			this.RegisterSP.RegisterSize = Brewmaster.StatusView.RegisterSize.EightBit;
+			this.RegisterSP.Size = new System.Drawing.Size(20, 20);
+			this.RegisterSP.TabIndex = 6;
+			this.RegisterSP.Text = "00";
+			this.RegisterSP.Value = 0;
 			// 
 			// label5
 			// 
@@ -392,13 +465,27 @@
 			this.panelDP.AutoSize = true;
 			this.panelDP.Controls.Add(this.RegisterDP);
 			this.panelDP.Controls.Add(label19);
-			this.panelDP.Location = new System.Drawing.Point(310, 0);
+			this.panelDP.Location = new System.Drawing.Point(244, 0);
 			this.panelDP.Margin = new System.Windows.Forms.Padding(0, 0, 0, 3);
 			this.panelDP.MinimumSize = new System.Drawing.Size(0, 20);
 			this.panelDP.Name = "panelDP";
-			this.panelDP.Size = new System.Drawing.Size(56, 20);
-			this.panelDP.TabIndex = 16;
+			this.panelDP.Size = new System.Drawing.Size(45, 20);
+			this.panelDP.TabIndex = 6;
 			this.panelDP.Visible = false;
+			// 
+			// RegisterDP
+			// 
+			this.RegisterDP.Cursor = System.Windows.Forms.Cursors.IBeam;
+			this.RegisterDP.Dock = System.Windows.Forms.DockStyle.Left;
+			this.RegisterDP.Font = new System.Drawing.Font("Consolas", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
+			this.RegisterDP.Location = new System.Drawing.Point(25, 0);
+			this.RegisterDP.Name = "RegisterDP";
+			this.RegisterDP.ReadOnly = false;
+			this.RegisterDP.RegisterSize = Brewmaster.StatusView.RegisterSize.EightBit;
+			this.RegisterDP.Size = new System.Drawing.Size(20, 20);
+			this.RegisterDP.TabIndex = 7;
+			this.RegisterDP.Text = "00";
+			this.RegisterDP.Value = 0;
 			// 
 			// label19
 			// 
@@ -416,11 +503,25 @@
 			// 
 			this.panelP.Controls.Add(this.RegisterP);
 			this.panelP.Controls.Add(labelP);
-			this.panelP.Location = new System.Drawing.Point(366, 0);
+			this.panelP.Location = new System.Drawing.Point(289, 0);
 			this.panelP.Margin = new System.Windows.Forms.Padding(0, 0, 0, 3);
 			this.panelP.Name = "panelP";
 			this.panelP.Size = new System.Drawing.Size(39, 20);
-			this.panelP.TabIndex = 14;
+			this.panelP.TabIndex = 7;
+			// 
+			// RegisterP
+			// 
+			this.RegisterP.Cursor = System.Windows.Forms.Cursors.IBeam;
+			this.RegisterP.Dock = System.Windows.Forms.DockStyle.Left;
+			this.RegisterP.Font = new System.Drawing.Font("Consolas", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
+			this.RegisterP.Location = new System.Drawing.Point(17, 0);
+			this.RegisterP.Name = "RegisterP";
+			this.RegisterP.ReadOnly = false;
+			this.RegisterP.RegisterSize = Brewmaster.StatusView.RegisterSize.EightBit;
+			this.RegisterP.Size = new System.Drawing.Size(20, 20);
+			this.RegisterP.TabIndex = 8;
+			this.RegisterP.Text = "00";
+			this.RegisterP.Value = 0;
 			// 
 			// labelP
 			// 
@@ -478,7 +579,7 @@
 			this.CheckDec.Location = new System.Drawing.Point(140, 0);
 			this.CheckDec.Name = "CheckDec";
 			this.CheckDec.Size = new System.Drawing.Size(64, 20);
-			this.CheckDec.TabIndex = 5;
+			this.CheckDec.TabIndex = 2;
 			this.CheckDec.Text = "Decimal";
 			RegisterToolTip.SetToolTip(this.CheckDec, "If decimal mode is set, additions and subtractions will treat the value as Binary" +
         " Coded Decimal (doesn\'t work on NES)");
@@ -490,7 +591,7 @@
 			this.CheckV.Location = new System.Drawing.Point(70, 0);
 			this.CheckV.Name = "CheckV";
 			this.CheckV.Size = new System.Drawing.Size(70, 20);
-			this.CheckV.TabIndex = 4;
+			this.CheckV.TabIndex = 1;
 			this.CheckV.Text = "Overflow";
 			RegisterToolTip.SetToolTip(this.CheckV, "A very complex flag that I can\'t explain in a single tool tip. Look it up, or jus" +
         "t ignore that it exists");
@@ -502,7 +603,7 @@
 			this.CheckN.Location = new System.Drawing.Point(0, 0);
 			this.CheckN.Name = "CheckN";
 			this.CheckN.Size = new System.Drawing.Size(70, 20);
-			this.CheckN.TabIndex = 3;
+			this.CheckN.TabIndex = 0;
 			this.CheckN.Text = "Negative";
 			RegisterToolTip.SetToolTip(this.CheckN, "Indicates a negative value (given two\'s complement). Typically gets set when the " +
         "result of the last operation sets bit 7 of a register");
@@ -528,7 +629,7 @@
 			this.CheckC.Location = new System.Drawing.Point(140, 0);
 			this.CheckC.Name = "CheckC";
 			this.CheckC.Size = new System.Drawing.Size(50, 20);
-			this.CheckC.TabIndex = 8;
+			this.CheckC.TabIndex = 2;
 			this.CheckC.Text = "Carry";
 			RegisterToolTip.SetToolTip(this.CheckC, "Carry flag indicates a carry from math or shift operations, allowing you to store" +
         " bigger values across multiple bytes. Also used to detect smaller/greater number" +
@@ -541,7 +642,7 @@
 			this.CheckZ.Location = new System.Drawing.Point(70, 0);
 			this.CheckZ.Name = "CheckZ";
 			this.CheckZ.Size = new System.Drawing.Size(70, 20);
-			this.CheckZ.TabIndex = 7;
+			this.CheckZ.TabIndex = 1;
 			this.CheckZ.Text = "Zero";
 			RegisterToolTip.SetToolTip(this.CheckZ, "Zero flag gets set when a comparison results in equal values, or a load, math or " +
         "logical operation results in 0. If the result is the opposite, the flag gets cle" +
@@ -554,7 +655,7 @@
 			this.CheckIrq.Location = new System.Drawing.Point(0, 0);
 			this.CheckIrq.Name = "CheckIrq";
 			this.CheckIrq.Size = new System.Drawing.Size(70, 20);
-			this.CheckIrq.TabIndex = 6;
+			this.CheckIrq.TabIndex = 0;
 			this.CheckIrq.Text = "Interrupt";
 			RegisterToolTip.SetToolTip(this.CheckIrq, "Get set when an IRQ occurs, and cleared when returning from it. Non-NMI IRQs are " +
         "prevented while flag is set");
@@ -580,7 +681,7 @@
 			this.CheckEmu.Location = new System.Drawing.Point(140, 0);
 			this.CheckEmu.Name = "CheckEmu";
 			this.CheckEmu.Size = new System.Drawing.Size(72, 20);
-			this.CheckEmu.TabIndex = 8;
+			this.CheckEmu.TabIndex = 2;
 			this.CheckEmu.Text = "Emulation";
 			RegisterToolTip.SetToolTip(this.CheckEmu, "The Emulation setting makes most instructions behave like their 6502 equivalents");
 			this.CheckEmu.UseVisualStyleBackColor = true;
@@ -591,7 +692,7 @@
 			this.CheckX.Location = new System.Drawing.Point(70, 0);
 			this.CheckX.Name = "CheckX";
 			this.CheckX.Size = new System.Drawing.Size(70, 20);
-			this.CheckX.TabIndex = 7;
+			this.CheckX.TabIndex = 1;
 			this.CheckX.Text = "8-bit X/Y";
 			RegisterToolTip.SetToolTip(this.CheckX, "When set, the X and Y registers work as 8-bit registers, otherwise all 16 bits ar" +
         "e used");
@@ -603,7 +704,7 @@
 			this.CheckM.Location = new System.Drawing.Point(0, 0);
 			this.CheckM.Name = "CheckM";
 			this.CheckM.Size = new System.Drawing.Size(70, 20);
-			this.CheckM.TabIndex = 6;
+			this.CheckM.TabIndex = 0;
 			this.CheckM.Text = "8-bit A";
 			RegisterToolTip.SetToolTip(this.CheckM, "When set, the A registers work as an 8-bit register, otherwise all 16 bits are us" +
         "ed");
@@ -657,7 +758,7 @@
 			this.EditPixel.Name = "EditPixel";
 			this.EditPixel.ReadOnly = true;
 			this.EditPixel.Size = new System.Drawing.Size(39, 20);
-			this.EditPixel.TabIndex = 19;
+			this.EditPixel.TabIndex = 1;
 			this.EditPixel.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
 			// 
 			// label9
@@ -667,7 +768,7 @@
 			label9.Name = "label9";
 			label9.Padding = new System.Windows.Forms.Padding(3, 3, 0, 0);
 			label9.Size = new System.Drawing.Size(39, 20);
-			label9.TabIndex = 18;
+			label9.TabIndex = 0;
 			label9.Text = "Pixel";
 			// 
 			// panel10
@@ -693,7 +794,7 @@
 			this.EditScanline.Name = "EditScanline";
 			this.EditScanline.ReadOnly = true;
 			this.EditScanline.Size = new System.Drawing.Size(39, 20);
-			this.EditScanline.TabIndex = 17;
+			this.EditScanline.TabIndex = 1;
 			this.EditScanline.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
 			// 
 			// label6
@@ -703,7 +804,7 @@
 			label6.Name = "label6";
 			label6.Padding = new System.Windows.Forms.Padding(3, 3, 0, 0);
 			label6.Size = new System.Drawing.Size(60, 20);
-			label6.TabIndex = 14;
+			label6.TabIndex = 0;
 			label6.Text = "Scanline";
 			// 
 			// panel11
@@ -728,7 +829,7 @@
 			this.ResetFrame.Margin = new System.Windows.Forms.Padding(0);
 			this.ResetFrame.Name = "ResetFrame";
 			this.ResetFrame.Size = new System.Drawing.Size(39, 21);
-			this.ResetFrame.TabIndex = 0;
+			this.ResetFrame.TabIndex = 4;
 			this.ResetFrame.Text = "Reset";
 			this.ResetFrame.UseVisualStyleBackColor = true;
 			this.ResetFrame.Click += new System.EventHandler(this.ResetFrame_Click);
@@ -740,7 +841,7 @@
 			this.ResetCycle.Margin = new System.Windows.Forms.Padding(0);
 			this.ResetCycle.Name = "ResetCycle";
 			this.ResetCycle.Size = new System.Drawing.Size(69, 21);
-			this.ResetCycle.TabIndex = 1;
+			this.ResetCycle.TabIndex = 5;
 			this.ResetCycle.Text = "Reset";
 			this.ResetCycle.UseVisualStyleBackColor = true;
 			this.ResetCycle.Click += new System.EventHandler(this.ResetCycle_Click);
@@ -756,7 +857,7 @@
 			this.EditCycle.Name = "EditCycle";
 			this.EditCycle.ReadOnly = true;
 			this.EditCycle.Size = new System.Drawing.Size(69, 20);
-			this.EditCycle.TabIndex = 16;
+			this.EditCycle.TabIndex = 3;
 			this.EditCycle.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
 			// 
 			// label7
@@ -767,7 +868,7 @@
 			label7.Name = "label7";
 			label7.Padding = new System.Windows.Forms.Padding(3, 3, 0, 0);
 			label7.Size = new System.Drawing.Size(60, 16);
-			label7.TabIndex = 13;
+			label7.TabIndex = 2;
 			label7.Text = "CPU cycle";
 			// 
 			// EditFrame
@@ -781,7 +882,7 @@
 			this.EditFrame.Name = "EditFrame";
 			this.EditFrame.ReadOnly = true;
 			this.EditFrame.Size = new System.Drawing.Size(39, 20);
-			this.EditFrame.TabIndex = 15;
+			this.EditFrame.TabIndex = 1;
 			this.EditFrame.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
 			// 
 			// label8
@@ -792,7 +893,7 @@
 			label8.Name = "label8";
 			label8.Padding = new System.Windows.Forms.Padding(3, 3, 0, 0);
 			label8.Size = new System.Drawing.Size(39, 16);
-			label8.TabIndex = 12;
+			label8.TabIndex = 0;
 			label8.Text = "Frame";
 			// 
 			// RegisterToolTip
@@ -1341,7 +1442,7 @@
 			this.expandStack.Location = new System.Drawing.Point(2, 170);
 			this.expandStack.Name = "expandStack";
 			this.expandStack.Size = new System.Drawing.Size(647, 20);
-			this.expandStack.TabIndex = 13;
+			this.expandStack.TabIndex = 3;
 			this.expandStack.UseVisualStyleBackColor = true;
 			// 
 			// expandTiming
@@ -1355,7 +1456,7 @@
 			this.expandTiming.Location = new System.Drawing.Point(2, 97);
 			this.expandTiming.Name = "expandTiming";
 			this.expandTiming.Size = new System.Drawing.Size(647, 20);
-			this.expandTiming.TabIndex = 3;
+			this.expandTiming.TabIndex = 2;
 			this.expandTiming.UseVisualStyleBackColor = true;
 			// 
 			// expandFlags
@@ -1369,7 +1470,7 @@
 			this.expandFlags.Location = new System.Drawing.Point(2, 47);
 			this.expandFlags.Name = "expandFlags";
 			this.expandFlags.Size = new System.Drawing.Size(647, 20);
-			this.expandFlags.TabIndex = 5;
+			this.expandFlags.TabIndex = 1;
 			this.expandFlags.UseVisualStyleBackColor = true;
 			// 
 			// expandCpu
@@ -1383,92 +1484,8 @@
 			this.expandCpu.Location = new System.Drawing.Point(2, 0);
 			this.expandCpu.Name = "expandCpu";
 			this.expandCpu.Size = new System.Drawing.Size(647, 20);
-			this.expandCpu.TabIndex = 4;
+			this.expandCpu.TabIndex = 0;
 			this.expandCpu.UseVisualStyleBackColor = true;
-			// 
-			// RegisterX
-			// 
-			this.RegisterX.Cursor = System.Windows.Forms.Cursors.IBeam;
-			this.RegisterX.Dock = System.Windows.Forms.DockStyle.Left;
-			this.RegisterX.Font = new System.Drawing.Font("Consolas", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
-			this.RegisterX.Location = new System.Drawing.Point(17, 0);
-			this.RegisterX.Name = "RegisterX";
-			this.RegisterX.RegisterSize = Brewmaster.StatusView.RegisterSize.EightBit;
-			this.RegisterX.TabIndex = 11;
-			this.RegisterX.Text = "00";
-			this.RegisterX.Value = 0;
-			// 
-			// RegisterY
-			// 
-			this.RegisterY.Cursor = System.Windows.Forms.Cursors.IBeam;
-			this.RegisterY.Dock = System.Windows.Forms.DockStyle.Left;
-			this.RegisterY.Font = new System.Drawing.Font("Consolas", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
-			this.RegisterY.Location = new System.Drawing.Point(17, 0);
-			this.RegisterY.Name = "RegisterY";
-			this.RegisterY.RegisterSize = Brewmaster.StatusView.RegisterSize.EightBit;
-			this.RegisterY.TabIndex = 12;
-			this.RegisterY.Text = "00";
-			this.RegisterY.Value = 0;
-			// 
-			// RegisterPC
-			// 
-			this.RegisterPC.Cursor = System.Windows.Forms.Cursors.IBeam;
-			this.RegisterPC.Dock = System.Windows.Forms.DockStyle.Left;
-			this.RegisterPC.Font = new System.Drawing.Font("Consolas", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
-			this.RegisterPC.Location = new System.Drawing.Point(24, 0);
-			this.RegisterPC.Name = "RegisterPC";
-			this.RegisterPC.RegisterSize = Brewmaster.StatusView.RegisterSize.EightBit;
-			this.RegisterPC.TabIndex = 11;
-			this.RegisterPC.Text = "00";
-			this.RegisterPC.Value = 0;
-			// 
-			// RegisterDB
-			// 
-			this.RegisterDB.Cursor = System.Windows.Forms.Cursors.IBeam;
-			this.RegisterDB.Dock = System.Windows.Forms.DockStyle.Left;
-			this.RegisterDB.Font = new System.Drawing.Font("Consolas", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
-			this.RegisterDB.Location = new System.Drawing.Point(25, 0);
-			this.RegisterDB.Name = "RegisterDB";
-			this.RegisterDB.RegisterSize = Brewmaster.StatusView.RegisterSize.EightBit;
-			this.RegisterDB.TabIndex = 11;
-			this.RegisterDB.Text = "00";
-			this.RegisterDB.Value = 0;
-			// 
-			// RegisterSP
-			// 
-			this.RegisterSP.Cursor = System.Windows.Forms.Cursors.IBeam;
-			this.RegisterSP.Dock = System.Windows.Forms.DockStyle.Left;
-			this.RegisterSP.Font = new System.Drawing.Font("Consolas", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
-			this.RegisterSP.Location = new System.Drawing.Point(24, 0);
-			this.RegisterSP.Name = "RegisterSP";
-			this.RegisterSP.RegisterSize = Brewmaster.StatusView.RegisterSize.EightBit;
-			this.RegisterSP.TabIndex = 11;
-			this.RegisterSP.Text = "00";
-			this.RegisterSP.Value = 0;
-			// 
-			// RegisterDP
-			// 
-			this.RegisterDP.Cursor = System.Windows.Forms.Cursors.IBeam;
-			this.RegisterDP.Dock = System.Windows.Forms.DockStyle.Left;
-			this.RegisterDP.Font = new System.Drawing.Font("Consolas", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
-			this.RegisterDP.Location = new System.Drawing.Point(25, 0);
-			this.RegisterDP.Name = "RegisterDP";
-			this.RegisterDP.RegisterSize = Brewmaster.StatusView.RegisterSize.EightBit;
-			this.RegisterDP.TabIndex = 11;
-			this.RegisterDP.Text = "00";
-			this.RegisterDP.Value = 0;
-			// 
-			// RegisterP
-			// 
-			this.RegisterP.Cursor = System.Windows.Forms.Cursors.IBeam;
-			this.RegisterP.Dock = System.Windows.Forms.DockStyle.Left;
-			this.RegisterP.Font = new System.Drawing.Font("Consolas", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
-			this.RegisterP.Location = new System.Drawing.Point(17, 0);
-			this.RegisterP.Name = "RegisterP";
-			this.RegisterP.RegisterSize = Brewmaster.StatusView.RegisterSize.EightBit;
-			this.RegisterP.TabIndex = 11;
-			this.RegisterP.Text = "00";
-			this.RegisterP.Value = 0;
 			// 
 			// CpuStatus
 			// 

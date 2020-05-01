@@ -129,6 +129,10 @@ namespace Brewmaster.StatusView
 
 		private void UpdateSnesState(Mesen.GUI.DebugState state)
 		{
+			RegisterA.DimUpperByte = CheckM.Checked = (state.Cpu.PS & ProcFlags.MemoryMode8) != 0;
+			RegisterX.DimUpperByte = RegisterY.DimUpperByte = CheckX.Checked = (state.Cpu.PS & ProcFlags.IndexMode8) != 0;
+			CheckEmu.Checked = state.Cpu.EmulationMode;
+
 			RegisterPC.Value = state.Cpu.K << 16 | state.Cpu.PC;
 			RegisterP.Value = (int)state.Cpu.PS;
 
@@ -147,10 +151,6 @@ namespace Brewmaster.StatusView
 			CheckDec.Checked = (state.Cpu.PS & ProcFlags.Decimal) != 0;
 			CheckV.Checked = (state.Cpu.PS & ProcFlags.Overflow) != 0;
 			CheckN.Checked = (state.Cpu.PS & ProcFlags.Negative) != 0;
-
-			CheckM.Checked = (state.Cpu.PS & ProcFlags.MemoryMode8) != 0;
-			CheckX.Checked = (state.Cpu.PS & ProcFlags.IndexMode8) != 0;
-			CheckEmu.Checked = state.Cpu.EmulationMode;
 
 			_lastCycle = state.Cpu.CycleCount;
 			_lastFrame = state.Ppu.FrameCount;

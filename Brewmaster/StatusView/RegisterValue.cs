@@ -50,6 +50,8 @@ namespace Brewmaster.StatusView
 				Invalidate();
 			}
 		}
+		public bool DimUpperByte { get; set; }
+		public Color DimColor { get; set; }
 		public override string Text
 		{
 			get { return _text; }
@@ -94,6 +96,7 @@ namespace Brewmaster.StatusView
 			TabStop = true;
 			RegisterSize = RegisterSize.EightBit;
 			Height = 20;
+			DimColor = Color.Gray;
 		}
 		private static int CharWidth = 7;
 		private static int LeftPadding = 3;
@@ -103,7 +106,13 @@ namespace Brewmaster.StatusView
 			e.Graphics.FillRectangle(Brushes.White, border);
 			if (!ReadOnly && Focused && _editIndex >= 0 && _editIndex < _digits)
 				e.Graphics.FillRectangle(Brushes.LightSteelBlue, new Rectangle((CharWidth * _editIndex) + LeftPadding, 2, CharWidth, Height - 4));
-			TextRenderer.DrawText(e.Graphics, Text, Font, new Point(0, 3), ForeColor);
+
+			if (DimUpperByte && _digits > 2)
+			{
+				TextRenderer.DrawText(e.Graphics, Text.Substring(0, 2), Font, new Point(0, 3), DimColor);
+				TextRenderer.DrawText(e.Graphics, Text.Substring(2), Font, new Point(CharWidth * 2, 3), ForeColor);
+			}
+			else TextRenderer.DrawText(e.Graphics, Text, Font, new Point(0, 3), ForeColor);
 
 			e.Graphics.DrawRectangle(_mouseOver || Focused ? Pens.Gray : Pens.LightGray, border);
 		}
