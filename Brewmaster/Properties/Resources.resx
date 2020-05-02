@@ -220,4 +220,7 @@
   <data name="_65816" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\65816.html;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
+  <data name="build3" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Toolbar\build3.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
 </root>

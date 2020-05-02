@@ -102,7 +102,7 @@ namespace Brewmaster.Properties {
         ///&lt;/header&gt;
         ///
         ///&lt;main class=&quot;main with-sidebar&quot;&gt;
-        ///  &lt;div class=&quot;sidebar&quot; role=&quot;com [rest of string was truncated]&quot;;.
+        ///  &lt;div class=&quot;si [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _65816 {
             get {
@@ -143,6 +143,16 @@ namespace Brewmaster.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap build3 {
+            get {
+                object obj = ResourceManager.GetObject("build3", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap buildrun {
             get {
                 object obj = ResourceManager.GetObject("buildrun", resourceCulture);
@@ -163,7 +173,7 @@ namespace Brewmaster.Properties {
         ///
         ///&lt;h2&gt;
         ///&lt;a href=&quot;mailto:uz@cc65.org&quot;&gt;Ullrich von Bassewitz&lt;/a&gt;,&lt;br&gt;
-        ///&lt;a href=&quot;mailto:greg.king5@verizon.net&quot; [rest of string was truncated]&quot;;.
+        ///&lt;a href=&quot;mailto:greg.king5@ [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string ca65 {
             get {

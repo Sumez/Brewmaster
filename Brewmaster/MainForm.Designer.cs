@@ -1634,7 +1634,7 @@ namespace Brewmaster
 			// build
 			// 
 			this.build.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.build.Image = global::Brewmaster.Properties.Resources.build2;
+			this.build.Image = global::Brewmaster.Properties.Resources.build3;
 			this.build.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.build.Name = "build";
 			this.build.Size = new System.Drawing.Size(23, 22);
