@@ -11,18 +11,27 @@ namespace Brewmaster.Ide
 	    public MouseEventHandler MouseDownHandler { get; set; }
 		public const int DragTreshold = 20;
 		private Label _label;
-	    private FlowLayoutPanel _tabPanel;
+		private readonly Button _closeButton;
+		private FlowLayoutPanel _tabPanel;
         public HeaderPanel()
         {
 	        InitializeComponent();
 
-	        _tabPanel = new FlowLayoutPanel();
+			_closeButton = new Button();
+			_closeButton.FlatStyle = FlatStyle.Flat;
+			_closeButton.FlatAppearance.BorderSize = 0;
+			_closeButton.Image = Properties.Resources.close;
+			_closeButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+			_closeButton.Width = 15;
+			_closeButton.Height = 15;
+			_closeButton.Location = new Point(Width - 17, 2);
+			_closeButton.Click += (s, a) => HidePanel();
+			Controls.Add(_closeButton);
+
+			_tabPanel = new FlowLayoutPanel();
 	        _tabPanel.Dock = DockStyle.Fill;
 	        _tabPanel.Visible = false;
-	        _tabPanel.MouseDown += (sender, args) =>
-	        {
-		        OnMouseDown(args);
-	        };
+	        _tabPanel.MouseDown += (sender, args) => OnMouseDown(args);
 	        _tabPanel.Padding = Padding.Empty;
 			Padding = Padding.Empty;
 	        _tabPanel.Margin = Padding.Empty;
@@ -43,6 +52,14 @@ namespace Brewmaster.Ide
 			ControlRemoved += (s, a) => Application.RemoveMessageFilter(mouseHandler);
 		}
 
+		private void HidePanel()
+		{
+			if (Parent is IdePanel panel && FindForm() is IIdeLayoutParent form)
+			{
+				if (panel is IdeGroupedPanel groupedPanel) panel = groupedPanel.SelectedTab.Panel;
+				form.LayoutHandler.HidePanel(panel);
+			}
+		}
 
 		private IdePanel _dragging;
 	    private Point _dragOffset;
@@ -55,7 +72,7 @@ namespace Brewmaster.Ide
 			    while (control != null && control != this) control = control.Parent;
 			    if (control == null) return false;
 		    }
-
+			if (_closeButton.Bounds.Contains(PointToClient(location))) return false;
 			if (!Bounds.Contains(Parent.PointToClient(location))) return false;
 
 		    if ((FindForm() is MainForm)) _dragging = Parent as IdePanel;
@@ -80,15 +97,8 @@ namespace Brewmaster.Ide
 		    {
 			    var draggingPanel = _dragging;
 			    _dragging = null;
-			    var form = FindForm();
-			    if (form is MainForm mainForm)
-			    {
-				    mainForm.ReleasePanel(draggingPanel, PointToScreen(delta));
-			    }
-				else if (form is FloatPanel floatPanel)
-			    {
-					floatPanel.ReleasePanel(draggingPanel, PointToScreen(delta));
-				}
+			    var form = FindForm() as IIdeLayoutParent;
+			    if (form != null) form.LayoutHandler.ReleasePanel(draggingPanel, PointToScreen(delta));
 			    else return false;
 				draggingPanel.Header.OnMouseDown(new MouseEventArgs(MouseButtons.Left, 1, 0, 0, 0)); // Forces form drag immediately
 		    }

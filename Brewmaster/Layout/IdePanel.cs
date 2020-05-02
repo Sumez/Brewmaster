@@ -66,16 +66,16 @@ namespace Brewmaster.Ide
 
 	public class IdeGroupedPanel : IdePanel
 	{
-		private IdeTab _selectedTab;
+		public IdeTab SelectedTab { get; private set; }
 		public List<IdeTab> Tabs = new List<IdeTab>();
 
 		private void SelectTab(IdeTab targetTab)
 		{
-			if (targetTab == _selectedTab) return;
-			_selectedTab = targetTab;
+			if (targetTab == SelectedTab) return;
+			SelectedTab = targetTab;
 			SuspendLayout();
-			foreach (var tab in Tabs.Where(t => t != _selectedTab)) tab.Panel.Visible = false;
-			_selectedTab.Panel.Visible = true;
+			foreach (var tab in Tabs.Where(t => t != SelectedTab)) tab.Panel.Visible = false;
+			SelectedTab.Panel.Visible = true;
 			ResumeLayout();
 		}
 

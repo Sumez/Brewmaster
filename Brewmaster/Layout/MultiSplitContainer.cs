@@ -254,7 +254,9 @@ namespace Brewmaster.Ide
 				_overlay.Show(ParentForm);
 			}
 
-			location = Math.Min(FullSize, Math.Max(0, Splits[_dragIndex] + location - _dragOffset - 2));
+			var min = _dragIndex > 0 ? Splits[_dragIndex - 1] : 0;
+			var max = _dragIndex == Splits.Count - 1 ? FullSize : Splits[_dragIndex + 1];
+			location = Math.Min(max, Math.Max(min, Splits[_dragIndex] + location - _dragOffset - 2));
 			var overlayLocation = new Rectangle(Point.Empty, Size);
 			if (Horizontal)
 			{
@@ -275,7 +277,10 @@ namespace Brewmaster.Ide
 		{
 			Cursor = Cursor.Current = Horizontal ? Cursors.SizeWE : Cursors.SizeNS;
 			_dragTarget += location - _dragOffset;
-			Splits[_dragIndex] = Math.Min(FullSize, Math.Max(0, _dragTarget));
+
+			var min = _dragIndex > 0 ? Splits[_dragIndex - 1] : 0;
+			var max = _dragIndex == Splits.Count - 1 ? FullSize : Splits[_dragIndex + 1];
+			Splits[_dragIndex] = Math.Min(max, Math.Max(min, _dragTarget));
 			_dragOffset = location;
 			AdjustPanels();
 

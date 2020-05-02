@@ -30,8 +30,8 @@ using Brewmaster.Settings;
 
 namespace Brewmaster
 {
-	public partial class MainForm : Form
-    {
+	public partial class MainForm : Form, IIdeLayoutParent
+	{
 	    public const string SettingsFileName = "user.bwmsettings";
 	    public const string ProgramTitle = "Brewmaster";
 
@@ -263,10 +263,12 @@ namespace Brewmaster
 				AddWindowOption(ProjectExplorer);
 				AddWindowOption(NumberHelper);
 				AddWindowOption(OpcodeHelper);
+				AddWindowOption(Ca65Helper);
 				AddWindowOption(mesen);
 				AddWindowOption(OutputWindow);
 				AddWindowOption(TileMap);
 				AddWindowOption(Sprites);
+				AddWindowOption(SpriteList);
 				AddWindowOption(MemoryTabs);
 				AddWindowOption(cpuStatus1);
 				AddWindowOption(WatchValues);
@@ -354,12 +356,16 @@ namespace Brewmaster
 
 			var menuItem = new ToolStripMenuItem(idePanel.Label);
 			menuItem.Checked = idePanel.FindForm() != null;
-			menuItem.CheckOnClick = true;
 			menuItem.Click += (s, e) => {
-				if (!menuItem.Checked) LayoutHandler.HidePanel(idePanel);
+				if (menuItem.Checked) LayoutHandler.HidePanel(idePanel);
 				else LayoutHandler.ShowPanel(idePanel);
 			};
 			ViewMenuItem.DropDownItems.Add(menuItem);
+
+			LayoutHandler.PanelStatusChanged += (changedPanel, visible) =>
+			{
+				if (changedPanel == idePanel) menuItem.Checked = visible;
+			};
 
 			// TODO: Save in settings
 		}
@@ -1576,11 +1582,6 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 		{
 			restartMenuItem.PerformClick();
 		}
-
-	    public void ReleasePanel(IdePanel panel, Point location)
-	    {
-		    LayoutHandler.ReleasePanel(panel, location);
-	    }
 
 		private void stepOver_Click(object sender, EventArgs e)
 		{
