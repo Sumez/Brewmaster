@@ -30,8 +30,8 @@ using Brewmaster.Settings;
 
 namespace Brewmaster
 {
-	public partial class MainForm : Form
-    {
+	public partial class MainForm : Form, IIdeLayoutParent
+	{
 	    public const string SettingsFileName = "user.bwmsettings";
 	    public const string ProgramTitle = "Brewmaster";
 
@@ -263,10 +263,12 @@ namespace Brewmaster
 				AddWindowOption(ProjectExplorer);
 				AddWindowOption(NumberHelper);
 				AddWindowOption(OpcodeHelper);
+				AddWindowOption(Ca65Helper);
 				AddWindowOption(mesen);
 				AddWindowOption(OutputWindow);
 				AddWindowOption(TileMap);
 				AddWindowOption(Sprites);
+				AddWindowOption(SpriteList);
 				AddWindowOption(MemoryTabs);
 				AddWindowOption(cpuStatus1);
 				AddWindowOption(WatchValues);
@@ -322,6 +324,19 @@ namespace Brewmaster
 				if (Settings.AsmHighlighting != null && Settings.AsmHighlighting.SerializedData.Count > 0) Ca65Highlighting.DefaultColors = Settings.AsmHighlighting.Data;
 				TextEditor.DefaultCodeProperties.Font = Settings.DefaultFont;
 
+				if (Settings.WindowX.HasValue && Settings.WindowY.HasValue)
+				{
+					var location = new Point(Settings.WindowX.Value, Settings.WindowY.Value);
+					// Check if last position is still a visible position on the desktop
+					if (Screen.FromPoint(location).WorkingArea.IntersectsWith(new Rectangle(location, Size))) {
+						StartPosition = FormStartPosition.Manual;
+						Location = location;
+						Left = location.X;
+						Top = location.Y;
+					}
+					if (Settings.WindowState != FormWindowState.Minimized) WindowState = Settings.WindowState;
+				}
+
 				//Resize += (sender, args) => { Refresh(); }; // this shouldn't be necessary
 			}
 			catch (Exception ex)
@@ -341,12 +356,16 @@ namespace Brewmaster
 
 			var menuItem = new ToolStripMenuItem(idePanel.Label);
 			menuItem.Checked = idePanel.FindForm() != null;
-			menuItem.CheckOnClick = true;
 			menuItem.Click += (s, e) => {
-				if (!menuItem.Checked) LayoutHandler.HidePanel(idePanel);
+				if (menuItem.Checked) LayoutHandler.HidePanel(idePanel);
 				else LayoutHandler.ShowPanel(idePanel);
 			};
 			ViewMenuItem.DropDownItems.Add(menuItem);
+
+			LayoutHandler.PanelStatusChanged += (changedPanel, visible) =>
+			{
+				if (changedPanel == idePanel) menuItem.Checked = visible;
+			};
 
 			// TODO: Save in settings
 		}
@@ -762,6 +781,9 @@ namespace Brewmaster
         private void MainForm_Closing(object sender, FormClosingEventArgs e)
         {
 	        if (!CloseCurrentProject(true)) e.Cancel = true;
+			Settings.WindowX = Location.X;
+			Settings.WindowY = Location.Y;
+			Settings.WindowState = WindowState;
 	        Settings.ShowScrollOverlay = TileMap.ShowScrollOverlay;
 	        Settings.ResizeTileMap = TileMap.FitImage;
 			Settings.Save();
@@ -1560,11 +1582,6 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 		{
 			restartMenuItem.PerformClick();
 		}
-
-	    public void ReleasePanel(IdePanel panel, Point location)
-	    {
-		    LayoutHandler.ReleasePanel(panel, location);
-	    }
 
 		private void stepOver_Click(object sender, EventArgs e)
 		{

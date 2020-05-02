@@ -21,6 +21,13 @@ namespace Brewmaster.Settings
 
 		[NonSerialized] private string _filePath;
 
+		[XmlElement(ElementName = "WindowState")]
+		public FormWindowState WindowState = FormWindowState.Normal;
+		[XmlElement(ElementName = "WindowX")]
+		public int? WindowX;
+		[XmlElement(ElementName = "WindowY")]
+		public int? WindowY;
+
 		[XmlElement(ElementName = "RecentProject")]
 		public List<string> RecentProjects = new List<string>();
 		[XmlElement(ElementName = "UpdateRate")]
@@ -77,6 +84,7 @@ namespace Brewmaster.Settings
 			get { return new Font(DefaultFontFamily, DefaultFontSize, GraphicsUnit.Point); }
 			set { DefaultFontFamily = value.FontFamily.Name; DefaultFontSize = value.SizeInPoints; }
 		}
+
 
 		[XmlElement(ElementName = "AsmHighlighting")]
 		public HighlightingColors AsmHighlighting;

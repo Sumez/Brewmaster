@@ -1634,7 +1634,7 @@ namespace Brewmaster
 			// build
 			// 
 			this.build.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.build.Image = global::Brewmaster.Properties.Resources.build2;
+			this.build.Image = global::Brewmaster.Properties.Resources.build3;
 			this.build.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.build.Name = "build";
 			this.build.Size = new System.Drawing.Size(23, 22);
@@ -1993,7 +1993,6 @@ namespace Brewmaster
 			this.Name = "MainForm";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Brewmaster";
-			this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_Closing);
 			availableIdePanels.ResumeLayout(false);
 			availableIdePanels.PerformLayout();

@@ -11,7 +11,7 @@ namespace Brewmaster.Ide
 		private readonly MainForm _form;
 		private readonly Dictionary<IdePanel, PanelPosition> _memorizedPanelPositions = new Dictionary<IdePanel, PanelPosition>();
 		public List<MultiSplitContainer> DockContainers { get; private set; }
-
+		public Action<IdePanel, bool> PanelStatusChanged;
 
 		public LayoutHandler(MainForm mainForm)
 		{
@@ -343,6 +343,7 @@ namespace Brewmaster.Ide
 				if (parent is IdeGroupedPanel groupedPanel)
 				{
 					RemovePanelFromGroupedPanel(panel, groupedPanel);
+					OnPanelStatusChanged(panel, false);
 					return;
 				}
 				parent = parent.Parent;
@@ -353,10 +354,12 @@ namespace Brewmaster.Ide
 			{
 				_memorizedPanelPositions.Remove(panel);
 				panelForm.Visible = false;
+				OnPanelStatusChanged(panel, false);
 				return;
 			}
 
 			RemovePanelFromSplitContainer(panel);
+			OnPanelStatusChanged(panel, false);
 		}
 
 		public static IdePanel GetPanel(Control control)
@@ -372,29 +375,49 @@ namespace Brewmaster.Ide
 
 		public void ShowPanel(IdePanel panel)
 		{
+			ShowPanel(panel, panel);
+		}
+		private void ShowPanel(IdePanel panel, IdePanel locationReference)
+		{
 			var panelForm = panel.FindForm();
 			if (panelForm != null && !(panelForm is MainForm))
 			{
 				panelForm.Visible = true;
+				OnPanelStatusChanged(panel, true);
 				return;
 			}
 
-			if (!_memorizedPanelPositions.ContainsKey(panel))
+			if (!_memorizedPanelPositions.ContainsKey(locationReference))
 			{
 				// Panel was never visible in the first place, show as new form
 				CreateFloatPanel(panel);
+				OnPanelStatusChanged(panel, true);
 				return;
 			}
 
-			var position = _memorizedPanelPositions[panel];
+			var position = _memorizedPanelPositions[locationReference];
 			_form.SuspendLayout();
 			if (position.Sibling != null)
-				AddPanelToGroupedPanel(position.Sibling, panel, position.Index);
+			{
+				var siblingForm = position.Sibling.FindForm();
+				if (siblingForm != null && siblingForm.Visible) AddPanelToGroupedPanel(position.Sibling, panel, position.Index);
+				else
+				{
+					// Panel that was sibling when panel was hidden is no longer visible, so use its old position as reference
+					ShowPanel(panel, position.Sibling);
+					return;
+				}
+			}
 			else
 				AddPanelToSplitContainer(position.SplitContainer, panel, Math.Min(position.Index, position.SplitContainer.Panels.Count));
 			_form.ResumeLayout();
+			OnPanelStatusChanged(panel, true);
 		}
 
+		private void OnPanelStatusChanged(IdePanel panel, bool visible)
+		{
+			if (PanelStatusChanged != null) PanelStatusChanged(panel, visible);
+		}
 
 		private struct PanelPosition
 		{

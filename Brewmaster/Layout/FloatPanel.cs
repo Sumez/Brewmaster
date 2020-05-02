@@ -6,13 +6,13 @@ using System.Windows.Forms;
 
 namespace Brewmaster.Ide
 {
-	public partial class FloatPanel : Form
+	public partial class FloatPanel : Form, IIdeLayoutParent
 	{
-		private readonly LayoutHandler _layoutHandler;
+		public LayoutHandler LayoutHandler { get; set; }
 
 		public FloatPanel(LayoutHandler layoutHandler)
 		{
-			_layoutHandler = layoutHandler;
+			LayoutHandler = layoutHandler;
 			InitializeComponent();
 		}
 
@@ -69,7 +69,7 @@ namespace Brewmaster.Ide
 		protected override void OnResizeEnd(EventArgs e)
 		{
 			base.OnResizeEnd(e);
-			if (_dragging) _layoutHandler.DockPanel(this);
+			if (_dragging) LayoutHandler.DockPanel(this);
 			TopMost = false;
 			_dragging = false;
 		}
@@ -81,7 +81,7 @@ namespace Brewmaster.Ide
 			//System.Diagnostics.Debug.Write(cursorPosition.X + "," + cursorPosition.Y + Environment.NewLine);
 
 			TopMost = true;
-			if (_dragging) _layoutHandler.SuggestDock(cursorPosition, this);
+			if (_dragging) LayoutHandler.SuggestDock(cursorPosition, this);
 		}
 
 		public void SetChildPanel(IdePanel panel)
@@ -90,10 +90,9 @@ namespace Brewmaster.Ide
 			Controls.Add(panel);
 		}
 		public IdePanel ChildPanel { get { return Controls[0] as IdePanel; } }
-
-		public void ReleasePanel(IdePanel panel, Point location)
-		{
-			_layoutHandler.ReleasePanel(panel, location);
-		}
+	}
+	public interface IIdeLayoutParent
+	{
+		LayoutHandler LayoutHandler { get; }
 	}
 }
