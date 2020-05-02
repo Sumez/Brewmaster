@@ -1993,7 +1993,6 @@ namespace Brewmaster
 			this.Name = "MainForm";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Brewmaster";
-			this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_Closing);
 			availableIdePanels.ResumeLayout(false);
 			availableIdePanels.PerformLayout();

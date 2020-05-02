@@ -83,9 +83,10 @@ namespace Brewmaster.Ide
 
 		private int _oldWidth;
 		private int _oldHeight;
-		protected override void OnSizeChanged(EventArgs e)
+		protected override void OnLayout(LayoutEventArgs e)
 		{
-			base.OnSizeChanged(e);
+			base.OnLayout(e);
+			if (_oldHeight == Height && _oldWidth == Width) return;
 			ResizePanels(Horizontal ? (Width - _oldWidth) : (Height - _oldHeight), true);
 			_oldWidth = Width;
 			_oldHeight = Height;

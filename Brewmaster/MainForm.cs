@@ -322,6 +322,19 @@ namespace Brewmaster
 				if (Settings.AsmHighlighting != null && Settings.AsmHighlighting.SerializedData.Count > 0) Ca65Highlighting.DefaultColors = Settings.AsmHighlighting.Data;
 				TextEditor.DefaultCodeProperties.Font = Settings.DefaultFont;
 
+				if (Settings.WindowX.HasValue && Settings.WindowY.HasValue)
+				{
+					var location = new Point(Settings.WindowX.Value, Settings.WindowY.Value);
+					// Check if last position is still a visible position on the desktop
+					if (Screen.FromPoint(location).WorkingArea.IntersectsWith(new Rectangle(location, Size))) {
+						StartPosition = FormStartPosition.Manual;
+						Location = location;
+						Left = location.X;
+						Top = location.Y;
+					}
+					if (Settings.WindowState != FormWindowState.Minimized) WindowState = Settings.WindowState;
+				}
+
 				//Resize += (sender, args) => { Refresh(); }; // this shouldn't be necessary
 			}
 			catch (Exception ex)
@@ -762,6 +775,9 @@ namespace Brewmaster
         private void MainForm_Closing(object sender, FormClosingEventArgs e)
         {
 	        if (!CloseCurrentProject(true)) e.Cancel = true;
+			Settings.WindowX = Location.X;
+			Settings.WindowY = Location.Y;
+			Settings.WindowState = WindowState;
 	        Settings.ShowScrollOverlay = TileMap.ShowScrollOverlay;
 	        Settings.ResizeTileMap = TileMap.FitImage;
 			Settings.Save();
