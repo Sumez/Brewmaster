@@ -126,6 +126,7 @@ namespace Brewmaster.EditorWindows
 			ImageList.Images.Add(Resources.label);
 			ImageList.Images.Add(Resources.opcode);
 			ImageList.Images.Add(Resources.ca65icon);
+			ImageList.Images.Add(Resources.macro);
 			DefaultIndex = -1;
 		}
 	}
@@ -141,6 +142,7 @@ namespace Brewmaster.EditorWindows
 			Symbol = symbol;
 			Priority = priority;
 			GetDescription = getDescription;
+			ImageIndex = symbol is MacroSymbol ? 3 : 0;
 		}
 
 		public bool InsertAction(TextArea textArea, char ch)
@@ -149,7 +151,7 @@ namespace Brewmaster.EditorWindows
 			return true;
 		}
 
-		public int ImageIndex { get { return 0; } }
+		public int ImageIndex { get; private set; }
 		public string Text
 		{
 			get { return Symbol.Text; }

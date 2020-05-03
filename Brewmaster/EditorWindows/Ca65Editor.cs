@@ -171,6 +171,7 @@ namespace Brewmaster.EditorWindows
 					case AsmWord.AsmWordType.LabelAbsolute:
 					case AsmWord.AsmWordType.LabelReference:
 					case AsmWord.AsmWordType.LabelDefinition:
+					case AsmWord.AsmWordType.Macro:
 						e.ShowToolTip(GetSymbolDescription(word.Word));
 						break;
 					case AsmWord.AsmWordType.Command:
@@ -290,8 +291,12 @@ namespace Brewmaster.EditorWindows
 		{
 			//TODO: Watch manually written addresses, too!
 			//TODO: X/Y offsets, maybe even DP?
-			if (!File.Project.DebugSymbols.ContainsKey(word)) return word;
-
+			if (!File.Project.DebugSymbols.ContainsKey(word))
+			{
+				var macro = File.LocalSymbols.FirstOrDefault(s => s.Text == word) as MacroSymbol;
+				if (macro != null) return macro.ToString();
+				return word;
+			}
 			var symbol = File.Project.DebugSymbols[word];
 			var memoryState = GetCpuMemory();
 			if (memoryState == null) return string.Format("{0} ({1})", word, WatchValue.FormatHexAddress(symbol.Value));
@@ -354,7 +359,10 @@ namespace Brewmaster.EditorWindows
 			if (File.Project.Symbols != null && File.Project.DebugSymbols != null)
 			if (word != null && !(word is AsmWord) && (File.Project.DebugSymbols.ContainsKey(word.Word) || File.Project.Symbols.Any(s => s.Key == word.Word)))
 			{
-				return new AsmWord(Document, line, word.Offset, word.Length, new HighlightColor(Color.Black, false, false), true, AsmWord.AsmWordType.LabelReference);
+				var type = AsmWord.AsmWordType.LabelReference;
+				var macro = File.Project.Symbols.FirstOrDefault(s => s.Key == word.Word).Value as MacroSymbol;
+				if (macro != null) type = AsmWord.AsmWordType.Macro;
+				return new AsmWord(Document, line, word.Offset, word.Length, new HighlightColor(Color.Black, false, false), true, type);
 			}
 			return word as AsmWord;
 		}

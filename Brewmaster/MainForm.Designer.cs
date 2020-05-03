@@ -1527,7 +1527,7 @@ namespace Brewmaster
 			// newProjectToolStripButton
 			// 
 			this.newProjectToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.newProjectToolStripButton.Image = global::Brewmaster.Properties.Resources._new;
+			this.newProjectToolStripButton.Image = global::Brewmaster.Properties.Resources.newfile;
 			this.newProjectToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.newProjectToolStripButton.Name = "newProjectToolStripButton";
 			this.newProjectToolStripButton.Size = new System.Drawing.Size(23, 22);

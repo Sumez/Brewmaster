@@ -32,7 +32,8 @@ namespace Brewmaster.ProjectModel
 		public static readonly Regex ImportSymbolRegex = new Regex(@"^\s*\.import(?:zp){0,1}\s+(.+?)\s*$", RegexOptions.IgnoreCase);
 		public static readonly Regex DefineSymbolRegex = new Regex(@"^\s*([@a-z_][0-9a-z_]*?)(?::.*|\s*:{0,1}=.*)$", RegexOptions.IgnoreCase);
 		public static readonly Regex DefineProcSymbolRegex = new Regex(@"^\s*\.proc\s+([@a-z_][0-9a-z_]*?)\s*$", RegexOptions.IgnoreCase);
-		public static readonly Regex ImportFileRegex = new Regex(@"^\s*\.include\s+\""(.+?)\""\s*$", RegexOptions.IgnoreCase);
+		public static readonly Regex IncludeFileRegex = new Regex(@"^\s*\.include\s+\""(.+?)\""\s*$", RegexOptions.IgnoreCase);
+		public static readonly Regex MacroRegex = new Regex(@"^\s*\.mac(?:ro){0,1}\s+([@a-z_][0-9a-z_]*)(?:\s+(.+)){0,1}$", RegexOptions.IgnoreCase);
 
 		private static readonly string[] ImageFileTypes = new[] { ".png", ".jpg", ".bmp", ".gif" };
 		private static readonly string[] SourceFileTypes = new[] { ".asm", ".s" };
@@ -76,10 +77,10 @@ namespace Brewmaster.ProjectModel
 			{
 				lineNumber++;
 
-				var importMatch = ImportFileRegex.Match(line);
-				if (importMatch.Success && includePaths.Length > 0)
+				var includeMatch = IncludeFileRegex.Match(line);
+				if (includeMatch.Success && includePaths.Length > 0)
 				{
-					var matchedFilename = importMatch.Groups[1].Value;
+					var matchedFilename = includeMatch.Groups[1].Value;
 					var childFilename = matchedFilename;
 					foreach (var path in includePaths)
 					{
@@ -115,6 +116,21 @@ namespace Brewmaster.ProjectModel
 						Text = defineMatch.Groups[1].Value,
 						Character = defineMatch.Groups[1].Index,
 						Line = lineNumber
+					});
+				}
+
+				var macroMatch = MacroRegex.Match(line);
+				if (macroMatch.Success)
+				{
+					newSymbols.Add(new MacroSymbol
+					{
+						Source = source,
+						Text = macroMatch.Groups[1].Value,
+						Character = macroMatch.Groups[1].Index,
+						Line = lineNumber,
+						Parameters = macroMatch.Groups[2].Success
+							? macroMatch.Groups[2].Value.Split(',').Select(p => p.Trim()).ToList()
+							: new List<string>()
 					});
 				}
 			}

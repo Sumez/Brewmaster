@@ -615,6 +615,7 @@
     <None Include="Resources\Other\expanded.png" />
     <None Include="Resources\Other\label.png" />
     <None Include="Resources\Other\opcode.png" />
+    <None Include="Resources\Other\macro.png" />
     <Content Include="Resources\Other\warning.png" />
     <None Include="Resources\Toolbar\buildrun.png" />
     <None Include="Resources\Toolbar\config.png" />

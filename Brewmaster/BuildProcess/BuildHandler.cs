@@ -173,14 +173,12 @@ namespace Brewmaster.BuildProcess
 					if (e.Data != null) errors.Add(new BuildError(e.Data));
 				};
 				
-				//var relativeDir = new Uri(projectFolder + @"\").MakeRelativeUri(new Uri(projectFile.File.DirectoryName)).ToString();
-				//var sourceFile = relativeDir + @"/" + projectFile.File.Name;
 				var fileDirectory = projectFile.GetRelativeDirectory();
-				process.StartInfo.Arguments = string.Format("{0} -o {1} -t nes --cpu {2}{4} -I .{3}", 
+				process.StartInfo.Arguments = string.Format("\"{0}\" -o \"{1}\" -t nes --cpu {2}{4} -I .{3}", 
 					sourceFile, 
 					objectFile, 
 					projectFile.Project.GetTargetCpu(), 
-					string.IsNullOrWhiteSpace(fileDirectory) ? "" : " -I " + fileDirectory,
+					string.IsNullOrWhiteSpace(fileDirectory) ? "" : " -I \"" + fileDirectory + "\"",
 					string.Join("", configuration.Symbols.Select(s => " -D " + s)));
 
 				process.Start();
@@ -280,13 +278,12 @@ namespace Brewmaster.BuildProcess
 					var directory = Path.Combine(projectFolder, cartridge.BuildPath, projectFile.GetRelativeDirectory());
 					if (!Directory.Exists(directory)) Directory.CreateDirectory(directory);
 					var fileBase = projectFile.GetRelativeDirectory() + @"/" + Path.GetFileNameWithoutExtension(projectFile.File.Name);
-					var relativeDir = new Uri(projectFolder + @"\").MakeRelativeUri(new Uri(projectFile.File.DirectoryName + @"\")).ToString();
-					var sourceFile = relativeDir + projectFile.File.Name;
+					var sourceFile = projectFile.GetRelativePath();
 					var objectFile = cartridge.BuildPath + @"/" + fileBase + ".o";
 					var dependencyFile = cartridge.BuildPath + @"/" + fileBase + ".d";
 					objectFiles.Add(objectFile);
 
-					asmProcess.StartInfo.Arguments = string.Format("{0} -o {1} --create-dep {2} -t nes --cpu {3}{4} -g -I .", 
+					asmProcess.StartInfo.Arguments = string.Format("\"{0}\" -o \"{1}\" --create-dep \"{2}\" -t nes --cpu {3}{4} -g -I .", 
 						sourceFile, 
 						objectFile, 
 						dependencyFile, 
@@ -326,7 +323,13 @@ namespace Brewmaster.BuildProcess
 				//linkerProcess.StartInfo.Arguments = string.Format("-t nes -C {0} --mapfile {1} -Wl --dbgfile,{2} -o {3} {4}", cartridge.LinkerConfigFile, cartridge.MapFile, cartridge.DebugFile, prgFile, string.Join(" ", objectFiles));
 
 				linkerProcess.StartInfo.FileName = string.Format(@"{0}\cc65\bin\ld65.exe", ideFolder);
-				linkerProcess.StartInfo.Arguments = string.Format("-o {3} -C {0} -m {1} --dbgfile {2} {4}", linkerConfig.GetRelativePath(), cartridge.MapFile, cartridge.DebugFile, outputFile, string.Join(" ", objectFiles));
+				linkerProcess.StartInfo.Arguments = string.Format("-o \"{3}\" -C \"{0}\" -m \"{1}\" --dbgfile \"{2}\" {4}", 
+					linkerConfig.GetRelativePath(), 
+					cartridge.MapFile, 
+					cartridge.DebugFile, 
+					outputFile, 
+					string.Join(" ", objectFiles.Select(f => string.Format("\"{0}\"", f)))
+				);
 
 				Log(new LogData("ld65 " + linkerProcess.StartInfo.Arguments));
 				linkerProcess.Start();
