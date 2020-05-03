@@ -148,6 +148,7 @@
     <Compile Include="EditorWindows\TextEditorMenu.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="EditorWindows\Text\FileCompletion.cs" />
     <Compile Include="EditorWindows\Text\FindResults.cs">
       <SubType>Form</SubType>
     </Compile>

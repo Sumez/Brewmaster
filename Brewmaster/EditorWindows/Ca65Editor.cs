@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Brewmaster.BuildProcess;
+using Brewmaster.EditorWindows.Text;
 using Brewmaster.Emulation;
 using Brewmaster.Modules;
 using Brewmaster.Modules.Ca65Helper;
@@ -34,6 +36,7 @@ namespace Brewmaster.EditorWindows
 		public AsmProjectFile File { get; private set; }
 		protected Events ModuleEvents { get; private set; }
 		protected CompletionDataProvider _completionDataProvider;
+		protected CompletionDataProvider _fileCompletionDataProvider;
 
 		private CompletionWindow _codeCompletionWindow;
 		private int _caretLine = 0;
@@ -51,6 +54,7 @@ namespace Brewmaster.EditorWindows
 			File = file;
 			ModuleEvents = events;
 			Document.FormattingStrategy = new Ca65Formatting();
+			_fileCompletionDataProvider = new FileCompletion(new[] { file.Project.Directory, file.File.Directory });
 
 			ActiveTextAreaControl.TextArea.InsertLeftMargin(1, 
 				new CpuAddressMargin(ActiveTextAreaControl.TextArea,
@@ -381,12 +385,43 @@ namespace Brewmaster.EditorWindows
 
 			if (word == null) return;
 
+			if (word is AsmWord asmWord && asmWord.WordType == AsmWord.AsmWordType.String)
+			{
+				// TODO: Detect this when opening menu, so "go to" option is available. Also reuse logic in autocompletion code
+				if (line.Words.Any(w => w.Word.Equals(".INCLUDE", StringComparison.InvariantCultureIgnoreCase) || w.Word.Equals(".INCBIN", StringComparison.InvariantCultureIgnoreCase)))
+				{
+					GoToFile(word.Word.Trim('\'', '\"'));
+				}
+				return;
+			}
+
 			var symbols = File.Project.Symbols; // TODO: use local symbol index
 			var matchingSymbol = symbols.Where(s => s.Value.Text == word.Word).Select(s => s.Value)
 				.OrderBy(s => s.Source != this.File.File.FullName).FirstOrDefault();
 			if (matchingSymbol != null && File.Project.GoTo != null)
 				File.Project.GoTo(matchingSymbol.Source, matchingSymbol.Line, matchingSymbol.Character);
 		}
+		private void GoToFile(string fileReference)
+		{
+			AsmProjectFile foundFile = null;
+			try
+			{
+				var matchFiles = new[] {
+					Path.Combine(File.GetRelativeDirectory(), fileReference).Replace('\\', '/'),
+					fileReference.Replace('\\', '/')
+				};
+				var completeMatch = matchFiles.Select(mf => new DirectoryInfo(Path.Combine(File.Project.Directory.FullName, mf)).FullName);
+				foundFile = File.Project.Files.FirstOrDefault(f =>
+					completeMatch.Any(mf => mf.Equals(f.File.FullName, StringComparison.InvariantCultureIgnoreCase)) ||
+					matchFiles.Any(mf => mf.Equals(f.GetRelativePath(), StringComparison.InvariantCultureIgnoreCase)));
+			}
+			catch
+			{
+				return;
+			}
+			if (foundFile != null) ModuleEvents.OpenFile(foundFile);
+		}
+
 		public void UpdateBreakpointsInEditor()
 		{
 			if (File.EditorBreakpoints == null) return;
@@ -507,7 +542,7 @@ namespace Brewmaster.EditorWindows
 			//var pretext = Document.GetText(line.Offset, word.Offset - line.Offset);
 			
 
-			_completionDataProvider.PreSelection = word.Word;
+			_fileCompletionDataProvider.PreSelection =  _completionDataProvider.PreSelection = word.Word;
 
 			if (_codeCompletionWindow != null)
 			{
@@ -517,12 +552,19 @@ namespace Brewmaster.EditorWindows
 
 			try
 			{
+				var provider = _completionDataProvider;
+				if (line.Words.OfType<AsmWord>()
+					.Any(w => w.WordType == AsmWord.AsmWordType.Command && 
+					(w.Word.Equals(".INCLUDE", StringComparison.InvariantCultureIgnoreCase) || 
+					w.Word.Equals(".INCBIN", StringComparison.InvariantCultureIgnoreCase))))
+					provider = _fileCompletionDataProvider;
+
 				_codeCompletionWindow = CompletionWindow.ShowCompletionWindow(
-					ParentForm, // The parent window for the completion window
-					this, // The text editor to show the window for
-					File.File.FullName, // Filename - will be passed back to the provider
-					_completionDataProvider, // Provider to get the list of possible completions
-					keyValue // Key pressed - will be passed to the provider
+					ParentForm,					// The parent window for the completion window
+					this,						// The text editor to show the window for
+					File.File.FullName,			// Filename - will be passed back to the provider
+					provider,					// Provider to get the list of possible completions
+					keyValue					// Key pressed - will be passed to the provider
 				);
 			}
 			catch (ArgumentOutOfRangeException ex)
