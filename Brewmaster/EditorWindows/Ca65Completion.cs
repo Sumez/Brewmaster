@@ -169,7 +169,7 @@ namespace Brewmaster.EditorWindows
 		{
 			Opcode = opcode;
 			Text = Opcode.Command.ToLower();
-			Description = string.Join(Environment.NewLine, Opcode.Description);
+			Description = opcode.ToString();
 		}
 		public bool InsertAction(TextArea textArea, char ch)
 		{
@@ -190,7 +190,7 @@ namespace Brewmaster.EditorWindows
 		{
 			Command = command;
 			Text = alias;
-			Description = string.Join(Environment.NewLine, Command.Description.Select(d => d.Text));
+			Description = Command.ToString();
 		}
 		public bool InsertAction(TextArea textArea, char ch)
 		{

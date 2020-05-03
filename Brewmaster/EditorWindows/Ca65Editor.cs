@@ -166,8 +166,25 @@ namespace Brewmaster.EditorWindows
 				Document.MarkerStrategy.AddMarker(testMarker);
 				ActiveTextAreaControl.TextArea.Invalidate();
 
-				e.ShowToolTip(word.IsLabel? GetSymbolDescription(word.Word) : word.Word);
-				// TODO: Opcode help
+				switch (word.WordType)
+				{
+					case AsmWord.AsmWordType.LabelAbsolute:
+					case AsmWord.AsmWordType.LabelReference:
+					case AsmWord.AsmWordType.LabelDefinition:
+						e.ShowToolTip(GetSymbolDescription(word.Word));
+						break;
+					case AsmWord.AsmWordType.Command:
+						var command = Ca65Parser.GetCommandFromWord(word.Word);
+						if (command != null) e.ShowToolTip(command.ToString());
+						break;
+					case AsmWord.AsmWordType.Opcode:
+						var opcode = OpcodeParser.GetOpcodeFromWord(word.Word, File.Project.Type);
+						if (opcode != null) e.ShowToolTip(opcode.ToString());
+						break;
+					default:
+						e.ShowToolTip(word.Word);
+						break;
+				}
 			};
 
 			Document.DocumentAboutToBeChanged += (s, arts) =>
@@ -235,16 +252,18 @@ namespace Brewmaster.EditorWindows
 			var word = GetAsmWord(ActiveTextAreaControl.Caret.Position);
 			if (word == null || word.WordType != AsmWord.AsmWordType.Command) return;
 
-			var knownCommands = Ca65Parser.GetCommands();
-			if (knownCommands.ContainsKey(word.Word.ToUpper())) ModuleEvents.HighlightCommand(knownCommands[word.Word.ToUpper()]);
+			var command = Ca65Parser.GetCommandFromWord(word.Word);
+			if (command != null) ModuleEvents.HighlightCommand(command);
 		}
 		private void HighlightOpcodeOnLine()
 		{
 			var lineSegment = Document.GetLineSegment(_caretLine);
 			if (lineSegment == null) return;
-			var opcode = lineSegment.Words.OfType<AsmWord>().FirstOrDefault(w => w.WordType == AsmWord.AsmWordType.Opcode);
-			var allOpcodes = OpcodeParser.GetOpcodes(File.Project.Type);
-			if (opcode != null && allOpcodes.ContainsKey(opcode.Word.ToUpper())) ModuleEvents.HighlightOpcode(allOpcodes[opcode.Word.ToUpper()]);
+			var word = lineSegment.Words.OfType<AsmWord>().FirstOrDefault(w => w.WordType == AsmWord.AsmWordType.Opcode);
+
+			if (word == null) return;
+			var opcode = OpcodeParser.GetOpcodeFromWord(word.Word, File.Project.Type);
+			if (opcode != null) ModuleEvents.HighlightOpcode(opcode);
 		}
 
 		private DebugLine GetDebugLine(int lineNumber)

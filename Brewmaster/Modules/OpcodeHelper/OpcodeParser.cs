@@ -33,6 +33,11 @@ namespace Brewmaster.Modules.OpcodeHelper
 
 		[XmlElement(ElementName = "FlagExplanation")]
 		public List<FlagExplanation> SerialiazableFlagExplanations;
+
+		public override string ToString()
+		{
+			return string.Join(Environment.NewLine, Description);
+		}
 	}
 
 	public class FlagExplanation
@@ -220,6 +225,13 @@ namespace Brewmaster.Modules.OpcodeHelper
 			}
 			return list;
 
+		}
+
+		public static Opcode GetOpcodeFromWord(string word, ProjectType type)
+		{
+			var allOpcodes = OpcodeParser.GetOpcodes(type);
+			if (allOpcodes.ContainsKey(word.ToUpper())) return allOpcodes[word.ToUpper()];
+			else return null;
 		}
 	}
 }

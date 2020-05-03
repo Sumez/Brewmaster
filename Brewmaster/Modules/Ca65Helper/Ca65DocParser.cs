@@ -12,6 +12,11 @@ namespace Brewmaster.Modules.Ca65Helper
 		public List<string> Aliases = new List<string>();
 		public List<string> SeeAlso = new List<string>();
 		public List<Ca65CommandDescription> Description = new List<Ca65CommandDescription>();
+
+		public override string ToString()
+		{
+			return string.Join(Environment.NewLine, Description.Select(d => d.Text));
+		}
 	}
 	public class Ca65CommandDescription
 	{
@@ -73,6 +78,13 @@ namespace Brewmaster.Modules.Ca65Helper
 			}
 
 			return _list;
+		}
+
+		public static Ca65Command GetCommandFromWord(string word)
+		{
+			var knownCommands = GetCommands();
+			if (knownCommands.ContainsKey(word.ToUpper())) return knownCommands[word.ToUpper()];
+			else return null;
 		}
 	}
 }
