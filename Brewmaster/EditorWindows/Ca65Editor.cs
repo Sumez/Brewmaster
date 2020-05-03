@@ -298,7 +298,7 @@ namespace Brewmaster.EditorWindows
 
 			var val8 = memoryState.ReadAddress(symbol.Value);
 			var val16 = memoryState.ReadAddress(symbol.Value, true);
-			// TODO: Show where symbol is defined
+			// TODO: Show where symbol is defined?
 			return string.Format("{0} ({1})\n\nValue: {2} ({3})\nWord value: {4} ({5})",
 				word,
 				WatchValue.FormatHexAddress(symbol.Value),
@@ -449,8 +449,6 @@ namespace Brewmaster.EditorWindows
 
 			Document.BookmarkManager.AddMark(new PcArrow(Document, buildLine.LineNumber));
 			ActiveTextAreaControl.TextArea.Invalidate();
-			// TODO: Focus on window, and scroll if line is out of view
-
 			ActiveTextAreaControl.TextArea.ScrollTo(buildLine.LineNumber);
 		}
 
@@ -478,7 +476,6 @@ namespace Brewmaster.EditorWindows
 			}
 			if (wordType == AsmWord.AsmWordType.Opcode && wordLengthLimit > 0 && !_forcedAutoCompleteWindow)
 			{
-				// TODO: Opcode help
 				if (_codeCompletionWindow != null) _codeCompletionWindow.Close();
 				return;
 			}
@@ -587,8 +584,6 @@ namespace Brewmaster.EditorWindows
 												};
 
 			ActiveTextAreaControl.Caret.PositionChanged += (s, a) => IdentifyLocalLabels();
-
-			ShowCpuAddresses = true; // TODO: Remove
 
 			_labelStartMarker = new TextMarker(0, 1, TextMarkerType.SolidBlock, Document.HighlightingStrategy.GetColorFor("Highlighted word").BackgroundColor);
 			_labelEndMarker = new TextMarker(0, 0, TextMarkerType.SolidBlock, Document.HighlightingStrategy.GetColorFor("Highlighted word").BackgroundColor);
