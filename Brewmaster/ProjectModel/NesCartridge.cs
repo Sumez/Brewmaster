@@ -16,7 +16,8 @@ namespace Brewmaster.ProjectModel
 		public string MapFile { get; set; }
 		public List<string> Symbols { get; set; }
 		public List<ChrBank> ChrBanks { get; set; }
-		
+		public bool CalculateChecksum { get; set; }
+
 		public NesCartridge()
 		{
 			ChrBanks = new List<ChrBank>();
