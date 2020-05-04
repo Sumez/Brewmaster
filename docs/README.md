@@ -1,7 +1,6 @@
 [Click here to download the latest official release](https://github.com/Sumez/Brewmaster/releases/latest/download/brewmaster.zip)
 
-![Logo](logo.png)
-# What is Brewmaster?
+# What is Brewmaster? ![Logo](logo.png)
 ### Great for beginners
 Assembly programming can sound like a scary ordeal to a lot of people. Not just because the word itself gives an impression of something both complex, archaic and geeky, but also because a lot of the documentation and terminology surrounding it can feel very obtuse to anyone not already involved in it. The truth is that the 6502-style assembly language that the NES and SNES use is extremely simple, and although it is very versatile, it is also quick to learn and get started with.
 For people starting out, Brewmaster provides an easy setup that will get you immediately started on creating your first NES or SNES game using assembly code. Simply import one of the pre-made templates and build it immediately. No dependencies, and no installation necessary. Just run the program and you're set.
