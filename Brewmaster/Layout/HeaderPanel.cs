@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using Brewmaster.ProjectExplorer;
@@ -121,8 +122,9 @@ namespace Brewmaster.Ide
 	    public string Label
 	    {
 		    get { return _label.Text; }
-		    set { _label.Text = value; }
-	    }
+			set { _label.Text = value; }
+
+		}
 
 	    /*protected override void OnPaint(PaintEventArgs e)
         {
@@ -171,7 +173,35 @@ namespace Brewmaster.Ide
 	    {
 		    if (_tabPanel.Controls.Contains(tab.Button)) _tabPanel.Controls.Remove(tab.Button);
 	    }
-    }
+
+	    protected override void OnLayout(LayoutEventArgs a)
+	    {
+		    base.OnLayout(a);
+		    if (_tabPanel == null || _tabPanel.Controls.Count == 0) return;
+
+			var fullWidth = _tabPanel.Width - 20;
+		    var maxSize = new Size (fullWidth / _tabPanel.Controls.Count, _tabPanel.Height);
+		    var takenWidth = 0;
+		    var resizeControls = new List<Control>();
+		    foreach (Control control in _tabPanel.Controls)
+		    {
+			    var testSize = control.GetPreferredSize(maxSize);
+			    if (testSize.Width > maxSize.Width)
+			    {
+				    resizeControls.Add(control);
+				}
+			    else
+			    {
+				    control.MaximumSize = maxSize;
+				    takenWidth += testSize.Width;
+			    }
+		    }
+
+		    if (resizeControls.Count == 0) return;
+		    maxSize = new Size((fullWidth - takenWidth) / resizeControls.Count, _tabPanel.Height);
+		    foreach (var control in resizeControls) control.MaximumSize = maxSize;
+	    }
+	}
 
 	public class IdeTab
 	{
@@ -186,6 +216,7 @@ namespace Brewmaster.Ide
 			_tabButton.Text = panel.Label;
 			_tabButton.AutoSize = true;
 			_tabButton.Appearance = Appearance.Button;
+			_tabButton.AutoEllipsis = true;
 			_tabButton.FlatStyle = FlatStyle.Flat;
 			_tabButton.FlatAppearance.BorderSize = 0;
 			_tabButton.FlatAppearance.MouseOverBackColor = SystemColors.ButtonHighlight;
