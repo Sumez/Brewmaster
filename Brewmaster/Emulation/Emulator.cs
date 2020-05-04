@@ -10,7 +10,7 @@ namespace Brewmaster.Emulation
 {
 	public class InteropEmu
 	{
-		private const string DLLPath = "Mesen\\MesenCore.dll";
+		private const string DLLPath = "lib\\MesenCore.dll";
 		[DllImport(DLLPath)] [return: MarshalAs(UnmanagedType.I1)] public static extern bool TestDll();
 		[DllImport(DLLPath)] public static extern void InitDll();
 

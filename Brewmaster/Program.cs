@@ -31,7 +31,15 @@ namespace Brewmaster
             Application.SetCompatibleTextRenderingDefault(false);
 
 			WorkingDirectory = Application.StartupPath;
-			EmulatorDirectory = Path.Combine(WorkingDirectory, @"Mesen");
+			EmulatorDirectory = GetUserFilePath("Mesen");
+			var emulatorResources = Path.Combine(EmulatorDirectory, "Resources");
+			if (!Directory.Exists(EmulatorDirectory)) Directory.CreateDirectory(EmulatorDirectory);
+			if (!Directory.Exists(emulatorResources))
+			{
+				Directory.CreateDirectory(emulatorResources);
+				var dir = new DirectoryInfo(Path.Combine(WorkingDirectory, @"lib\Mesen"));
+				foreach (var resource in dir.GetFiles()) resource.CopyTo(Path.Combine(emulatorResources, resource.Name));
+			}
 			Directory.SetCurrentDirectory(EmulatorDirectory);
 
 			try
