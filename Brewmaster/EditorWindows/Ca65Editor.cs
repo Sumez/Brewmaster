@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Brewmaster.BuildProcess;
+using Brewmaster.EditorWindows.Text;
 using Brewmaster.Emulation;
 using Brewmaster.Modules;
 using Brewmaster.Modules.Ca65Helper;
@@ -34,6 +36,7 @@ namespace Brewmaster.EditorWindows
 		public AsmProjectFile File { get; private set; }
 		protected Events ModuleEvents { get; private set; }
 		protected CompletionDataProvider _completionDataProvider;
+		protected CompletionDataProvider _fileCompletionDataProvider;
 
 		private CompletionWindow _codeCompletionWindow;
 		private int _caretLine = 0;
@@ -51,6 +54,11 @@ namespace Brewmaster.EditorWindows
 			File = file;
 			ModuleEvents = events;
 			Document.FormattingStrategy = new Ca65Formatting();
+			_fileCompletionDataProvider = new FileCompletion(new[] { file.Project.Directory, file.File.Directory },
+				() => {
+					_forcedAutoCompleteWindow = true;
+					ShowIntellisense('/', 0);
+				});
 
 			ActiveTextAreaControl.TextArea.InsertLeftMargin(1, 
 				new CpuAddressMargin(ActiveTextAreaControl.TextArea,
@@ -166,8 +174,26 @@ namespace Brewmaster.EditorWindows
 				Document.MarkerStrategy.AddMarker(testMarker);
 				ActiveTextAreaControl.TextArea.Invalidate();
 
-				e.ShowToolTip(word.IsLabel? GetSymbolDescription(word.Word) : word.Word);
-				// TODO: Opcode help
+				switch (word.WordType)
+				{
+					case AsmWord.AsmWordType.LabelAbsolute:
+					case AsmWord.AsmWordType.LabelReference:
+					case AsmWord.AsmWordType.LabelDefinition:
+					case AsmWord.AsmWordType.Macro:
+						e.ShowToolTip(GetSymbolDescription(word.Word));
+						break;
+					case AsmWord.AsmWordType.Command:
+						var command = Ca65Parser.GetCommandFromWord(word.Word);
+						if (command != null) e.ShowToolTip(command.ToString());
+						break;
+					case AsmWord.AsmWordType.Opcode:
+						var opcode = OpcodeParser.GetOpcodeFromWord(word.Word, File.Project.Type);
+						if (opcode != null) e.ShowToolTip(opcode.ToString());
+						break;
+					default:
+						e.ShowToolTip(word.Word);
+						break;
+				}
 			};
 
 			Document.DocumentAboutToBeChanged += (s, arts) =>
@@ -235,16 +261,18 @@ namespace Brewmaster.EditorWindows
 			var word = GetAsmWord(ActiveTextAreaControl.Caret.Position);
 			if (word == null || word.WordType != AsmWord.AsmWordType.Command) return;
 
-			var knownCommands = Ca65Parser.GetCommands();
-			if (knownCommands.ContainsKey(word.Word.ToUpper())) ModuleEvents.HighlightCommand(knownCommands[word.Word.ToUpper()]);
+			var command = Ca65Parser.GetCommandFromWord(word.Word);
+			if (command != null) ModuleEvents.HighlightCommand(command);
 		}
 		private void HighlightOpcodeOnLine()
 		{
 			var lineSegment = Document.GetLineSegment(_caretLine);
 			if (lineSegment == null) return;
-			var opcode = lineSegment.Words.OfType<AsmWord>().FirstOrDefault(w => w.WordType == AsmWord.AsmWordType.Opcode);
-			var allOpcodes = OpcodeParser.GetOpcodes(File.Project.Type);
-			if (opcode != null && allOpcodes.ContainsKey(opcode.Word.ToUpper())) ModuleEvents.HighlightOpcode(allOpcodes[opcode.Word.ToUpper()]);
+			var word = lineSegment.Words.OfType<AsmWord>().FirstOrDefault(w => w.WordType == AsmWord.AsmWordType.Opcode);
+
+			if (word == null) return;
+			var opcode = OpcodeParser.GetOpcodeFromWord(word.Word, File.Project.Type);
+			if (opcode != null) ModuleEvents.HighlightOpcode(opcode);
 		}
 
 		private DebugLine GetDebugLine(int lineNumber)
@@ -271,15 +299,19 @@ namespace Brewmaster.EditorWindows
 		{
 			//TODO: Watch manually written addresses, too!
 			//TODO: X/Y offsets, maybe even DP?
-			if (!File.Project.DebugSymbols.ContainsKey(word)) return word;
-
+			if (!File.Project.DebugSymbols.ContainsKey(word))
+			{
+				var macro = File.LocalSymbols.FirstOrDefault(s => s.Text == word) as MacroSymbol;
+				if (macro != null) return macro.ToString();
+				return word;
+			}
 			var symbol = File.Project.DebugSymbols[word];
 			var memoryState = GetCpuMemory();
 			if (memoryState == null) return string.Format("{0} ({1})", word, WatchValue.FormatHexAddress(symbol.Value));
 
 			var val8 = memoryState.ReadAddress(symbol.Value);
 			var val16 = memoryState.ReadAddress(symbol.Value, true);
-			// TODO: Show where symbol is defined
+			// TODO: Show where symbol is defined?
 			return string.Format("{0} ({1})\n\nValue: {2} ({3})\nWord value: {4} ({5})",
 				word,
 				WatchValue.FormatHexAddress(symbol.Value),
@@ -332,12 +364,22 @@ namespace Brewmaster.EditorWindows
 			if (position.Column > 0 && (word == null || word.Type == TextWordType.Space || word.Type == TextWordType.Tab))
 				word = line.GetWord(position.Column - 1);
 
-			if (File.Project.Symbols != null && File.Project.DebugSymbols != null)
-			if (word != null && !(word is AsmWord) && (File.Project.DebugSymbols.ContainsKey(word.Word) || File.Project.Symbols.Any(s => s.Key == word.Word)))
+			if (word == null) return null;
+			var asmWord = word as AsmWord;
+
+			if(asmWord == null && File.Project.Symbols != null && File.Project.DebugSymbols != null
+				&& (File.Project.DebugSymbols.ContainsKey(word.Word) || File.Project.Symbols.Any(s => s.Key == word.Word)))
 			{
-				return new AsmWord(Document, line, word.Offset, word.Length, new HighlightColor(Color.Black, false, false), true, AsmWord.AsmWordType.LabelReference);
+				var type = AsmWord.AsmWordType.LabelReference;
+				var macro = File.Project.Symbols.FirstOrDefault(s => s.Key == word.Word).Value as MacroSymbol;
+				if (macro != null) type = AsmWord.AsmWordType.Macro;
+				return new AsmWord(Document, line, word.Offset, word.Length, new HighlightColor(Color.Black, false, false), true, type);
 			}
-			return word as AsmWord;
+			if (IsIncludeLine(line) && asmWord != null && asmWord.WordType == AsmWord.AsmWordType.String)
+			{
+				asmWord.WordType = AsmWord.AsmWordType.FileReference;
+			}
+			return asmWord;
 		}
 		private void GoToSymbol()
 		{
@@ -354,12 +396,51 @@ namespace Brewmaster.EditorWindows
 
 			if (word == null) return;
 
+			if (word is AsmWord asmWord && (asmWord.WordType == AsmWord.AsmWordType.String || asmWord.WordType == AsmWord.AsmWordType.FileReference))
+			{
+				if (IsIncludeLine(line))
+				{
+					GoToFile(word.Word.Trim('\'', '\"'));
+				}
+				return;
+			}
+
 			var symbols = File.Project.Symbols; // TODO: use local symbol index
 			var matchingSymbol = symbols.Where(s => s.Value.Text == word.Word).Select(s => s.Value)
 				.OrderBy(s => s.Source != this.File.File.FullName).FirstOrDefault();
 			if (matchingSymbol != null && File.Project.GoTo != null)
 				File.Project.GoTo(matchingSymbol.Source, matchingSymbol.Line, matchingSymbol.Character);
 		}
+
+		private bool IsIncludeLine(LineSegment line)
+		{
+			return line.Words.OfType<AsmWord>()
+				.Any(w => w.WordType == AsmWord.AsmWordType.Command &&
+				          (w.Word.Equals(".INCLUDE", StringComparison.InvariantCultureIgnoreCase) ||
+				           w.Word.Equals(".INCBIN", StringComparison.InvariantCultureIgnoreCase)));
+		}
+
+		private void GoToFile(string fileReference)
+		{
+			AsmProjectFile foundFile = null;
+			try
+			{
+				var matchFiles = new[] {
+					Path.Combine(File.GetRelativeDirectory(), fileReference).Replace('\\', '/'),
+					fileReference.Replace('\\', '/')
+				};
+				var completeMatch = matchFiles.Select(mf => new DirectoryInfo(Path.Combine(File.Project.Directory.FullName, mf)).FullName);
+				foundFile = File.Project.Files.FirstOrDefault(f =>
+					completeMatch.Any(mf => mf.Equals(f.File.FullName, StringComparison.InvariantCultureIgnoreCase)) ||
+					matchFiles.Any(mf => mf.Equals(f.GetRelativePath(), StringComparison.InvariantCultureIgnoreCase)));
+			}
+			catch
+			{
+				return;
+			}
+			if (foundFile != null) ModuleEvents.OpenFile(foundFile);
+		}
+
 		public void UpdateBreakpointsInEditor()
 		{
 			if (File.EditorBreakpoints == null) return;
@@ -430,8 +511,6 @@ namespace Brewmaster.EditorWindows
 
 			Document.BookmarkManager.AddMark(new PcArrow(Document, buildLine.LineNumber));
 			ActiveTextAreaControl.TextArea.Invalidate();
-			// TODO: Focus on window, and scroll if line is out of view
-
 			ActiveTextAreaControl.TextArea.ScrollTo(buildLine.LineNumber);
 		}
 
@@ -459,17 +538,10 @@ namespace Brewmaster.EditorWindows
 			}
 			if (wordType == AsmWord.AsmWordType.Opcode && wordLengthLimit > 0 && !_forcedAutoCompleteWindow)
 			{
-				// TODO: Opcode help
 				if (_codeCompletionWindow != null) _codeCompletionWindow.Close();
 				return;
 			}
 			if ((wordType == AsmWord.AsmWordType.NumberByte || wordType == AsmWord.AsmWordType.NumberWord) && wordLengthLimit > 0 && !_forcedAutoCompleteWindow)
-			{
-				if (_codeCompletionWindow != null) _codeCompletionWindow.Close();
-				return;
-			}
-
-			if (word.Offset + word.Length != caretPosition.Column)
 			{
 				if (_codeCompletionWindow != null) _codeCompletionWindow.Close();
 				return;
@@ -480,10 +552,29 @@ namespace Brewmaster.EditorWindows
 				if ((word.IsWhiteSpace || string.IsNullOrWhiteSpace(word.Word)) && !_forcedAutoCompleteWindow && _codeCompletionWindow != null) _codeCompletionWindow.Close();
 				return;
 			}
-			//var pretext = Document.GetText(line.Offset, word.Offset - line.Offset);
-			
-
-			_completionDataProvider.PreSelection = word.Word;
+			var provider = _completionDataProvider;
+			if (IsIncludeLine(line) && caretPosition.Column > 0)
+			{
+				// Auto-complete file names for include statements
+				var fullLine = Document.GetText(line);
+				var stringStart = fullLine.LastIndexOf("\"", caretPosition.Column - 1);
+				if (stringStart > 0 && stringStart == fullLine.IndexOf("\""))
+				{
+					// Open file completion if caret is after the first " of the line
+					provider = _fileCompletionDataProvider;
+					provider.PreSelection = fullLine.Substring(stringStart, caretPosition.Column - stringStart);
+				}
+			}
+			if (provider == _completionDataProvider)
+			{
+				// Regular auto-complete for symbols
+				if (word.Offset + word.Length != caretPosition.Column)
+				{
+					if (_codeCompletionWindow != null) _codeCompletionWindow.Close();
+					return;
+				}
+				provider.PreSelection = word.Word;
+			}
 
 			if (_codeCompletionWindow != null)
 			{
@@ -494,11 +585,11 @@ namespace Brewmaster.EditorWindows
 			try
 			{
 				_codeCompletionWindow = CompletionWindow.ShowCompletionWindow(
-					ParentForm, // The parent window for the completion window
-					this, // The text editor to show the window for
-					File.File.FullName, // Filename - will be passed back to the provider
-					_completionDataProvider, // Provider to get the list of possible completions
-					keyValue // Key pressed - will be passed to the provider
+					ParentForm,					// The parent window for the completion window
+					this,						// The text editor to show the window for
+					File.File.FullName,			// Filename - will be passed back to the provider
+					provider,					// Provider to get the list of possible completions
+					keyValue					// Key pressed - will be passed to the provider
 				);
 			}
 			catch (ArgumentOutOfRangeException ex)
@@ -568,8 +659,6 @@ namespace Brewmaster.EditorWindows
 												};
 
 			ActiveTextAreaControl.Caret.PositionChanged += (s, a) => IdentifyLocalLabels();
-
-			ShowCpuAddresses = true; // TODO: Remove
 
 			_labelStartMarker = new TextMarker(0, 1, TextMarkerType.SolidBlock, Document.HighlightingStrategy.GetColorFor("Highlighted word").BackgroundColor);
 			_labelEndMarker = new TextMarker(0, 0, TextMarkerType.SolidBlock, Document.HighlightingStrategy.GetColorFor("Highlighted word").BackgroundColor);

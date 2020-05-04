@@ -59,7 +59,7 @@ namespace Brewmaster.EditorWindows
 				}
 				else
 				{
-					GoToDefinitionOption.Enabled = (value.WordType == AsmWord.AsmWordType.LabelAbsolute || value.WordType == AsmWord.AsmWordType.LabelReference);
+					GoToDefinitionOption.Enabled = (value.WordType == AsmWord.AsmWordType.LabelAbsolute || value.WordType == AsmWord.AsmWordType.LabelReference || value.WordType == AsmWord.AsmWordType.Macro || value.WordType == AsmWord.AsmWordType.FileReference);
 					BreakOnWriteOption.Enabled = BreakOnReadOption.Enabled = AddToWatchOption.Enabled = (value.WordType == AsmWord.AsmWordType.LabelReference || value.WordType == AsmWord.AsmWordType.LabelDefinition || value.WordType == AsmWord.AsmWordType.NumberByte || value.WordType == AsmWord.AsmWordType.NumberWord);
 				}
 				AddToWatchOption.Text = AddToWatchOption.Enabled ? string.Format("Add '{0}' To Watch", value.Word)  : "Add To Watch";

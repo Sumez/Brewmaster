@@ -21,7 +21,7 @@ namespace Brewmaster.EditorWindows
 
 		public enum AsmWordType {
 			None, Opcode, LabelDefinition, LabelReference, LabelAbsolute, Macro, NumberWord, NumberByte, String,
-			Command, Comment
+			Command, Comment, FileReference
 		}
 
 		public bool IsLabel

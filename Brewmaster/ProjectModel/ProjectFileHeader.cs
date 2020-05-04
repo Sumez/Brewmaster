@@ -68,7 +68,7 @@ namespace Brewmaster.ProjectModel
 					{
 						c.ChrBuildPath, c.PrgBuildPath, c.BuildPath, c.ChrFile,
 						c.DebugFile, c.Filename, c.LinkerConfigFile, c.MapFile, c.PrgFile,
-						c.Name, string.Join(",", c.Symbols)
+						c.Name, string.Join(",", c.Symbols), c.CalculateChecksum ? "1" : "0"
 					},
 					ChrBankFileIds = c.ChrBanks.Select(b =>
 						b.Sources.Select(f => fileReferences[f]).ToArray()).ToArray()
@@ -140,7 +140,8 @@ namespace Brewmaster.ProjectModel
 					MapFile = cData[7],
 					PrgFile = cData[8],
 					Name = cData.Length > 9 ? cData[9] : null,
-					Symbols = cData.Length > 10 ? cData[10].Split(new [] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToList() : new List<string>()
+					Symbols = cData.Length > 10 ? cData[10].Split(new [] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToList() : new List<string>(),
+					CalculateChecksum = cData.Length > 11 ? cData[11] != "0" : true,
 				};
 				if (configurationHeader.ChrBankFileIds != null)
 				foreach (var bank in configurationHeader.ChrBankFileIds)

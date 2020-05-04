@@ -1,4 +1,6 @@
 ﻿
+using System.Collections.Generic;
+
 namespace Brewmaster.EditorWindows
 {
 	public class Symbol
@@ -14,6 +16,14 @@ namespace Brewmaster.EditorWindows
 		public override string ToString()
 		{
 			return Text;
+		}
+	}
+	public class MacroSymbol : Symbol
+	{
+		public List<string> Parameters { get; set; }
+		public override string ToString()
+		{
+			return string.Format("{0} {1}", Text, string.Join(", ", Parameters));
 		}
 	}
 }

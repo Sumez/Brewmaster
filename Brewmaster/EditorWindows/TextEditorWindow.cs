@@ -53,7 +53,7 @@ namespace Brewmaster.EditorWindows
 			if (codeEditor != null)
 			{
 				SourceNavigator.Visible = true;
-				if (ProjectFile.LocalSymbols != null) SourceNavigator.UpdateSymbols(ProjectFile.LocalSymbols);
+				if (ProjectFile.LocalSymbols != null) SourceNavigator.UpdateSymbols(ProjectFile.LocalSymbols.Where(s => s.Source == ProjectFile.File.FullName));
 
 				codeEditor.ParseErrors = (code) => form.BuildHandler.ParseErrors(code, ProjectFile);
 				codeEditor.AddToWatch = form.AddWatch;

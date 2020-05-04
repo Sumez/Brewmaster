@@ -148,6 +148,7 @@
     <Compile Include="EditorWindows\TextEditorMenu.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="EditorWindows\Text\FileCompletion.cs" />
     <Compile Include="EditorWindows\Text\FindResults.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -608,6 +609,13 @@
     <None Include="Resources\Other\ca65icon.png" />
     <None Include="Resources\65816.html" />
     <None Include="Resources\Other\close.png" />
+    <None Include="Resources\Files\chip.png" />
+    <None Include="Resources\Files\file.png" />
+    <None Include="Resources\Files\folder.png" />
+    <None Include="Resources\Files\folder-dark.png" />
+    <None Include="Resources\Files\image.png" />
+    <None Include="Resources\Files\nesproject.png" />
+    <None Include="Resources\Files\text.png" />
     <Content Include="Resources\Other\error.png" />
     <None Include="Resources\Other\smallload.png" />
     <None Include="Resources\Other\smallsave.png" />
@@ -615,6 +623,7 @@
     <None Include="Resources\Other\expanded.png" />
     <None Include="Resources\Other\label.png" />
     <None Include="Resources\Other\opcode.png" />
+    <None Include="Resources\Other\macro.png" />
     <Content Include="Resources\Other\warning.png" />
     <None Include="Resources\Toolbar\buildrun.png" />
     <None Include="Resources\Toolbar\config.png" />

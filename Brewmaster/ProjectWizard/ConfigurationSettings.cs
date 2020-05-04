@@ -10,7 +10,15 @@ namespace Brewmaster.ProjectWizard
 {
 	public partial class ConfigurationSettings : UserControl
 	{
-		public AsmProject Project { get; set; }
+		private AsmProject _project;
+		public AsmProject Project {
+			get { return _project; }
+			set
+			{
+				_project = value;
+				CalculateSnesChecksum.Visible = ChecksumLabel.Visible = _project.Type == ProjectType.Snes;
+			}
+		}
 
 		public ConfigurationSettings()
 		{
@@ -26,6 +34,7 @@ namespace Brewmaster.ProjectWizard
 			OutputFile.Text = configuration.Filename;
 			GenerateMapFile.Checked = configuration.MapFile != null;
 			ConfigurationFile.Text = configuration.LinkerConfigFile;
+			CalculateSnesChecksum.Checked = configuration.CalculateChecksum;
 			Symbols.Text = string.Join(Environment.NewLine, configuration.Symbols);
 		}
 
@@ -51,6 +60,8 @@ namespace Brewmaster.ProjectWizard
 			configuration.ChrFile = null;
 			configuration.PrgFile = null;
 			configuration.PrgBuildPath = null;
+
+			configuration.CalculateChecksum = CalculateSnesChecksum.Checked;
 
 			return true;
 		}

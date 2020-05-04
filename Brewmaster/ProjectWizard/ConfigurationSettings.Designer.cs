@@ -37,12 +37,14 @@ namespace Brewmaster.ProjectWizard
 			System.Windows.Forms.Label label3;
 			System.Windows.Forms.Label label4;
 			System.Windows.Forms.Label nameLabel;
+			this.ChecksumLabel = new System.Windows.Forms.Label();
 			this.OutputFile = new System.Windows.Forms.TextBox();
 			this.ConfigurationFile = new System.Windows.Forms.TextBox();
 			this.BrowseConfigFile = new System.Windows.Forms.Button();
 			this.GenerateMapFile = new System.Windows.Forms.CheckBox();
 			this.Symbols = new System.Windows.Forms.TextBox();
 			this.ConfigurationName = new System.Windows.Forms.TextBox();
+			this.CalculateSnesChecksum = new System.Windows.Forms.CheckBox();
 			configurationLabel = new System.Windows.Forms.Label();
 			outputLabel = new System.Windows.Forms.Label();
 			label1 = new System.Windows.Forms.Label();
@@ -82,7 +84,7 @@ namespace Brewmaster.ProjectWizard
 			// label2
 			// 
 			label2.AutoSize = true;
-			label2.Location = new System.Drawing.Point(-3, 121);
+			label2.Location = new System.Drawing.Point(-3, 120);
 			label2.Name = "label2";
 			label2.Size = new System.Drawing.Size(81, 13);
 			label2.TabIndex = 14;
@@ -100,9 +102,10 @@ namespace Brewmaster.ProjectWizard
 			// label4
 			// 
 			label4.AutoSize = true;
-			label4.Location = new System.Drawing.Point(256, 244);
+			label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			label4.Location = new System.Drawing.Point(260, 244);
 			label4.Name = "label4";
-			label4.Size = new System.Drawing.Size(67, 39);
+			label4.Size = new System.Drawing.Size(59, 36);
 			label4.TabIndex = 16;
 			label4.Text = "MAPPER=3\r\nDEBUG\r\nCHRROM=0";
 			// 
@@ -114,6 +117,15 @@ namespace Brewmaster.ProjectWizard
 			nameLabel.Size = new System.Drawing.Size(101, 13);
 			nameLabel.TabIndex = 18;
 			nameLabel.Text = "Configuration name:";
+			// 
+			// ChecksumLabel
+			// 
+			this.ChecksumLabel.AutoSize = true;
+			this.ChecksumLabel.Location = new System.Drawing.Point(-3, 286);
+			this.ChecksumLabel.Name = "ChecksumLabel";
+			this.ChecksumLabel.Size = new System.Drawing.Size(91, 13);
+			this.ChecksumLabel.TabIndex = 20;
+			this.ChecksumLabel.Text = "SNES checksum:";
 			// 
 			// OutputFile
 			// 
@@ -168,10 +180,24 @@ namespace Brewmaster.ProjectWizard
 			this.ConfigurationName.Size = new System.Drawing.Size(381, 20);
 			this.ConfigurationName.TabIndex = 0;
 			// 
+			// CalculateSnesChecksum
+			// 
+			this.CalculateSnesChecksum.AutoSize = true;
+			this.CalculateSnesChecksum.Checked = true;
+			this.CalculateSnesChecksum.CheckState = System.Windows.Forms.CheckState.Checked;
+			this.CalculateSnesChecksum.Location = new System.Drawing.Point(114, 285);
+			this.CalculateSnesChecksum.Name = "CalculateSnesChecksum";
+			this.CalculateSnesChecksum.Size = new System.Drawing.Size(167, 17);
+			this.CalculateSnesChecksum.TabIndex = 19;
+			this.CalculateSnesChecksum.Text = "Calculate and include in ROM";
+			this.CalculateSnesChecksum.UseVisualStyleBackColor = true;
+			// 
 			// ConfigurationSettings
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+			this.Controls.Add(this.CalculateSnesChecksum);
+			this.Controls.Add(this.ChecksumLabel);
 			this.Controls.Add(nameLabel);
 			this.Controls.Add(this.ConfigurationName);
 			this.Controls.Add(label4);
@@ -199,5 +225,7 @@ namespace Brewmaster.ProjectWizard
 		public TextBox ConfigurationFile;
 		public CheckBox GenerateMapFile;
 		public TextBox Symbols;
+		public CheckBox CalculateSnesChecksum;
+		private Label ChecksumLabel;
 	}
 }

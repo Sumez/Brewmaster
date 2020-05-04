@@ -121,11 +121,11 @@ namespace Brewmaster.EditorWindows
 			_project = project;
 			_getSymbolDescription = getSymbolDescription;
 			_events = events;
-			var resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
 			ImageList = new ImageList();
 			ImageList.Images.Add(Resources.label);
 			ImageList.Images.Add(Resources.opcode);
 			ImageList.Images.Add(Resources.ca65icon);
+			ImageList.Images.Add(Resources.macro);
 			DefaultIndex = -1;
 		}
 	}
@@ -141,6 +141,7 @@ namespace Brewmaster.EditorWindows
 			Symbol = symbol;
 			Priority = priority;
 			GetDescription = getDescription;
+			ImageIndex = symbol is MacroSymbol ? 3 : 0;
 		}
 
 		public bool InsertAction(TextArea textArea, char ch)
@@ -149,7 +150,7 @@ namespace Brewmaster.EditorWindows
 			return true;
 		}
 
-		public int ImageIndex { get { return 0; } }
+		public int ImageIndex { get; private set; }
 		public string Text
 		{
 			get { return Symbol.Text; }
@@ -169,7 +170,7 @@ namespace Brewmaster.EditorWindows
 		{
 			Opcode = opcode;
 			Text = Opcode.Command.ToLower();
-			Description = string.Join(Environment.NewLine, Opcode.Description);
+			Description = opcode.ToString();
 		}
 		public bool InsertAction(TextArea textArea, char ch)
 		{
@@ -190,7 +191,7 @@ namespace Brewmaster.EditorWindows
 		{
 			Command = command;
 			Text = alias;
-			Description = string.Join(Environment.NewLine, Command.Description.Select(d => d.Text));
+			Description = Command.ToString();
 		}
 		public bool InsertAction(TextArea textArea, char ch)
 		{

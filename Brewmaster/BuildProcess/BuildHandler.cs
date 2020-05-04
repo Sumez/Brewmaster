@@ -173,14 +173,12 @@ namespace Brewmaster.BuildProcess
 					if (e.Data != null) errors.Add(new BuildError(e.Data));
 				};
 				
-				//var relativeDir = new Uri(projectFolder + @"\").MakeRelativeUri(new Uri(projectFile.File.DirectoryName)).ToString();
-				//var sourceFile = relativeDir + @"/" + projectFile.File.Name;
 				var fileDirectory = projectFile.GetRelativeDirectory();
-				process.StartInfo.Arguments = string.Format("{0} -o {1} -t nes --cpu {2}{4} -I .{3}", 
+				process.StartInfo.Arguments = string.Format("\"{0}\" -o \"{1}\" -t nes --cpu {2}{4} -I .{3}", 
 					sourceFile, 
 					objectFile, 
 					projectFile.Project.GetTargetCpu(), 
-					string.IsNullOrWhiteSpace(fileDirectory) ? "" : " -I " + fileDirectory,
+					string.IsNullOrWhiteSpace(fileDirectory) ? "" : " -I \"" + fileDirectory + "\"",
 					string.Join("", configuration.Symbols.Select(s => " -D " + s)));
 
 				process.Start();
@@ -218,7 +216,7 @@ namespace Brewmaster.BuildProcess
 			foreach (var file in project.Files.Where(f => f.Mode == CompileMode.ContentPipeline && f.Pipeline != null))
 			{
 				// Get a fresh File Info from the file system in case something was changed since we loaded the project
-				var fileInfo = new FileInfo(file.File.FullName); // TODO: Refresh this using file system watch
+				var fileInfo = new FileInfo(file.File.FullName); // TODO: Refresh ProjectFile.File using file system watch to get LastWriteTime
                                                      // ?
 				if (!fileInfo.Exists)
 				{
@@ -280,13 +278,12 @@ namespace Brewmaster.BuildProcess
 					var directory = Path.Combine(projectFolder, cartridge.BuildPath, projectFile.GetRelativeDirectory());
 					if (!Directory.Exists(directory)) Directory.CreateDirectory(directory);
 					var fileBase = projectFile.GetRelativeDirectory() + @"/" + Path.GetFileNameWithoutExtension(projectFile.File.Name);
-					var relativeDir = new Uri(projectFolder + @"\").MakeRelativeUri(new Uri(projectFile.File.DirectoryName + @"\")).ToString();
-					var sourceFile = relativeDir + projectFile.File.Name;
+					var sourceFile = projectFile.GetRelativePath();
 					var objectFile = cartridge.BuildPath + @"/" + fileBase + ".o";
 					var dependencyFile = cartridge.BuildPath + @"/" + fileBase + ".d";
 					objectFiles.Add(objectFile);
 
-					asmProcess.StartInfo.Arguments = string.Format("{0} -o {1} --create-dep {2} -t nes --cpu {3}{4} -g -I .", 
+					asmProcess.StartInfo.Arguments = string.Format("\"{0}\" -o \"{1}\" --create-dep \"{2}\" -t nes --cpu {3}{4} -g -I .", 
 						sourceFile, 
 						objectFile, 
 						dependencyFile, 
@@ -306,7 +303,14 @@ namespace Brewmaster.BuildProcess
 				buildProcessSource.SetResult(false);
 				return errors;
 			}
+
 			if (File.Exists(targetFile)) File.Delete(targetFile);
+			var outputFile = targetFile;
+			if (cartridge.PrgBuildPath != null && cartridge.PrgFile != null)
+			{
+				outputFile = cartridge.PrgBuildPath + @"/" + cartridge.PrgFile;
+			}
+
 			using (var linkerProcess = new Process())
 			{
 				linkerProcess.StartInfo = asmParams;
@@ -315,18 +319,17 @@ namespace Brewmaster.BuildProcess
 				string multilineError = null;
 				linkerProcess.ErrorDataReceived += (s, e) => { ProcessErrorData(e.Data, errors, ref multilineError); };
 
-
-				var outputFile = targetFile;
-				if (cartridge.PrgBuildPath != null && cartridge.PrgFile != null)
-				{
-					outputFile = cartridge.PrgBuildPath + @"/" + cartridge.PrgFile;
-				}
-
 				//linkerProcess.StartInfo.FileName = string.Format(@"{0}\cc65\bin\cl65.exe", ideFolder);
 				//linkerProcess.StartInfo.Arguments = string.Format("-t nes -C {0} --mapfile {1} -Wl --dbgfile,{2} -o {3} {4}", cartridge.LinkerConfigFile, cartridge.MapFile, cartridge.DebugFile, prgFile, string.Join(" ", objectFiles));
 
 				linkerProcess.StartInfo.FileName = string.Format(@"{0}\cc65\bin\ld65.exe", ideFolder);
-				linkerProcess.StartInfo.Arguments = string.Format("-o {3} -C {0} -m {1} --dbgfile {2} {4}", linkerConfig.GetRelativePath(), cartridge.MapFile, cartridge.DebugFile, outputFile, string.Join(" ", objectFiles));
+				linkerProcess.StartInfo.Arguments = string.Format("-o \"{3}\" -C \"{0}\" -m \"{1}\" --dbgfile \"{2}\" {4}", 
+					linkerConfig.GetRelativePath(), 
+					cartridge.MapFile, 
+					cartridge.DebugFile, 
+					outputFile, 
+					string.Join(" ", objectFiles.Select(f => string.Format("\"{0}\"", f)))
+				);
 
 				Log(new LogData("ld65 " + linkerProcess.StartInfo.Arguments));
 				linkerProcess.Start();
@@ -340,6 +343,37 @@ namespace Brewmaster.BuildProcess
 				}
 			}
 
+			if (project.Type == ProjectType.Snes && cartridge.CalculateChecksum)
+			using (var stream = File.Open(outputFile, FileMode.Open, FileAccess.ReadWrite))
+			{
+				Log(new LogData("Calculating SNES checksum", LogType.Headline));
+
+				var prgSize = (Int32)stream.Length; // We don't expect the PRG size to ever be longer than a 32 bit int
+				var prgData = new byte[prgSize];
+				var checksumData = new byte[4];
+
+				stream.Read(prgData, 0, prgSize);
+
+				ushort checksum = 0;
+				unchecked // Allow 16bit integer to overflow
+				{
+					for (var i = 0; i < prgSize; i++)
+					{
+						if (i >= 0x7FDC && i <= 0x7FDF) continue;
+						checksum += prgData[i];
+					}
+					checksum += 0xff;
+					checksum += 0xff;
+				}
+				checksumData[2] = (byte)(checksum & 0xff);
+				checksumData[3] = (byte)((checksum >> 8) & 0xff);
+				checksumData[0] = (byte)(~checksum & 0xff);
+				checksumData[1] = (byte)((~checksum >> 8) & 0xff);
+
+				stream.Position = 0x7FDC;
+				stream.Write(checksumData, 0, 4);
+			}
+
 			if (prgFolder != null) {
 				if (project.Type == ProjectType.Nes) Log(new LogData("Merging into iNES file", LogType.Headline));
 				using (var write = File.OpenWrite(targetFile))
@@ -350,26 +384,6 @@ namespace Brewmaster.BuildProcess
 						var prgData = new byte[prgSize];
 
 						read.Read(prgData, 0, prgSize);
-						if (project.Type == ProjectType.Snes)
-						{
-							//TODO: Configurable
-							if (project.Type == ProjectType.Snes) Log(new LogData("Calculating SNES checksum", LogType.Headline));
-							ushort checksum = 0;
-							unchecked // Allow 16bit integer to overflow
-							{
-								for (var i = 0; i < prgSize; i++)
-								{
-									if (i >= 0x7FDC && i <= 0x7FDF) continue;
-									checksum += prgData[i];
-								}
-								checksum += 0xff;
-								checksum += 0xff;
-							}
-							prgData[0x7FDE] = (byte)(checksum & 0xff);
-							prgData[0x7FDF] = (byte)((checksum >> 8) & 0xff);
-							prgData[0x7FDC] = (byte)(~checksum & 0xff);
-							prgData[0x7FDD] = (byte)((~checksum >> 8) & 0xff);
-						}
 						write.Write(prgData, 0, prgSize);
 					}
 					if (chrFolder != null)
