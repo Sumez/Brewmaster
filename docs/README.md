@@ -1,3 +1,6 @@
+[Click here to download the latest official release](https://github.com/Sumez/Brewmaster/releases/latest/download/brewmaster.zip)
+
+![Logo](logo.png)
 # What is Brewmaster?
 ### Great for beginners
 Assembly programming can sound like a scary ordeal to a lot of people. Not just because the word itself gives an impression of something both complex, archaic and geeky, but also because a lot of the documentation and terminology surrounding it can feel very obtuse to anyone not already involved in it. The truth is that the 6502-style assembly language that the NES and SNES use is extremely simple, and although it is very versatile, it is also quick to learn and get started with.
@@ -56,3 +59,8 @@ Brewmaster is created using the .NET WinForms library, which should be supported
 ### Can only NES and SNES programs be created using Brewmaster?
 Technically you can create anything supported by ca65 (such as Atari 2600 and C64), but the built-in emulator tools are currently only for the NES and SNES platforms (including variants and clones, such as Dendy or FDS).
 If Brewmaster takes off I might look into supporting more emulators or maybe even other assemblers. But right now the focus is on improving the tools for the already supported platforms.
+
+
+## Downloads
+[Latest official release](https://github.com/Sumez/Brewmaster/releases/latest)
+[See all releases (including pre-releases)](https://github.com/Sumez/Brewmaster/releases)
