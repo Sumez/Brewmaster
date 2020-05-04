@@ -97,7 +97,7 @@ namespace Brewmaster.StatusView
 
 					RegisterPC.RegisterSize = RegisterSize.SixteenBit;
 
-					panelDB.Visible = panelDP.Visible = false;
+					snesFlags.Visible = panelDB.Visible = panelDP.Visible = false;
 					break;
 				case ProjectType.Snes:
 					RegisterA.RegisterSize =
@@ -106,7 +106,7 @@ namespace Brewmaster.StatusView
 
 					RegisterPC.RegisterSize = RegisterSize.TwentyfourBit;
 
-					panelDB.Visible = panelDP.Visible = true;
+					snesFlags.Visible = panelDB.Visible = panelDP.Visible = true;
 					break;
 			}
 			registerPanel.ResumeLayout();
