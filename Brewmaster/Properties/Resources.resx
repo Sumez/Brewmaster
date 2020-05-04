@@ -157,7 +157,7 @@
   <data name="restart" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Toolbar\restart.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="save-all" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="saveAll" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Toolbar\save-all.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="redo1" type="System.Resources.ResXFileRef, System.Windows.Forms">
@@ -228,5 +228,29 @@
   </data>
   <data name="macro" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Other\macro.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="cartridge1" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Files\cartridge.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="chip" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Files\chip.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="file" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Files\file.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="folder" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Files\folder.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="folder_dark" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Files\folder-dark.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="image" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Files\image.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="nesproject" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Files\nesproject.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="text" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Files\text.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

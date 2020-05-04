@@ -121,7 +121,6 @@ namespace Brewmaster.EditorWindows
 			_project = project;
 			_getSymbolDescription = getSymbolDescription;
 			_events = events;
-			var resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
 			ImageList = new ImageList();
 			ImageList.Images.Add(Resources.label);
 			ImageList.Images.Add(Resources.opcode);

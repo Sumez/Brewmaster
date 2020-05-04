@@ -699,7 +699,7 @@ namespace Brewmaster
 			// 
 			// File_SaveAllMenuItem
 			// 
-			this.File_SaveAllMenuItem.Image = global::Brewmaster.Properties.Resources.save_all;
+			this.File_SaveAllMenuItem.Image = global::Brewmaster.Properties.Resources.saveAll;
 			this.File_SaveAllMenuItem.Name = "File_SaveAllMenuItem";
 			this.File_SaveAllMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
             | System.Windows.Forms.Keys.S)));
@@ -1558,7 +1558,7 @@ namespace Brewmaster
 			// saveAllToolStripButton
 			// 
 			this.saveAllToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.saveAllToolStripButton.Image = global::Brewmaster.Properties.Resources.save_all;
+			this.saveAllToolStripButton.Image = global::Brewmaster.Properties.Resources.saveAll;
 			this.saveAllToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.saveAllToolStripButton.Name = "saveAllToolStripButton";
 			this.saveAllToolStripButton.Size = new System.Drawing.Size(23, 22);

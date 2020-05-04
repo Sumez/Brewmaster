@@ -102,7 +102,7 @@ namespace Brewmaster.Properties {
         ///&lt;/header&gt;
         ///
         ///&lt;main class=&quot;main with-sidebar&quot;&gt;
-        ///  &lt;div class=&quot;si [rest of string was truncated]&quot;;.
+        ///  &lt;div class=&quot;sidebar&quot; role=&quot;com [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _65816 {
             get {
@@ -163,7 +163,7 @@ namespace Brewmaster.Properties {
         ///
         ///&lt;h2&gt;
         ///&lt;a href=&quot;mailto:uz@cc65.org&quot;&gt;Ullrich von Bassewitz&lt;/a&gt;,&lt;br&gt;
-        ///&lt;a href=&quot;mailto:greg.king5@ [rest of string was truncated]&quot;;.
+        ///&lt;a href=&quot;mailto:greg.king5@verizon.net&quot; [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string ca65 {
             get {
@@ -187,6 +187,26 @@ namespace Brewmaster.Properties {
         internal static System.Drawing.Bitmap cartridge {
             get {
                 object obj = ResourceManager.GetObject("cartridge", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap cartridge1 {
+            get {
+                object obj = ResourceManager.GetObject("cartridge1", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap chip {
+            get {
+                object obj = ResourceManager.GetObject("chip", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -254,6 +274,46 @@ namespace Brewmaster.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap file {
+            get {
+                object obj = ResourceManager.GetObject("file", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap folder {
+            get {
+                object obj = ResourceManager.GetObject("folder", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap folder_dark {
+            get {
+                object obj = ResourceManager.GetObject("folder_dark", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap image {
+            get {
+                object obj = ResourceManager.GetObject("image", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap label {
             get {
                 object obj = ResourceManager.GetObject("label", resourceCulture);
@@ -277,6 +337,16 @@ namespace Brewmaster.Properties {
         internal static System.Drawing.Bitmap macro {
             get {
                 object obj = ResourceManager.GetObject("macro", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap nesproject {
+            get {
+                object obj = ResourceManager.GetObject("nesproject", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -364,9 +434,9 @@ namespace Brewmaster.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap save_all {
+        internal static System.Drawing.Bitmap save1 {
             get {
-                object obj = ResourceManager.GetObject("save-all", resourceCulture);
+                object obj = ResourceManager.GetObject("save1", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -374,9 +444,9 @@ namespace Brewmaster.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap save1 {
+        internal static System.Drawing.Bitmap saveAll {
             get {
-                object obj = ResourceManager.GetObject("save1", resourceCulture);
+                object obj = ResourceManager.GetObject("saveAll", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -457,6 +527,16 @@ namespace Brewmaster.Properties {
         internal static System.Drawing.Bitmap stop1 {
             get {
                 object obj = ResourceManager.GetObject("stop1", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap text {
+            get {
+                object obj = ResourceManager.GetObject("text", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

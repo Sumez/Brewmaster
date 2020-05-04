@@ -54,7 +54,11 @@ namespace Brewmaster.EditorWindows
 			File = file;
 			ModuleEvents = events;
 			Document.FormattingStrategy = new Ca65Formatting();
-			_fileCompletionDataProvider = new FileCompletion(new[] { file.Project.Directory, file.File.Directory });
+			_fileCompletionDataProvider = new FileCompletion(new[] { file.Project.Directory, file.File.Directory },
+				() => {
+					_forcedAutoCompleteWindow = true;
+					ShowIntellisense('/', 0);
+				});
 
 			ActiveTextAreaControl.TextArea.InsertLeftMargin(1, 
 				new CpuAddressMargin(ActiveTextAreaControl.TextArea,
@@ -360,15 +364,22 @@ namespace Brewmaster.EditorWindows
 			if (position.Column > 0 && (word == null || word.Type == TextWordType.Space || word.Type == TextWordType.Tab))
 				word = line.GetWord(position.Column - 1);
 
-			if (File.Project.Symbols != null && File.Project.DebugSymbols != null)
-			if (word != null && !(word is AsmWord) && (File.Project.DebugSymbols.ContainsKey(word.Word) || File.Project.Symbols.Any(s => s.Key == word.Word)))
+			if (word == null) return null;
+			var asmWord = word as AsmWord;
+
+			if(asmWord == null && File.Project.Symbols != null && File.Project.DebugSymbols != null
+				&& (File.Project.DebugSymbols.ContainsKey(word.Word) || File.Project.Symbols.Any(s => s.Key == word.Word)))
 			{
 				var type = AsmWord.AsmWordType.LabelReference;
 				var macro = File.Project.Symbols.FirstOrDefault(s => s.Key == word.Word).Value as MacroSymbol;
 				if (macro != null) type = AsmWord.AsmWordType.Macro;
 				return new AsmWord(Document, line, word.Offset, word.Length, new HighlightColor(Color.Black, false, false), true, type);
 			}
-			return word as AsmWord;
+			if (IsIncludeLine(line) && asmWord != null && asmWord.WordType == AsmWord.AsmWordType.String)
+			{
+				asmWord.WordType = AsmWord.AsmWordType.FileReference;
+			}
+			return asmWord;
 		}
 		private void GoToSymbol()
 		{
@@ -385,10 +396,9 @@ namespace Brewmaster.EditorWindows
 
 			if (word == null) return;
 
-			if (word is AsmWord asmWord && asmWord.WordType == AsmWord.AsmWordType.String)
+			if (word is AsmWord asmWord && (asmWord.WordType == AsmWord.AsmWordType.String || asmWord.WordType == AsmWord.AsmWordType.FileReference))
 			{
-				// TODO: Detect this when opening menu, so "go to" option is available. Also reuse logic in autocompletion code
-				if (line.Words.Any(w => w.Word.Equals(".INCLUDE", StringComparison.InvariantCultureIgnoreCase) || w.Word.Equals(".INCBIN", StringComparison.InvariantCultureIgnoreCase)))
+				if (IsIncludeLine(line))
 				{
 					GoToFile(word.Word.Trim('\'', '\"'));
 				}
@@ -401,6 +411,15 @@ namespace Brewmaster.EditorWindows
 			if (matchingSymbol != null && File.Project.GoTo != null)
 				File.Project.GoTo(matchingSymbol.Source, matchingSymbol.Line, matchingSymbol.Character);
 		}
+
+		private bool IsIncludeLine(LineSegment line)
+		{
+			return line.Words.OfType<AsmWord>()
+				.Any(w => w.WordType == AsmWord.AsmWordType.Command &&
+				          (w.Word.Equals(".INCLUDE", StringComparison.InvariantCultureIgnoreCase) ||
+				           w.Word.Equals(".INCBIN", StringComparison.InvariantCultureIgnoreCase)));
+		}
+
 		private void GoToFile(string fileReference)
 		{
 			AsmProjectFile foundFile = null;
@@ -528,21 +547,34 @@ namespace Brewmaster.EditorWindows
 				return;
 			}
 
-			if (word.Offset + word.Length != caretPosition.Column)
-			{
-				if (_codeCompletionWindow != null) _codeCompletionWindow.Close();
-				return;
-			}
-
 			if (word.Word.Trim().Length < wordLengthLimit)
 			{
 				if ((word.IsWhiteSpace || string.IsNullOrWhiteSpace(word.Word)) && !_forcedAutoCompleteWindow && _codeCompletionWindow != null) _codeCompletionWindow.Close();
 				return;
 			}
-			//var pretext = Document.GetText(line.Offset, word.Offset - line.Offset);
-			
-
-			_fileCompletionDataProvider.PreSelection =  _completionDataProvider.PreSelection = word.Word;
+			var provider = _completionDataProvider;
+			if (IsIncludeLine(line) && caretPosition.Column > 0)
+			{
+				// Auto-complete file names for include statements
+				var fullLine = Document.GetText(line);
+				var stringStart = fullLine.LastIndexOf("\"", caretPosition.Column - 1);
+				if (stringStart > 0 && stringStart == fullLine.IndexOf("\""))
+				{
+					// Open file completion if caret is after the first " of the line
+					provider = _fileCompletionDataProvider;
+					provider.PreSelection = fullLine.Substring(stringStart, caretPosition.Column - stringStart);
+				}
+			}
+			if (provider == _completionDataProvider)
+			{
+				// Regular auto-complete for symbols
+				if (word.Offset + word.Length != caretPosition.Column)
+				{
+					if (_codeCompletionWindow != null) _codeCompletionWindow.Close();
+					return;
+				}
+				provider.PreSelection = word.Word;
+			}
 
 			if (_codeCompletionWindow != null)
 			{
@@ -552,13 +584,6 @@ namespace Brewmaster.EditorWindows
 
 			try
 			{
-				var provider = _completionDataProvider;
-				if (line.Words.OfType<AsmWord>()
-					.Any(w => w.WordType == AsmWord.AsmWordType.Command && 
-					(w.Word.Equals(".INCLUDE", StringComparison.InvariantCultureIgnoreCase) || 
-					w.Word.Equals(".INCBIN", StringComparison.InvariantCultureIgnoreCase))))
-					provider = _fileCompletionDataProvider;
-
 				_codeCompletionWindow = CompletionWindow.ShowCompletionWindow(
 					ParentForm,					// The parent window for the completion window
 					this,						// The text editor to show the window for

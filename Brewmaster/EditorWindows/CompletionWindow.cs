@@ -295,8 +295,8 @@ namespace Brewmaster.EditorWindows
 					control.EndUpdate();
 				}
 			}
-			Close();
-			return result;
+			if (result) Close();
+			return true;
 		}
 
 		private Size GetListViewSize(int itemCount)
