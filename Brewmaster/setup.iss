@@ -1,7 +1,7 @@
 [Setup]
 AppName=Brewmaster
 OutputBaseFilename=BrewmasterSetup
-AppVersion=0.1
+AppVersion={#version}
 WizardStyle=modern
 DefaultDirName={autopf}\Brewmaster
 DefaultGroupName=Brewmaster
