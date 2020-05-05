@@ -97,10 +97,9 @@
 			this.horizontalLine1.TabIndex = 2;
 			this.horizontalLine1.Text = "horizontalLine1";
 			// 
-			// _tileMapDisplay
+			// _spriteDisplay
 			// 
 			this._spriteDisplay.AutoScroll = true;
-			this._spriteDisplay.BackColor = System.Drawing.Color.Black;
 			this._spriteDisplay.FitImage = false;
 			this._spriteDisplay.Location = new System.Drawing.Point(0, 0);
 			this._spriteDisplay.Name = "_spriteDisplay";

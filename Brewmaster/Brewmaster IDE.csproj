@@ -175,6 +175,15 @@
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Modules\OpcodeHelper\OpcodeParser.cs" />
+    <Compile Include="Modules\Ppu\ChrRender.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Modules\Ppu\ChrViewer.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Modules\Ppu\ChrViewer.Designer.cs">
+      <DependentUpon>ChrViewer.cs</DependentUpon>
+    </Compile>
     <Compile Include="Modules\SpriteList\Sprite.cs" />
     <Compile Include="Modules\SpriteList\SpriteList.cs">
       <SubType>Component</SubType>
@@ -508,6 +517,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Modules\OpcodeHelper\OpcodeHelper.resx">
       <DependentUpon>OpcodeHelper.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Modules\Ppu\ChrViewer.resx">
+      <DependentUpon>ChrViewer.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Modules\Watch\WatchList.resx">
       <DependentUpon>WatchList.cs</DependentUpon>

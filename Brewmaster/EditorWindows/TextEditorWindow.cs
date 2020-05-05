@@ -150,7 +150,7 @@ namespace Brewmaster.EditorWindows
 
 		public override void Save()
 		{
-			//if (Pristine) return;
+			if (Pristine) return;
 			lock (_savingLock)
 			{
 				SavingFile = true;

@@ -37,7 +37,8 @@ namespace Brewmaster
 
 	    public AsmProject CurrentProject { get; set; }
 	    public Settings.Settings Settings { get; private set; }
-	    public SpriteViewer Sprites { get; private set; }
+		public SpriteViewer Sprites { get; private set; }
+		public ChrViewer ChrViewer { get; private set; }
 	    public SpriteList SpriteList { get; private set; }
 	    public LayoutHandler LayoutHandler { get; private set; }
 	    public BuildHandler BuildHandler { get; private set; }
@@ -220,6 +221,7 @@ namespace Brewmaster
 				var ppuPanel = new IdeGroupedPanel();
 				ppuPanel.AddPanel(new IdePanel(TileMap) { Label = "Tilemaps / Nametables" });
 				ppuPanel.AddPanel(new IdePanel(Sprites = new SpriteViewer(_moduleEvents)) { Label = "Sprites" });
+				ppuPanel.AddPanel(new IdePanel(ChrViewer = new ChrViewer(_moduleEvents)) { Label = "Chr" });
 
 				var memoryPanel = new IdeGroupedPanel();
 				memoryPanel.AddPanel(new IdePanel(MemoryTabs) { Label = "Memory Viewer" });
@@ -868,11 +870,6 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
         {
 	        if (!(editorTabs.SelectedTab is ISaveable tab)) return;
 	        tab.Save();
-			tab.Save();
-			tab.Save();
-			tab.Save();
-			tab.Save();
-			tab.Save();
         }
 
 		private void File_SaveAsMenuItem_Click(object sender, EventArgs e)
