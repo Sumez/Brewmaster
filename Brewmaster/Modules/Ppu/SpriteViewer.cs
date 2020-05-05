@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
-using Brewmaster.Modules;
 
-namespace Brewmaster.Ppu
+namespace Brewmaster.Modules.Ppu
 {
 	public partial class SpriteViewer : UserControl
 	{

@@ -3,7 +3,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 
-namespace Brewmaster.Ppu
+namespace Brewmaster.Modules.Ppu
 {
 	public abstract class ScaledImageRenderer : Panel
 	{

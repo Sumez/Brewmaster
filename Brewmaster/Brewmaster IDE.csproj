@@ -179,22 +179,22 @@
     <Compile Include="Modules\SpriteList\SpriteList.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Ppu\SpriteRender.cs">
+    <Compile Include="Modules\Ppu\SpriteRender.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Ppu\SpriteViewer.cs">
+    <Compile Include="Modules\Ppu\SpriteViewer.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Ppu\SpriteViewer.Designer.cs">
+    <Compile Include="Modules\Ppu\SpriteViewer.Designer.cs">
       <DependentUpon>SpriteViewer.cs</DependentUpon>
     </Compile>
-    <Compile Include="Ppu\ScaledImageRenderer.cs">
+    <Compile Include="Modules\Ppu\ScaledImageRenderer.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Ppu\TileMapViewer.cs">
+    <Compile Include="Modules\Ppu\TileMapViewer.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Ppu\TileMapViewer.Designer.cs">
+    <Compile Include="Modules\Ppu\TileMapViewer.Designer.cs">
       <DependentUpon>TileMapViewer.cs</DependentUpon>
     </Compile>
     <Compile Include="ProjectExplorer\ProjectExplorerMenu.cs">
@@ -324,7 +324,7 @@
     </Compile>
     <Compile Include="Pipeline\ChrPipeline.cs" />
     <Compile Include="Pipeline\DataPipeline.cs" />
-    <Compile Include="Ppu\TileMapRender.cs">
+    <Compile Include="Modules\Ppu\TileMapRender.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Program.cs" />
@@ -518,10 +518,10 @@
     <EmbeddedResource Include="Layout\HeaderPanel.resx">
       <DependentUpon>HeaderPanel.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Ppu\SpriteViewer.resx">
+    <EmbeddedResource Include="Modules\Ppu\SpriteViewer.resx">
       <DependentUpon>SpriteViewer.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Ppu\TileMapViewer.resx">
+    <EmbeddedResource Include="Modules\Ppu\TileMapViewer.resx">
       <DependentUpon>TileMapViewer.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ProjectExplorer\ProjectExplorer.resx">
