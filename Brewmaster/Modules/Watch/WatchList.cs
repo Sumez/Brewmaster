@@ -175,9 +175,16 @@ namespace Brewmaster.Modules.Watch
 			Items.Add(AddRow);
 		}
 
+		protected override void OnBeforeLabelEdit(LabelEditEventArgs e)
+		{
+			base.OnBeforeLabelEdit(e);
+			if (!e.CancelEdit) contextMenu.Enabled = false;
+		}
+
 		protected override void OnAfterLabelEdit(LabelEditEventArgs e)
 		{
 			base.OnAfterLabelEdit(e);
+			contextMenu.Enabled = true;
 
 			if (Items[e.Item] == AddRow && !String.IsNullOrEmpty(e.Label))
 			{
