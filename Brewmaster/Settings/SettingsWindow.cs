@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using Brewmaster.EditorWindows;
 using Brewmaster.ProjectModel;
@@ -85,7 +86,7 @@ rts
 
 			foreach (var feature in (Feature[])Enum.GetValues(typeof(Feature)))
 			{
-				featureList.Items.Add(feature.ToString());
+				featureList.Items.Add(new FeatureSelection(feature));
 			}
 			featureList.SelectedValueChanged += (s, e) => UpdateKeyboardShortcut();
 			featureList.SelectedIndex = 0;
@@ -146,20 +147,27 @@ rts
 
 		private void reassignKeyButton_Click(object sender, EventArgs e)
 		{
-			if (!Enum.TryParse(featureList.SelectedItem.ToString(), out Feature feature)) return;
+			var selectedFeature = featureList.SelectedItem as FeatureSelection;
+			if (selectedFeature == null) return;
 			using (var keyAssignDialog = new ButtonAssignment(true))
 			{
 				keyAssignDialog.StartPosition = FormStartPosition.CenterParent;
 				keyAssignDialog.ShowDialog(this);
-				KeyBindings[feature] = keyAssignDialog.KeyboardInput;
+				var existing = KeyBindings.FirstOrDefault(b => b.Binding == (int)keyAssignDialog.KeyboardInput && b.Feature != (int)selectedFeature.Feature);
+				if (keyAssignDialog.KeyboardInput != Keys.None && existing.Binding == (int)keyAssignDialog.KeyboardInput)
+					MessageBox.Show(string.Format("This shortcut is already assigned to '{0}'", FeatureSelection.GetFeatureName((Feature)existing.Feature)), 
+						"Keyboard shortcuts", MessageBoxButtons.OK, MessageBoxIcon.Information);
+				else
+					KeyBindings[selectedFeature.Feature] = keyAssignDialog.KeyboardInput;
 			}
 			UpdateKeyboardShortcut();
 		}
 
 		private void UpdateKeyboardShortcut()
 		{
-			if (!Enum.TryParse(featureList.SelectedItem.ToString(), out Feature feature)) return;
-			var keys = KeyBindings[feature];
+			var selectedFeature = featureList.SelectedItem as FeatureSelection;
+			if (selectedFeature == null) return;
+			var keys = KeyBindings[selectedFeature.Feature];
 
 			if (keys == Keys.None)
 			{
@@ -255,6 +263,24 @@ rts
 		}
 	}
 
+	public class FeatureSelection
+	{
+		public Feature Feature { get; private set; }
+		public FeatureSelection(Feature feature)
+		{
+			Feature = feature;
+		}
+
+		public override string ToString()
+		{
+			return GetFeatureName(Feature);
+		}
+
+		public static string GetFeatureName(Feature feature)
+		{
+			return Regex.Replace(feature.ToString(), "[a-z][A-Z]", m => m.Value[0] + " " + char.ToLower(m.Value[1]));
+		}
+	}
 	public class DummyCa65Editor : TextEditor
 	{
 		public DummyCa65Editor()

@@ -28,16 +28,15 @@
         /// </summary>
         private void InitializeComponent()
         {
-			System.Windows.Forms.Label text;
 			System.Windows.Forms.Label header;
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AboutWindow));
+			this.text = new System.Windows.Forms.Label();
 			this.panel2 = new System.Windows.Forms.Panel();
 			this.logoPicture1 = new Brewmaster.LogoPicture();
+			this.panel3 = new System.Windows.Forms.Panel();
 			this.link = new System.Windows.Forms.LinkLabel();
 			this.closeButton = new System.Windows.Forms.Button();
 			this.panel1 = new System.Windows.Forms.Panel();
-			this.panel3 = new System.Windows.Forms.Panel();
-			text = new System.Windows.Forms.Label();
 			header = new System.Windows.Forms.Label();
 			this.panel2.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.logoPicture1)).BeginInit();
@@ -46,13 +45,23 @@
 			// 
 			// text
 			// 
-			text.AutoSize = true;
-			text.Location = new System.Drawing.Point(113, 74);
-			text.Name = "text";
-			text.Size = new System.Drawing.Size(217, 65);
-			text.TabIndex = 4;
-			text.Text = "Version 0.1.0\r\n\r\nAn open source homebrew IDE for Windows\r\n\r\n2019-2020 Created by " +
+			this.text.AutoSize = true;
+			this.text.Location = new System.Drawing.Point(113, 74);
+			this.text.Name = "text";
+			this.text.Size = new System.Drawing.Size(217, 65);
+			this.text.TabIndex = 4;
+			this.text.Text = "Version 0.1.0\r\n\r\nAn open source homebrew IDE for Windows\r\n\r\n2019-2020 Created by " +
     "Sumez";
+			// 
+			// header
+			// 
+			header.AutoSize = true;
+			header.Font = new System.Drawing.Font("Microsoft Tai Le", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			header.Location = new System.Drawing.Point(18, 11);
+			header.Name = "header";
+			header.Size = new System.Drawing.Size(153, 34);
+			header.TabIndex = 5;
+			header.Text = "Brewmaster";
 			// 
 			// panel2
 			// 
@@ -60,7 +69,7 @@
 			this.panel2.Controls.Add(this.panel3);
 			this.panel2.Controls.Add(this.link);
 			this.panel2.Controls.Add(this.closeButton);
-			this.panel2.Controls.Add(text);
+			this.panel2.Controls.Add(this.text);
 			this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.panel2.Location = new System.Drawing.Point(0, 0);
 			this.panel2.Name = "panel2";
@@ -77,6 +86,16 @@
 			this.logoPicture1.TabIndex = 8;
 			this.logoPicture1.TabStop = false;
 			// 
+			// panel3
+			// 
+			this.panel3.BackColor = System.Drawing.Color.White;
+			this.panel3.Controls.Add(header);
+			this.panel3.Dock = System.Windows.Forms.DockStyle.Top;
+			this.panel3.Location = new System.Drawing.Point(0, 0);
+			this.panel3.Name = "panel3";
+			this.panel3.Size = new System.Drawing.Size(387, 55);
+			this.panel3.TabIndex = 9;
+			// 
 			// link
 			// 
 			this.link.AutoSize = true;
@@ -87,16 +106,6 @@
 			this.link.TabStop = true;
 			this.link.Text = "https://brewmaster.dev";
 			this.link.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel1_LinkClicked);
-			// 
-			// header
-			// 
-			header.AutoSize = true;
-			header.Font = new System.Drawing.Font("Microsoft Tai Le", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			header.Location = new System.Drawing.Point(18, 11);
-			header.Name = "header";
-			header.Size = new System.Drawing.Size(153, 34);
-			header.TabIndex = 5;
-			header.Text = "Brewmaster";
 			// 
 			// closeButton
 			// 
@@ -114,16 +123,6 @@
 			this.panel1.Name = "panel1";
 			this.panel1.Size = new System.Drawing.Size(65, 65);
 			this.panel1.TabIndex = 0;
-			// 
-			// panel3
-			// 
-			this.panel3.BackColor = System.Drawing.Color.White;
-			this.panel3.Controls.Add(header);
-			this.panel3.Dock = System.Windows.Forms.DockStyle.Top;
-			this.panel3.Location = new System.Drawing.Point(0, 0);
-			this.panel3.Name = "panel3";
-			this.panel3.Size = new System.Drawing.Size(387, 55);
-			this.panel3.TabIndex = 9;
 			// 
 			// AboutWindow
 			// 
@@ -157,5 +156,6 @@
 		private System.Windows.Forms.LinkLabel link;
 		private LogoPicture logoPicture1;
 		private System.Windows.Forms.Panel panel3;
+		private System.Windows.Forms.Label text;
 	}
 }

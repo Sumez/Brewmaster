@@ -337,6 +337,8 @@ namespace Brewmaster
 					if (Settings.WindowState != FormWindowState.Minimized) WindowState = Settings.WindowState;
 				}
 
+				BindShortcutKeys();
+
 				//Resize += (sender, args) => { Refresh(); }; // this shouldn't be necessary
 			}
 			catch (Exception ex)
@@ -348,8 +350,44 @@ namespace Brewmaster
 			ResumeLayout();
         }
 
+		private void BindShortcutKeys()
+		{
+			Program.BindKey(Feature.CreateNew, nesProjectMenuItem);
+			Program.BindKey(Feature.Open, File_OpenProjectMenuItem);
+			Program.BindKey(Feature.Save, File_SaveMenuItem);
+			Program.BindKey(Feature.SaveAll, File_SaveAllMenuItem);
+			Program.BindKey(Feature.Print, File_PrintMenuItem);
+			Program.BindKey(Feature.Exit, File_ExitMenuItem);
 
-	    private void AddWindowOption(Control windowControl)
+			Program.BindKey(Feature.Undo, (keys) => Edit_UndoMenuItem.ShortcutKeyDisplayString = keys == Keys.None ? "" : ButtonAssignment.GetString(keys));
+			Program.BindKey(Feature.Redo, (keys) => Edit_RedoMenuItem.ShortcutKeyDisplayString = keys == Keys.None ? "" : ButtonAssignment.GetString(keys));
+			Program.BindKey(Feature.Cut, (keys) => Edit_CutMenuItem.ShortcutKeyDisplayString = keys == Keys.None ? "" : ButtonAssignment.GetString(keys));
+			Program.BindKey(Feature.Copy, (keys) => Edit_CopyMenuItem.ShortcutKeyDisplayString = keys == Keys.None ? "" : ButtonAssignment.GetString(keys));
+			Program.BindKey(Feature.Paste, (keys) => Edit_PasteMenuItem.ShortcutKeyDisplayString = keys == Keys.None ? "" : ButtonAssignment.GetString(keys));
+			Program.BindKey(Feature.SelectAll, (keys) => selectAllMenuItem.ShortcutKeyDisplayString = keys == Keys.None ? "" : ButtonAssignment.GetString(keys));
+			
+			Program.BindKey(Feature.Find, findMenuItem);
+			Program.BindKey(Feature.FindAll, findInFilesMenuItem);
+			Program.BindKey(Feature.FindNext, findNextMenuItem);
+			Program.BindKey(Feature.Replace, replaceMenuItem);
+			Program.BindKey(Feature.GoToLine, Edit_GoToMenuItem);
+			Program.BindKey(Feature.Build, buildProjectMenuItem);
+			Program.BindKey(Feature.Run, runMenuItem);
+			Program.BindKey(Feature.RunNewBuild, runNewBuildMenuItem);
+			Program.BindKey(Feature.Restart, restartMenuItem);
+
+			Program.BindKey(Feature.StepOver, stepOverMenuItem);
+			Program.BindKey(Feature.StepInto, stepIntoMenuItem);
+			Program.BindKey(Feature.StepOut, stepOutMenuItem);
+			Program.BindKey(Feature.StepBack, stepBackMenuItem);
+
+			Program.BindKey(Feature.SaveState, saveStateMenuItem);
+			Program.BindKey(Feature.LoadState, loadStateMenuItem);
+
+		}
+
+
+		private void AddWindowOption(Control windowControl)
 		{
 			var idePanel = LayoutHandler.GetPanel(windowControl);
 			if (idePanel == null) return;

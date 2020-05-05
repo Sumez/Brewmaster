@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -16,6 +17,7 @@ using Brewmaster.Modules.Watch;
 using Brewmaster.ProjectModel;
 using Brewmaster.Settings;
 using ICSharpCode.TextEditor;
+using ICSharpCode.TextEditor.Actions;
 using ICSharpCode.TextEditor.Document;
 
 namespace Brewmaster.EditorWindows
@@ -838,7 +840,38 @@ namespace Brewmaster.EditorWindows
 		{
 			Text = "";
 			TextEditorProperties = DefaultCodeProperties;
+
+			FeatureActions.Add(Feature.Undo, editactions[Keys.Control | Keys.Z]);
+			FeatureActions.Add(Feature.Redo, editactions[Keys.Control | Keys.Y]);
+			FeatureActions.Add(Feature.Cut, editactions[Keys.Control | Keys.X]);
+			FeatureActions.Add(Feature.Copy, editactions[Keys.Control | Keys.C]);
+			FeatureActions.Add(Feature.Paste, editactions[Keys.Control | Keys.V]);
+			FeatureActions.Add(Feature.SelectAll, editactions[Keys.Control | Keys.A]);
+
+			foreach (var feature in FeatureActions)
+			{
+				Program.BindKey(feature.Key, UpdateKeyBinding);
+			}
 		}
+
+		protected void UpdateKeyBinding(KeyBindingEventArgs args)
+		{
+			var action = FeatureActions[args.Feature];
+			var existingAction = editactions.FirstOrDefault(kvp => kvp.Value == action);
+			if (existingAction.Value == action) editactions.Remove(existingAction.Key);
+			if (!editactions.ContainsKey(args.Keys)) editactions.Add(args.Keys, action);
+		}
+		
+		protected override void Dispose(bool disposing)
+		{
+			foreach (var feature in FeatureActions)
+			{
+				Program.UnbindKey(feature.Key, UpdateKeyBinding);
+			}
+			base.Dispose(disposing);
+		}
+
+		protected Dictionary<Feature, IEditAction> FeatureActions = new Dictionary<Feature, IEditAction>();
 
 		public static ITextEditorProperties DefaultCodeProperties = new DefaultBrewmasterCodeProperties();
 

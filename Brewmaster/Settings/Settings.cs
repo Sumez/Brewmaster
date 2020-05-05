@@ -241,9 +241,37 @@ namespace Brewmaster.Settings
 		Rename = 2,
 		ActivateItem = 4,
 		RemoveFromList = 5,
+		LoadState = 6,
+		SaveState = 7,
+		CreateNew = 8,
+		Open = 9,
+		Save = 10,
+		SaveAll = 11,
+		Print = 12,
+		Exit = 13,
+		CloseWindow = 15,
+		Find = 16,
+		FindAll = 17,
+		FindNext = 18,
+		Replace = 19,
 		GoToDefinition = 20,
 		AddToWatch = 21,
-		AutoComplete = 22
+		AutoComplete = 22,
+		GoToLine = 23,
+
+		Cut = 24,
+		Copy = 25,
+		Paste = 26,
+		SelectAll = 27,
+
+		Build = 40,
+		Run = 41,
+		RunNewBuild = 42,
+		Restart = 43,
+		StepOver = 44,
+		StepInto = 45,
+		StepOut = 46,
+		StepBack = 47,
 	}
 	[Serializable]
 	public class HighlightingColors {
@@ -311,7 +339,35 @@ namespace Brewmaster.Settings
 					new KeyBinding(Feature.GoToDefinition, Keys.F12),
 					new KeyBinding(Feature.RemoveFromList, Keys.Delete),
 					new KeyBinding(Feature.Rename, Keys.F2),
+					new KeyBinding(Feature.CloseWindow, Keys.W | Keys.Control),
 					new KeyBinding(Feature.AutoComplete, Keys.Space | Keys.Control),
+
+					new KeyBinding(Feature.CreateNew, Keys.N | Keys.Control),
+					new KeyBinding(Feature.Open, Keys.O | Keys.Control),
+					new KeyBinding(Feature.Save, Keys.S | Keys.Control),
+					new KeyBinding(Feature.SaveAll, Keys.S | Keys.Control | Keys.Shift),
+					new KeyBinding(Feature.Print, Keys.P | Keys.Control),
+					new KeyBinding(Feature.Exit, Keys.F4 | Keys.Alt),
+
+					new KeyBinding(Feature.Cut, Keys.X | Keys.Control),
+					new KeyBinding(Feature.Copy, Keys.C | Keys.Control),
+					new KeyBinding(Feature.Paste, Keys.V | Keys.Control),
+					new KeyBinding(Feature.SelectAll, Keys.A | Keys.Control),
+
+					new KeyBinding(Feature.Find, Keys.F | Keys.Control),
+					new KeyBinding(Feature.FindAll, Keys.F | Keys.Control | Keys.Shift),
+					new KeyBinding(Feature.FindNext, Keys.F3),
+					new KeyBinding(Feature.Replace, Keys.H | Keys.Control),
+					new KeyBinding(Feature.GoToLine, Keys.G | Keys.Control),
+					new KeyBinding(Feature.Build, Keys.B | Keys.Control | Keys.Shift),
+					new KeyBinding(Feature.Run, Keys.F5),
+					new KeyBinding(Feature.RunNewBuild, Keys.F5 | Keys.Control),
+					new KeyBinding(Feature.Restart, Keys.R | Keys.Control),
+
+					new KeyBinding(Feature.StepOver, Keys.F10),
+					new KeyBinding(Feature.StepInto, Keys.F11),
+					new KeyBinding(Feature.StepOut, Keys.F11 | Keys.Shift),
+					new KeyBinding(Feature.StepBack, Keys.F10 | Keys.Shift)
 				};
 			}
 		}

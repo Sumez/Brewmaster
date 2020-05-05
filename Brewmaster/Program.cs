@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Windows.Forms;
@@ -90,29 +91,48 @@ namespace Brewmaster
 			MessageBox.Show(CurrentWindow, message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 		}
 
-	    public static void BindKey(Feature feature, Action<Keys> callback)
+	    public static void BindKey(Feature feature, ToolStripMenuItem menuItem)
 	    {
-		    BindingsChanged += () => callback(Keys[feature]);
-		    callback(Keys[feature]);
+		    BindKey(feature, keys => menuItem.ShortcutKeys = keys);
+	    }
+		public static void BindKey(Feature feature, Action<Keys> callback)
+	    {
+		    BindKey(feature, (a) => callback(a.Keys));
+	    }
+		public static void BindKey(Feature feature, Action<KeyBindingEventArgs> callback)
+	    {
+		    if (!BindingCallbacks.ContainsKey(feature)) BindingCallbacks.Add(feature, new List<Action<KeyBindingEventArgs>>());
+		    BindingCallbacks[feature].Add(callback);
+
+		    callback(new KeyBindingEventArgs(Keys[feature], feature));
 		}
 
-	    public static void UpdateKeyBindings(KeyBindings newBindings)
+	    public static void UnbindKey(Feature feature, Action<KeyBindingEventArgs> callback)
+	    {
+		    if (!BindingCallbacks.ContainsKey(feature) || !BindingCallbacks[feature].Contains(callback)) return;
+		    BindingCallbacks[feature].Remove(callback);
+	    }
+
+		public static void UpdateKeyBindings(KeyBindings newBindings)
 	    {
 		    Keys.Clear();
-		    foreach (var binding in newBindings) Keys.Add(binding);
+		    foreach (var binding in newBindings)
+		    {
+			    Keys.Add(binding);
+			    var feature = (Feature)binding.Feature;
+			    if (!BindingCallbacks.ContainsKey(feature)) continue;
 
-		    try
-		    {
-			    if (BindingsChanged != null) BindingsChanged();
-		    }
-		    catch (Exception ex)
-		    {
-			    Error(
-				    "Unexpeted error remapping key bindings.\nYou may need to restart the program for new mappings to take effect",
-				    ex);
+			    try
+			    {
+				    foreach (var callback in BindingCallbacks[feature]) callback(new KeyBindingEventArgs(Keys[feature], feature));
+			    }
+				catch (Exception ex)
+			    {
+				    Error("Unexpeted error remapping key bindings.\nYou may need to restart the program for new mappings to take effect", ex);
+			    }
 		    }
 	    }
-	    private static event Action BindingsChanged;
+		private static readonly Dictionary<Feature, List<Action<KeyBindingEventArgs>>> BindingCallbacks = new Dictionary<Feature, List<Action<KeyBindingEventArgs>>>();
 
 	    public static string GetUserFilePath(string fileName)
 	    {
@@ -121,4 +141,15 @@ namespace Brewmaster
 			    "Brewmaster", fileName);
 	    }
     }
+	public class KeyBindingEventArgs
+	{
+		public KeyBindingEventArgs(Keys keys, Feature feature)
+		{
+			Keys = keys;
+			Feature = feature;
+		}
+		public Keys Keys { get; private set; }
+		public Feature Feature { get; private set; }
+	}
+
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Drawing.Drawing2D;
+using System.Reflection;
 using System.Windows.Forms;
 
 namespace Brewmaster
@@ -10,6 +11,15 @@ namespace Brewmaster
         public AboutWindow()
         {
             InitializeComponent();
+
+	        var version = "?.?.?";
+	        try
+	        {
+		        var assembly = Assembly.GetExecutingAssembly();
+		        version = FileVersionInfo.GetVersionInfo(assembly.Location).ProductVersion;
+	        }
+	        catch { }
+			text.Text = string.Format("Version {0}\r\n\r\nAn open source homebrew IDE for Windows\r\n\r\n2019-2020 Created by Sumez", version);
         }
 
         private void button1_Click(object sender, EventArgs e)
