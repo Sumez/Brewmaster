@@ -4,7 +4,7 @@ using System.Drawing.Drawing2D;
 using System.Runtime.InteropServices;
 using Brewmaster.Emulation;
 
-namespace Brewmaster.Ppu
+namespace Brewmaster.Modules.Ppu
 {
 	public class TileMapRender : ScaledImageRenderer
 	{

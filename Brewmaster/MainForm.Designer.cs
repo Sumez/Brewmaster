@@ -1,5 +1,6 @@
 ﻿using System.Windows.Forms;
 using Brewmaster.EditorWindows;
+using Brewmaster.Modules.Ppu;
 
 namespace Brewmaster
 {
@@ -50,7 +51,7 @@ namespace Brewmaster
 			this.editorTabs = new Brewmaster.EditorWindows.EditorTabs();
 			this.mesen = new Brewmaster.Emulation.MesenControl();
 			this.cpuStatus1 = new Brewmaster.StatusView.CpuStatus();
-			this.TileMap = new Brewmaster.Ppu.TileMapViewer();
+			this.TileMap = new TileMapViewer();
 			this.MemoryTabs = new System.Windows.Forms.TabControl();
 			this.CpuMemoryTab = new System.Windows.Forms.TabPage();
 			this.CpuMemoryViewer = new Brewmaster.MemoryViewer.MemoryViewer();
@@ -2135,7 +2136,7 @@ namespace Brewmaster
 		private StatusView.CpuStatus cpuStatus1;
 		private System.Windows.Forms.ToolStripMenuItem EmulatorMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem updateEveryFrameMenuItem;
-		private Ppu.TileMapViewer TileMap;
+		private TileMapViewer TileMap;
 		private System.Windows.Forms.ImageList CodeItemImages;
 		private System.Windows.Forms.ToolStripMenuItem findNextMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem nesGraphicsMenuItem;

@@ -58,10 +58,25 @@ namespace Brewmaster.Emulation
 		public Mesen.GUI.DebugState SnesState;
 		public ProjectType Type { get; }
 		public SpriteData Sprites = new SpriteData();
+		public CharacterData CharacterData = new CharacterData();
 		public TileMapData TileMaps;
 		public MemoryState Memory = new MemoryState(null, null, null);
 	}
 
+	public class CharacterData
+	{
+		public byte[][] PixelData = new byte[2][];
+		public int Width = 128;
+		public int Height = 128;
+
+		public event Action OnRefreshRequest;
+		public int ColorMode { get; private set; } = 1;
+		public void RequestRefresh(int colorMode)
+		{
+			ColorMode = colorMode;
+			if (OnRefreshRequest != null) OnRefreshRequest();
+		}
+	}
 	public class SpriteData
 	{
 		public byte[] PixelData = new byte[256 * 240 * 4];

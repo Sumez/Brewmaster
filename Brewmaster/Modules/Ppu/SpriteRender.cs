@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using Brewmaster.Emulation;
-using Brewmaster.Modules;
 using Brewmaster.ProjectModel;
 
-namespace Brewmaster.Ppu
+namespace Brewmaster.Modules.Ppu
 {
 	public class SpriteRender : ScaledImageRenderer
 	{

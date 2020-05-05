@@ -308,7 +308,7 @@ namespace Brewmaster.BuildProcess
 			var outputFile = targetFile;
 			if (cartridge.PrgBuildPath != null && cartridge.PrgFile != null)
 			{
-				outputFile = cartridge.PrgBuildPath + @"/" + cartridge.PrgFile;
+				outputFile = Path.Combine(projectFolder, cartridge.PrgBuildPath, cartridge.PrgFile);
 			}
 
 			using (var linkerProcess = new Process())

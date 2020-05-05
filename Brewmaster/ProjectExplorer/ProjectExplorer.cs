@@ -187,9 +187,12 @@ namespace Brewmaster.ProjectExplorer
 			base.OnBeforeLabelEdit(e);
 			var editable = e.Node as EditableNode;
 			if (editable == null || !editable.Editable) e.CancelEdit = true;
+
+			if (!e.CancelEdit) _menu.SetNode(null);
 		}
 		protected override void OnAfterLabelEdit(NodeLabelEditEventArgs e)
 		{
+			_menu.SetNode(SelectedNode);
 			if (string.IsNullOrWhiteSpace(e.Label))
 			{
 				e.CancelEdit = true;

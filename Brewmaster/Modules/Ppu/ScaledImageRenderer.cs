@@ -3,7 +3,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 
-namespace Brewmaster.Ppu
+namespace Brewmaster.Modules.Ppu
 {
 	public abstract class ScaledImageRenderer : Panel
 	{
@@ -20,7 +20,6 @@ namespace Brewmaster.Ppu
 
 		protected ScaledImageRenderer()
 		{
-			BackColor = Color.Black;
 			_pictureBox = new PictureBox();
 			_pictureBox.Image = new Bitmap(512, 480);
 			_pictureBox.Width = 512;
@@ -41,6 +40,7 @@ namespace Brewmaster.Ppu
 		{
 			if (_backBuffer == null) return;
 
+			BackColor = SystemColors.ControlDarkDark;
 			var image = new Bitmap(ImageWidth, ImageHeight); // Create new temporary image to prevent errors when drawing a new image while the old is being drawn to screen
 			lock (BackBufferLock)
 			using (var g = Graphics.FromImage(image))

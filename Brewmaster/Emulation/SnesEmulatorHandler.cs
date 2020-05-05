@@ -68,6 +68,7 @@ namespace Brewmaster.Emulation
 			_mainWindow = mainWindow;
 			_state.TileMaps.PixelData[0] = new byte[1024 * 1024 * 4];
 			_state.TileMaps.OnRefreshRequest += () => PushTileMapData();
+			_state.CharacterData.OnRefreshRequest += () => PushCharacterData();
 		}
 
 		public void LoadCartridge(string baseDir, string cartridgeFile)
@@ -235,11 +236,14 @@ namespace Brewmaster.Emulation
 
 		private readonly EmulationState _state = new EmulationState(ProjectType.Snes)
 		{
-			TileMaps = new TileMapData {NumberOfMaps = 1, DataWidth = 1024 * 4, NumberOfPages = 4}
+			TileMaps = new TileMapData { NumberOfMaps = 1, DataWidth = 1024 * 4, NumberOfPages = 4 },
+			CharacterData = new CharacterData { PixelData = new [] { new byte[0x400000] } }
 		};
 		private GetTilemapOptions _tilemapOptions = new GetTilemapOptions();
-		private GetSpritePreviewOptions _spriteOptions = new GetSpritePreviewOptions();
-
+		private readonly GetSpritePreviewOptions _spriteOptions = new GetSpritePreviewOptions();
+		private GetTileViewOptions _tileViewOptions = new GetTileViewOptions();
+		private readonly byte[] _tileSource = new byte[0x40000];
+		
 		protected override void EmitDebugData()
 		{
 			if (OnRegisterUpdate != null)
@@ -251,10 +255,37 @@ namespace Brewmaster.Emulation
 				_state.Memory.CpuData = SnesDebugApi.GetMemoryState(SnesMemoryType.CpuMemory);
 				SnesDebugApi.GetSpritePreview(_spriteOptions, _state.SnesState.Ppu, _state.Memory.PpuData, _state.Memory.OamData, _state.Memory.CgRam, _state.Sprites.PixelData);
 				_state.Sprites.Details = Sprite.GetSnesSprites(_state.Memory.OamData, _state.SnesState.Ppu.OamMode);
-
+				GetCharacterData();
+				
 				OnRegisterUpdate(_state);
 				if (OnTileMapUpdate != null) PushTileMapData(true, true);
 			}
+		}
+
+		private void PushCharacterData()
+		{
+			GetCharacterData();
+			if (OnRegisterUpdate != null) OnRegisterUpdate(_state);
+		}
+		private void GetCharacterData()
+		{
+			_tileViewOptions.Format = (TileFormat)_state.CharacterData.ColorMode;
+			_tileViewOptions.Width = 16;
+			_tileViewOptions.PageSize = 0x10000;
+			var source = SnesDebugApi.GetMemoryState(SnesMemoryType.VideoRam);
+			var address = 0;
+			var size = Math.Min(source.Length - address, _tileViewOptions.PageSize);
+			Array.Copy(source, address, _tileSource, 0, size);
+			_state.CharacterData.Width = 128;
+			_state.CharacterData.Height = GetChrHeight(_tileViewOptions, _state.CharacterData.ColorMode);
+			SnesDebugApi.GetTileView(_tileViewOptions, _tileSource, _tileSource.Length, _state.Memory.CgRam, _state.CharacterData.PixelData[0]);
+		}
+
+		private static int GetChrHeight(GetTileViewOptions options, int colorMode)
+		{
+			var bitDepth = colorMode == 0 ? 2 : colorMode == 1 ? 4 : 8;
+			if (colorMode >= 4) bitDepth *= 2;
+			return 8 * options.PageSize / (8 * options.Width * bitDepth);
 		}
 
 		private void PushTileMapData(bool skipVram = false, bool skipState = false)

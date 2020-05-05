@@ -4,7 +4,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using Brewmaster.Emulation;
 
-namespace Brewmaster.Ppu
+namespace Brewmaster.Modules.Ppu
 {
 	public partial class TileMapViewer : UserControl
 	{

@@ -20,9 +20,9 @@ using Brewmaster.Modules.Build;
 using Brewmaster.Modules.Ca65Helper;
 using Brewmaster.Modules.NumberHelper;
 using Brewmaster.Modules.OpcodeHelper;
+using Brewmaster.Modules.Ppu;
 using Brewmaster.Modules.SpriteList;
 using Brewmaster.Modules.Watch;
-using Brewmaster.Ppu;
 using Brewmaster.ProjectExplorer;
 using Brewmaster.ProjectModel;
 using Brewmaster.ProjectWizard;
@@ -37,7 +37,8 @@ namespace Brewmaster
 
 	    public AsmProject CurrentProject { get; set; }
 	    public Settings.Settings Settings { get; private set; }
-	    public SpriteViewer Sprites { get; private set; }
+		public SpriteViewer Sprites { get; private set; }
+		public ChrViewer ChrViewer { get; private set; }
 	    public SpriteList SpriteList { get; private set; }
 	    public LayoutHandler LayoutHandler { get; private set; }
 	    public BuildHandler BuildHandler { get; private set; }
@@ -218,6 +219,7 @@ namespace Brewmaster
 
 				// Load layout
 				var ppuPanel = new IdeGroupedPanel();
+				ppuPanel.AddPanel(new IdePanel(ChrViewer = new ChrViewer(_moduleEvents)) { Label = "Chr" });
 				ppuPanel.AddPanel(new IdePanel(TileMap) { Label = "Tilemaps / Nametables" });
 				ppuPanel.AddPanel(new IdePanel(Sprites = new SpriteViewer(_moduleEvents)) { Label = "Sprites" });
 
@@ -868,11 +870,6 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
         {
 	        if (!(editorTabs.SelectedTab is ISaveable tab)) return;
 	        tab.Save();
-			tab.Save();
-			tab.Save();
-			tab.Save();
-			tab.Save();
-			tab.Save();
         }
 
 		private void File_SaveAsMenuItem_Click(object sender, EventArgs e)
