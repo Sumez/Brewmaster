@@ -5,6 +5,7 @@ using System.Windows.Forms;
 using System.Windows.Forms.VisualStyles;
 using Brewmaster.ProjectExplorer;
 using Brewmaster.Properties;
+using Brewmaster.Settings;
 
 namespace Brewmaster.EditorWindows
 {
@@ -355,24 +356,28 @@ namespace Brewmaster.EditorWindows
 				copyPathMenuItem.Enabled = openDirectoryMenuItem.Enabled = true;
 
 			};
+			menu.Closing += (s, a) => { menuTab = null; }; // Makes menu shortcuts work when menu is closed
+
 			saveMenuItem.Click += (s, a) => {
-				var saveable = menuTab as ISaveable;
+				var saveable = (menuTab ?? SelectedTab) as ISaveable;
 				if (saveable != null) saveable.Save();
 			};
-			closeMenuItem.Click += (s, a) => CloseTab(menuTab);
+			closeMenuItem.Click += (s, a) => CloseTab(menuTab ?? SelectedTab);
 			closeAllMenuItem.Click += (s, a) => CloseAll();
-			closeAllOthersMenuItem.Click += (s, a) => CloseAll(menuTab);
+			closeAllOthersMenuItem.Click += (s, a) => CloseAll(menuTab ?? SelectedTab);
 
 			copyPathMenuItem.Click += (s, a) =>
 			{
-				var editorWindow = menuTab as EditorWindow;
+				var editorWindow = (menuTab ?? SelectedTab) as EditorWindow;
 				if (editorWindow != null) Clipboard.SetText(editorWindow.ProjectFile.File.FullName);
 			};
 			openDirectoryMenuItem.Click += (s, a) =>
 			{
-				var editorWindow = menuTab as EditorWindow;
+				var editorWindow = (menuTab ?? SelectedTab) as EditorWindow;
 				if (openDirectoryMenuItem != null) OsFeatures.OpenFolder(editorWindow.ProjectFile.File.Directory.FullName);
 			};
+
+			Program.BindKey(Feature.CloseWindow, (keys) => closeMenuItem.ShortcutKeys = keys);
 
 			return menu;
 		}

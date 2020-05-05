@@ -81,10 +81,11 @@ namespace Brewmaster.Modules.Breakpoints
 				_events.UpdatedBreakpoints();
 			};
 			goToMenuItem.Click += (s, a) => JumpToBreakpoint(SelectedBreakpoints.FirstOrDefault());
-			editMenuItem.Click += (s, a) => EditBreakpoint(SelectedBreakpoints.FirstOrDefault());
+			editMenuItem.Click += (s, a) => ActivateBreakpoint(SelectedBreakpoints.FirstOrDefault());
 			addMenuItem.Click += (s, a) => AddNewBreakpoint();
 
 			Program.BindKey(Feature.RemoveFromList, (keys) => deleteMenuItem.ShortcutKeys = keys);
+			Program.BindKey(Feature.ActivateItem, (keys) => editMenuItem.ShortcutKeys = keys);
 			ContextMenuStrip = contextMenu;
 		}
 

@@ -86,7 +86,7 @@ namespace Brewmaster.Ide
 		protected override void OnLayout(LayoutEventArgs e)
 		{
 			base.OnLayout(e);
-			if (_oldHeight == Height && _oldWidth == Width) return;
+			if (_oldHeight == Height && _oldWidth == Width && e.AffectedProperty != "Visible") return;
 			ResizePanels(Horizontal ? (Width - _oldWidth) : (Height - _oldHeight), true);
 			_oldWidth = Width;
 			_oldHeight = Height;

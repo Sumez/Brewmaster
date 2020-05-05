@@ -70,15 +70,17 @@ namespace Brewmaster.EditorWindows
 					}
 				}
 			}
+
 			foreach (var globalSymbol in GlobalSymbols)
 			{
 				if (!globalSymbol.Value.Text.ToLower().Contains(preSelection)) continue;
 
-				if (symbols.Contains(globalSymbol.Key) && globalSymbol.Value.Source == fileName)
+				/*if (symbols.Contains(globalSymbol.Key) && globalSymbol.Value.Source == fileName)
 				{
+					// TODO: This shouldn't be necessary when we're parsing include-files. Remove commenting if symbols are missing anywhere, but watch out for symbols appearing as duplicates
 					returnValues.Add(new Ca65SymbolData(globalSymbol.Value, 1, _getSymbolDescription));
 				}
-				else if (globalSymbol.Value.Public || (importedSymbols.Contains(globalSymbol.Key) && globalSymbol.Value.Source != fileName))
+				else*/ if (globalSymbol.Value.Public || (importedSymbols.Contains(globalSymbol.Key) && globalSymbol.Value.Source != fileName))
 				{
 					returnValues.Add(new Ca65SymbolData(globalSymbol.Value, 2, _getSymbolDescription));
 				}
