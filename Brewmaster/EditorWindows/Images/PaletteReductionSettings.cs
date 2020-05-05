@@ -12,15 +12,12 @@ namespace Brewmaster.EditorWindows.Images
 	{
 		private FlowLayoutPanel ChrPipelinePanel;
 		private GroupBox PaletteGroup;
-		private readonly AsmProjectFile _file;
 		private readonly ImageRenderControl _image;
 		private bool _loading;
 		private List<PaletteEntries> PaletteEntries;
 		private CheckBox _enablePaletteReduction;
-		private readonly List<Color> _paletteSource;
 		private ContextMenuStrip contextMenuStrip1;
 		private System.ComponentModel.IContainer components;
-		private List<Color?> _palette;
 		private FlowLayoutPanel PaletteContainer;
 		private List<List<Color>> _palettes;
 

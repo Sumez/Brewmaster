@@ -31,7 +31,7 @@
 			System.Windows.Forms.Label label1;
 			this.panel1 = new System.Windows.Forms.Panel();
 			this.StatusLabel = new System.Windows.Forms.Label();
-			this.CancelButton = new System.Windows.Forms.Button();
+			this._cancelButton = new System.Windows.Forms.Button();
 			this.FindNextButton = new System.Windows.Forms.Button();
 			this.SearchQuery = new System.Windows.Forms.TextBox();
 			this.ReplaceWith = new System.Windows.Forms.TextBox();
@@ -74,16 +74,16 @@
 			// 
 			// CancelButton
 			// 
-			this.CancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.CancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.CancelButton.Location = new System.Drawing.Point(246, 3);
-			this.CancelButton.Margin = new System.Windows.Forms.Padding(3, 3, 0, 3);
-			this.CancelButton.Name = "CancelButton";
-			this.CancelButton.Size = new System.Drawing.Size(75, 23);
-			this.CancelButton.TabIndex = 6;
-			this.CancelButton.Text = "Close";
-			this.CancelButton.UseVisualStyleBackColor = true;
-			this.CancelButton.Click += new System.EventHandler(this.CancelButton_Click);
+			this._cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this._cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+			this._cancelButton.Location = new System.Drawing.Point(246, 3);
+			this._cancelButton.Margin = new System.Windows.Forms.Padding(3, 3, 0, 3);
+			this._cancelButton.Name = "_cancelButton";
+			this._cancelButton.Size = new System.Drawing.Size(75, 23);
+			this._cancelButton.TabIndex = 6;
+			this._cancelButton.Text = "Close";
+			this._cancelButton.UseVisualStyleBackColor = true;
+			this._cancelButton.Click += new System.EventHandler(this.CancelButton_Click);
 			// 
 			// FindNextButton
 			// 
@@ -139,7 +139,7 @@
 			// 
 			this.flowLayoutPanel1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.flowLayoutPanel1.AutoSize = true;
-			this.flowLayoutPanel1.Controls.Add(this.CancelButton);
+			this.flowLayoutPanel1.Controls.Add(this._cancelButton);
 			this.flowLayoutPanel1.Controls.Add(this.ReplaceAllButton);
 			this.flowLayoutPanel1.Controls.Add(this.ReplaceButton);
 			this.flowLayoutPanel1.Controls.Add(this.FindNextButton);
@@ -205,7 +205,7 @@
 
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Label StatusLabel;
-        private System.Windows.Forms.Button CancelButton;
+        private System.Windows.Forms.Button _cancelButton;
         private System.Windows.Forms.Button FindNextButton;
         private System.Windows.Forms.TextBox SearchQuery;
 		private System.Windows.Forms.TextBox ReplaceWith;

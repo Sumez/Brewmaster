@@ -27,8 +27,6 @@ namespace Brewmaster.Emulation
 		public event Action<EmulationState> OnRegisterUpdate;
 		public event Action<TileMapData> OnTileMapUpdate;
 
-		private Object emulatorLock = new Object();
-
 		public NesEmulatorHandler(Form mainWindow)
 		{
 			_mainWindow = mainWindow;
@@ -107,7 +105,6 @@ namespace Brewmaster.Emulation
 			RefreshBreakpoints();
 		}
 
-		private Task emulatorThread = null;
 		public void RunGame()
         {
 			/*emulatorThread = Task.Run(() =>
@@ -290,11 +287,7 @@ namespace Brewmaster.Emulation
 
 		private static double ConvertVolume(int volume)
 		{
-			if(true) {
-				return ((double)volume / 100d);
-			} else {
-				return 0;
-			}
+			return ((double)volume / 100d);
 		}
 		private static double ConvertPanning(Int32 panning)
 		{

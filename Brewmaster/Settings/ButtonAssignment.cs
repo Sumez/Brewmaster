@@ -77,7 +77,7 @@ namespace Brewmaster.Settings
 			{
 				testMenu.ShortcutKeys = keyData;
 			}
-			catch (InvalidEnumArgumentException ex)
+			catch (InvalidEnumArgumentException)
 			{
 				return true;
 			}

@@ -22,9 +22,9 @@ namespace Brewmaster
 			text.Text = string.Format("Version {0}\r\n\r\nAn open source homebrew IDE for Windows\r\n\r\n2019-2020 Created by Sumez", version);
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void closeButton_Click(object sender, EventArgs e)
         {
-            this.Close();
+            Close();
         }
 
 		private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
@@ -33,10 +33,7 @@ namespace Brewmaster
 			{
 				Process.Start("https://brewmaster.dev");
 			}
-			catch (Exception ex)
-			{
-				
-			}
+			catch { }
 		}
 	}
 	public class LogoPicture : PictureBox
