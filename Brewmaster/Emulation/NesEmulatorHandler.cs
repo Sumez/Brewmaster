@@ -306,6 +306,7 @@ namespace Brewmaster.Emulation
 			InteropEmu.SetEmulationSpeed(100);
 			InteropEmu.SetTurboRewindSpeed(300, 100);
 
+			InteropEmu.SetFlag(EmulationFlags.DisableGameSelectionScreen, true);
 			InteropEmu.SetFlag(EmulationFlags.Mmc3IrqAltBehavior, false);
 			InteropEmu.SetFlag(EmulationFlags.AllowInvalidInput, false);
 			InteropEmu.SetFlag(EmulationFlags.RemoveSpriteLimit, false);

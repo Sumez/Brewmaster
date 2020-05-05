@@ -32,7 +32,7 @@ namespace Brewmaster.Emulation
 {
 	public class EmuApi
 	{
-		private const string DllPath = "Mesen\\MesenSCore.dll";
+		private const string DllPath = "lib\\MesenSCore.dll";
 		[DllImport(DllPath)] public static extern void InitDll();
 		[DllImport(DllPath, EntryPoint = "GetMesenVersion")] private static extern UInt32 GetMesenVersionWrapper();
 		public static Version GetMesenVersion()
@@ -350,6 +350,7 @@ namespace Brewmaster.Emulation
 			SnesConfigApi.SetShortcutKeys(shortcutKeys, (UInt32)shortcutKeys.Length);
 			SnesConfigApi.SetPreferences(new InteropPreferencesConfig()
 			{
+				DisableGameSelectionScreen = true,
 				ShowFps = false,
 				ShowFrameCounter = false,
 				ShowGameTimer = false,
