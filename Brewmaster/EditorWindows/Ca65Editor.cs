@@ -594,7 +594,7 @@ namespace Brewmaster.EditorWindows
 					keyValue					// Key pressed - will be passed to the provider
 				);
 			}
-			catch (ArgumentOutOfRangeException ex)
+			catch (ArgumentOutOfRangeException)
 			{
 				_codeCompletionWindow = null;
 			}
@@ -886,12 +886,6 @@ namespace Brewmaster.EditorWindows
 			}
 			if (length > 0) ActiveTextAreaControl.SelectionManager.SetSelection(new TextLocation(column, line - 1), new TextLocation(column + length.Value, line - 1));
 			ActiveTextAreaControl.Caret.Position = new TextLocation(column, line - 1);
-			return;
-
-			var caret = ActiveTextAreaControl.Caret;
-			caret.Line = line - 1; // Convert to zero-indexed line TODO: use zero-index in symbol data?
-			caret.Column = column;
-			caret.UpdateCaretPosition();
 		}
 
 		public void FocusLine(int line, bool isBuildLine)

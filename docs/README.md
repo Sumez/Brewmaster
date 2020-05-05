@@ -6,12 +6,12 @@ Download the latest official release here:
 
 # What is Brewmaster?
 ### Great for beginners
-Assembly programming can sound like a scary ordeal to a lot of people. Not just because the word itself gives an impression of something both complex, archaic and geeky, but also because a lot of the documentation and terminology surrounding it can feel very obtuse to anyone not already involved in it. The truth is that the 6502-style assembly language that the NES and SNES use is extremely simple, and although it is very versatile, it is also quick to learn and get started with.
-For people starting out, Brewmaster provides an easy setup that will get you immediately started on creating your first NES or SNES game using assembly code. Simply import one of the pre-made templates and build it immediately. No dependencies, and no installation necessary. Just run the program and you're set.
+Assembly programming can sound like a scary ordeal to a lot of people. Not just because the word itself gives an impression of something both complex, archaic and geeky, but also because a lot of the documentation and terminology surrounding it can feel very obtuse to anyone not already involved in it. The truth is that the 6502-style assembly language that the NES and SNES use is extremely simple, and although it is very versatile, it is also quick to learn and get started with.  
+For people starting out, Brewmaster provides an easy setup that will get you immediately started on creating your first NES or SNES game using assembly code. Simply import one of the pre-made templates and build it immediately. No obscure dependencies, and no installation necessary. Just run the program and you're set.
 ### Perfect for seasoned programmers
-The primary philosophy behind Brewmaster is that it shouldn't just do the job - but that it should feel comfortable and intuitive to work with, as one would expect of a modern Windows program.
-If you are already used to creating your own assembly programs, and running an emulator to debug your code, Brewmaster should only make this process even more convenient. Simply import your existing project and build it to run it immediately in the built-in emulator, stepping through the code as you write it! Debugging a console game has never been easier.
-Brewmaster is full of little tools here and there that will hopefully help speed up both the programming, data conversion, and debugging processes. And if you are missing anything, feel free to add to the issue tracker on GitHub, or contact me directly!
+The primary philosophy behind Brewmaster is that it shouldn't just do the job - but that it should feel comfortable and intuitive to work with, as one would expect of a modern Windows program.  
+If you are already used to creating your own assembly programs, and running an emulator to debug your code, Brewmaster should only make this process even more convenient. Simply import your existing project and build it to run it immediately in the built-in emulator, stepping through the code as you write it! Debugging a console game has never been easier.  
+Brewmaster is full of little tools here and there that will hopefully help speed up both the programming, data conversion, and debugging processes. And if you are missing anything, feel free to add to the [issue tracker](https://github.com/Sumez/Brewmaster/issues) on GitHub, or contact me directly!
 
 *- Sumez*
 
@@ -21,7 +21,7 @@ Templates and default settings will make it easy to build both kinds of projects
 (SPC support to be added in the future)
 
 ### Intelligent configurable syntax highlighting and symbol auto-completion
-Will help a lot with both regular 6502 ASM and most basic ca65 features. Some of the assembler's more advanced features might not be well supported, but feedback is very welcome!
+Will help a lot with both regular 6502 ASM and most basic ca65 features. Some of the assembler's more advanced features might not be recognized, but feedback is very welcome!
 
 ### Easy navigation across source files
 Press F12 (configurable) to immediately navigate to the definition of any recognized assembler symbol, or use the quick navigator in the top right corner to jump between symbols in the current file.
@@ -30,13 +30,13 @@ Press F12 (configurable) to immediately navigate to the definition of any recogn
 Syntax errors, unknown symbols, and similar errors that would prevent the source file from assembling will be marked instantly as you type.
 
 ### Solid built-in emulator
-Game is executed using [Mesen](https://github.com/SourMesen/Mesen)'s core DLL, with the same accuracy the emulator is known for :)
+Game is executed using [Mesen](https://github.com/SourMesen/Mesen)'s core DLL, with the same accuracy the emulator is known for!
 
 ### Text editor breakpoints
 Execution breakpoints are based on the text editor, rather than the program counter. Place breakpoints anywhere in the source code and the program will break on the line you placed it, even after you move code around.
 
 ### Build and continue
-Edit your code and create a new build while debugging, and you'll be able to continue your session with the new ROM image right where you left off.
+Edit your code and create a new build while debugging, and you'll be able to continue your session with the new ROM image *right where you left off*.
 
 ### Built-in debug tools
 All the usual stuff like memory viewer, nametable visualizer, etc. Not too expansive right now, but can potentially be expanded to include anything Mesen also has.
@@ -45,7 +45,7 @@ All the usual stuff like memory viewer, nametable visualizer, etc. Not too expan
 Hover over any address or symbol in the code to see value as both hex, decimal and word values. Add any address or symbol to the live watch to see how the value changes.
 
 ### Built-in opcode reference
-No more need for a cheat sheet. Get immediate information about how each opcode works, or cross reference a list of available commands.
+No more need for a cheat sheet. Get immediate information about how each opcode works, or cross reference a full list of available instructions.
 
 ### Expandable data pipeline
 Build your entire toolchain into the IDE by including data sources (such as tileset images, stage editor data, FamiTracker projects, etc.) and specifying how to convert them every time your project builds
@@ -62,7 +62,10 @@ Brewmaster is created using the .NET WinForms library, which should be supported
 ### Can only NES and SNES programs be created using Brewmaster?
 Technically you can create anything supported by ca65 (such as Atari 2600 and C64), but the built-in emulator tools are currently only for the NES and SNES platforms (including variants and clones, such as Dendy or FDS).  
 If Brewmaster takes off I might look into supporting more emulators or maybe even other assemblers. But right now the focus is on improving the tools for the already supported platforms.
-
+### Can I make a fork of Brewmaster, help with its development, or use its features in my own project?
+Brewmaster is open source under the GPL-3.0 license. You are free to alter the source and include it in your own projects as long as they use a compatible license, but please do credit me!  
+If you are interested in improving Brewmaster, or add new features to it, feel free to make a fork of your own, and add a pull request to Brewmaster's master branch. Before starting any work however, it's recommended to check the [issue tracker](https://github.com/Sumez/Brewmaster/issues) for existing feature requests, and don't hesitate to get in touch with me to discuss potential additions.  
+It is expected that any new additions follow the original code standards. As a general rule, avoid redundancy, obscure naming, and excessive branching - and check for warnings from the project's built-in code analysis ruleset.
 
 ## Downloads
 - [Latest official release](https://github.com/Sumez/Brewmaster/releases/latest)

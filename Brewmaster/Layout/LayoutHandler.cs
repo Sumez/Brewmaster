@@ -28,27 +28,11 @@ namespace Brewmaster.Ide
 			if (DockSuggestion.LayoutSplit != null)
 			{
 				var panelSize = panel.Size;
-				var parent = DockSuggestion.LayoutSplit.Parent;
 				var multiSplitParent = DockSuggestion.LayoutSplit.Parent as MultiSplitContainer;
 
 				if (multiSplitParent != null)
 				{
 					AddPanelToSplitContainer(multiSplitParent, panel.ChildPanel, DockSuggestion.LayoutSplit.Index);
-				}
-				else { 
-					var splitContainer = new SplitContainer();
-					splitContainer.Dock = DockStyle.Fill;
-					splitContainer.BorderStyle = BorderStyle.FixedSingle;
-					if (!DockSuggestion.LayoutSplit.Horizontal) splitContainer.Orientation = Orientation.Horizontal;
-
-					var list = new List<Control>();
-					foreach (Control control in parent.Controls) list.Add(control);
-					foreach (Control control in list) splitContainer.Panel1.Controls.Add(control);
-					list.Clear();
-					parent.Controls.Add(splitContainer);
-
-					foreach (Control control in panel.Controls) list.Add(control);
-					foreach (Control control in list) splitContainer.Panel2.Controls.Add(control);
 				}
 			}
 			else if (DockSuggestion.JoinPanel is IdeGroupedPanel groupedPanel)
@@ -288,46 +272,6 @@ namespace Brewmaster.Ide
 					LayoutSplit = closestSplit
 				};
 			}
-		}
-
-		private bool CheckDockLocation(SplitterPanel container, string name, bool horizontal)
-		{
-			var relativePosition = container.PointToClient(Cursor.Position);
-			var absoluteBounds = container.Parent.RectangleToScreen(container.Bounds);
-
-			if (!absoluteBounds.Contains(Cursor.Position)) return false;
-
-			var splits = new List<LayoutSplit>();
-
-			GetSplits(container, splits, horizontal);
-
-			var closestSplit = new LayoutSplit
-			{
-				Location = horizontal ? absoluteBounds.Left : absoluteBounds.Top,
-				Parent = container,
-				Horizontal = horizontal
-			};
-			SuggestClosestSplit(closestSplit, splits, absoluteBounds, horizontal);
-			return true;
-		}
-
-		private void GetSplits(Control container, List<LayoutSplit> splits, bool horizontal)
-		{
-			var splitChild = container.Controls.OfType<SplitContainer>().FirstOrDefault();
-
-			if (splitChild == null)
-			{
-				splits.Add(new LayoutSplit
-				{
-					Location = horizontal ? container.Parent.RectangleToScreen(container.Bounds).Right : container.Parent.RectangleToScreen(container.Bounds).Bottom,
-					Parent = container,
-					Horizontal = horizontal
-				});
-				return;
-			}
-
-			GetSplits(splitChild.Panel1, splits, horizontal);
-			GetSplits(splitChild.Panel2, splits, horizontal);
 		}
 
 		public void SetDockContainers(params MultiSplitContainer[] containers)

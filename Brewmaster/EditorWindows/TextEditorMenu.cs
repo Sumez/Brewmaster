@@ -10,7 +10,6 @@ namespace Brewmaster.EditorWindows
 		private readonly ToolStripMenuItem _pasteMenuItem;
 		private readonly ToolStripMenuItem _deleteMenuItem;
 		private readonly ToolStripMenuItem _selectAllMenuItem;
-		private readonly ToolStripMenuItem _insertMenuItem;
 
 		public TextEditorMenu(Events events)
 		{
@@ -20,8 +19,6 @@ namespace Brewmaster.EditorWindows
 
 			_deleteMenuItem = new ToolStripMenuItem("Delete", null, (s, a) => events.Delete());
 			_selectAllMenuItem = new ToolStripMenuItem("Select All", null, (s, a) => events.SelectAll());
-
-			_insertMenuItem = new ToolStripMenuItem("Insert");
 
 			InitializeComponent();
 		}

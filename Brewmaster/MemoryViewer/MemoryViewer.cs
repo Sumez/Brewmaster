@@ -278,11 +278,11 @@ namespace Brewmaster.MemoryViewer
 
 			if (targetRow > firstVisibleRow + visibleRows)
 			{
-				Scroll(targetRow - firstVisibleRow - visibleRows);
+				ScrollViewer(targetRow - firstVisibleRow - visibleRows);
 			}
 			if (targetRow < firstVisibleRow)
 			{
-				Scroll(targetRow - firstVisibleRow);
+				ScrollViewer(targetRow - firstVisibleRow);
 			}
 		}
 
@@ -439,11 +439,11 @@ namespace Brewmaster.MemoryViewer
 
 		protected override void OnMouseWheel(MouseEventArgs e)
 		{
-			if (e.Delta > 0) Scroll(-1);
-			if (e.Delta < 0) Scroll(1);
+			if (e.Delta > 0) ScrollViewer(-1);
+			if (e.Delta < 0) ScrollViewer(1);
 		}
 
-		private void Scroll(int amount)
+		private void ScrollViewer(int amount)
 		{
 			ScrollBar.Value = Math.Max(0, Math.Min(ScrollBar.Maximum, ScrollBar.Value + amount));
 			Invalidate();

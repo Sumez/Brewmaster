@@ -868,9 +868,14 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
         {
 	        if (!(editorTabs.SelectedTab is ISaveable tab)) return;
 	        tab.Save();
+			tab.Save();
+			tab.Save();
+			tab.Save();
+			tab.Save();
+			tab.Save();
         }
 
-        private void File_SaveAsMenuItem_Click(object sender, EventArgs e)
+		private void File_SaveAsMenuItem_Click(object sender, EventArgs e)
         {
 			throw new NotImplementedException();
         }

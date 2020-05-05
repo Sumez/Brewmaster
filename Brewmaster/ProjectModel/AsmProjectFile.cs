@@ -73,6 +73,7 @@ namespace Brewmaster.ProjectModel
 			if (!System.IO.File.Exists(source)) return;
 
 			var lineNumber = 0;
+			// TODO: If a file is open in an editor, get text from the editor, instead of the saved file (issue #74)
 			foreach (var line in System.IO.File.ReadLines(source))
 			{
 				lineNumber++;

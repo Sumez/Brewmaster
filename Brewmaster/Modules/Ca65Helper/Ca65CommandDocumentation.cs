@@ -14,7 +14,6 @@ namespace Brewmaster.Modules.Ca65Helper
 		private System.ComponentModel.IContainer components;
 		private FlowLayoutPanel seeAlsoPanel;
 		private Panel seeAlsoContainer;
-		private readonly Dictionary<Opcode, OpcodeButton> _buttons = new Dictionary<Opcode, OpcodeButton>();
 
 		public Ca65CommandDocumentation()
 		{

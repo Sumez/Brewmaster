@@ -129,7 +129,6 @@ namespace Brewmaster.ProjectModel
 		{
 			var headerLength = Type == ProjectType.Nes ? 16 : 0; // TODO: Base extra offset on info in the debug file
 			var debugInfo = new DebugInfo();
-			var symbols = new Dictionary<string, DebugSymbol>();
 			var debugFileInfo = new FileInfo(debugFile);
 			if (!debugFileInfo.Exists) return;
 			using (var reader = debugFileInfo.OpenText())
@@ -342,7 +341,6 @@ namespace Brewmaster.ProjectModel
 		public static AsmProject ImportFromDirectory(DirectoryInfo parentDirectory)
 		{
 			var project = new AsmProject { Directory = parentDirectory };
-			var fileReferences = new Dictionary<string, AsmProjectFile>();
 			AddFilesFromDirectory(project, parentDirectory);
 
 			return project;

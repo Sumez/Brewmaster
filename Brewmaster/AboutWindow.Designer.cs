@@ -115,7 +115,7 @@
 			this.closeButton.Size = new System.Drawing.Size(75, 23);
 			this.closeButton.TabIndex = 0;
 			this.closeButton.Text = "Close";
-			this.closeButton.Click += new System.EventHandler(this.button1_Click);
+			this.closeButton.Click += new System.EventHandler(this.closeButton_Click);
 			// 
 			// panel1
 			// 

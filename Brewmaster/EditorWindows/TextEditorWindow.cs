@@ -110,18 +110,6 @@ namespace Brewmaster.EditorWindows
 
 			RefreshEditorBreakpoints();
 			RefreshEditorBuildInfo();
-
-			string textType;
-			switch (ProjectFile.File.Extension)
-			{
-				case "s":
-					textType = "Java";
-					break;
-				default:
-					textType = "Text";
-					break;
-			}
-			//AddLanguages(textType);
 			Invalidate();
 
 			if (_fileSystemWatcher == null)
@@ -162,7 +150,7 @@ namespace Brewmaster.EditorWindows
 
 		public override void Save()
 		{
-			if (Pristine) return;
+			//if (Pristine) return;
 			lock (_savingLock)
 			{
 				SavingFile = true;
@@ -190,7 +178,22 @@ namespace Brewmaster.EditorWindows
 			}
 			Pristine = true;
 
-			ProjectFile.Project.LoadAllSymbolsAsync(); // Call on main project to update any files that include this, etc.
+			RefreshSymbolsInProject();
+		}
+
+		private Task _symbolTask;
+		private bool _queueSymbolTask;
+		private void RefreshSymbolsInProject()
+		{
+			// Call on main project to update any files that include this, import labels, etc.
+			if (_symbolTask != null && !_symbolTask.IsCompleted)
+				_queueSymbolTask = true;
+			else
+				_symbolTask = ProjectFile.Project.LoadAllSymbolsAsync()
+					.ContinueWith(t =>
+					{
+						if (_queueSymbolTask) _symbolTask = ProjectFile.Project.LoadAllSymbolsAsync();
+					});
 		}
 
 		private void InitializeComponent()

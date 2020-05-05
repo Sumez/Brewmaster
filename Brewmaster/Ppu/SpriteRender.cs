@@ -43,7 +43,6 @@ namespace Brewmaster.Ppu
 		{
 			if (_data == null) return;
 
-			var location = e.Location;
 			for (var i = 0; i < _data.Details.Count; i++)
 			{
 				var sprite = _data.Details[i];
