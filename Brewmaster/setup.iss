@@ -16,3 +16,8 @@ Source: "bin\Release\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs
 
 [Icons]
 Name: "{group}\Brewmaster"; Filename: "{app}\Brewmaster.exe"
+Name: "{group}\Uninstall Brewmaster"; Filename: "{uninstallexe}"
+Name: "{autodesktop}\My Program"
+
+[Run]
+Filename: "{app}\Brewmaster.exe"; Description: "Launch Brewmaster now"; Flags: postinstall nowait skipifsilent
