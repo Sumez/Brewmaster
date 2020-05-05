@@ -1,10 +1,8 @@
 <img align="right" src="logo.png" alt="Logo" style="margin: 0 0 5px 5px;" />
 
-Download the latest official release here:
-
-[Installer](https://github.com/Sumez/Brewmaster/releases/latest/download/BrewmasterSetup.exe)
-
-[Zip file](https://github.com/Sumez/Brewmaster/releases/latest/download/Brewmaster.zip)
+Download the latest official release here:  
+[Installer](https://github.com/Sumez/Brewmaster/releases/latest/download/BrewmasterSetup.exe)  
+[Zip file](https://github.com/Sumez/Brewmaster/releases/latest/download/Brewmaster.zip)  
 
 # What is Brewmaster?
 ### Great for beginners
@@ -19,7 +17,7 @@ Brewmaster is full of little tools here and there that will hopefully help speed
 
 
 ## Create NES and SNES games
-Templates and default settings will make it easy to build both kinds of projects, and tools and emulators are available for live debugging on both platforms.
+Templates and default settings will make it easy to build both kinds of projects, and tools and emulators are available for live debugging on both platforms.  
 (SPC support to be added in the future)
 
 ### Intelligent configurable syntax highlighting and symbol auto-completion
@@ -62,7 +60,7 @@ Sorry. Brewmaster is designed entirely around the ca65 syntax. I might look into
 ### Will Brewmaster be available on Linux or macOS?
 Brewmaster is created using the .NET WinForms library, which should be supported by Mono, and thus portable. Right now, trying to run the program in Mono will crash it, but if anyone is up to that task, I'd be very welcoming to people willing to test the program on other platforms, or even help creating a multiplatform fork.
 ### Can only NES and SNES programs be created using Brewmaster?
-Technically you can create anything supported by ca65 (such as Atari 2600 and C64), but the built-in emulator tools are currently only for the NES and SNES platforms (including variants and clones, such as Dendy or FDS).
+Technically you can create anything supported by ca65 (such as Atari 2600 and C64), but the built-in emulator tools are currently only for the NES and SNES platforms (including variants and clones, such as Dendy or FDS).  
 If Brewmaster takes off I might look into supporting more emulators or maybe even other assemblers. But right now the focus is on improving the tools for the already supported platforms.
 
 
