@@ -235,11 +235,14 @@ namespace Brewmaster.Emulation
 
 		private readonly EmulationState _state = new EmulationState(ProjectType.Snes)
 		{
-			TileMaps = new TileMapData {NumberOfMaps = 1, DataWidth = 1024 * 4, NumberOfPages = 4}
+			TileMaps = new TileMapData { NumberOfMaps = 1, DataWidth = 1024 * 4, NumberOfPages = 4 },
+			CharacterData = new CharacterData { PixelData = new [] { new byte[0x400000] } }
 		};
 		private GetTilemapOptions _tilemapOptions = new GetTilemapOptions();
-		private GetSpritePreviewOptions _spriteOptions = new GetSpritePreviewOptions();
-
+		private readonly GetSpritePreviewOptions _spriteOptions = new GetSpritePreviewOptions();
+		private GetTileViewOptions _tileViewOptions = new GetTileViewOptions();
+		private readonly byte[] _tileSource = new byte[0x40000];
+		
 		protected override void EmitDebugData()
 		{
 			if (OnRegisterUpdate != null)
@@ -251,6 +254,13 @@ namespace Brewmaster.Emulation
 				_state.Memory.CpuData = SnesDebugApi.GetMemoryState(SnesMemoryType.CpuMemory);
 				SnesDebugApi.GetSpritePreview(_spriteOptions, _state.SnesState.Ppu, _state.Memory.PpuData, _state.Memory.OamData, _state.Memory.CgRam, _state.Sprites.PixelData);
 				_state.Sprites.Details = Sprite.GetSnesSprites(_state.Memory.OamData, _state.SnesState.Ppu.OamMode);
+
+				_tileViewOptions.Format = TileFormat.Bpp4;
+				var source = SnesDebugApi.GetMemoryState(SnesMemoryType.VideoRam);
+				var address = 0;
+				var size = Math.Min(source.Length - address, _tileViewOptions.PageSize);
+				Array.Copy(source, address, _tileSource, 0, size);
+				SnesDebugApi.GetTileView(_tileViewOptions, _tileSource, _tileSource.Length, _state.Memory.CgRam, _state.CharacterData.PixelData[0]);
 
 				OnRegisterUpdate(_state);
 				if (OnTileMapUpdate != null) PushTileMapData(true, true);

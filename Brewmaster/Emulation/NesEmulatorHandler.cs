@@ -247,10 +247,8 @@ namespace Brewmaster.Emulation
 					_debugState.Sprites.PixelData = InteropEmu.DebugGetSprites();
 					_debugState.Sprites.Details = Sprite.GetNesSprites(_debugState.Memory.OamData, _debugState.NesState.PPU.ControlFlags.LargeSprites == 1);
 
-					_debugState.CharacterData.PixelData[0] = InteropEmu.DebugGetChrBank(0, 0, false,
-						CdlHighlightType.None, true, false, out _dummyPaletteData);
-					_debugState.CharacterData.PixelData[0] = InteropEmu.DebugGetChrBank(1, 0, false,
-						CdlHighlightType.None, true, false, out _dummyPaletteData);
+					_debugState.CharacterData.PixelData[0] = InteropEmu.DebugGetChrBank(0, 0, false, CdlHighlightType.None, true, false, out _dummyPaletteData);
+					_debugState.CharacterData.PixelData[1] = InteropEmu.DebugGetChrBank(1, 0, false, CdlHighlightType.None, true, false, out _dummyPaletteData);
 
 					OnRegisterUpdate(_debugState);
 				}
