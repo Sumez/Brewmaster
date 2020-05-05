@@ -1,7 +1,9 @@
-<img align="right" src="/logo.png" alt="Logo" style="margin: 0 0 5px 5px;" />
+<img align="right" src="logo.png" alt="Logo" style="margin: 0 0 5px 5px;" />
 
 Download the latest official release here:
+
 [Installer](https://github.com/Sumez/Brewmaster/releases/latest/download/BrewmasterSetup.exe)
+
 [Zip file](https://github.com/Sumez/Brewmaster/releases/latest/download/Brewmaster.zip)
 
 # What is Brewmaster?
