@@ -65,7 +65,7 @@ namespace Brewmaster
 
 	    private static void Application_ThreadException(object sender, ThreadExceptionEventArgs e)
 	    {
-			throw new Exception(e.Exception.Message);
+			Error(e.Exception.Message, e.Exception);
 	    }
 
 		public static string WorkingDirectory { get; set; }
