@@ -240,7 +240,7 @@ namespace Brewmaster.ProjectModel
 		private void LoadAllSymbols()
 		{
 			var symbols = new List<KeyValuePair<string, Symbol>>();
-			foreach (var sourceFile in Files.Where(f => f.Mode == CompileMode.IncludeInAssembly))
+			foreach (var sourceFile in Files.Where(f => f.IsTextFile && f.Mode != CompileMode.ContentPipeline && f.Mode != CompileMode.LinkerConfig))
 			{
 				sourceFile.AddSymbolsFromFile(symbols);
 			}

@@ -190,7 +190,7 @@ namespace Brewmaster.EditorWindows
 			}
 			Pristine = true;
 
-			ProjectFile.Project.LoadAllSymbolsAsync();
+			ProjectFile.Project.LoadAllSymbolsAsync(); // Call on main project to update any files that include this, etc.
 		}
 
 		private void InitializeComponent()
