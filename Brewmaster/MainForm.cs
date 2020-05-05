@@ -440,7 +440,7 @@ namespace Brewmaster
 			if (RequestFile != null) LoadProject(RequestFile);
 			else if (Settings.ReOpenLastProject && Settings.CurrentProject != null)
 				LoadProject(Settings.CurrentProject);
-		}
+	    }
 
 	    private void RemoveBreakpoints(IEnumerable<Breakpoint> breakpoints)
 		{
@@ -778,7 +778,7 @@ namespace Brewmaster
 			Settings = Brewmaster.Settings.Settings.Load(userSettingsPath);
 	    }
 
-        private void MainForm_Closing(object sender, FormClosingEventArgs e)
+		private void MainForm_Closing(object sender, FormClosingEventArgs e)
         {
 	        if (!CloseCurrentProject(true)) e.Cancel = true;
 			Settings.WindowX = Location.X;
