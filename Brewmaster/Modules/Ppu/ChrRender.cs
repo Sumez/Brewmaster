@@ -17,17 +17,6 @@ namespace Brewmaster.Modules.Ppu
 			SetImageSize(128, 256);
 		}
 
-		private Events _events;
-		public Events ModuleEvents
-		{
-			set
-			{
-				_events = value;
-				if (_events == null) return;
-				_events.EmulationStateUpdate += (state) => UpdateChrData(state.CharacterData, state.Type);
-			}
-		}
-
 		public void UpdateChrData(CharacterData data, ProjectType type)
 		{
 			_data = data;
@@ -39,6 +28,11 @@ namespace Brewmaster.Modules.Ppu
 		{
 			if (_data == null) return;
 
+			if (ImageWidth != _data.Width || ImageHeight != _data.Height * _data.PixelData.Length)
+			{
+				SetImageSize(_data.Width, _data.Height * _data.PixelData.Length);
+			}
+
 			lock (BackBufferLock)
 			using (var graphics = getGraphics())
 			{
@@ -46,9 +40,9 @@ namespace Brewmaster.Modules.Ppu
 				for (var i = 0; i < _data.PixelData.Length; i++)
 				{
 					var handle = GCHandle.Alloc(_data.PixelData[i], GCHandleType.Pinned);
-					using (var source = new Bitmap(128, 128, 4 * 128, PixelFormat.Format32bppPArgb, handle.AddrOfPinnedObject()))
+					using (var source = new Bitmap(_data.Width, _data.Height, 4 * _data.Width, PixelFormat.Format32bppPArgb, handle.AddrOfPinnedObject()))
 					{
-						graphics.DrawImage(source, 0, 128 * i);
+						graphics.DrawImage(source, 0, _data.Height * i);
 					}
 					handle.Free();
 				}

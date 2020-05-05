@@ -1,15 +1,47 @@
 ﻿using System;
 using System.Windows.Forms;
+using Brewmaster.Emulation;
+using Brewmaster.ProjectModel;
 
 namespace Brewmaster.Modules.Ppu
 {
 	public partial class ChrViewer : UserControl
 	{
+		private CharacterData _data;
 
 		public ChrViewer(Events events)
 		{
 			InitializeComponent();
-			_chrDisplay.ModuleEvents = events;
+			events.EmulationStateUpdate += (state) => UpdateChrData(state.CharacterData, state.Type);
+			events.ProjectTypeChanged += (type) =>
+			{
+				var showOptionPanel = type == ProjectType.Snes;
+				if (_snesOptionPanel.Visible != showOptionPanel) _snesOptionPanel.Visible = showOptionPanel;
+			};
+		}
+
+		private void UpdateChrData(CharacterData characterData, ProjectType type)
+		{
+			_data = characterData;
+			_chrDisplay.UpdateChrData(characterData, type);
+			if (_bitDepthSelector.SelectedIndex != characterData.ColorMode && !_bitDepthSelector.Focused) _bitDepthSelector.SelectedIndex = characterData.ColorMode;
+		}
+
+		protected override void OnLoad(EventArgs e)
+		{
+			base.OnLoad(e);
+			_bitDepthSelector.Items.Add("2bpp");
+			_bitDepthSelector.Items.Add("4bpp");
+			_bitDepthSelector.Items.Add("8bpp");
+			_bitDepthSelector.Items.Add("Direct color");
+			_bitDepthSelector.Items.Add("Mode 7");
+			_bitDepthSelector.Items.Add("Mode 7 direct color");
+
+			_bitDepthSelector.SelectedIndexChanged += (s, a) => {
+				if (_data == null) return;
+				_data.RequestRefresh(_bitDepthSelector.SelectedIndex);
+			};
+			_bitDepthSelector.SelectedIndex = 1;
 		}
 
 		protected override void OnLayout(LayoutEventArgs e)
@@ -27,8 +59,6 @@ namespace Brewmaster.Modules.Ppu
 		private void _scaleButton_CheckedChanged(object sender, EventArgs e)
 		{
 			_chrDisplay.FitImage = _scaleButton.Checked;
-			// Removes confusing focus from current button
-			//if (_scaleButton.Focused && _layerButtons.Count > _requestedLayerId) _layerButtons[_requestedLayerId].Focus();
 		}
 	}
 }

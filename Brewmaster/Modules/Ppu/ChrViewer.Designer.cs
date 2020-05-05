@@ -33,18 +33,20 @@
 			this._controlPanel = new System.Windows.Forms.Panel();
 			this._displayButtonPanel = new System.Windows.Forms.FlowLayoutPanel();
 			this._scaleButton = new System.Windows.Forms.CheckBox();
-			this._layerButtonPanel = new System.Windows.Forms.FlowLayoutPanel();
+			this._snesOptionPanel = new System.Windows.Forms.FlowLayoutPanel();
+			this._bitDepthSelector = new System.Windows.Forms.ComboBox();
 			this.horizontalLine1 = new Brewmaster.StatusView.HorizontalLine();
-			this._chrDisplay = new ChrRender();
+			this._chrDisplay = new Brewmaster.Modules.Ppu.ChrRender();
 			RegisterToolTip = new System.Windows.Forms.ToolTip(this.components);
 			this._controlPanel.SuspendLayout();
 			this._displayButtonPanel.SuspendLayout();
+			this._snesOptionPanel.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// _controlPanel
 			// 
 			this._controlPanel.Controls.Add(this._displayButtonPanel);
-			this._controlPanel.Controls.Add(this._layerButtonPanel);
+			this._controlPanel.Controls.Add(this._snesOptionPanel);
 			this._controlPanel.Dock = System.Windows.Forms.DockStyle.Bottom;
 			this._controlPanel.Location = new System.Drawing.Point(0, 598);
 			this._controlPanel.Name = "_controlPanel";
@@ -76,16 +78,29 @@
 			this._scaleButton.UseVisualStyleBackColor = true;
 			this._scaleButton.CheckedChanged += new System.EventHandler(this._scaleButton_CheckedChanged);
 			// 
-			// _layerButtonPanel
+			// _snesOptionPanel
 			// 
-			this._layerButtonPanel.AutoSize = true;
-			this._layerButtonPanel.Dock = System.Windows.Forms.DockStyle.Left;
-			this._layerButtonPanel.Location = new System.Drawing.Point(0, 0);
-			this._layerButtonPanel.MinimumSize = new System.Drawing.Size(30, 25);
-			this._layerButtonPanel.Name = "_layerButtonPanel";
-			this._layerButtonPanel.Size = new System.Drawing.Size(30, 25);
-			this._layerButtonPanel.TabIndex = 0;
-			this._layerButtonPanel.WrapContents = false;
+			this._snesOptionPanel.AutoSize = true;
+			this._snesOptionPanel.Controls.Add(this._bitDepthSelector);
+			this._snesOptionPanel.Dock = System.Windows.Forms.DockStyle.Left;
+			this._snesOptionPanel.Location = new System.Drawing.Point(0, 0);
+			this._snesOptionPanel.MinimumSize = new System.Drawing.Size(30, 25);
+			this._snesOptionPanel.Name = "_snesOptionPanel";
+			this._snesOptionPanel.Size = new System.Drawing.Size(86, 25);
+			this._snesOptionPanel.TabIndex = 2;
+			this._snesOptionPanel.Visible = false;
+			this._snesOptionPanel.WrapContents = false;
+			// 
+			// _bitDepthSelector
+			// 
+			this._bitDepthSelector.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this._bitDepthSelector.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+			this._bitDepthSelector.FormattingEnabled = true;
+			this._bitDepthSelector.Location = new System.Drawing.Point(2, 2);
+			this._bitDepthSelector.Margin = new System.Windows.Forms.Padding(2);
+			this._bitDepthSelector.Name = "_bitDepthSelector";
+			this._bitDepthSelector.Size = new System.Drawing.Size(82, 21);
+			this._bitDepthSelector.TabIndex = 0;
 			// 
 			// horizontalLine1
 			// 
@@ -100,6 +115,7 @@
 			// _chrDisplay
 			// 
 			this._chrDisplay.AutoScroll = true;
+			this._chrDisplay.BackColor = System.Drawing.SystemColors.ControlDarkDark;
 			this._chrDisplay.FitImage = false;
 			this._chrDisplay.Location = new System.Drawing.Point(0, 0);
 			this._chrDisplay.Name = "_chrDisplay";
@@ -119,16 +135,18 @@
 			this._controlPanel.ResumeLayout(false);
 			this._controlPanel.PerformLayout();
 			this._displayButtonPanel.ResumeLayout(false);
+			this._snesOptionPanel.ResumeLayout(false);
 			this.ResumeLayout(false);
 
 		}
 
 		#endregion
 		private System.Windows.Forms.Panel _controlPanel;
-		private System.Windows.Forms.FlowLayoutPanel _layerButtonPanel;
 		private System.Windows.Forms.FlowLayoutPanel _displayButtonPanel;
 		private System.Windows.Forms.CheckBox _scaleButton;
 		private StatusView.HorizontalLine horizontalLine1;
 		private ChrRender _chrDisplay;
+		private System.Windows.Forms.FlowLayoutPanel _snesOptionPanel;
+		private System.Windows.Forms.ComboBox _bitDepthSelector;
 	}
 }

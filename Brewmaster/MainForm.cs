@@ -219,9 +219,9 @@ namespace Brewmaster
 
 				// Load layout
 				var ppuPanel = new IdeGroupedPanel();
+				ppuPanel.AddPanel(new IdePanel(ChrViewer = new ChrViewer(_moduleEvents)) { Label = "Chr" });
 				ppuPanel.AddPanel(new IdePanel(TileMap) { Label = "Tilemaps / Nametables" });
 				ppuPanel.AddPanel(new IdePanel(Sprites = new SpriteViewer(_moduleEvents)) { Label = "Sprites" });
-				ppuPanel.AddPanel(new IdePanel(ChrViewer = new ChrViewer(_moduleEvents)) { Label = "Chr" });
 
 				var memoryPanel = new IdeGroupedPanel();
 				memoryPanel.AddPanel(new IdePanel(MemoryTabs) { Label = "Memory Viewer" });

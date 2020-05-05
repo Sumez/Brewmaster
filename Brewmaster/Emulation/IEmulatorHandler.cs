@@ -66,6 +66,16 @@ namespace Brewmaster.Emulation
 	public class CharacterData
 	{
 		public byte[][] PixelData = new byte[2][];
+		public int Width = 128;
+		public int Height = 128;
+
+		public event Action OnRefreshRequest;
+		public int ColorMode { get; private set; } = 1;
+		public void RequestRefresh(int colorMode)
+		{
+			ColorMode = colorMode;
+			if (OnRefreshRequest != null) OnRefreshRequest();
+		}
 	}
 	public class SpriteData
 	{
