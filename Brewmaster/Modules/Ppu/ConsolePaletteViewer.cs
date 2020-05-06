@@ -6,7 +6,7 @@ namespace Brewmaster.Modules.Ppu
 
 	public class ConsolePaletteViewer : PaletteViewer
 	{
-		public ConsolePaletteViewer()
+		public ConsolePaletteViewer(Events events)
 		{
 			Columns = 16;
 
@@ -20,6 +20,14 @@ namespace Brewmaster.Modules.Ppu
 				}
 				Invalidate();
 			};*/
+			events.ProjectTypeChanged += type =>
+			{
+				Columns = type == ProjectModel.ProjectType.Snes ? (0x20 * 8) : 16;
+				CellWidth = CellHeight = type == ProjectModel.ProjectType.Snes ? 3 : 20;
+
+				Invalidate();
+				FitSize();
+			};
 		}
 		protected override void DrawColor(Graphics graphics, int index, int x, int y)
 		{

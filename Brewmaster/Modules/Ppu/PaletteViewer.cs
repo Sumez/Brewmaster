@@ -21,6 +21,7 @@ namespace Brewmaster.Modules.Ppu
 			CellHeight = 20;
 			DoubleBuffered = true;
 			Font = new Font("Consolas", 12, FontStyle.Bold, GraphicsUnit.Pixel);
+			Layout += (s, a) => FitSize();
 		}
 
 		public Palette Palette
@@ -29,6 +30,7 @@ namespace Brewmaster.Modules.Ppu
 			set
 			{
 				_palette = value;
+				FitSize();
 				Invalidate();
 			}
 		}
@@ -71,6 +73,20 @@ namespace Brewmaster.Modules.Ppu
 				e.Graphics.DrawRectangle(Pens.White, CellWidth * (i % Columns), CellHeight * (i / Columns), CellWidth - 1, CellHeight - 1);
 				e.Graphics.DrawRectangle(Pens.Black, CellWidth * (i % Columns) + 1, CellHeight * (i / Columns) + 1, CellWidth - 3, CellHeight - 3);
 			}
+		}
+		public int BestWidth
+		{
+			get { return Columns * CellWidth; }
+		}
+		public int BestHeight
+		{
+			get { return (Palette.Colors.Count / Columns) * CellHeight; }
+		}
+		protected void FitSize()
+		{
+			if (Palette == null) return;
+			if (Width == BestWidth && Height == BestHeight) return;
+			Size = new Size(BestWidth, BestHeight);
 		}
 
 		protected virtual void DrawColor(Graphics graphics, int index, int x, int y)

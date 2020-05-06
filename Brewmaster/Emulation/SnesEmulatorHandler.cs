@@ -245,20 +245,20 @@ namespace Brewmaster.Emulation
 		
 		protected override void EmitDebugData()
 		{
-			if (OnRegisterUpdate != null)
-			{
-				_state.SnesState = SnesDebugApi.GetState();
-				_state.Memory.PpuData = SnesDebugApi.GetMemoryState(SnesMemoryType.VideoRam);
-				_state.Memory.OamData = SnesDebugApi.GetMemoryState(SnesMemoryType.SpriteRam);
-				_state.Memory.CgRam = SnesDebugApi.GetMemoryState(SnesMemoryType.CGRam);
-				_state.Memory.CpuData = SnesDebugApi.GetMemoryState(SnesMemoryType.CpuMemory);
-				SnesDebugApi.GetSpritePreview(_spriteOptions, _state.SnesState.Ppu, _state.Memory.PpuData, _state.Memory.OamData, _state.Memory.CgRam, _state.Sprites.PixelData);
-				_state.Sprites.Details = Sprite.GetSnesSprites(_state.Memory.OamData, _state.SnesState.Ppu.OamMode);
-				GetCharacterData();
-				GetTileMapData();
+			if (OnRegisterUpdate == null) return;
 
-				OnRegisterUpdate(_state);
-			}
+			_state.SnesState = SnesDebugApi.GetState();
+			_state.Memory.PpuData = SnesDebugApi.GetMemoryState(SnesMemoryType.VideoRam);
+			_state.Memory.OamData = SnesDebugApi.GetMemoryState(SnesMemoryType.SpriteRam);
+			_state.Memory.CgRam = SnesDebugApi.GetMemoryState(SnesMemoryType.CGRam);
+			_state.Memory.CpuData = SnesDebugApi.GetMemoryState(SnesMemoryType.CpuMemory);
+			SnesDebugApi.GetSpritePreview(_spriteOptions, _state.SnesState.Ppu, _state.Memory.PpuData, _state.Memory.OamData, _state.Memory.CgRam, _state.Sprites.PixelData);
+			_state.Sprites.Details = Sprite.GetSnesSprites(_state.Memory.OamData, _state.SnesState.Ppu.OamMode);
+
+			GetCharacterData();
+			GetTileMapData();
+
+			OnRegisterUpdate(_state);
 		}
 
 		private void PushCharacterData()

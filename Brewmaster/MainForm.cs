@@ -220,8 +220,8 @@ namespace Brewmaster
 				lineAddressMappingsMenuItem.Checked = Settings.ShowLineAddresses;
 
 				// Load layout
-				new IdePanel(ConsolePaletteViewer = new ConsolePaletteViewer()) { Label = "Global palette" };
-				var palette = new IdePanel(GamePaletteViewer = new GamePaletteViewer(_moduleEvents)) { Label = "Palette" };
+				new IdePanel(new ScrollableView(ConsolePaletteViewer = new ConsolePaletteViewer(_moduleEvents))) { Label = "Global palette" };
+				var palette = new IdePanel(new ScrollableView(GamePaletteViewer = new GamePaletteViewer(_moduleEvents))) { Label = "Palette" };
 
 				var ppuPanel = new IdeGroupedPanel();
 				ppuPanel.AddPanel(new IdePanel(ChrViewer = new ChrViewer(_moduleEvents)) { Label = "Chr" });

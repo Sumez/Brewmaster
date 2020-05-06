@@ -177,7 +177,7 @@ namespace Brewmaster.MemoryViewer
 
 			var text = string.Format("Address: {0}\nValue: ${1} ({2})\nWord value: ${3} ({4})", addressHex, valueHex, value, wordValueHex, wordValue);
 
-			AddressDetails.Show(text, this, e.Location.X + 20, e.Location.Y);
+			AddressDetails.Show(text, this, e.Location.X + 20, e.Location.Y + 2);
 		}
 		protected override void OnMouseLeave(EventArgs e)
 		{

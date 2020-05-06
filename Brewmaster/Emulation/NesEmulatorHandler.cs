@@ -241,6 +241,7 @@ namespace Brewmaster.Emulation
 					_debugState.Memory.CpuData = InteropEmu.DebugGetMemoryState(DebugMemoryType.CpuMemory);
 					_debugState.Memory.PpuData = InteropEmu.DebugGetMemoryState(DebugMemoryType.PpuMemory);
 					_debugState.Memory.OamData = InteropEmu.DebugGetMemoryState(DebugMemoryType.SpriteMemory);
+					_debugState.Memory.CgRam = InteropEmu.DebugGetMemoryState(DebugMemoryType.PaletteMemory);
 
 					InteropEmu.DebugGetState(ref _debugState.NesState);
 					_debugState.Sprites.PixelData = InteropEmu.DebugGetSprites();
@@ -248,9 +249,6 @@ namespace Brewmaster.Emulation
 
 					_debugState.CharacterData.PixelData[0] = InteropEmu.DebugGetChrBank(0, 0, false, CdlHighlightType.None, true, false, out _dummyPaletteData);
 					_debugState.CharacterData.PixelData[1] = InteropEmu.DebugGetChrBank(1, 0, false, CdlHighlightType.None, true, false, out _dummyPaletteData);
-
-					//_debugState.Palette = InteropEmu.DebugGetPalette();
-					_debugState.Palette = InteropEmu.DebugGetMemoryState(DebugMemoryType.PaletteMemory).Select(v => (int)v).ToArray();
 
 					GetNametableData();
 

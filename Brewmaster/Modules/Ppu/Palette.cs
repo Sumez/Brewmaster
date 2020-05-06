@@ -7,6 +7,7 @@ namespace Brewmaster.Modules.Ppu
 	public class Palette
 	{
 		public List<Color> Colors { get; set; }
+		private bool _snes = false;
 
 		public Palette()
 		{
@@ -26,6 +27,20 @@ namespace Brewmaster.Modules.Ppu
 			}
 		}
 
+		public Color Get(int index)
+		{
+			if (!_snes) return Colors[index];
+			var r = To8Bit(index & 0x1F);
+			var g = To8Bit((index >> 5) & 0x1F);
+			var b = To8Bit((index >> 10) & 0x1F);
+
+			return Color.FromArgb(r, g, b);
+		}
+		private static int To8Bit(int color)
+		{
+			return ((color << 3) + (color >> 2));
+		}
+
 		public byte[] GetBinary(bool argb = true)
 		{
 			var returnValue = new List<byte>();
@@ -43,7 +58,11 @@ namespace Brewmaster.Modules.Ppu
 
 		public void LoadSnesPalette()
 		{
-			// TODO
+			_snes = true;
+			//return;
+
+			Colors = new List<Color>();
+			for (var i = 0; i < 0x8000; i++) Colors.Add(Get(i));
 		}
 	}
 

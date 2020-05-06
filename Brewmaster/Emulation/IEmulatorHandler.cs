@@ -57,7 +57,6 @@ namespace Brewmaster.Emulation
 		public Mesen.GUI.DebugState SnesState;
 		public ProjectType Type { get; }
 
-		public int[] Palette;
 		public SpriteData Sprites = new SpriteData();
 		public CharacterData CharacterData = new CharacterData();
 		public TileMapData TileMaps;
