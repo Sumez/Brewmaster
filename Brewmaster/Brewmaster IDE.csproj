@@ -191,10 +191,16 @@
     <Compile Include="Modules\Ppu\ChrViewer.Designer.cs">
       <DependentUpon>ChrViewer.cs</DependentUpon>
     </Compile>
-    <Compile Include="Modules\Ppu\NesPaletteViewer.cs">
+    <Compile Include="Modules\Ppu\ConsolePaletteViewer.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Modules\Ppu\GamePaletteViewer.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Modules\Ppu\Palette.cs" />
+    <Compile Include="Modules\Ppu\PaletteViewer.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Modules\SpriteList\Sprite.cs" />
     <Compile Include="Modules\SpriteList\SpriteList.cs">
       <SubType>Component</SubType>

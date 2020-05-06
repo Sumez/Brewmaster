@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -76,69 +75,8 @@ namespace Brewmaster.Modules.Ppu
 
 		protected virtual void DrawColor(Graphics graphics, int index, int x, int y)
 		{
-			graphics.FillRectangle(new SolidBrush(Palette.Colors[index]), x, y, CellWidth, CellHeight);
-		}
-	}
-
-	public class ConsolePaletteViewer : PaletteViewer
-	{
-		public ConsolePaletteViewer()
-		{
-			Columns = 16;
-
-			// TODO configurable palettes:
-			/*ColorClicked += index =>
-			{
-				using (var colorDialog = new ColorDialog { Color = Palette.Colors[index] })
-				{
-					colorDialog.ShowDialog(this);
-					Palette.Colors[index] = colorDialog.Color;
-				}
-				Invalidate();
-			};*/
-		}
-		protected override void DrawColor(Graphics graphics, int index, int x, int y)
-		{
-			base.DrawColor(graphics, index, x, y);
-			if (index != HoverIndex) return;
-
-			var brightness = Palette.Colors[index].GetBrightness();
-			var hex = Convert.ToString(index, 16).PadLeft(2, '0').ToUpper();
-			graphics.DrawString(hex, Font, brightness >= 0.7f ? Brushes.Black : Brushes.White, x + 1, y + 3);
-		}
-	}
-
-	public class GamePaletteViewer : PaletteViewer
-	{
-		private int[] _paletteIndexes;
-		public Palette SourcePalette { get; set; }
-
-		public GamePaletteViewer(Events events)
-		{
-			Columns = 4;
-			CellWidth = 40;
-			CellHeight = 40;
-
-			Palette = new Palette();
-			events.EmulationStateUpdate += state =>
-			{
-				Palette.Colors = new List<Color>(state.Palette.Length);
-				_paletteIndexes = state.Palette;
-				for (var i = 0; i < state.Palette.Length; i++)
-				{
-					Palette.Colors.Add(SourcePalette.Colors[_paletteIndexes[i]]);
-				}
-				Invalidate();
-			};
-		}
-
-		protected override void DrawColor(Graphics graphics, int index, int x, int y)
-		{
-			base.DrawColor(graphics, index, x, y);
-
-			var brightness = Palette.Colors[index].GetBrightness();
-			var hex = Convert.ToString(_paletteIndexes[index], 16).PadLeft(2, '0').ToUpper();
-			graphics.DrawString(hex, Font, brightness >= 0.7f ? Brushes.Black : Brushes.White, x + 2, y + 2);
+			using (var brush = new SolidBrush(Palette.Colors[index]))
+				graphics.FillRectangle(brush, x, y, CellWidth, CellHeight);
 		}
 	}
 }
