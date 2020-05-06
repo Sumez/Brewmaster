@@ -122,8 +122,7 @@ namespace Brewmaster.Ide
 	    public string Label
 	    {
 		    get { return _label.Text; }
-			set { _label.Text = value; }
-
+		    set { _label.Text = value; }
 		}
 
 	    /*protected override void OnPaint(PaintEventArgs e)

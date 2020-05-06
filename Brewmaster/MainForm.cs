@@ -39,7 +39,9 @@ namespace Brewmaster
 	    public Settings.Settings Settings { get; private set; }
 		public SpriteViewer Sprites { get; private set; }
 		public ChrViewer ChrViewer { get; private set; }
-	    public SpriteList SpriteList { get; private set; }
+		public SpriteList SpriteList { get; private set; }
+		public ConsolePaletteViewer ConsolePaletteViewer { get; private set; }
+		public GamePaletteViewer GamePaletteViewer { get; private set; }
 	    public LayoutHandler LayoutHandler { get; private set; }
 	    public BuildHandler BuildHandler { get; private set; }
 	    public string RequestFile { get; set; }
@@ -218,10 +220,15 @@ namespace Brewmaster
 				lineAddressMappingsMenuItem.Checked = Settings.ShowLineAddresses;
 
 				// Load layout
+				new IdePanel(new ScrollableView(ConsolePaletteViewer = new ConsolePaletteViewer(_moduleEvents))) { Label = "Global palette" };
+				var palette = new IdePanel(new ScrollableView(GamePaletteViewer = new GamePaletteViewer(_moduleEvents))) { Label = "Palette" };
+
 				var ppuPanel = new IdeGroupedPanel();
 				ppuPanel.AddPanel(new IdePanel(ChrViewer = new ChrViewer(_moduleEvents)) { Label = "Chr" });
-				ppuPanel.AddPanel(new IdePanel(TileMap) { Label = "Tilemaps / Nametables" });
+				TileMap.ModuleEvents = _moduleEvents;
+				ppuPanel.AddPanel(new IdePanel(TileMap) { Label = "Nametables" });
 				ppuPanel.AddPanel(new IdePanel(Sprites = new SpriteViewer(_moduleEvents)) { Label = "Sprites" });
+				ppuPanel.AddPanel(palette);
 
 				var memoryPanel = new IdeGroupedPanel();
 				memoryPanel.AddPanel(new IdePanel(MemoryTabs) { Label = "Memory Viewer" });
@@ -276,6 +283,9 @@ namespace Brewmaster
 				AddWindowOption(WatchValues);
 				AddWindowOption(BreakpointList);
 				AddWindowOption(ErrorList);
+
+				AddWindowOption(ConsolePaletteViewer);
+				AddWindowOption(GamePaletteViewer);
 
 				// Setup features
 				BuildHandler = new BuildHandler();
@@ -348,7 +358,6 @@ namespace Brewmaster
 				// TODO: Suggest resetting settings?
 				throw ex;
 			}
-
 			ResumeLayout();
         }
 
@@ -395,6 +404,7 @@ namespace Brewmaster
 			if (idePanel == null) return;
 
 			var menuItem = new ToolStripMenuItem(idePanel.Label);
+			idePanel.LabelChanged += label => { menuItem.Text = label; };
 			menuItem.Checked = idePanel.FindForm() != null;
 			menuItem.Click += (s, e) => {
 				if (menuItem.Checked) LayoutHandler.HidePanel(idePanel);
@@ -480,7 +490,9 @@ namespace Brewmaster
 			if (RequestFile != null) LoadProject(RequestFile);
 			else if (Settings.ReOpenLastProject && Settings.CurrentProject != null)
 				LoadProject(Settings.CurrentProject);
-	    }
+			else
+				_moduleEvents.SetProjectType(ProjectType.Nes);
+		}
 
 	    private void RemoveBreakpoints(IEnumerable<Breakpoint> breakpoints)
 		{
@@ -510,8 +522,10 @@ namespace Brewmaster
 		private void LoadEmulator(ProjectType projectType)
 	    {
 		    mesen.SwitchSystem(projectType, (e) => InitializeEmulator(e, projectType));
+		    if (projectType == ProjectType.Nes) GamePaletteViewer.SourcePalette = ConsolePaletteViewer.Palette = mesen.EmulatorSettings.NesPalette;
+		    if (projectType == ProjectType.Snes) GamePaletteViewer.SourcePalette = ConsolePaletteViewer.Palette = mesen.EmulatorSettings.SnesPalette;
 			// TODO: Use events object and/or go through mesen control
-		    CpuMemoryViewer.DataChanged = mesen.Emulator.SetCpuMemory;
+			CpuMemoryViewer.DataChanged = mesen.Emulator.SetCpuMemory;
 		    PpuMemoryViewer.DataChanged = mesen.Emulator.SetPpuMemory;
 		    OamMemoryViewer.DataChanged = mesen.Emulator.SetOamMemory;
 	    }
@@ -523,7 +537,6 @@ namespace Brewmaster
 		    emulator.OnRun += ActivateBreakPointsForCurrentProject;
 		    emulator.OnStatusChange += ThreadSafeStatusHandler;
 		    emulator.OnRegisterUpdate += ThreadSafeDebugStateHandler;
-		    emulator.OnTileMapUpdate += TileMap.UpdateNametableData;
 			emulator.OnFpsUpdate += fps => BeginInvoke(new Action<int>(UpdateFps), fps);
 
 		    cpuStatus1.StateEdited = emulator.ForceNewState;
@@ -539,10 +552,6 @@ namespace Brewmaster
 			if (mesen.Emulator == null) return;
 
 			mesen.Emulator.Stop();
-			CpuMemoryViewer.DataChanged -= mesen.Emulator.SetCpuMemory;
-			PpuMemoryViewer.DataChanged -= mesen.Emulator.SetPpuMemory;
-			OamMemoryViewer.DataChanged -= mesen.Emulator.SetOamMemory;
-
 			mesen.UnloadEmulator();
 		}
 

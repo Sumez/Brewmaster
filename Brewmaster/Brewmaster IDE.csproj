@@ -158,6 +158,13 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Emulation\EmulatorHandler.cs" />
+    <Compile Include="MemoryViewer\HexEditor.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MemoryViewer\HexEditor.Drawing.cs">
+      <SubType>Component</SubType>
+      <DependentUpon>HexEditor.cs</DependentUpon>
+    </Compile>
     <Compile Include="Modules\Breakpoints\BreakpointEditor.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -183,6 +190,19 @@
     </Compile>
     <Compile Include="Modules\Ppu\ChrViewer.Designer.cs">
       <DependentUpon>ChrViewer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Ppu\ConsolePaletteViewer.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Modules\Ppu\GamePaletteViewer.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Modules\Ppu\Palette.cs" />
+    <Compile Include="Modules\Ppu\PaletteViewer.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Modules\ScrollableView.cs">
+      <SubType>Component</SubType>
     </Compile>
     <Compile Include="Modules\SpriteList\Sprite.cs" />
     <Compile Include="Modules\SpriteList\SpriteList.cs">
@@ -301,7 +321,7 @@
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
     <Compile Include="MemoryViewer\MemoryViewer.cs">
-      <SubType>Component</SubType>
+      <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Modules\Breakpoints\BreakpointList.cs">
       <SubType>Component</SubType>
@@ -606,6 +626,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="lib\Mesen\PixelFont.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="nes.pal">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="packages.config" />

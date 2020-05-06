@@ -343,7 +343,6 @@ namespace Brewmaster
 			this.CpuMemoryTab.Controls.Add(this.CpuMemoryViewer);
 			this.CpuMemoryTab.Location = new System.Drawing.Point(4, 4);
 			this.CpuMemoryTab.Name = "CpuMemoryTab";
-			this.CpuMemoryTab.Padding = new System.Windows.Forms.Padding(3);
 			this.CpuMemoryTab.Size = new System.Drawing.Size(848, 424);
 			this.CpuMemoryTab.TabIndex = 0;
 			this.CpuMemoryTab.Text = "CPU";
@@ -364,7 +363,6 @@ namespace Brewmaster
 			this.PpuMemoryTab.Controls.Add(this.PpuMemoryViewer);
 			this.PpuMemoryTab.Location = new System.Drawing.Point(4, 4);
 			this.PpuMemoryTab.Name = "PpuMemoryTab";
-			this.PpuMemoryTab.Padding = new System.Windows.Forms.Padding(3);
 			this.PpuMemoryTab.Size = new System.Drawing.Size(848, 424);
 			this.PpuMemoryTab.TabIndex = 1;
 			this.PpuMemoryTab.Text = "PPU";
@@ -385,7 +383,6 @@ namespace Brewmaster
 			this.OamMemoryTab.Controls.Add(this.OamMemoryViewer);
 			this.OamMemoryTab.Location = new System.Drawing.Point(4, 4);
 			this.OamMemoryTab.Name = "OamMemoryTab";
-			this.OamMemoryTab.Padding = new System.Windows.Forms.Padding(3);
 			this.OamMemoryTab.Size = new System.Drawing.Size(848, 424);
 			this.OamMemoryTab.TabIndex = 2;
 			this.OamMemoryTab.Text = "OAM";

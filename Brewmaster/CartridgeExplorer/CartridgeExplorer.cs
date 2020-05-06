@@ -4,7 +4,6 @@ namespace Brewmaster.CartridgeExplorer
 {
 	public class CartridgeExplorer: TreeView
 	{
-		private ImageList CartridgeIconList;
 		private System.ComponentModel.IContainer components;
 
 		public CartridgeExplorer()
@@ -35,23 +34,7 @@ namespace Brewmaster.CartridgeExplorer
 
 		private void InitializeComponent()
 		{
-			this.components = new System.ComponentModel.Container();
-			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CartridgeExplorer));
-			this.CartridgeIconList = new System.Windows.Forms.ImageList(this.components);
 			this.SuspendLayout();
-			// 
-			// CartridgeIconList
-			// 
-			this.CartridgeIconList.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("CartridgeIconList.ImageStream")));
-			this.CartridgeIconList.TransparentColor = System.Drawing.Color.Transparent;
-			this.CartridgeIconList.Images.SetKeyName(0, "cartridge.png");
-			this.CartridgeIconList.Images.SetKeyName(1, "chip.png");
-			// 
-			// CartridgeExplorer
-			// 
-			this.ImageIndex = 0;
-			this.ImageList = this.CartridgeIconList;
-			this.SelectedImageIndex = 0;
 			this.ResumeLayout(false);
 
 		}

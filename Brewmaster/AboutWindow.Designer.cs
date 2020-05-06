@@ -29,7 +29,6 @@
         private void InitializeComponent()
         {
 			System.Windows.Forms.Label header;
-			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AboutWindow));
 			this.text = new System.Windows.Forms.Label();
 			this.panel2 = new System.Windows.Forms.Panel();
 			this.logoPicture1 = new Brewmaster.LogoPicture();
@@ -43,16 +42,6 @@
 			this.panel3.SuspendLayout();
 			this.SuspendLayout();
 			// 
-			// text
-			// 
-			this.text.AutoSize = true;
-			this.text.Location = new System.Drawing.Point(113, 74);
-			this.text.Name = "text";
-			this.text.Size = new System.Drawing.Size(217, 65);
-			this.text.TabIndex = 4;
-			this.text.Text = "Version 0.1.0\r\n\r\nAn open source homebrew IDE for Windows\r\n\r\n2019-2020 Created by " +
-    "Sumez";
-			// 
 			// header
 			// 
 			header.AutoSize = true;
@@ -62,6 +51,16 @@
 			header.Size = new System.Drawing.Size(153, 34);
 			header.TabIndex = 5;
 			header.Text = "Brewmaster";
+			// 
+			// text
+			// 
+			this.text.AutoSize = true;
+			this.text.Location = new System.Drawing.Point(113, 74);
+			this.text.Name = "text";
+			this.text.Size = new System.Drawing.Size(217, 65);
+			this.text.TabIndex = 4;
+			this.text.Text = "Version 0.1.0\r\n\r\nAn open source homebrew IDE for Windows\r\n\r\n2019-2020 Created by " +
+    "Sumez";
 			// 
 			// panel2
 			// 
@@ -132,10 +131,10 @@
 			this.ClientSize = new System.Drawing.Size(387, 210);
 			this.Controls.Add(this.panel2);
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
-			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MaximizeBox = false;
 			this.MinimizeBox = false;
 			this.Name = "AboutWindow";
+			this.ShowIcon = false;
 			this.ShowInTaskbar = false;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "About Brewmaster";

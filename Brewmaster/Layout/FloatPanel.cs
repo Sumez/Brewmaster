@@ -87,6 +87,7 @@ namespace Brewmaster.Ide
 		public void SetChildPanel(IdePanel panel)
 		{
 			if (Controls.Count >= 0) Controls.Clear();
+			panel.Dock = DockStyle.Fill;
 			Controls.Add(panel);
 		}
 		public IdePanel ChildPanel { get { return Controls[0] as IdePanel; } }

@@ -4,6 +4,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using Brewmaster.Modules.Ppu;
 using Brewmaster.ProjectModel;
 using Brewmaster.Settings;
 
@@ -58,6 +59,12 @@ namespace Brewmaster.Emulation
 				_isSpeedTolTipVisible = true;
 				_toolTip.Show(EmulationSpeed[_speedSlider.Value] + "%", _speedSlider, Point.Add(_speedSlider.Location, new Size(45, -25)));
 			};
+
+			// Loading files synchronously in constructor is bad practice, but the file is small, and this should only happen when program starts anyway
+			// In the future, maybe get settings-object from a thread that loads all settings async on startup
+			EmulatorSettings = new EmulatorSettings();
+			EmulatorSettings.NesPalette.Load(Path.Combine(Program.WorkingDirectory, "nes.pal")); // TODO: custom palettes
+			EmulatorSettings.SnesPalette.LoadSnesPalette();
 		}
 
 		private bool _isSpeedTolTipVisible = false;
@@ -184,75 +191,59 @@ namespace Brewmaster.Emulation
 			}
 		}
 
-		private EmulatorSettings _emulatorSettings = new EmulatorSettings();
+		public EmulatorSettings EmulatorSettings { get; private set; }
 
-		public class EmulatorSettings
-		{
-			public bool RandomPowerOnState = true;
-			public bool PlayAudio = true;
-			public bool ShowBgLayer = true;
-			public bool ShowBgLayer1 = true;
-			public bool ShowBgLayer2 = true;
-			public bool ShowBgLayer3 = true;
-			public bool ShowBgLayer4 = true;
-			public bool ShowSpriteLayer = true;
-			public bool PlaySquare1 = true;
-			public bool PlaySquare2 = true;
-			public bool PlayTriangle = true;
-			public bool PlayNoise = true;
-			public bool PlayPcm = true;
-		}
 		public bool RandomPowerOnState
 		{
-			set { _emulatorSettings.RandomPowerOnState = value; if (Emulator != null) Emulator.UpdateSettings(_emulatorSettings); }
+			set { EmulatorSettings.RandomPowerOnState = value; if (Emulator != null) Emulator.UpdateSettings(EmulatorSettings); }
 		}
 		public bool PlayAudio
 		{
-			set { _emulatorSettings.PlayAudio = value; if (Emulator != null) Emulator.UpdateSettings(_emulatorSettings); }
+			set { EmulatorSettings.PlayAudio = value; if (Emulator != null) Emulator.UpdateSettings(EmulatorSettings); }
 		}
 		public bool ShowBgLayer
 		{
-			set { _emulatorSettings.ShowBgLayer = value; if (Emulator != null) Emulator.UpdateSettings(_emulatorSettings); }
+			set { EmulatorSettings.ShowBgLayer = value; if (Emulator != null) Emulator.UpdateSettings(EmulatorSettings); }
 		}
 		public bool ShowBgLayer1
 		{
-			set { _emulatorSettings.ShowBgLayer1 = value; if (Emulator != null) Emulator.UpdateSettings(_emulatorSettings); }
+			set { EmulatorSettings.ShowBgLayer1 = value; if (Emulator != null) Emulator.UpdateSettings(EmulatorSettings); }
 		}
 		public bool ShowBgLayer2
 		{
-			set { _emulatorSettings.ShowBgLayer2 = value; if (Emulator != null) Emulator.UpdateSettings(_emulatorSettings); }
+			set { EmulatorSettings.ShowBgLayer2 = value; if (Emulator != null) Emulator.UpdateSettings(EmulatorSettings); }
 		}
 		public bool ShowBgLayer3
 		{
-			set { _emulatorSettings.ShowBgLayer3 = value; if (Emulator != null) Emulator.UpdateSettings(_emulatorSettings); }
+			set { EmulatorSettings.ShowBgLayer3 = value; if (Emulator != null) Emulator.UpdateSettings(EmulatorSettings); }
 		}
 		public bool ShowBgLayer4
 		{
-			set { _emulatorSettings.ShowBgLayer4 = value; if (Emulator != null) Emulator.UpdateSettings(_emulatorSettings); }
+			set { EmulatorSettings.ShowBgLayer4 = value; if (Emulator != null) Emulator.UpdateSettings(EmulatorSettings); }
 		}
 		public bool ShowSpriteLayer
 		{
-			set { _emulatorSettings.ShowSpriteLayer = value; if (Emulator != null) Emulator.UpdateSettings(_emulatorSettings); }
+			set { EmulatorSettings.ShowSpriteLayer = value; if (Emulator != null) Emulator.UpdateSettings(EmulatorSettings); }
 		}
 		public bool PlaySquare1
 		{
-			set { _emulatorSettings.PlaySquare1 = value; if (Emulator != null) Emulator.UpdateSettings(_emulatorSettings); }
+			set { EmulatorSettings.PlaySquare1 = value; if (Emulator != null) Emulator.UpdateSettings(EmulatorSettings); }
 		}
 		public bool PlaySquare2
 		{
-			set { _emulatorSettings.PlaySquare2 = value; if (Emulator != null) Emulator.UpdateSettings(_emulatorSettings); }
+			set { EmulatorSettings.PlaySquare2 = value; if (Emulator != null) Emulator.UpdateSettings(EmulatorSettings); }
 		}
 		public bool PlayTriangle
 		{
-			set { _emulatorSettings.PlayTriangle = value; if (Emulator != null) Emulator.UpdateSettings(_emulatorSettings); }
+			set { EmulatorSettings.PlayTriangle = value; if (Emulator != null) Emulator.UpdateSettings(EmulatorSettings); }
 		}
 		public bool PlayNoise
 		{
-			set { _emulatorSettings.PlayNoise = value; if (Emulator != null) Emulator.UpdateSettings(_emulatorSettings); }
+			set { EmulatorSettings.PlayNoise = value; if (Emulator != null) Emulator.UpdateSettings(EmulatorSettings); }
 		}
 		public bool PlayPcm
 		{
-			set { _emulatorSettings.PlayPcm = value; if (Emulator != null) Emulator.UpdateSettings(_emulatorSettings); }
+			set { EmulatorSettings.PlayPcm = value; if (Emulator != null) Emulator.UpdateSettings(EmulatorSettings); }
 		}
 
 		public Color EmulatorBackgroundColor { set { _renderer.BackColor = value; Invalidate(); } }
@@ -303,7 +294,7 @@ namespace Brewmaster.Emulation
 				? _snesEmulator
 				: _nesEmulator;
 
-			Emulator.UpdateSettings(_emulatorSettings);
+			Emulator.UpdateSettings(EmulatorSettings);
 			currentMapping = mappings[projectType];
 			Emulator.UpdateControllerMappings(currentMapping);
 			_currentProjectType = projectType;
@@ -427,5 +418,24 @@ namespace Brewmaster.Emulation
 			_currentFile = Path.GetFileNameWithoutExtension(file);
 			if (Emulator != null) Emulator.LoadCartridgeAtSameState(directory, file, getPc);
 		}
+	}
+
+	public class EmulatorSettings
+	{
+		public bool RandomPowerOnState = true;
+		public bool PlayAudio = true;
+		public bool ShowBgLayer = true;
+		public bool ShowBgLayer1 = true;
+		public bool ShowBgLayer2 = true;
+		public bool ShowBgLayer3 = true;
+		public bool ShowBgLayer4 = true;
+		public bool ShowSpriteLayer = true;
+		public bool PlaySquare1 = true;
+		public bool PlaySquare2 = true;
+		public bool PlayTriangle = true;
+		public bool PlayNoise = true;
+		public bool PlayPcm = true;
+		public Palette NesPalette = new Palette();
+		public Palette SnesPalette = new Palette();
 	}
 }

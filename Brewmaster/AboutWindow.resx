@@ -120,29 +120,4 @@
   <metadata name="header.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>False</value>
   </metadata>
-  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-  <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-    <value>
-        AAABAAEAEBAAAAEAIABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAA
-        AAD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP//
-        /wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP//
-        /wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP//
-        /wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP//
-        /wD///8A////AP///wD///8AAAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAA
-        AP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP+Ghob/hoaG/4aGhv+Ghob/hoaG/729vf+9vb3/vb29/4aG
-        hv+Ghob/hoaG/4aGhv+Ghob/hoaG/wAAAP8AAAD/hoaG/2tra/8AAAD/a2tr/2tra/+Ghob/hoaG/4aG
-        hv8AAP//AAD//4aGhv8AAP//AAD//4aGhv8AAAD/AAAA/4aGhv8AAAD/AAAA/wAAAP9ra2v/vb29/729
-        vf+9vb3/AAD//wAA//+Ghob/AAD//wAA//+Ghob/AAAA/wAAAP+Ghob/a2tr/wAAAP9ra2v/a2tr/729
-        vf+9vb3/vb29/2tra/9ra2v/a2tr/2tra/9ra2v/hoaG/wAAAP8AAAD/hoaG/4aGhv+Ghob/hoaG/4aG
-        hv+9vb3/vb29/729vf+Ghob/hoaG/4aGhv+Ghob/hoaG/4aGhv8AAAD/AAAA/wAAAP8AAAD/AAAA/wAA
-        AP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/////wD///8A////AP//
-        /wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP//
-        /wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP//
-        /wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP//
-        /wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP//
-        /wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP//
-        /wD///8A//8AAP//AAD//wAA//8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD//wAA//8AAP//
-        AAD//wAA//8AAA==
-</value>
-  </data>
 </root>

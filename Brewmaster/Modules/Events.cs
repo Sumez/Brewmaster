@@ -54,10 +54,12 @@ namespace Brewmaster.Modules
 			if (SelectedSpriteChanged != null) SelectedSpriteChanged(SelectedSprite);
 		}
 
+		private bool _projectTypeInitialized = false;
 		public void SetProjectType(ProjectType projectType)
 		{
-			if (projectType == ProjectType) return;
+			if (projectType == ProjectType && _projectTypeInitialized) return;
 			ProjectType = projectType;
+			_projectTypeInitialized = true;
 			if (ProjectTypeChanged != null) ProjectTypeChanged(projectType);
 		}
 
