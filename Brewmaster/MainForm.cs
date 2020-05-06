@@ -539,10 +539,6 @@ namespace Brewmaster
 			if (mesen.Emulator == null) return;
 
 			mesen.Emulator.Stop();
-			CpuMemoryViewer.DataChanged -= mesen.Emulator.SetCpuMemory;
-			PpuMemoryViewer.DataChanged -= mesen.Emulator.SetPpuMemory;
-			OamMemoryViewer.DataChanged -= mesen.Emulator.SetOamMemory;
-
 			mesen.UnloadEmulator();
 		}
 
