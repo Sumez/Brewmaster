@@ -163,7 +163,7 @@
     </Compile>
     <Compile Include="MemoryViewer\HexEditor.Drawing.cs">
       <SubType>Component</SubType>
-	  <DependentUpon>HexEditor.cs</DependentUpon>
+      <DependentUpon>HexEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="Modules\Breakpoints\BreakpointEditor.cs">
       <SubType>Form</SubType>
@@ -191,6 +191,10 @@
     <Compile Include="Modules\Ppu\ChrViewer.Designer.cs">
       <DependentUpon>ChrViewer.cs</DependentUpon>
     </Compile>
+    <Compile Include="Modules\Ppu\NesPaletteViewer.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Modules\Ppu\Palette.cs" />
     <Compile Include="Modules\SpriteList\Sprite.cs" />
     <Compile Include="Modules\SpriteList\SpriteList.cs">
       <SubType>Component</SubType>
@@ -613,6 +617,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="lib\Mesen\PixelFont.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="nes.pal">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="packages.config" />

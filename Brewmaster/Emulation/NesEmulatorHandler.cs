@@ -25,7 +25,6 @@ namespace Brewmaster.Emulation
 		public event Action<int> OnBreak;
 		public event Action<EmulatorStatus> OnStatusChange;
 		public event Action<EmulationState> OnRegisterUpdate;
-		public event Action<TileMapData> OnTileMapUpdate;
 
 		public NesEmulatorHandler(Form mainWindow)
 		{
@@ -250,23 +249,29 @@ namespace Brewmaster.Emulation
 					_debugState.CharacterData.PixelData[0] = InteropEmu.DebugGetChrBank(0, 0, false, CdlHighlightType.None, true, false, out _dummyPaletteData);
 					_debugState.CharacterData.PixelData[1] = InteropEmu.DebugGetChrBank(1, 0, false, CdlHighlightType.None, true, false, out _dummyPaletteData);
 
+					//_debugState.Palette = InteropEmu.DebugGetPalette();
+					_debugState.Palette = InteropEmu.DebugGetMemoryState(DebugMemoryType.PaletteMemory).Select(v => (int)v).ToArray();
+
+					GetNametableData();
+
 					OnRegisterUpdate(_debugState);
 				}
-				if (OnTileMapUpdate != null) PushNametableData();
 			}
 		}
 
-		private void PushNametableData()
+		private void GetNametableData()
 		{
 			InteropEmu.DebugGetPpuScroll(out _debugState.TileMaps.ScrollX, out _debugState.TileMaps.ScrollY);
 			for (int i = 0; i < _debugState.TileMaps.NumberOfMaps; i++)
 			{
 				InteropEmu.DebugGetNametable(i, NametableDisplayMode.Normal, out _debugState.TileMaps.PixelData[i], out _debugState.TileMaps.TileData[i], out _debugState.TileMaps.AttributeData[i]);
 			}
-			if (OnTileMapUpdate != null) OnTileMapUpdate(_debugState.TileMaps);
-
 		}
-
+		private void PushNametableData()
+		{
+			GetNametableData();
+			if (OnRegisterUpdate != null) OnRegisterUpdate(_debugState);
+		}
 		public void SetCpuMemory(int offset, byte value)
 		{
 			InteropEmu.DebugSetMemoryValue(DebugMemoryType.CpuMemory, (uint)offset, value);
@@ -321,7 +326,7 @@ namespace Brewmaster.Emulation
 
 			InteropEmu.SetRamPowerOnState(RamPowerOnState.AllZeros);
 		}
-		public void UpdateSettings(MesenControl.EmulatorSettings settings)
+		public void UpdateSettings(EmulatorSettings settings)
 		{
 			InteropEmu.SetRamPowerOnState(settings.RandomPowerOnState ? RamPowerOnState.Random : RamPowerOnState.AllZeros);
 			InteropEmu.SetFlag(EmulationFlags.RandomizeMapperPowerOnState, settings.RandomPowerOnState);
@@ -335,6 +340,8 @@ namespace Brewmaster.Emulation
 
 			InteropEmu.SetFlag(EmulationFlags.DisableBackground, !settings.ShowBgLayer);
 			InteropEmu.SetFlag(EmulationFlags.DisableSprites, !settings.ShowSpriteLayer);
+
+			InteropEmu.SetRgbPalette(settings.NesPalette.GetBinary(), 4*16);
 		}
 
 

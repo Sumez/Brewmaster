@@ -29,6 +29,7 @@ namespace Brewmaster.Ide
 			get { return Header.Label; }
 			set
 			{
+				if (Header.Label == value) return;
 				Header.Label = value;
 				if (LabelChanged != null) LabelChanged(value);
 			}
@@ -179,7 +180,7 @@ namespace Brewmaster.Ide
 
 	}
 
-	public class IdeTabPage : TabPage
+	public class IdeTabPage : TabPage // TODO: Delete, this is unused right?
 	{
 		private IdePanel _child;
 

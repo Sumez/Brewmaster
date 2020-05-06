@@ -59,7 +59,6 @@ namespace Brewmaster.Emulation
 		public event Action<int> OnBreak;
 		public event Action<EmulatorStatus> OnStatusChange;
 		public event Action<EmulationState> OnRegisterUpdate;
-		public event Action<TileMapData> OnTileMapUpdate;
 
 		private Object emulatorLock = new Object();
 
@@ -176,7 +175,7 @@ namespace Brewmaster.Emulation
 			SnesApi.LoadStateFile(file);
 		}
 
-		public void UpdateSettings(MesenControl.EmulatorSettings settings)
+		public void UpdateSettings(EmulatorSettings settings)
 		{
 			EmulationConfig.RamPowerOnState = settings.RandomPowerOnState ? RamState.Random : RamState.AllZeros;
 			EmulationConfig.EnableRandomPowerOnState = settings.RandomPowerOnState;
@@ -256,9 +255,9 @@ namespace Brewmaster.Emulation
 				SnesDebugApi.GetSpritePreview(_spriteOptions, _state.SnesState.Ppu, _state.Memory.PpuData, _state.Memory.OamData, _state.Memory.CgRam, _state.Sprites.PixelData);
 				_state.Sprites.Details = Sprite.GetSnesSprites(_state.Memory.OamData, _state.SnesState.Ppu.OamMode);
 				GetCharacterData();
-				
+				GetTileMapData();
+
 				OnRegisterUpdate(_state);
-				if (OnTileMapUpdate != null) PushTileMapData(true, true);
 			}
 		}
 
@@ -288,14 +287,18 @@ namespace Brewmaster.Emulation
 			return 8 * options.PageSize / (8 * options.Width * bitDepth);
 		}
 
-		private void PushTileMapData(bool skipVram = false, bool skipState = false)
+		private void PushTileMapData()
 		{
-			if (!skipVram)
-			{
-				_state.Memory.CgRam = SnesDebugApi.GetMemoryState(SnesMemoryType.CGRam);
-				_state.Memory.PpuData = SnesDebugApi.GetMemoryState(SnesMemoryType.VideoRam);
-			}
-			if (!skipState) _state.SnesState = _state.SnesState = SnesDebugApi.GetState();
+			_state.Memory.CgRam = SnesDebugApi.GetMemoryState(SnesMemoryType.CGRam);
+			_state.Memory.PpuData = SnesDebugApi.GetMemoryState(SnesMemoryType.VideoRam);
+			_state.SnesState = _state.SnesState = SnesDebugApi.GetState();
+
+			GetTileMapData();
+			if (OnRegisterUpdate != null) OnRegisterUpdate(_state);
+		}
+
+		private void GetTileMapData()
+		{
 			_tilemapOptions.Layer = (byte)_state.TileMaps.GetPage;
 			_state.TileMaps.MapWidth = GetMapWidth();
 			_state.TileMaps.MapHeight = GetMapHeight();
@@ -304,8 +307,6 @@ namespace Brewmaster.Emulation
 			_state.TileMaps.ViewportHeight = _state.SnesState.Ppu.OverscanMode ? 239 : 224;
 			_state.TileMaps.ScrollX = (_state.SnesState.Ppu.BgMode == 7 ? (int)_state.SnesState.Ppu.Mode7.HScroll : _state.SnesState.Ppu.Layers[_tilemapOptions.Layer].HScroll) % _state.TileMaps.MapWidth;
 			_state.TileMaps.ScrollY = (_state.SnesState.Ppu.BgMode == 7 ? (int)_state.SnesState.Ppu.Mode7.VScroll : _state.SnesState.Ppu.Layers[_tilemapOptions.Layer].VScroll) % _state.TileMaps.MapHeight;
-
-			if (OnTileMapUpdate != null) OnTileMapUpdate(_state.TileMaps);
 		}
 
 		private int GetMapWidth()

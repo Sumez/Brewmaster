@@ -11,7 +11,6 @@ namespace Brewmaster.Emulation
 	public interface IEmulatorHandler : IDisposable
 	{
 		event Action<int> OnBreak;
-		event Action<TileMapData> OnTileMapUpdate;
 		event Action<EmulationState> OnRegisterUpdate;
 		event Action OnRun;
 		event Action<EmulatorStatus> OnStatusChange;
@@ -44,7 +43,7 @@ namespace Brewmaster.Emulation
 		void ForceNewState(EmulationState state);
 		void SaveState(string file);
 		void LoadState(string file);
-		void UpdateSettings(MesenControl.EmulatorSettings emulatorSettings);
+		void UpdateSettings(EmulatorSettings emulatorSettings);
 		void UpdateControllerMappings(Dictionary<ControllerButtons, int> mappings);
 	}
 
@@ -57,6 +56,8 @@ namespace Brewmaster.Emulation
 		public DebugState NesState;
 		public Mesen.GUI.DebugState SnesState;
 		public ProjectType Type { get; }
+
+		public int[] Palette;
 		public SpriteData Sprites = new SpriteData();
 		public CharacterData CharacterData = new CharacterData();
 		public TileMapData TileMaps;
