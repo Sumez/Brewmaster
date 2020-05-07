@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows.Forms;
+using Brewmaster.EditorWindows.Text;
 using Brewmaster.Modules;
 using Brewmaster.ProjectModel;
 

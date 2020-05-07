@@ -1,13 +1,13 @@
-﻿using ICSharpCode.TextEditor;
-using ICSharpCode.TextEditor.Gui.CompletionWindow;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using Brewmaster.Properties;
+using ICSharpCode.TextEditor;
+using ICSharpCode.TextEditor.Gui.CompletionWindow;
 
-namespace Brewmaster.EditorWindows.Text
+namespace Brewmaster.EditorWindows.Code
 {
 	public class FileCompletion : CompletionDataProvider
 	{

@@ -4,7 +4,7 @@ using Brewmaster.Modules.Watch;
 using Brewmaster.ProjectModel;
 using ICSharpCode.TextEditor;
 
-namespace Brewmaster.EditorWindows
+namespace Brewmaster.EditorWindows.Code
 {
 	public class CpuAddressMargin : AbstractMargin
 	{

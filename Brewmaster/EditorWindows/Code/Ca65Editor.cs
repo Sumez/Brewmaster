@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -17,10 +16,9 @@ using Brewmaster.Modules.Watch;
 using Brewmaster.ProjectModel;
 using Brewmaster.Settings;
 using ICSharpCode.TextEditor;
-using ICSharpCode.TextEditor.Actions;
 using ICSharpCode.TextEditor.Document;
 
-namespace Brewmaster.EditorWindows
+namespace Brewmaster.EditorWindows.Code
 {
 
 	public class Ca65Formatting : DefaultFormattingStrategy, IFormattingStrategy
@@ -740,186 +738,4 @@ namespace Brewmaster.EditorWindows
 
 	}
 
-	public class ErrorMarker : TextMarker
-	{
-		public ErrorMarker(int offset, int length, string message, Color color) 
-			: base(offset, length, TextMarkerType.WaveLine, color)
-		{
-			ToolTip = message;
-		}
-	}
-	public class BreakpointMarker : Bookmark
-	{
-		public int BuildLine { get; set; }
-		public bool Healthy { get; set; }
-		public Breakpoint GlobalBreakpoint { get; set; }
-
-		public event Action OnRemove;
-		public BreakpointMarker(IDocument document, int line, int buildLine, bool isEnabled, bool isHealthy, Action onRemove)
-			: base(document, new TextLocation(0, line), isEnabled)
-		{
-			BuildLine = buildLine;
-			Healthy = isHealthy;
-			OnRemove = onRemove;
-		}
-		public override void Draw(IconBarMargin margin, Graphics g, Point p)
-		{
-			var brush = Healthy ? Brushes.OrangeRed : Brushes.Gold;
-			var diameter = margin.Size.Width / 1.5f;
-			if (IsEnabled)
-				g.FillEllipse(brush, p.X, p.Y + (diameter / 4), diameter, diameter);
-			else
-				g.DrawEllipse(new Pen(brush, 1), p.X, p.Y + (diameter / 4), diameter, diameter);
-		}
-
-		public override bool Click(Control parent, MouseEventArgs e)
-		{
-			base.Click(parent, e);
-			if (OnRemove != null) OnRemove();
-			return true;
-		}
-	}
-	public class BuildLineMarker : Bookmark
-	{
-		public int BuildLine { get; set; }
-		public BuildLineMarker(IDocument document, int line) : base(document, new TextLocation(0, line), true)
-		{
-			BuildLine = line;
-		}
-		public override bool Click(Control parent, MouseEventArgs e)
-		{
-			return false;
-		}
-		public override void Draw(IconBarMargin margin, Graphics g, Point p)
-		{
-		}
-	}
-	public class PcArrow : Bookmark
-	{
-		public PcArrow(IDocument document, int line) : base(document, new TextLocation(0, line), true)
-		{
-		}
-		public override bool Click(Control parent, MouseEventArgs e)
-		{
-			return false;
-		}
-		public override void Draw(IconBarMargin margin, Graphics g, Point p)
-		{
-			/*var path = new System.Drawing.Drawing2D.GraphicsPath(new []
-			{
-				new PointF(p.X, p.Y-3),
-				new PointF(p.X+4, p.Y-3),
-				new PointF(p.X+4, p.Y-6),
-				new PointF(p.X+7, p.Y),
-				new PointF(p.X+4, p.Y+6),
-				new PointF(p.X+4, p.Y+3),
-				new PointF(p.X, p.Y+3),
-			}, new Byte[] {
-				0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20
-			});
-			g.FillPath(Brushes.White, path);*/
-			margin.DrawArrow(g, p.Y);
-		}
-	}
-
-	public class DefaultBrewmasterCodeProperties : DefaultTextEditorProperties
-	{
-		public DefaultBrewmasterCodeProperties()
-		{
-			IsIconBarVisible = true;
-			Font = new Font("Courier New", 10, GraphicsUnit.Point);
-			VerticalRulerRow = 0;
-			EnableFolding = false;
-			ShowLineNumbers = true;
-			CutCopyWholeLine = false;
-		}
-	}
-	public class TextEditor : TextEditorControl
-	{
-		public TextEditor()
-		{
-			Text = "";
-			TextEditorProperties = DefaultCodeProperties;
-
-			FeatureActions.Add(Feature.Undo, editactions[Keys.Control | Keys.Z]);
-			FeatureActions.Add(Feature.Redo, editactions[Keys.Control | Keys.Y]);
-			FeatureActions.Add(Feature.Cut, editactions[Keys.Control | Keys.X]);
-			FeatureActions.Add(Feature.Copy, editactions[Keys.Control | Keys.C]);
-			FeatureActions.Add(Feature.Paste, editactions[Keys.Control | Keys.V]);
-			FeatureActions.Add(Feature.SelectAll, editactions[Keys.Control | Keys.A]);
-
-			foreach (var feature in FeatureActions)
-			{
-				Program.BindKey(feature.Key, UpdateKeyBinding);
-			}
-		}
-
-		protected void UpdateKeyBinding(KeyBindingEventArgs args)
-		{
-			var action = FeatureActions[args.Feature];
-			var existingAction = editactions.FirstOrDefault(kvp => kvp.Value == action);
-			if (existingAction.Value == action) editactions.Remove(existingAction.Key);
-			if (!editactions.ContainsKey(args.Keys)) editactions.Add(args.Keys, action);
-		}
-		
-		protected override void Dispose(bool disposing)
-		{
-			foreach (var feature in FeatureActions)
-			{
-				Program.UnbindKey(feature.Key, UpdateKeyBinding);
-			}
-			base.Dispose(disposing);
-		}
-
-		protected Dictionary<Feature, IEditAction> FeatureActions = new Dictionary<Feature, IEditAction>();
-
-		public static ITextEditorProperties DefaultCodeProperties = new DefaultBrewmasterCodeProperties();
-
-		public void GoToWordAt(int line, int column, int? length)
-		{
-			var lineSegment = Document.GetLineSegment(line - 1);
-			if (!length.HasValue)
-			{
-				var word = lineSegment.GetWord(column);
-				if (word == null) throw new Exception("Word not fount at Line " + line + ", column " + column);
-				length = word.Length;
-			}
-			if (length > 0) ActiveTextAreaControl.SelectionManager.SetSelection(new TextLocation(column, line - 1), new TextLocation(column + length.Value, line - 1));
-			ActiveTextAreaControl.Caret.Position = new TextLocation(column, line - 1);
-		}
-
-		public void FocusLine(int line, bool isBuildLine)
-		{
-			line -= 1;
-			if (isBuildLine)
-			{
-				var buildLine = Document.BookmarkManager.Marks.OfType<BuildLineMarker>().FirstOrDefault(m => m.BuildLine == line);
-				if (buildLine == null) return;
-				line = buildLine.LineNumber;
-			}
-			ActiveTextAreaControl.TextArea.ScrollTo(line);
-			ActiveTextAreaControl.Caret.Position = new TextLocation(0, line);
-		}
-
-		public virtual void Cut(object sender, EventArgs eventArgs)
-		{
-			ActiveTextAreaControl.TextArea.ClipboardHandler.Cut(sender, eventArgs);
-		}
-		public virtual void Paste(object sender, EventArgs eventArgs)
-		{
-			ActiveTextAreaControl.TextArea.ClipboardHandler.Paste(sender, eventArgs);
-		}
-		public virtual void Delete(object sender, EventArgs eventArgs)
-		{
-			ActiveTextAreaControl.TextArea.ClipboardHandler.Delete(sender, eventArgs);
-		}
-		public virtual void Copy(object sender, EventArgs eventArgs)
-		{
-			ActiveTextAreaControl.TextArea.ClipboardHandler.Copy(sender, eventArgs);
-		}
-		public virtual void SelectAll(object sender, EventArgs eventArgs)
-		{
-			ActiveTextAreaControl.TextArea.ClipboardHandler.SelectAll(sender, eventArgs);
-		}
-	}
 }

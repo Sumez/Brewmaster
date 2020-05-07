@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Brewmaster.BuildProcess;
 using Brewmaster.EditorWindows;
+using Brewmaster.EditorWindows.Code;
 using Brewmaster.EditorWindows.Images;
 using Brewmaster.EditorWindows.Text;
 using Brewmaster.Emulation;

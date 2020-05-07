@@ -12,7 +12,7 @@ using Brewmaster.Properties;
 using ICSharpCode.TextEditor;
 using ICSharpCode.TextEditor.Gui.CompletionWindow;
 
-namespace Brewmaster.EditorWindows
+namespace Brewmaster.EditorWindows.Code
 {
 	public abstract class CompletionDataProvider : ICompletionDataProvider
 	{

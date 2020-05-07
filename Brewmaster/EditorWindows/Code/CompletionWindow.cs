@@ -5,7 +5,7 @@ using ICSharpCode.TextEditor;
 using ICSharpCode.TextEditor.Document;
 using ICSharpCode.TextEditor.Gui.CompletionWindow;
 
-namespace Brewmaster.EditorWindows
+namespace Brewmaster.EditorWindows.Code
 {
 	public class CompletionWindow : AbstractCompletionWindow
 	{

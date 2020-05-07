@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using System.Windows.Forms.VisualStyles;
+using Brewmaster.EditorWindows.Text;
 using Brewmaster.ProjectExplorer;
 using Brewmaster.Properties;
 using Brewmaster.Settings;

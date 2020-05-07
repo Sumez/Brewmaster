@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Brewmaster.EditorWindows;
+using Brewmaster.EditorWindows.Text;
 using Brewmaster.Emulation;
 using Brewmaster.Modules.Ca65Helper;
 using Brewmaster.Modules.OpcodeHelper;

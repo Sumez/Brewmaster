@@ -1,7 +1,7 @@
 ﻿
 using System.Collections.Generic;
 
-namespace Brewmaster.EditorWindows
+namespace Brewmaster.EditorWindows.Code
 {
 	public class Symbol
 	{

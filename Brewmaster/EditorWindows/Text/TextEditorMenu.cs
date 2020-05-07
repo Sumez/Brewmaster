@@ -1,7 +1,7 @@
 ﻿using System.Windows.Forms;
 using Brewmaster.Modules;
 
-namespace Brewmaster.EditorWindows
+namespace Brewmaster.EditorWindows.Text
 {
 	public class TextEditorMenu : ContextMenuStrip
 	{
