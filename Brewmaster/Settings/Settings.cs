@@ -258,20 +258,23 @@ namespace Brewmaster.Settings
 		AddToWatch = 21,
 		AutoComplete = 22,
 		GoToLine = 23,
+		GoToAll = 24,
 
-		Cut = 24,
-		Copy = 25,
-		Paste = 26,
-		SelectAll = 27,
+		Cut = 30,
+		Copy = 31,
+		Paste = 32,
+		SelectAll = 35,
 
 		Build = 40,
 		Run = 41,
 		RunNewBuild = 42,
-		Restart = 43,
-		StepOver = 44,
-		StepInto = 45,
-		StepOut = 46,
-		StepBack = 47,
+		Pause = 43,
+		Stop = 44,
+		Restart = 45,
+		StepOver = 60,
+		StepInto = 61,
+		StepOut = 62,
+		StepBack = 63,
 	}
 	[Serializable]
 	public class HighlightingColors {
@@ -359,6 +362,8 @@ namespace Brewmaster.Settings
 					new KeyBinding(Feature.FindNext, Keys.F3),
 					new KeyBinding(Feature.Replace, Keys.H | Keys.Control),
 					new KeyBinding(Feature.GoToLine, Keys.G | Keys.Control),
+					new KeyBinding(Feature.GoToAll, Keys.Oemcomma | Keys.Control),
+
 					new KeyBinding(Feature.Build, Keys.B | Keys.Control | Keys.Shift),
 					new KeyBinding(Feature.Run, Keys.F5),
 					new KeyBinding(Feature.RunNewBuild, Keys.F5 | Keys.Control),

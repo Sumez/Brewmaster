@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Windows.Forms;
+using Brewmaster.EditorWindows.Text;
 using Brewmaster.Modules;
 using Brewmaster.ProjectModel;
 using Brewmaster.Settings;
 
-namespace Brewmaster.EditorWindows
+namespace Brewmaster.EditorWindows.Code
 {
 	public class CodeMenu : TextEditorMenu
 	{

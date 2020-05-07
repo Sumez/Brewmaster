@@ -43,8 +43,8 @@ namespace Brewmaster.ProjectExplorer
 		{
 			DirectoryInfo = directory;
 			Text = directory.Name;
-			ImageIndex = 15;
-			SelectedImageIndex = 15;
+			ImageIndex = 3;
+			SelectedImageIndex = 3;
 		}
 
 		public void AddSubdirectory()
@@ -68,15 +68,17 @@ namespace Brewmaster.ProjectExplorer
 			{
 				case FileType.Source:
 				case FileType.Include:
-					ImageIndex = 18;
+					ImageIndex = 6;
 					break;
 				case FileType.Image:
-					ImageIndex = 17;
+					ImageIndex = 5;
 					break;
 				default:
-					ImageIndex = 16;
+					ImageIndex = 4;
 					break;
 			}
+			
+			if (fileInfo.Mode == CompileMode.LinkerConfig) ImageIndex = 7;
 			if (fileInfo.Missing)
 			{
 				ImageIndex = 100;

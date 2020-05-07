@@ -8,7 +8,7 @@ using Brewmaster.ProjectModel;
 using ICSharpCode.TextEditor;
 using ICSharpCode.TextEditor.Document;
 
-namespace Brewmaster.EditorWindows
+namespace Brewmaster.EditorWindows.Code
 {
 	public class AsmWord : TextWord
 	{

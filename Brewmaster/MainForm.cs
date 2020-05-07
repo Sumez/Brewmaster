@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Brewmaster.BuildProcess;
 using Brewmaster.EditorWindows;
+using Brewmaster.EditorWindows.Code;
 using Brewmaster.EditorWindows.Images;
 using Brewmaster.EditorWindows.Text;
 using Brewmaster.Emulation;
@@ -32,7 +33,7 @@ namespace Brewmaster
 {
 	public partial class MainForm : Form, IIdeLayoutParent
 	{
-	    public const string SettingsFileName = "user.bwmsettings";
+		public const string SettingsFileName = "user.bwmsettings";
 	    public const string ProgramTitle = "Brewmaster";
 
 	    public AsmProject CurrentProject { get; set; }
@@ -46,7 +47,8 @@ namespace Brewmaster
 	    public BuildHandler BuildHandler { get; private set; }
 	    public string RequestFile { get; set; }
 		public OpcodeHelper OpcodeHelper { get; private set; }
-	    public Ca65CommandDocumentation Ca65Helper { get; private set; }
+		public Ca65CommandDocumentation Ca65Helper { get; private set; }
+		public ProjectExplorer.ProjectExplorer ProjectExplorer { get; private set; }
 
 		private readonly Action<LogData> _logHandler;
 		private readonly Action<int> _breakHandler;
@@ -258,7 +260,7 @@ namespace Brewmaster
 				southContainer.AddPanel(WatchPanel);
 				southContainer.AddPanel(memoryPanel);
 
-				westContainer.AddPanel(new IdePanel(ProjectExplorer) { Label = "Project Explorer" });
+				westContainer.AddPanel(new IdePanel(ProjectExplorer = new ProjectExplorer.ProjectExplorer()) { Label = "Project Explorer" });
 				//westContainer.AddPanel(new IdePanel(CartridgeExplorer) { Label = "Cartridge Explorer" });
 				var helperPanel = new IdeGroupedPanel();
 				helperPanel.AddPanel(new IdePanel(OpcodeHelper = new OpcodeHelper(_moduleEvents)) { Label = "Opcodes" });
@@ -382,9 +384,12 @@ namespace Brewmaster
 			Program.BindKey(Feature.FindNext, findNextMenuItem);
 			Program.BindKey(Feature.Replace, replaceMenuItem);
 			Program.BindKey(Feature.GoToLine, Edit_GoToMenuItem);
+			Program.BindKey(Feature.GoToAll, goToAllMenuItem);
 			Program.BindKey(Feature.Build, buildProjectMenuItem);
 			Program.BindKey(Feature.Run, runMenuItem);
 			Program.BindKey(Feature.RunNewBuild, runNewBuildMenuItem);
+			Program.BindKey(Feature.Pause, pauseMenuItem);
+			Program.BindKey(Feature.Stop, stopMenuItem);
 			Program.BindKey(Feature.Restart, restartMenuItem);
 
 			Program.BindKey(Feature.StepOver, stepOverMenuItem);
@@ -1065,7 +1070,7 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 			ResumeLayout();
 
 			Task.WhenAll(
-				CurrentProject.ParseDebugDataAsync(),
+				BuildHandler.ParseDebugDataAsync(CurrentProject),
 				CurrentProject.LoadAllSymbolsAsync()).ContinueWith((t) =>
 			{
 				ThreadSafeBreakpointHandler(CurrentProject.GetAllBreakpoints());
@@ -1900,6 +1905,13 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 		private void newProjectToolStripButton_Click(object sender, EventArgs e)
 		{
 			nesProjectMenuItem.PerformClick();
+		}
+
+		private void goToAllMenuItem_Click(object sender, EventArgs e)
+		{
+			if (CurrentProject == null) return;
+			var goToAll = new GoToAll(CurrentProject, _moduleEvents);
+			goToAll.Show(this);
 		}
 	}
 

@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Brewmaster.EditorWindows.Text;
+using Brewmaster.EditorWindows.Code;
 using Brewmaster.Ide;
 using Brewmaster.Modules;
 using Brewmaster.ProjectModel;
 
-namespace Brewmaster.EditorWindows
+namespace Brewmaster.EditorWindows.Text
 {
 	public class TextEditorWindow : SaveableEditorWindow
 	{

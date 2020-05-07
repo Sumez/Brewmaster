@@ -35,7 +35,6 @@ namespace Brewmaster
         {
 			this.components = new System.ComponentModel.Container();
 			System.Windows.Forms.Panel availableIdePanels;
-			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
 			System.Windows.Forms.ToolStripSeparator toolStripSeparator14;
 			System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
 			System.Windows.Forms.ToolStripSeparator toolStripSeparator25;
@@ -48,10 +47,11 @@ namespace Brewmaster
 			System.Windows.Forms.ToolStripSeparator toolStripSeparator23;
 			System.Windows.Forms.ToolStripSeparator toolStripSeparator13;
 			System.Windows.Forms.ToolStripSeparator toolStripSeparator27;
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
 			this.editorTabs = new Brewmaster.EditorWindows.EditorTabs();
 			this.mesen = new Brewmaster.Emulation.MesenControl();
 			this.cpuStatus1 = new Brewmaster.StatusView.CpuStatus();
-			this.TileMap = new TileMapViewer();
+			this.TileMap = new Brewmaster.Modules.Ppu.TileMapViewer();
 			this.MemoryTabs = new System.Windows.Forms.TabControl();
 			this.CpuMemoryTab = new System.Windows.Forms.TabPage();
 			this.CpuMemoryViewer = new Brewmaster.MemoryViewer.MemoryViewer();
@@ -62,8 +62,6 @@ namespace Brewmaster
 			this.CartridgeExplorer = new Brewmaster.CartridgeExplorer.CartridgeExplorer();
 			this.WatchPanel = new Brewmaster.Ide.IdeGroupedPanel();
 			this.OutputPanel = new Brewmaster.Ide.IdeGroupedPanel();
-			this.ProjectExplorer = new Brewmaster.ProjectExplorer.ProjectExplorer();
-			this.ProjectExplorerImageList = new System.Windows.Forms.ImageList(this.components);
 			this.MainWindowMenu = new System.Windows.Forms.MenuStrip();
 			this.FileMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.File_NewMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -109,6 +107,7 @@ namespace Brewmaster
 			this.replaceMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.toolStripSeparator12 = new System.Windows.Forms.ToolStripSeparator();
 			this.Edit_GoToMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.goToAllMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.toolStripSeparator49 = new System.Windows.Forms.ToolStripSeparator();
 			this.selectAllMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.insertMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -230,7 +229,6 @@ namespace Brewmaster
 			this.OpenProjectFileDialog = new System.Windows.Forms.OpenFileDialog();
 			this.OpenFilesFileDialog = new System.Windows.Forms.OpenFileDialog();
 			this.CreateNewFileDialog = new System.Windows.Forms.SaveFileDialog();
-			this.CodeItemImages = new System.Windows.Forms.ImageList(this.components);
 			this.MainEastContainer2 = new Brewmaster.Ide.MultiSplitContainer();
 			this._menuHelper = new Brewmaster.Modules.MenuHelper(this.components);
 			availableIdePanels = new System.Windows.Forms.Panel();
@@ -267,7 +265,6 @@ namespace Brewmaster
 			availableIdePanels.Controls.Add(this.CartridgeExplorer);
 			availableIdePanels.Controls.Add(this.WatchPanel);
 			availableIdePanels.Controls.Add(this.OutputPanel);
-			availableIdePanels.Controls.Add(this.ProjectExplorer);
 			availableIdePanels.Location = new System.Drawing.Point(10, 80);
 			availableIdePanels.Name = "availableIdePanels";
 			availableIdePanels.Size = new System.Drawing.Size(856, 450);
@@ -353,9 +350,10 @@ namespace Brewmaster
 			this.CpuMemoryViewer.BackColor = System.Drawing.SystemColors.Control;
 			this.CpuMemoryViewer.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.CpuMemoryViewer.Font = new System.Drawing.Font("Consolas", 10F);
-			this.CpuMemoryViewer.Location = new System.Drawing.Point(3, 3);
+			this.CpuMemoryViewer.Location = new System.Drawing.Point(0, 0);
+			this.CpuMemoryViewer.Margin = new System.Windows.Forms.Padding(0);
 			this.CpuMemoryViewer.Name = "CpuMemoryViewer";
-			this.CpuMemoryViewer.Size = new System.Drawing.Size(842, 418);
+			this.CpuMemoryViewer.Size = new System.Drawing.Size(848, 424);
 			this.CpuMemoryViewer.TabIndex = 0;
 			// 
 			// PpuMemoryTab
@@ -373,9 +371,10 @@ namespace Brewmaster
 			this.PpuMemoryViewer.BackColor = System.Drawing.SystemColors.Control;
 			this.PpuMemoryViewer.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.PpuMemoryViewer.Font = new System.Drawing.Font("Consolas", 10F);
-			this.PpuMemoryViewer.Location = new System.Drawing.Point(3, 3);
+			this.PpuMemoryViewer.Location = new System.Drawing.Point(0, 0);
+			this.PpuMemoryViewer.Margin = new System.Windows.Forms.Padding(0);
 			this.PpuMemoryViewer.Name = "PpuMemoryViewer";
-			this.PpuMemoryViewer.Size = new System.Drawing.Size(842, 418);
+			this.PpuMemoryViewer.Size = new System.Drawing.Size(848, 424);
 			this.PpuMemoryViewer.TabIndex = 0;
 			// 
 			// OamMemoryTab
@@ -393,20 +392,19 @@ namespace Brewmaster
 			this.OamMemoryViewer.BackColor = System.Drawing.SystemColors.Control;
 			this.OamMemoryViewer.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.OamMemoryViewer.Font = new System.Drawing.Font("Consolas", 10F);
-			this.OamMemoryViewer.Location = new System.Drawing.Point(3, 3);
+			this.OamMemoryViewer.Location = new System.Drawing.Point(0, 0);
+			this.OamMemoryViewer.Margin = new System.Windows.Forms.Padding(0);
 			this.OamMemoryViewer.Name = "OamMemoryViewer";
-			this.OamMemoryViewer.Size = new System.Drawing.Size(842, 418);
+			this.OamMemoryViewer.Size = new System.Drawing.Size(848, 424);
 			this.OamMemoryViewer.TabIndex = 0;
 			// 
 			// CartridgeExplorer
 			// 
 			this.CartridgeExplorer.BorderStyle = System.Windows.Forms.BorderStyle.None;
 			this.CartridgeExplorer.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.CartridgeExplorer.ImageIndex = 0;
 			this.CartridgeExplorer.ItemHeight = 20;
 			this.CartridgeExplorer.Location = new System.Drawing.Point(0, 0);
 			this.CartridgeExplorer.Name = "CartridgeExplorer";
-			this.CartridgeExplorer.SelectedImageIndex = 0;
 			this.CartridgeExplorer.ShowLines = false;
 			this.CartridgeExplorer.Size = new System.Drawing.Size(856, 450);
 			this.CartridgeExplorer.TabIndex = 2;
@@ -433,49 +431,6 @@ namespace Brewmaster
 			this.OutputPanel.Size = new System.Drawing.Size(856, 450);
 			this.OutputPanel.TabIndex = 2;
 			// 
-			// ProjectExplorer
-			// 
-			this.ProjectExplorer.AddExistingFile = null;
-			this.ProjectExplorer.AllowDrop = true;
-			this.ProjectExplorer.BorderStyle = System.Windows.Forms.BorderStyle.None;
-			this.ProjectExplorer.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.ProjectExplorer.ImageIndex = 9;
-			this.ProjectExplorer.ImageList = this.ProjectExplorerImageList;
-			this.ProjectExplorer.ItemHeight = 20;
-			this.ProjectExplorer.LabelEdit = true;
-			this.ProjectExplorer.Location = new System.Drawing.Point(0, 0);
-			this.ProjectExplorer.Name = "ProjectExplorer";
-			this.ProjectExplorer.SelectedImageIndex = 0;
-			this.ProjectExplorer.ShowLines = false;
-			this.ProjectExplorer.ShowNodeToolTips = true;
-			this.ProjectExplorer.Size = new System.Drawing.Size(856, 450);
-			this.ProjectExplorer.TabIndex = 2;
-			// 
-			// ProjectExplorerImageList
-			// 
-			this.ProjectExplorerImageList.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("ProjectExplorerImageList.ImageStream")));
-			this.ProjectExplorerImageList.TransparentColor = System.Drawing.Color.Transparent;
-			this.ProjectExplorerImageList.Images.SetKeyName(0, "classfile.png");
-			this.ProjectExplorerImageList.Images.SetKeyName(1, "cssfile2.png");
-			this.ProjectExplorerImageList.Images.SetKeyName(2, "htmlfile2.png");
-			this.ProjectExplorerImageList.Images.SetKeyName(3, "imagefile.png");
-			this.ProjectExplorerImageList.Images.SetKeyName(4, "jarfile.png");
-			this.ProjectExplorerImageList.Images.SetKeyName(5, "javafile.png");
-			this.ProjectExplorerImageList.Images.SetKeyName(6, "javascriptfile2.png");
-			this.ProjectExplorerImageList.Images.SetKeyName(7, "newfile2.png");
-			this.ProjectExplorerImageList.Images.SetKeyName(8, "packagejavafile.png");
-			this.ProjectExplorerImageList.Images.SetKeyName(9, "nesproject.png");
-			this.ProjectExplorerImageList.Images.SetKeyName(10, "sqlfile2.png");
-			this.ProjectExplorerImageList.Images.SetKeyName(11, "textfile2.png");
-			this.ProjectExplorerImageList.Images.SetKeyName(12, "xmlfile2.png");
-			this.ProjectExplorerImageList.Images.SetKeyName(13, "cppfile.png");
-			this.ProjectExplorerImageList.Images.SetKeyName(14, "headerfile.png");
-			this.ProjectExplorerImageList.Images.SetKeyName(15, "folder-dark.png");
-			this.ProjectExplorerImageList.Images.SetKeyName(16, "file.png");
-			this.ProjectExplorerImageList.Images.SetKeyName(17, "image.png");
-			this.ProjectExplorerImageList.Images.SetKeyName(18, "text.png");
-			this.ProjectExplorerImageList.Images.SetKeyName(19, "data.png");
-			// 
 			// toolStripSeparator14
 			// 
 			toolStripSeparator14.Name = "toolStripSeparator14";
@@ -489,7 +444,7 @@ namespace Brewmaster
 			// toolStripSeparator25
 			// 
 			toolStripSeparator25.Name = "toolStripSeparator25";
-			toolStripSeparator25.Size = new System.Drawing.Size(137, 6);
+			toolStripSeparator25.Size = new System.Drawing.Size(138, 6);
 			// 
 			// toolStripSeparator26
 			// 
@@ -535,7 +490,7 @@ namespace Brewmaster
 			// toolStripSeparator27
 			// 
 			toolStripSeparator27.Name = "toolStripSeparator27";
-			toolStripSeparator27.Size = new System.Drawing.Size(211, 6);
+			toolStripSeparator27.Size = new System.Drawing.Size(212, 6);
 			toolStripSeparator27.Visible = false;
 			// 
 			// MainWindowMenu
@@ -803,6 +758,7 @@ namespace Brewmaster
             this.replaceMenuItem,
             this.toolStripSeparator12,
             this.Edit_GoToMenuItem,
+            this.goToAllMenuItem,
             this.toolStripSeparator49,
             this.selectAllMenuItem,
             toolStripSeparator13,
@@ -910,6 +866,13 @@ namespace Brewmaster
 			this.Edit_GoToMenuItem.Size = new System.Drawing.Size(217, 22);
 			this.Edit_GoToMenuItem.Text = "Go To";
 			this.Edit_GoToMenuItem.Click += new System.EventHandler(this.Edit_GoToMenuItem_Click);
+			// 
+			// goToAllMenuItem
+			// 
+			this.goToAllMenuItem.Name = "goToAllMenuItem";
+			this.goToAllMenuItem.Size = new System.Drawing.Size(217, 22);
+			this.goToAllMenuItem.Text = "Go To All";
+			this.goToAllMenuItem.Click += new System.EventHandler(this.goToAllMenuItem_Click);
 			// 
 			// toolStripSeparator49
 			// 
@@ -1265,7 +1228,7 @@ namespace Brewmaster
 			this.playAudioMenuItem.CheckOnClick = true;
 			this.playAudioMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.playAudioMenuItem.Name = "playAudioMenuItem";
-			this.playAudioMenuItem.Size = new System.Drawing.Size(140, 22);
+			this.playAudioMenuItem.Size = new System.Drawing.Size(141, 22);
 			this.playAudioMenuItem.Text = "Play Audio";
 			this.playAudioMenuItem.Click += new System.EventHandler(this.playAudioToolStripMenuItem_Click);
 			// 
@@ -1275,7 +1238,7 @@ namespace Brewmaster
 			this.playPulse1MenuItem.CheckOnClick = true;
 			this.playPulse1MenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.playPulse1MenuItem.Name = "playPulse1MenuItem";
-			this.playPulse1MenuItem.Size = new System.Drawing.Size(140, 22);
+			this.playPulse1MenuItem.Size = new System.Drawing.Size(141, 22);
 			this.playPulse1MenuItem.Text = "Play Pulse 1";
 			this.playPulse1MenuItem.Click += new System.EventHandler(this.playPulse1ToolStripMenuItem_Click);
 			// 
@@ -1285,7 +1248,7 @@ namespace Brewmaster
 			this.playPulse2MenuItem.CheckOnClick = true;
 			this.playPulse2MenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.playPulse2MenuItem.Name = "playPulse2MenuItem";
-			this.playPulse2MenuItem.Size = new System.Drawing.Size(140, 22);
+			this.playPulse2MenuItem.Size = new System.Drawing.Size(141, 22);
 			this.playPulse2MenuItem.Text = "Play Pulse 2";
 			this.playPulse2MenuItem.Click += new System.EventHandler(this.playPulse2ToolStripMenuItem_Click);
 			// 
@@ -1295,7 +1258,7 @@ namespace Brewmaster
 			this.playTriangleMenuItem.CheckOnClick = true;
 			this.playTriangleMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.playTriangleMenuItem.Name = "playTriangleMenuItem";
-			this.playTriangleMenuItem.Size = new System.Drawing.Size(140, 22);
+			this.playTriangleMenuItem.Size = new System.Drawing.Size(141, 22);
 			this.playTriangleMenuItem.Text = "Play Triangle";
 			this.playTriangleMenuItem.Click += new System.EventHandler(this.playTriangleToolStripMenuItem_Click);
 			// 
@@ -1305,7 +1268,7 @@ namespace Brewmaster
 			this.playNoiseMenuItem.CheckOnClick = true;
 			this.playNoiseMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.playNoiseMenuItem.Name = "playNoiseMenuItem";
-			this.playNoiseMenuItem.Size = new System.Drawing.Size(140, 22);
+			this.playNoiseMenuItem.Size = new System.Drawing.Size(141, 22);
 			this.playNoiseMenuItem.Text = "Play Noise";
 			this.playNoiseMenuItem.Click += new System.EventHandler(this.playNoiseToolStripMenuItem_Click);
 			// 
@@ -1315,7 +1278,7 @@ namespace Brewmaster
 			this.playPcmMenuItem.CheckOnClick = true;
 			this.playPcmMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.playPcmMenuItem.Name = "playPcmMenuItem";
-			this.playPcmMenuItem.Size = new System.Drawing.Size(140, 22);
+			this.playPcmMenuItem.Size = new System.Drawing.Size(141, 22);
 			this.playPcmMenuItem.Text = "Play PCM";
 			this.playPcmMenuItem.Click += new System.EventHandler(this.playPCMToolStripMenuItem_Click);
 			// 
@@ -1461,7 +1424,7 @@ namespace Brewmaster
 			// viewHelpTopicsMenuItem
 			// 
 			this.viewHelpTopicsMenuItem.Name = "viewHelpTopicsMenuItem";
-			this.viewHelpTopicsMenuItem.Size = new System.Drawing.Size(214, 22);
+			this.viewHelpTopicsMenuItem.Size = new System.Drawing.Size(215, 22);
 			this.viewHelpTopicsMenuItem.Text = "View Help Topics                 ";
 			this.viewHelpTopicsMenuItem.Visible = false;
 			this.viewHelpTopicsMenuItem.Click += new System.EventHandler(this.Help_ViewHelpTopicsMenuItem_Click);
@@ -1469,7 +1432,7 @@ namespace Brewmaster
 			// aboutMenuItem
 			// 
 			this.aboutMenuItem.Name = "aboutMenuItem";
-			this.aboutMenuItem.Size = new System.Drawing.Size(214, 22);
+			this.aboutMenuItem.Size = new System.Drawing.Size(215, 22);
 			this.aboutMenuItem.Text = "About";
 			this.aboutMenuItem.Click += new System.EventHandler(this.Help_AboutMenuItem_Click);
 			// 
@@ -1955,16 +1918,6 @@ namespace Brewmaster
 			this.CreateNewFileDialog.OverwritePrompt = false;
 			this.CreateNewFileDialog.Title = "Save File";
 			// 
-			// CodeItemImages
-			// 
-			this.CodeItemImages.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("CodeItemImages.ImageStream")));
-			this.CodeItemImages.TransparentColor = System.Drawing.Color.Transparent;
-			this.CodeItemImages.Images.SetKeyName(0, "cartridge.png");
-			this.CodeItemImages.Images.SetKeyName(1, "data.png");
-			this.CodeItemImages.Images.SetKeyName(2, "image.png");
-			this.CodeItemImages.Images.SetKeyName(3, "nesproject.ico");
-			this.CodeItemImages.Images.SetKeyName(4, "text.png");
-			// 
 			// MainEastContainer2
 			// 
 			this.MainEastContainer2.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -2121,20 +2074,17 @@ namespace Brewmaster
         private System.Windows.Forms.ToolStripMenuItem CloseProject_ProjExplorerContextMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator44;
         private System.Windows.Forms.ToolStripMenuItem RemoveAddedFiles_ProjExplorerContextMenuItem;
-        private System.Windows.Forms.ImageList ProjectExplorerImageList;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator49;
 		private Emulation.MesenControl mesen;
 		private System.Windows.Forms.ToolStripButton pause;
 		private System.Windows.Forms.ToolStripButton stop;
 		private System.Windows.Forms.ToolStripButton restart;
-		private ProjectExplorer.ProjectExplorer ProjectExplorer;
 		private CartridgeExplorer.CartridgeExplorer CartridgeExplorer;
 		private System.Windows.Forms.ToolStripButton newProjectToolStripButton;
 		private StatusView.CpuStatus cpuStatus1;
 		private System.Windows.Forms.ToolStripMenuItem EmulatorMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem updateEveryFrameMenuItem;
 		private TileMapViewer TileMap;
-		private System.Windows.Forms.ImageList CodeItemImages;
 		private System.Windows.Forms.ToolStripMenuItem findNextMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem nesGraphicsMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem displayNesBgMenuItem;
@@ -2198,6 +2148,7 @@ namespace Brewmaster
 		public ToolStripStatusLabel charLabel;
 		public ToolStripStatusLabel toolStripStatusLabel3;
 		private ToolStripMenuItem findInFilesMenuItem;
+		private ToolStripMenuItem goToAllMenuItem;
 	}
 }
 

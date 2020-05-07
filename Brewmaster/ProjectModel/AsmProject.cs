@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
 using Brewmaster.EditorWindows;
+using Brewmaster.EditorWindows.Code;
+using Brewmaster.EditorWindows.Text;
 using Brewmaster.Pipeline;
 using Brewmaster.ProjectExplorer;
 using Brewmaster.ProjectModel.Compatibility;

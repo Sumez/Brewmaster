@@ -150,10 +150,18 @@
     <Compile Include="CartridgeExplorer\CartridgeExplorer.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="EditorWindows\TextEditorMenu.cs">
+    <Compile Include="EditorWindows\Code\AllCompletion.cs" />
+    <Compile Include="EditorWindows\Code\CodeMarkers.cs" />
+    <Compile Include="EditorWindows\Code\GoToAll.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EditorWindows\Text\TextEditor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="EditorWindows\Text\TextEditorMenu.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="EditorWindows\Text\FileCompletion.cs" />
+    <Compile Include="EditorWindows\Code\FileCompletion.cs" />
     <Compile Include="EditorWindows\Text\FindResults.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -229,17 +237,17 @@
     <Compile Include="ProjectExplorer\ProjectExplorerMenu.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="EditorWindows\CpuAddressMargin.cs" />
+    <Compile Include="EditorWindows\Code\CpuAddressMargin.cs" />
     <Compile Include="EditorWindows\EditorTabs.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="EditorWindows\Ca65Completion.cs" />
-    <Compile Include="EditorWindows\Ca65Editor.cs" />
-    <Compile Include="EditorWindows\Ca65Highlighting.cs" />
-    <Compile Include="EditorWindows\CodeMenu.cs">
+    <Compile Include="EditorWindows\Code\Ca65Completion.cs" />
+    <Compile Include="EditorWindows\Code\Ca65Editor.cs" />
+    <Compile Include="EditorWindows\Code\Ca65Highlighting.cs" />
+    <Compile Include="EditorWindows\Code\CodeMenu.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="EditorWindows\CompletionWindow.cs">
+    <Compile Include="EditorWindows\Code\CompletionWindow.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="EditorWindows\EditorWindow.cs">
@@ -260,8 +268,8 @@
     <Compile Include="EditorWindows\Images\PaletteEntries.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="EditorWindows\Symbol.cs" />
-    <Compile Include="EditorWindows\TextEditorWindow.cs">
+    <Compile Include="EditorWindows\Code\Symbol.cs" />
+    <Compile Include="EditorWindows\Text\TextEditorWindow.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="EditorWindows\Text\FindWindow.cs">
@@ -270,7 +278,7 @@
     <Compile Include="EditorWindows\Text\FindWindow.Designer.cs">
       <DependentUpon>FindWindow.cs</DependentUpon>
     </Compile>
-    <Compile Include="EditorWindows\Text\SourceNavigator.cs">
+    <Compile Include="EditorWindows\Code\SourceNavigator.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Emulation\Emulator.cs" />
@@ -474,6 +482,9 @@
     <EmbeddedResource Include="CartridgeExplorer\CartridgeExplorer.resx">
       <DependentUpon>CartridgeExplorer.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="EditorWindows\Code\GoToAll.resx">
+      <DependentUpon>GoToAll.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="EditorWindows\Images\PaletteReductionSettings.resx">
       <DependentUpon>PaletteReductionSettings.cs</DependentUpon>
     </EmbeddedResource>
@@ -483,7 +494,7 @@
     <EmbeddedResource Include="EditorWindows\Images\ImagePipelineSettings.resx">
       <DependentUpon>ImagePipelineSettings.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="EditorWindows\TextEditorWindow.resx">
+    <EmbeddedResource Include="EditorWindows\Text\TextEditorWindow.resx">
       <DependentUpon>TextEditorWindow.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="EditorWindows\Text\FindResults.resx">
@@ -492,7 +503,7 @@
     <EmbeddedResource Include="EditorWindows\Text\FindWindow.resx">
       <DependentUpon>FindWindow.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="EditorWindows\Text\SourceNavigator.resx">
+    <EmbeddedResource Include="EditorWindows\Code\SourceNavigator.resx">
       <DependentUpon>SourceNavigator.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Emulation\MesenControl.resx">
@@ -658,6 +669,11 @@
     <None Include="Resources\Files\image.png" />
     <None Include="Resources\Files\nesproject.png" />
     <None Include="Resources\Files\text.png" />
+    <None Include="Resources\Files\file_config.png" />
+    <None Include="Resources\Files\file_image.png" />
+    <None Include="Resources\Files\file_text.png" />
+    <None Include="Resources\Files\data.png" />
+    <None Include="Resources\Files\snesproject.png" />
     <Content Include="Resources\Other\error.png" />
     <None Include="Resources\Other\smallload.png" />
     <None Include="Resources\Other\smallsave.png" />

@@ -264,6 +264,16 @@ namespace Brewmaster.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap data {
+            get {
+                object obj = ResourceManager.GetObject("data", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap expanded {
             get {
                 object obj = ResourceManager.GetObject("expanded", resourceCulture);
@@ -277,6 +287,36 @@ namespace Brewmaster.Properties {
         internal static System.Drawing.Bitmap file {
             get {
                 object obj = ResourceManager.GetObject("file", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap file_config {
+            get {
+                object obj = ResourceManager.GetObject("file_config", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap file_image {
+            get {
+                object obj = ResourceManager.GetObject("file_image", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap file_text {
+            get {
+                object obj = ResourceManager.GetObject("file_text", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -347,6 +387,16 @@ namespace Brewmaster.Properties {
         internal static System.Drawing.Bitmap nesproject {
             get {
                 object obj = ResourceManager.GetObject("nesproject", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap nesproject1 {
+            get {
+                object obj = ResourceManager.GetObject("nesproject1", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -477,6 +527,16 @@ namespace Brewmaster.Properties {
         internal static System.Drawing.Bitmap smallsave {
             get {
                 object obj = ResourceManager.GetObject("smallsave", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap snesproject {
+            get {
+                object obj = ResourceManager.GetObject("snesproject", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

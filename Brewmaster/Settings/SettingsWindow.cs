@@ -4,7 +4,8 @@ using System.Drawing;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
-using Brewmaster.EditorWindows;
+using Brewmaster.EditorWindows.Code;
+using Brewmaster.EditorWindows.Text;
 using Brewmaster.ProjectModel;
 using ICSharpCode.TextEditor.Document;
 
