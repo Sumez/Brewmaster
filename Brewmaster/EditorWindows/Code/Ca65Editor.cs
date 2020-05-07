@@ -407,7 +407,7 @@ namespace Brewmaster.EditorWindows.Code
 
 			var symbols = File.Project.Symbols; // TODO: use local symbol index
 			var matchingSymbol = symbols.Where(s => s.Value.Text == word.Word).Select(s => s.Value)
-				.OrderBy(s => s.Source != this.File.File.FullName).FirstOrDefault();
+				.OrderBy(s => s.Source != File.File.FullName).FirstOrDefault();
 			if (matchingSymbol != null && File.Project.GoTo != null)
 				File.Project.GoTo(matchingSymbol.Source, matchingSymbol.Line, matchingSymbol.Character);
 		}

@@ -39,6 +39,7 @@ namespace Brewmaster.EditorWindows.Code
 		public static ICompletionDataProvider CompletionDataProvider { get; private set; }
 		public bool CloseWhenCaretAtBeginning { get; set; }
 		public CodeCompletionListView ListView { get; private set; }
+		public event Action InsertCompleted;
 
 		public static CompletionWindow ShowCompletionWindow(Form parent, TextEditorControl control, string fileName,
 			ICompletionDataProvider completionDataProvider, char firstChar)
@@ -50,6 +51,19 @@ namespace Brewmaster.EditorWindows.Code
 			var window = new CompletionWindow(parent, control);
 			window.RefreshList(completionData);
 			window.SetLocation();
+			window.ShowCompletionWindow();
+			return window;
+		}
+		public static CompletionWindow ShowCompletionWindow(Form parent, TextEditorControl control, ICompletionDataProvider completionDataProvider, Point location)
+		{
+			CompletionDataProvider = completionDataProvider;
+			var completionData = CompletionDataProvider.GenerateCompletionData(null, null, ' ');
+			if (completionData.Length == 0) return null;
+
+			var window = new CompletionWindow(parent, control);
+			window.RefreshList(completionData);
+			//window.SetLocation();
+			window.Location = location;
 			window.ShowCompletionWindow();
 			return window;
 		}
@@ -245,6 +259,11 @@ namespace Brewmaster.EditorWindows.Code
 			DeclarationViewWindow.Refresh();
 		}
 
+		public bool ProcessKey(Keys keyData)
+		{
+			return ProcessTextAreaKey(keyData);
+		}
+
 		protected override bool ProcessTextAreaKey(Keys keyData)
 		{
 			if (!Visible)
@@ -284,7 +303,7 @@ namespace Brewmaster.EditorWindows.Code
 
 				try
 				{
-					if (EndOffset - StartOffset > 0)
+					if (EndOffset - StartOffset > 0 && StartOffset >= 0)
 					{
 						control.Document.Remove(StartOffset, EndOffset - StartOffset);
 					}
@@ -295,7 +314,12 @@ namespace Brewmaster.EditorWindows.Code
 					control.EndUpdate();
 				}
 			}
-			if (result) Close();
+
+			if (result)
+			{
+				Close();
+				if (InsertCompleted != null) InsertCompleted();
+			}
 			return true;
 		}
 

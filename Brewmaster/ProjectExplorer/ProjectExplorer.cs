@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using Brewmaster.ProjectModel;
+using Brewmaster.Properties;
 
 namespace Brewmaster.ProjectExplorer
 {
@@ -52,6 +53,22 @@ namespace Brewmaster.ProjectExplorer
 			_menu.DeleteDirectory = DeleteDirectory;
 			_menu.MoveToPipeline = MoveFileToPipeline;
 			_menu.RemoveFromProject = (file) => _project.RemoveProjectFile(file);
+
+			BorderStyle = BorderStyle.None;
+			Dock = DockStyle.Fill;
+			ImageList = new ImageList();
+			ItemHeight = 20;
+			ShowNodeToolTips = true;
+
+			ImageList.Images.Add(Resources.nesproject);
+			ImageList.Images.Add(Resources.snesproject);
+			ImageList.Images.Add(Resources.data);
+
+			ImageList.Images.Add(Resources.folder);
+			ImageList.Images.Add(Resources.file);
+			ImageList.Images.Add(Resources.file_image);
+			ImageList.Images.Add(Resources.file_text);
+			ImageList.Images.Add(Resources.file_config);
 		}
 
 		protected override bool OnBeforeDrag(object draggedItem)
@@ -222,14 +239,15 @@ namespace Brewmaster.ProjectExplorer
 			var projectNode = CreateNodeFromDirectory(_project.Directory, false, _project.Directories);
 			projectNode.Edited += (e) => _project.Name = e.Label; // TODO: Update window title
 			projectNode.Text = _project.Name;
-			projectNode.ImageIndex = 9;
-			projectNode.SelectedImageIndex = 9;
+			var projectImage = _project.Type == ProjectType.Snes ? 1 : 0;
+			projectNode.ImageIndex = projectImage;
+			projectNode.SelectedImageIndex = projectImage;
 
 			var dataNode = CreateNodeFromDirectory(_project.Directory, true, new List<DirectoryInfo>());
 			dataNode.Editable = false;
 			dataNode.Text = "Data pipeline";
-			dataNode.ImageIndex = 19;
-			dataNode.SelectedImageIndex = 19;
+			dataNode.ImageIndex = 2;
+			dataNode.SelectedImageIndex = 2;
 
 			if (Nodes.Count == 0)
 			{

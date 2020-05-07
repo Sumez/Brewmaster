@@ -89,7 +89,10 @@ namespace Brewmaster.Settings
 
 		public static string GetString(object keys)
 		{
-			return new KeysConverter().ConvertTo(null, CultureInfo.CurrentUICulture, keys, typeof(string))?.ToString();
+			return new KeysConverter().ConvertTo(null, CultureInfo.CurrentUICulture, keys, typeof(string))?.ToString()
+				.Replace("Oemcomma", ",")
+				.Replace("OemPeriod", ".")
+				.Replace("Oem", "");
 		}
 
 		private ToolStripMenuItem testMenu = new ToolStripMenuItem("test");

@@ -93,7 +93,11 @@ namespace Brewmaster
 
 	    public static void BindKey(Feature feature, ToolStripMenuItem menuItem)
 	    {
-		    BindKey(feature, keys => menuItem.ShortcutKeys = keys);
+		    BindKey(feature, (Keys keys) =>
+		    {
+			    menuItem.ShortcutKeys = keys;
+			    menuItem.ShortcutKeyDisplayString = keys == System.Windows.Forms.Keys.None ? "" : ButtonAssignment.GetString(keys);
+		    });
 	    }
 		public static void BindKey(Feature feature, Action<Keys> callback)
 	    {

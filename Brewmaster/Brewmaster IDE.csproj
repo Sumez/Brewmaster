@@ -150,7 +150,11 @@
     <Compile Include="CartridgeExplorer\CartridgeExplorer.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="EditorWindows\Code\AllCompletion.cs" />
     <Compile Include="EditorWindows\Code\CodeMarkers.cs" />
+    <Compile Include="EditorWindows\Code\GoToAll.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="EditorWindows\Text\TextEditor.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -478,6 +482,9 @@
     <EmbeddedResource Include="CartridgeExplorer\CartridgeExplorer.resx">
       <DependentUpon>CartridgeExplorer.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="EditorWindows\Code\GoToAll.resx">
+      <DependentUpon>GoToAll.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="EditorWindows\Images\PaletteReductionSettings.resx">
       <DependentUpon>PaletteReductionSettings.cs</DependentUpon>
     </EmbeddedResource>
@@ -662,6 +669,11 @@
     <None Include="Resources\Files\image.png" />
     <None Include="Resources\Files\nesproject.png" />
     <None Include="Resources\Files\text.png" />
+    <None Include="Resources\Files\file_config.png" />
+    <None Include="Resources\Files\file_image.png" />
+    <None Include="Resources\Files\file_text.png" />
+    <None Include="Resources\Files\data.png" />
+    <None Include="Resources\Files\snesproject.png" />
     <Content Include="Resources\Other\error.png" />
     <None Include="Resources\Other\smallload.png" />
     <None Include="Resources\Other\smallsave.png" />

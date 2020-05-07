@@ -22,7 +22,7 @@ namespace Brewmaster.EditorWindows.Code
 			_directories = directories;
 			_reOpen = reOpen;
 			ImageList = new ImageList();
-			ImageList.Images.Add(Resources.folder_dark);
+			ImageList.Images.Add(Resources.folder);
 			ImageList.Images.Add(Resources.file);
 			DefaultIndex = -1;
 		}

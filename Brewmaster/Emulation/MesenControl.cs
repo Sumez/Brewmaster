@@ -63,7 +63,7 @@ namespace Brewmaster.Emulation
 			// Loading files synchronously in constructor is bad practice, but the file is small, and this should only happen when program starts anyway
 			// In the future, maybe get settings-object from a thread that loads all settings async on startup
 			EmulatorSettings = new EmulatorSettings();
-			EmulatorSettings.NesPalette.Load(Path.Combine(Program.WorkingDirectory, "nes.pal")); // TODO: custom palettes
+			if (Program.WorkingDirectory != null) EmulatorSettings.NesPalette.Load(Path.Combine(Program.WorkingDirectory, "nes.pal")); // TODO: custom palettes
 			EmulatorSettings.SnesPalette.LoadSnesPalette();
 		}
 
