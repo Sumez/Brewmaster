@@ -1066,7 +1066,7 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 			ResumeLayout();
 
 			Task.WhenAll(
-				CurrentProject.ParseDebugDataAsync(),
+				BuildHandler.ParseDebugDataAsync(CurrentProject),
 				CurrentProject.LoadAllSymbolsAsync()).ContinueWith((t) =>
 			{
 				ThreadSafeBreakpointHandler(CurrentProject.GetAllBreakpoints());

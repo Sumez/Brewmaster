@@ -422,6 +422,12 @@ namespace Brewmaster.BuildProcess
 			return errors;
 		}
 
+		public async Task ParseDebugDataAsync(AsmProject project)
+		{
+			var debugDataTask = project.ParseDebugDataAsync();
+			await debugDataTask.ContinueWith(t => { if (OnDebugDataUpdated != null) OnDebugDataUpdated(); });
+		}
+
 		private void ProcessErrorData(string message, List<BuildError> errors, ref string multilineError)
 		{
 			if (message == null) return;
