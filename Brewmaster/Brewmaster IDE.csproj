@@ -694,6 +694,7 @@
     <Content Include="Templates\ftm">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="setup.iss" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

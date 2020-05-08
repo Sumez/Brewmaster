@@ -1,4 +1,5 @@
 [Setup]
+AppId=brewmaster
 AppName=Brewmaster
 OutputBaseFilename=BrewmasterSetup
 AppVersion={#version}
