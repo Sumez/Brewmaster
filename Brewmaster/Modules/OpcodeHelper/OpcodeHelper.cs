@@ -26,7 +26,6 @@ namespace Brewmaster.Modules.OpcodeHelper
 		private System.ComponentModel.IContainer components;
 		private FlowLayoutPanel buttonPanel;
 		private Label subDescription;
-		private FlowLayoutPanel addressingModesPanel;
 		private readonly Dictionary<Opcode, OpcodeButton> _buttons = new Dictionary<Opcode, OpcodeButton>();
 
 		private void LoadOpcodes(ProjectType type)
@@ -53,6 +52,9 @@ namespace Brewmaster.Modules.OpcodeHelper
 		public OpcodeHelper(Events events)
 		{
 			InitializeComponent();
+
+			descriptionPanel.Controls.Add(_addressingModeDescription = new AddressingModeDescription(toolTip) { Dock = DockStyle.Top });
+			descriptionPanel.Controls.SetChildIndex(_addressingModeDescription, 0);
 
 			_events = events;
 			_events.HighlightedOpcode += SelectOpcode;
@@ -97,6 +99,7 @@ namespace Brewmaster.Modules.OpcodeHelper
 
 		private Opcode _selected;
 		private List<Opcode> _opcodes;
+		private AddressingModeDescription _addressingModeDescription;
 
 		public void SelectOpcode(Opcode opcode)
 		{
@@ -125,7 +128,7 @@ namespace Brewmaster.Modules.OpcodeHelper
 				}
 				else stringBuilder.AppendLine(opcode.Description[i]);
 			}
-			subDescription.Visible = hasSubDescription;
+			if (subDescription.Visible != hasSubDescription) subDescription.Visible = hasSubDescription;
 			description.Text = stringBuilder.ToString();
 			flagC.Checked = opcode.AffectedFlags.HasFlag(AffectedFlag.C);
 			flagZ.Checked = opcode.AffectedFlags.HasFlag(AffectedFlag.Z);
@@ -136,13 +139,7 @@ namespace Brewmaster.Modules.OpcodeHelper
 			toolTip.SetToolTip(flagV, opcode.FlagExplanations.ContainsKey(AffectedFlag.V) ? opcode.FlagExplanations[AffectedFlag.V] : null);
 			toolTip.SetToolTip(flagN, opcode.FlagExplanations.ContainsKey(AffectedFlag.N) ? opcode.FlagExplanations[AffectedFlag.N] : null);
 
-			addressingModesPanel.SuspendLayout();
-			addressingModesPanel.Controls.Clear();
-			foreach (var addressingMode in opcode.AddressingModes)
-			{
-				addressingModesPanel.Controls.Add(new AddressingModeDescription(addressingMode, toolTip) { Margin = Padding.Empty });
-			}
-			addressingModesPanel.ResumeLayout();
+			_addressingModeDescription.Modes = opcode.AddressingModes;
 			if (!descriptionPanel.Visible) descriptionPanel.Visible = true;
 		}
 
@@ -161,7 +158,6 @@ namespace Brewmaster.Modules.OpcodeHelper
 			this.buttonPanelContainer = new System.Windows.Forms.Panel();
 			this.panel2 = new System.Windows.Forms.Panel();
 			this.descriptionPanel = new System.Windows.Forms.Panel();
-			this.addressingModesPanel = new System.Windows.Forms.FlowLayoutPanel();
 			this.description = new System.Windows.Forms.Label();
 			this.subDescription = new System.Windows.Forms.Label();
 			this.title = new System.Windows.Forms.Label();
@@ -290,7 +286,6 @@ namespace Brewmaster.Modules.OpcodeHelper
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.descriptionPanel.AutoScroll = true;
-			this.descriptionPanel.Controls.Add(this.addressingModesPanel);
 			this.descriptionPanel.Controls.Add(this.description);
 			this.descriptionPanel.Controls.Add(this.subDescription);
 			this.descriptionPanel.Controls.Add(flagPanel);
@@ -300,17 +295,6 @@ namespace Brewmaster.Modules.OpcodeHelper
 			this.descriptionPanel.Name = "descriptionPanel";
 			this.descriptionPanel.Size = new System.Drawing.Size(238, 427);
 			this.descriptionPanel.TabIndex = 2;
-			// 
-			// addressingModesPanel
-			// 
-			this.addressingModesPanel.AutoSize = true;
-			this.addressingModesPanel.Dock = System.Windows.Forms.DockStyle.Top;
-			this.addressingModesPanel.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
-			this.addressingModesPanel.Location = new System.Drawing.Point(0, 85);
-			this.addressingModesPanel.Name = "addressingModesPanel";
-			this.addressingModesPanel.Size = new System.Drawing.Size(238, 0);
-			this.addressingModesPanel.TabIndex = 6;
-			this.addressingModesPanel.WrapContents = false;
 			// 
 			// description
 			// 

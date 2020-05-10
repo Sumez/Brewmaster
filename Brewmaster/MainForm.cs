@@ -103,6 +103,7 @@ namespace Brewmaster
 			EmulatorStatusChanged(_emulatorStatus);
 
 		    ActiveFileChanged();
+
 	    }
 		private void ActiveFileChanged()
 		{
