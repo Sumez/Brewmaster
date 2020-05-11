@@ -1327,12 +1327,12 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 
         private void fullScreenMenuItem_Click(object sender, EventArgs e)
         {
-			Visible = false;
+			WindowState = FormWindowState.Normal;
 			FormBorderStyle = fullScreenMenuItem.Checked ? FormBorderStyle.None : FormBorderStyle.Sizable;
-			Visible = true;
-        }
+			if (fullScreenMenuItem.Checked) WindowState = FormWindowState.Maximized;
+		}
 
-        private void lineNumbersMenuItem_Click(object sender, EventArgs e)
+		private void lineNumbersMenuItem_Click(object sender, EventArgs e)
         {
 	        TextEditor.DefaultCodeProperties.ShowLineNumbers = Settings.ShowLineNumbers = viewLineNumbersMenuItem.Checked;
 			if (editorTabs.SelectedTab is TextEditorWindow textEditorWindow)
