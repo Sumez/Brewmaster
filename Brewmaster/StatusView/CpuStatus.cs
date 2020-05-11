@@ -11,23 +11,15 @@ namespace Brewmaster.StatusView
 {
 	public partial class CpuStatus : UserControl
 	{
-		public CpuStatus()
+		public CpuStatus(Events moduleEvents)
 		{
 			InitializeComponent();
 			InitializeFlagEvents();
 			SetMode(ProjectType.Nes);
-		}
 
-		public Events ModuleEvents
-		{
-			get { return _moduleEvents; }
-			set
-			{
-				_moduleEvents = value;
-				if (_moduleEvents == null) return;
-				_moduleEvents.EmulationStateUpdate += UpdateStates;
-				_moduleEvents.ProjectTypeChanged += SetMode;
-			}
+			_moduleEvents = moduleEvents;
+			_moduleEvents.EmulationStateUpdate += UpdateStates;
+			_moduleEvents.ProjectTypeChanged += SetMode;
 		}
 
 		private void InitializeFlagEvents()
