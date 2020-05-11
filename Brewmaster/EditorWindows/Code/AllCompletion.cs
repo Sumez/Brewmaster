@@ -26,6 +26,7 @@ namespace Brewmaster.EditorWindows.Code
 			ImageList = new ImageList();
 			ImageList.Images.Add(Resources.label);
 			ImageList.Images.Add(Resources.file);
+			ImageList.Images.Add(Resources.macro);
 		}
 
 		public override ICompletionData[] GenerateCompletionData(string fileName, TextArea textArea, char charTyped)
@@ -80,14 +81,14 @@ namespace Brewmaster.EditorWindows.Code
 		public NavigationData(Symbol symbol, AsmProject project, Events events)
 		{
 			Text = symbol.Text;
-			Description = string.Format(@"{0}: {1},{2}", new FileInfo(symbol.Source).Name, symbol.Line + 1, symbol.Character);
+			Description = string.Format(@"{0}: {1},{2}", new FileInfo(symbol.Source).Name, symbol.Line, symbol.Character + 1);
 			_navigate = () =>
 			{
 				var file = project.Files.FirstOrDefault(f => f.File.FullName == symbol.Source);
 				if (file == null) return;
 				events.OpenFile(file, symbol.Line, symbol.Character, symbol.Text.Length);
 			};
-			ImageIndex = 0;
+			ImageIndex = symbol is MacroSymbol ? 2 : 0;
 		}
 
 		public NavigationData(AsmProjectFile file, Events events)

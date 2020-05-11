@@ -47,7 +47,7 @@ namespace Brewmaster.BuildProcess
 			return buildProcessSource.Task;
 		}
 
-		public Task<List<BuildError>> ParseErrors(string sourceCode, AsmProjectFile projectFile)
+		public Task<IEnumerable<BuildError>> ParseErrors(string sourceCode, AsmProjectFile projectFile)
 		{
 			return Task.Run(() =>
 			{
@@ -154,12 +154,12 @@ namespace Brewmaster.BuildProcess
 			public BuildErrorType Type { get; private set; }
 			public string FullMessage { get; private set; }
 		}
-		private List<BuildError> ParseErrorsSync(string sourceCode, AsmProjectFile projectFile)
+		private IEnumerable<BuildError> ParseErrorsSync(string sourceCode, AsmProjectFile projectFile)
 		{
 			var errors = new List<BuildError>();
 			var projectFolder = projectFile.Project.Directory.FullName;
-			var sourceFile = Path.GetTempPath() + @"/ca65temp.s";
-			var objectFile = Path.GetTempPath() + @"/ca65temp.o";
+			var sourceFile = Path.Combine(Path.GetTempPath(), @"ca65temp.s");
+			var objectFile = Path.Combine(Path.GetTempPath(), @"ca65temp.o");
 			var configuration = projectFile.Project.CurrentConfiguration;
 
 			File.WriteAllText(sourceFile, sourceCode);
@@ -185,7 +185,7 @@ namespace Brewmaster.BuildProcess
 				process.BeginErrorReadLine();
 				process.WaitForExit();
 			}
-			return errors;
+			return errors.Where(e => e.File == sourceFile);
 		}
 		private List<BuildError> BuildSync(AsmProject project, TaskCompletionSource<bool> buildProcessSource)
 		{

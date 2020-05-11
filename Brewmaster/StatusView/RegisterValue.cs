@@ -97,6 +97,7 @@ namespace Brewmaster.StatusView
 			RegisterSize = RegisterSize.EightBit;
 			Height = 20;
 			DimColor = Color.Gray;
+			DoubleBuffered = true;
 		}
 		private static int CharWidth = 7;
 		private static int LeftPadding = 3;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using Brewmaster.Modules;
 using Brewmaster.ProjectModel;
 using Brewmaster.Properties;
 
@@ -14,6 +15,7 @@ namespace Brewmaster.ProjectExplorer
 		private AsmProject _project;
 		private EditableNode _dataRootNode;
 		private EditableNode _projectRootNode;
+		private Events _events;
 
 		public Action<AsmProjectFile> OpenFile;
 		public Action<string, FileTemplate, string> CreateNewFile { set { _menu.CreateNewFile = value; } }
@@ -40,8 +42,9 @@ namespace Brewmaster.ProjectExplorer
 
 		}
 
-		public ProjectExplorer()
+		public ProjectExplorer(Events events)
 		{
+			_events = events;
 			InitializeComponent();
 
 			AfterSelect += (sender, args) => _menu.SetNode(args.Node);
@@ -69,6 +72,12 @@ namespace Brewmaster.ProjectExplorer
 			ImageList.Images.Add(Resources.file_image);
 			ImageList.Images.Add(Resources.file_text);
 			ImageList.Images.Add(Resources.file_config);
+
+			_events.FilenameChanged += file =>
+			{
+				var node = GetNode<FileNode>(Nodes, n => n.FileInfo == file);
+				if (node != null) node.UpdateFromFile(file);
+			};
 		}
 
 		protected override bool OnBeforeDrag(object draggedItem)
@@ -283,12 +292,12 @@ namespace Brewmaster.ProjectExplorer
 				if ((projectFile.Mode == CompileMode.ContentPipeline) != pipeline) continue;
 
 				var fileNode = new FileNode(projectFile);
-				fileNode.Edited += (e) => RenameFile(projectFile.File, e);
+				fileNode.Edited += (e) => RenameFile(projectFile, e);
 				node.Nodes.Add(fileNode);
 			}
 			return node;
 		}
-		private void RenameFile(FileInfo file, NodeLabelEditEventArgs e)
+		private void RenameFile(AsmProjectFile file, NodeLabelEditEventArgs e)
 		{
 			foreach (var character in Path.GetInvalidFileNameChars())
 				if (e.Label.Contains(character))
@@ -297,7 +306,8 @@ namespace Brewmaster.ProjectExplorer
 					Program.Error(string.Format("Invalid character '{0}'", character));
 					return;
 				}
-			file.MoveTo(Path.Combine(file.DirectoryName, e.Label));
+			file.File.MoveTo(Path.Combine(file.File.DirectoryName, e.Label));
+			_events.OnFilenameChanged(file);
 			_project.Pristine = false;
 			// TODO: Update open tabs, and breakpoint list
 		}

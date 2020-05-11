@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Brewmaster.EditorWindows;
 using Brewmaster.EditorWindows.Text;
 using Brewmaster.Emulation;
 using Brewmaster.Modules.Ca65Helper;
@@ -33,6 +32,7 @@ namespace Brewmaster.Modules
 		public event Action<ProjectType> ProjectTypeChanged;
 		public event Action<Opcode> HighlightedOpcode;
 		public event Action<Ca65Command> HighlightedCommand;
+		public event Action<AsmProjectFile> FilenameChanged;
 
 		public void HighlightOpcode(Opcode opcode)
 		{
@@ -67,6 +67,11 @@ namespace Brewmaster.Modules
 		public void OpenFile(AsmProjectFile file, int? line = null, int? column = null, int? length = null)
 		{
 			if (OpenFileAction != null) OpenFileAction(file, line, column, length);
+		}
+
+		public void OnFilenameChanged(AsmProjectFile projectFile)
+		{
+			if (FilenameChanged != null) FilenameChanged(projectFile);
 		}
 	}
 }

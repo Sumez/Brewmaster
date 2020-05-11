@@ -4,6 +4,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Brewmaster.BuildProcess;
@@ -43,7 +44,7 @@ namespace Brewmaster.EditorWindows.Code
 		private static readonly Keys[] NavigationKeys = { Keys.ShiftKey, Keys.ControlKey, Keys.Alt, Keys.Down, Keys.Up, Keys.Left, Keys.Right, Keys.Home, Keys.End, Keys.Enter, Keys.Escape, Keys.PageDown, Keys.PageUp, Keys.Tab, Keys.Return };
 
 		private CodeMenu Menu { get; set; }
-		public Func<string, Task<List<BuildHandler.BuildError>>> ParseErrors { get; set; }
+		public Func<string, Task<IEnumerable<BuildHandler.BuildError>>> ParseErrors { get; set; }
 		public Action<string, bool> AddToWatch { get; set; }
 		public Action<int, Breakpoint.Types> AddAddressBreakpoint { get; set; }
 		public Action<string, Breakpoint.Types> AddSymbolBreakpoint { get; set; }
@@ -211,15 +212,13 @@ namespace Brewmaster.EditorWindows.Code
 
 			ActiveTextAreaControl.Caret.PositionChanged += (s, a) =>
 			{
-				HighlightCommandAtCaret();
+				QueueCareInformation();
 
 				if (ActiveTextAreaControl.Caret.Line == _caretLine) return;
-
 				_caretLine = ActiveTextAreaControl.Caret.Line;
 				RefreshErrorInfo();
-				HighlightOpcodeOnLine();
 			};
-			
+
 			ActiveTextAreaControl.TextArea.KeyUp += delegate(object sender, KeyEventArgs e)
 													{
 														/*if (e.KeyCode == Program.Keys[Brewmaster.Settings.Feature.GoToDefinition])
@@ -254,6 +253,22 @@ namespace Brewmaster.EditorWindows.Code
 
 				if (changed) RefreshBreakpointsInProject();
 			};
+		}
+
+		private void QueueCareInformation()
+		{
+			if (_queueTimer != null) _queueTimer.Change(100, Timeout.Infinite);
+			else _queueTimer = new System.Threading.Timer(RefreshInformationForLocation, null, 100, Timeout.Infinite);
+		}
+
+		private void RefreshInformationForLocation(object state)
+		{
+			_queueTimer = null;
+			BeginInvoke(new Action(() =>
+			{
+				HighlightCommandAtCaret();
+				HighlightOpcodeOnLine();
+			}));
 		}
 
 		private void HighlightCommandAtCaret()
@@ -324,6 +339,8 @@ namespace Brewmaster.EditorWindows.Code
 		private bool _changedSinceLastCheck = true;
 		private bool _queueCheck = false;
 		private Task _checkTask;
+		private System.Threading.Timer _queueTimer;
+
 		private void RefreshErrorInfo()
 		{
 			if (!_changedSinceLastCheck) return;

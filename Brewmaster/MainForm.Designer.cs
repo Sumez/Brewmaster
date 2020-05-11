@@ -444,7 +444,7 @@ namespace Brewmaster
 			// toolStripSeparator25
 			// 
 			toolStripSeparator25.Name = "toolStripSeparator25";
-			toolStripSeparator25.Size = new System.Drawing.Size(138, 6);
+			toolStripSeparator25.Size = new System.Drawing.Size(137, 6);
 			// 
 			// toolStripSeparator26
 			// 
@@ -490,7 +490,7 @@ namespace Brewmaster
 			// toolStripSeparator27
 			// 
 			toolStripSeparator27.Name = "toolStripSeparator27";
-			toolStripSeparator27.Size = new System.Drawing.Size(212, 6);
+			toolStripSeparator27.Size = new System.Drawing.Size(211, 6);
 			toolStripSeparator27.Visible = false;
 			// 
 			// MainWindowMenu
@@ -536,7 +536,7 @@ namespace Brewmaster
             this.File_ExitMenuItem});
 			this.FileMenuItem.Name = "FileMenuItem";
 			this.FileMenuItem.Size = new System.Drawing.Size(37, 20);
-			this.FileMenuItem.Text = "File";
+			this.FileMenuItem.Text = "&File";
 			// 
 			// File_NewMenuItem
 			// 
@@ -551,7 +551,7 @@ namespace Brewmaster
             this.graphicsDataMenuItem});
 			this.File_NewMenuItem.Name = "File_NewMenuItem";
 			this.File_NewMenuItem.Size = new System.Drawing.Size(260, 22);
-			this.File_NewMenuItem.Text = "New                                                      ";
+			this.File_NewMenuItem.Text = "&New                                                      ";
 			// 
 			// nesProjectMenuItem
 			// 
@@ -618,7 +618,7 @@ namespace Brewmaster
 			this.File_OpenProjectMenuItem.Name = "File_OpenProjectMenuItem";
 			this.File_OpenProjectMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
 			this.File_OpenProjectMenuItem.Size = new System.Drawing.Size(260, 22);
-			this.File_OpenProjectMenuItem.Text = "Open Project...";
+			this.File_OpenProjectMenuItem.Text = "&Open Project...";
 			this.File_OpenProjectMenuItem.Click += new System.EventHandler(this.File_OpenProjectMenuItem_Click);
 			// 
 			// importProjectMenuItem
@@ -639,7 +639,7 @@ namespace Brewmaster
 			this.File_SaveMenuItem.Name = "File_SaveMenuItem";
 			this.File_SaveMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
 			this.File_SaveMenuItem.Size = new System.Drawing.Size(260, 22);
-			this.File_SaveMenuItem.Text = "Save";
+			this.File_SaveMenuItem.Text = "&Save";
 			this.File_SaveMenuItem.Click += new System.EventHandler(this.File_SaveMenuItem_Click);
 			// 
 			// File_SaveAsMenuItem
@@ -669,7 +669,7 @@ namespace Brewmaster
 			// 
 			this.File_CloseMenuItem.Name = "File_CloseMenuItem";
 			this.File_CloseMenuItem.Size = new System.Drawing.Size(260, 22);
-			this.File_CloseMenuItem.Text = "Close";
+			this.File_CloseMenuItem.Text = "&Close";
 			this.File_CloseMenuItem.Click += new System.EventHandler(this.File_CloseMenuItem_Click);
 			// 
 			// File_CloseAllMenuItem
@@ -696,7 +696,7 @@ namespace Brewmaster
 			this.File_PrintMenuItem.Name = "File_PrintMenuItem";
 			this.File_PrintMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.P)));
 			this.File_PrintMenuItem.Size = new System.Drawing.Size(260, 22);
-			this.File_PrintMenuItem.Text = "Print...";
+			this.File_PrintMenuItem.Text = "&Print...";
 			this.File_PrintMenuItem.Click += new System.EventHandler(this.File_PrintMenuItem_Click);
 			// 
 			// File_PrintPreviewMenuItem
@@ -715,7 +715,7 @@ namespace Brewmaster
 			// 
 			this.settingsMenuItem.Name = "settingsMenuItem";
 			this.settingsMenuItem.Size = new System.Drawing.Size(260, 22);
-			this.settingsMenuItem.Text = "Settings...";
+			this.settingsMenuItem.Text = "Se&ttings...";
 			this.settingsMenuItem.Click += new System.EventHandler(this.settingsMenuItem_Click);
 			// 
 			// toolStripSeparator24
@@ -727,7 +727,7 @@ namespace Brewmaster
 			// 
 			this.recentProjectsMenuItem.Name = "recentProjectsMenuItem";
 			this.recentProjectsMenuItem.Size = new System.Drawing.Size(260, 22);
-			this.recentProjectsMenuItem.Text = "Recent Projects";
+			this.recentProjectsMenuItem.Text = "&Recent Projects";
 			// 
 			// toolStripSeparator9
 			// 
@@ -739,7 +739,7 @@ namespace Brewmaster
 			this.File_ExitMenuItem.Name = "File_ExitMenuItem";
 			this.File_ExitMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.F4)));
 			this.File_ExitMenuItem.Size = new System.Drawing.Size(260, 22);
-			this.File_ExitMenuItem.Text = "Exit";
+			this.File_ExitMenuItem.Text = "E&xit";
 			this.File_ExitMenuItem.Click += new System.EventHandler(this.File_ExitMenuItem_Click);
 			// 
 			// EditMenuItem
@@ -765,14 +765,14 @@ namespace Brewmaster
             this.insertMenuItem});
 			this.EditMenuItem.Name = "EditMenuItem";
 			this.EditMenuItem.Size = new System.Drawing.Size(39, 20);
-			this.EditMenuItem.Text = "Edit";
+			this.EditMenuItem.Text = "&Edit";
 			// 
 			// Edit_CutMenuItem
 			// 
 			this.Edit_CutMenuItem.Image = global::Brewmaster.Properties.Resources.cut1;
 			this.Edit_CutMenuItem.Name = "Edit_CutMenuItem";
 			this.Edit_CutMenuItem.Size = new System.Drawing.Size(217, 22);
-			this.Edit_CutMenuItem.Text = "Cut                           ";
+			this.Edit_CutMenuItem.Text = "Cu&t";
 			this.Edit_CutMenuItem.Click += new System.EventHandler(this.Edit_CutMenuItem_Click);
 			// 
 			// Edit_CopyMenuItem
@@ -781,7 +781,7 @@ namespace Brewmaster
 			this.Edit_CopyMenuItem.Name = "Edit_CopyMenuItem";
 			this.Edit_CopyMenuItem.ShortcutKeyDisplayString = "Ctrl+C";
 			this.Edit_CopyMenuItem.Size = new System.Drawing.Size(217, 22);
-			this.Edit_CopyMenuItem.Text = "Copy";
+			this.Edit_CopyMenuItem.Text = "&Copy";
 			this.Edit_CopyMenuItem.Click += new System.EventHandler(this.Edit_CopyMenuItem_Click);
 			// 
 			// Edit_PasteMenuItem
@@ -790,7 +790,7 @@ namespace Brewmaster
 			this.Edit_PasteMenuItem.Name = "Edit_PasteMenuItem";
 			this.Edit_PasteMenuItem.ShortcutKeyDisplayString = "Ctrl+V";
 			this.Edit_PasteMenuItem.Size = new System.Drawing.Size(217, 22);
-			this.Edit_PasteMenuItem.Text = "Paste";
+			this.Edit_PasteMenuItem.Text = "&Paste";
 			this.Edit_PasteMenuItem.Click += new System.EventHandler(this.Edit_PasteMenuItem_Click);
 			// 
 			// toolStripSeparator10
@@ -804,7 +804,7 @@ namespace Brewmaster
 			this.Edit_UndoMenuItem.Name = "Edit_UndoMenuItem";
 			this.Edit_UndoMenuItem.ShortcutKeyDisplayString = "Ctrl+Z";
 			this.Edit_UndoMenuItem.Size = new System.Drawing.Size(217, 22);
-			this.Edit_UndoMenuItem.Text = "Undo";
+			this.Edit_UndoMenuItem.Text = "&Undo";
 			this.Edit_UndoMenuItem.Click += new System.EventHandler(this.Edit_UndoMenuItem_Click);
 			// 
 			// Edit_RedoMenuItem
@@ -813,7 +813,7 @@ namespace Brewmaster
 			this.Edit_RedoMenuItem.Name = "Edit_RedoMenuItem";
 			this.Edit_RedoMenuItem.ShortcutKeyDisplayString = "Ctrl+Y";
 			this.Edit_RedoMenuItem.Size = new System.Drawing.Size(217, 22);
-			this.Edit_RedoMenuItem.Text = "Redo";
+			this.Edit_RedoMenuItem.Text = "&Redo";
 			this.Edit_RedoMenuItem.Click += new System.EventHandler(this.Edit_RedoMenuItem_Click);
 			// 
 			// toolStripSeparator11
@@ -826,7 +826,7 @@ namespace Brewmaster
 			this.findMenuItem.Name = "findMenuItem";
 			this.findMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F)));
 			this.findMenuItem.Size = new System.Drawing.Size(217, 22);
-			this.findMenuItem.Text = "Find...";
+			this.findMenuItem.Text = "&Find...";
 			this.findMenuItem.Click += new System.EventHandler(this.Edit_FindMenuItem_Click);
 			// 
 			// findInFilesMenuItem
@@ -864,7 +864,7 @@ namespace Brewmaster
 			this.Edit_GoToMenuItem.Name = "Edit_GoToMenuItem";
 			this.Edit_GoToMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.G)));
 			this.Edit_GoToMenuItem.Size = new System.Drawing.Size(217, 22);
-			this.Edit_GoToMenuItem.Text = "Go To";
+			this.Edit_GoToMenuItem.Text = "&Go To";
 			this.Edit_GoToMenuItem.Click += new System.EventHandler(this.Edit_GoToMenuItem_Click);
 			// 
 			// goToAllMenuItem
@@ -884,7 +884,7 @@ namespace Brewmaster
 			this.selectAllMenuItem.Name = "selectAllMenuItem";
 			this.selectAllMenuItem.ShortcutKeyDisplayString = "Ctrl+A";
 			this.selectAllMenuItem.Size = new System.Drawing.Size(217, 22);
-			this.selectAllMenuItem.Text = "Select All";
+			this.selectAllMenuItem.Text = "Select &All";
 			this.selectAllMenuItem.Click += new System.EventHandler(this.Edit_SelectAllMenuItem_Click);
 			// 
 			// insertMenuItem
@@ -917,7 +917,7 @@ namespace Brewmaster
             this.toolStripSeparator18});
 			this.ViewMenuItem.Name = "ViewMenuItem";
 			this.ViewMenuItem.Size = new System.Drawing.Size(44, 20);
-			this.ViewMenuItem.Text = "View";
+			this.ViewMenuItem.Text = "&View";
 			// 
 			// viewToolbarMenuItem
 			// 
@@ -926,7 +926,7 @@ namespace Brewmaster
 			this.viewToolbarMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.viewToolbarMenuItem.Name = "viewToolbarMenuItem";
 			this.viewToolbarMenuItem.Size = new System.Drawing.Size(197, 22);
-			this.viewToolbarMenuItem.Text = "Toolbar";
+			this.viewToolbarMenuItem.Text = "&Toolbar";
 			this.viewToolbarMenuItem.Click += new System.EventHandler(this.toolbarMenuItem_Click);
 			// 
 			// viewStatusBarMenuItem
@@ -936,7 +936,7 @@ namespace Brewmaster
 			this.viewStatusBarMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.viewStatusBarMenuItem.Name = "viewStatusBarMenuItem";
 			this.viewStatusBarMenuItem.Size = new System.Drawing.Size(197, 22);
-			this.viewStatusBarMenuItem.Text = "Status Bar";
+			this.viewStatusBarMenuItem.Text = "&Status Bar";
 			this.viewStatusBarMenuItem.Click += new System.EventHandler(this.statusBarMenuItem_Click);
 			// 
 			// toolStripSeparator35
@@ -949,7 +949,7 @@ namespace Brewmaster
 			this.fullScreenMenuItem.CheckOnClick = true;
 			this.fullScreenMenuItem.Name = "fullScreenMenuItem";
 			this.fullScreenMenuItem.Size = new System.Drawing.Size(197, 22);
-			this.fullScreenMenuItem.Text = "Full Screen";
+			this.fullScreenMenuItem.Text = "&Full Screen";
 			this.fullScreenMenuItem.Click += new System.EventHandler(this.fullScreenMenuItem_Click);
 			// 
 			// toolStripSeparator34
@@ -976,7 +976,7 @@ namespace Brewmaster
 			this.viewLineNumbersMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.viewLineNumbersMenuItem.Name = "viewLineNumbersMenuItem";
 			this.viewLineNumbersMenuItem.Size = new System.Drawing.Size(197, 22);
-			this.viewLineNumbersMenuItem.Text = "Line Numbers";
+			this.viewLineNumbersMenuItem.Text = "&Line Numbers";
 			this.viewLineNumbersMenuItem.Click += new System.EventHandler(this.lineNumbersMenuItem_Click);
 			// 
 			// lineAddressMappingsMenuItem
@@ -984,7 +984,7 @@ namespace Brewmaster
 			this.lineAddressMappingsMenuItem.CheckOnClick = true;
 			this.lineAddressMappingsMenuItem.Name = "lineAddressMappingsMenuItem";
 			this.lineAddressMappingsMenuItem.Size = new System.Drawing.Size(197, 22);
-			this.lineAddressMappingsMenuItem.Text = "Line Address Mappings";
+			this.lineAddressMappingsMenuItem.Text = "&Line Address Mappings";
 			this.lineAddressMappingsMenuItem.Click += new System.EventHandler(this.lineAddressMappingsMenuItem_Click);
 			// 
 			// toolStripSeparator18
@@ -1013,7 +1013,7 @@ namespace Brewmaster
             this.buildSettingsMenuItem});
 			this.BuildMenuItem.Name = "BuildMenuItem";
 			this.BuildMenuItem.Size = new System.Drawing.Size(46, 20);
-			this.BuildMenuItem.Text = "Build";
+			this.BuildMenuItem.Text = "&Build";
 			// 
 			// buildProjectMenuItem
 			// 
@@ -1022,7 +1022,7 @@ namespace Brewmaster
 			this.buildProjectMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
             | System.Windows.Forms.Keys.B)));
 			this.buildProjectMenuItem.Size = new System.Drawing.Size(208, 22);
-			this.buildProjectMenuItem.Text = "Build";
+			this.buildProjectMenuItem.Text = "&Build";
 			this.buildProjectMenuItem.Click += new System.EventHandler(this.buildToolStripMenuItem_Click);
 			// 
 			// runNewBuildMenuItem
@@ -1030,14 +1030,14 @@ namespace Brewmaster
 			this.runNewBuildMenuItem.Name = "runNewBuildMenuItem";
 			this.runNewBuildMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F5)));
 			this.runNewBuildMenuItem.Size = new System.Drawing.Size(208, 22);
-			this.runNewBuildMenuItem.Text = "Run New Build";
+			this.runNewBuildMenuItem.Text = "Run &New Build";
 			this.runNewBuildMenuItem.Click += new System.EventHandler(this.runNewBuildToolStripMenuItem_Click);
 			// 
 			// continueWithNewBuildMenuItem
 			// 
 			this.continueWithNewBuildMenuItem.Name = "continueWithNewBuildMenuItem";
 			this.continueWithNewBuildMenuItem.Size = new System.Drawing.Size(208, 22);
-			this.continueWithNewBuildMenuItem.Text = "Continue With New Build";
+			this.continueWithNewBuildMenuItem.Text = "&Continue With New Build";
 			this.continueWithNewBuildMenuItem.Visible = false;
 			this.continueWithNewBuildMenuItem.Click += new System.EventHandler(this.continueWithNewBuildToolStripMenuItem_Click);
 			// 
@@ -1047,7 +1047,7 @@ namespace Brewmaster
 			this.runMenuItem.Name = "runMenuItem";
 			this.runMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F5;
 			this.runMenuItem.Size = new System.Drawing.Size(208, 22);
-			this.runMenuItem.Text = "Run";
+			this.runMenuItem.Text = "&Run";
 			this.runMenuItem.Click += new System.EventHandler(this.Run_RunApplicationMenuItem_Click);
 			// 
 			// pauseMenuItem
@@ -1055,7 +1055,7 @@ namespace Brewmaster
 			this.pauseMenuItem.Image = global::Brewmaster.Properties.Resources.pause;
 			this.pauseMenuItem.Name = "pauseMenuItem";
 			this.pauseMenuItem.Size = new System.Drawing.Size(208, 22);
-			this.pauseMenuItem.Text = "Pause";
+			this.pauseMenuItem.Text = "&Pause";
 			this.pauseMenuItem.Click += new System.EventHandler(this.Run_RunAppletMenuItem_Click);
 			// 
 			// stopMenuItem
@@ -1063,7 +1063,7 @@ namespace Brewmaster
 			this.stopMenuItem.Image = global::Brewmaster.Properties.Resources.stop1;
 			this.stopMenuItem.Name = "stopMenuItem";
 			this.stopMenuItem.Size = new System.Drawing.Size(208, 22);
-			this.stopMenuItem.Text = "Stop";
+			this.stopMenuItem.Text = "&Stop";
 			this.stopMenuItem.Click += new System.EventHandler(this.StopMenuItem_Click);
 			// 
 			// restartMenuItem
@@ -1072,14 +1072,14 @@ namespace Brewmaster
 			this.restartMenuItem.Name = "restartMenuItem";
 			this.restartMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.R)));
 			this.restartMenuItem.Size = new System.Drawing.Size(208, 22);
-			this.restartMenuItem.Text = "Restart";
+			this.restartMenuItem.Text = "R&estart";
 			this.restartMenuItem.Click += new System.EventHandler(this.restartToolStripMenuItem_Click);
 			// 
 			// flashCartridgeMenuItem
 			// 
 			this.flashCartridgeMenuItem.Name = "flashCartridgeMenuItem";
 			this.flashCartridgeMenuItem.Size = new System.Drawing.Size(208, 22);
-			this.flashCartridgeMenuItem.Text = "Flash Cartridge";
+			this.flashCartridgeMenuItem.Text = "&Flash Cartridge";
 			this.flashCartridgeMenuItem.Click += new System.EventHandler(this.flashCartridgeMenuItem_Click);
 			// 
 			// toolStripSeparator20
@@ -1092,7 +1092,7 @@ namespace Brewmaster
 			this.stepOverMenuItem.Name = "stepOverMenuItem";
 			this.stepOverMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F10;
 			this.stepOverMenuItem.Size = new System.Drawing.Size(208, 22);
-			this.stepOverMenuItem.Text = "Step Over";
+			this.stepOverMenuItem.Text = "&Step Over";
 			this.stepOverMenuItem.Click += new System.EventHandler(this.stepOverMenuItem_Click);
 			// 
 			// stepIntoMenuItem
@@ -1100,7 +1100,7 @@ namespace Brewmaster
 			this.stepIntoMenuItem.Name = "stepIntoMenuItem";
 			this.stepIntoMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F11;
 			this.stepIntoMenuItem.Size = new System.Drawing.Size(208, 22);
-			this.stepIntoMenuItem.Text = "Step Into";
+			this.stepIntoMenuItem.Text = "Step &Into";
 			this.stepIntoMenuItem.Click += new System.EventHandler(this.stepIntoToolStripMenuItem_Click);
 			// 
 			// stepOutMenuItem
@@ -1108,7 +1108,7 @@ namespace Brewmaster
 			this.stepOutMenuItem.Name = "stepOutMenuItem";
 			this.stepOutMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Shift | System.Windows.Forms.Keys.F11)));
 			this.stepOutMenuItem.Size = new System.Drawing.Size(208, 22);
-			this.stepOutMenuItem.Text = "Step Out";
+			this.stepOutMenuItem.Text = "Step &Out";
 			this.stepOutMenuItem.Click += new System.EventHandler(this.stepOutToolStripMenuItem_Click);
 			// 
 			// stepBackMenuItem
@@ -1116,7 +1116,7 @@ namespace Brewmaster
 			this.stepBackMenuItem.Name = "stepBackMenuItem";
 			this.stepBackMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Shift | System.Windows.Forms.Keys.F10)));
 			this.stepBackMenuItem.Size = new System.Drawing.Size(208, 22);
-			this.stepBackMenuItem.Text = "Step Back";
+			this.stepBackMenuItem.Text = "Step B&ack";
 			this.stepBackMenuItem.Click += new System.EventHandler(this.stepBackToolStripMenuItem_Click);
 			// 
 			// toolStripSeparator21
@@ -1128,7 +1128,7 @@ namespace Brewmaster
 			// 
 			this.buildSettingsMenuItem.Name = "buildSettingsMenuItem";
 			this.buildSettingsMenuItem.Size = new System.Drawing.Size(208, 22);
-			this.buildSettingsMenuItem.Text = "Build Settings...";
+			this.buildSettingsMenuItem.Text = "Build Se&ttings...";
 			this.buildSettingsMenuItem.Click += new System.EventHandler(this.buildSettingsMenuItem_Click);
 			// 
 			// EmulatorMenuItem
@@ -1149,7 +1149,7 @@ namespace Brewmaster
             this.emulatorSettingsMenuItem});
 			this.EmulatorMenuItem.Name = "EmulatorMenuItem";
 			this.EmulatorMenuItem.Size = new System.Drawing.Size(67, 20);
-			this.EmulatorMenuItem.Text = "Emulator";
+			this.EmulatorMenuItem.Text = "E&mulator";
 			// 
 			// updateEveryFrameMenuItem
 			// 
@@ -1228,7 +1228,7 @@ namespace Brewmaster
 			this.playAudioMenuItem.CheckOnClick = true;
 			this.playAudioMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.playAudioMenuItem.Name = "playAudioMenuItem";
-			this.playAudioMenuItem.Size = new System.Drawing.Size(141, 22);
+			this.playAudioMenuItem.Size = new System.Drawing.Size(140, 22);
 			this.playAudioMenuItem.Text = "Play Audio";
 			this.playAudioMenuItem.Click += new System.EventHandler(this.playAudioToolStripMenuItem_Click);
 			// 
@@ -1238,7 +1238,7 @@ namespace Brewmaster
 			this.playPulse1MenuItem.CheckOnClick = true;
 			this.playPulse1MenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.playPulse1MenuItem.Name = "playPulse1MenuItem";
-			this.playPulse1MenuItem.Size = new System.Drawing.Size(141, 22);
+			this.playPulse1MenuItem.Size = new System.Drawing.Size(140, 22);
 			this.playPulse1MenuItem.Text = "Play Pulse 1";
 			this.playPulse1MenuItem.Click += new System.EventHandler(this.playPulse1ToolStripMenuItem_Click);
 			// 
@@ -1248,7 +1248,7 @@ namespace Brewmaster
 			this.playPulse2MenuItem.CheckOnClick = true;
 			this.playPulse2MenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.playPulse2MenuItem.Name = "playPulse2MenuItem";
-			this.playPulse2MenuItem.Size = new System.Drawing.Size(141, 22);
+			this.playPulse2MenuItem.Size = new System.Drawing.Size(140, 22);
 			this.playPulse2MenuItem.Text = "Play Pulse 2";
 			this.playPulse2MenuItem.Click += new System.EventHandler(this.playPulse2ToolStripMenuItem_Click);
 			// 
@@ -1258,7 +1258,7 @@ namespace Brewmaster
 			this.playTriangleMenuItem.CheckOnClick = true;
 			this.playTriangleMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.playTriangleMenuItem.Name = "playTriangleMenuItem";
-			this.playTriangleMenuItem.Size = new System.Drawing.Size(141, 22);
+			this.playTriangleMenuItem.Size = new System.Drawing.Size(140, 22);
 			this.playTriangleMenuItem.Text = "Play Triangle";
 			this.playTriangleMenuItem.Click += new System.EventHandler(this.playTriangleToolStripMenuItem_Click);
 			// 
@@ -1268,7 +1268,7 @@ namespace Brewmaster
 			this.playNoiseMenuItem.CheckOnClick = true;
 			this.playNoiseMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.playNoiseMenuItem.Name = "playNoiseMenuItem";
-			this.playNoiseMenuItem.Size = new System.Drawing.Size(141, 22);
+			this.playNoiseMenuItem.Size = new System.Drawing.Size(140, 22);
 			this.playNoiseMenuItem.Text = "Play Noise";
 			this.playNoiseMenuItem.Click += new System.EventHandler(this.playNoiseToolStripMenuItem_Click);
 			// 
@@ -1278,7 +1278,7 @@ namespace Brewmaster
 			this.playPcmMenuItem.CheckOnClick = true;
 			this.playPcmMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.playPcmMenuItem.Name = "playPcmMenuItem";
-			this.playPcmMenuItem.Size = new System.Drawing.Size(141, 22);
+			this.playPcmMenuItem.Size = new System.Drawing.Size(140, 22);
 			this.playPcmMenuItem.Text = "Play PCM";
 			this.playPcmMenuItem.Click += new System.EventHandler(this.playPCMToolStripMenuItem_Click);
 			// 
@@ -1397,13 +1397,13 @@ namespace Brewmaster
             this.WindowMenuSeparator});
 			this.WindowMenuItem.Name = "WindowMenuItem";
 			this.WindowMenuItem.Size = new System.Drawing.Size(63, 20);
-			this.WindowMenuItem.Text = "Window";
+			this.WindowMenuItem.Text = "&Window";
 			// 
 			// closeAllWindowsMenuItem
 			// 
 			this.closeAllWindowsMenuItem.Name = "closeAllWindowsMenuItem";
-			this.closeAllWindowsMenuItem.Size = new System.Drawing.Size(172, 22);
-			this.closeAllWindowsMenuItem.Text = "Close All Windows";
+			this.closeAllWindowsMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.closeAllWindowsMenuItem.Text = "&Close All Windows";
 			this.closeAllWindowsMenuItem.Click += new System.EventHandler(this.Window_CloseAllWindowsMenuItem_Click);
 			// 
 			// WindowMenuSeparator
@@ -1419,21 +1419,21 @@ namespace Brewmaster
             this.aboutMenuItem});
 			this.HelpMenuItem.Name = "HelpMenuItem";
 			this.HelpMenuItem.Size = new System.Drawing.Size(44, 20);
-			this.HelpMenuItem.Text = "Help";
+			this.HelpMenuItem.Text = "&Help";
 			// 
 			// viewHelpTopicsMenuItem
 			// 
 			this.viewHelpTopicsMenuItem.Name = "viewHelpTopicsMenuItem";
-			this.viewHelpTopicsMenuItem.Size = new System.Drawing.Size(215, 22);
-			this.viewHelpTopicsMenuItem.Text = "View Help Topics                 ";
+			this.viewHelpTopicsMenuItem.Size = new System.Drawing.Size(214, 22);
+			this.viewHelpTopicsMenuItem.Text = "&View Help Topics                 ";
 			this.viewHelpTopicsMenuItem.Visible = false;
 			this.viewHelpTopicsMenuItem.Click += new System.EventHandler(this.Help_ViewHelpTopicsMenuItem_Click);
 			// 
 			// aboutMenuItem
 			// 
 			this.aboutMenuItem.Name = "aboutMenuItem";
-			this.aboutMenuItem.Size = new System.Drawing.Size(215, 22);
-			this.aboutMenuItem.Text = "About";
+			this.aboutMenuItem.Size = new System.Drawing.Size(214, 22);
+			this.aboutMenuItem.Text = "&About";
 			this.aboutMenuItem.Click += new System.EventHandler(this.Help_AboutMenuItem_Click);
 			// 
 			// toolstrippanel

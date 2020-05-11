@@ -62,6 +62,7 @@ namespace Brewmaster.Modules.Ppu
 					}
 				}
 				if (_showScrollOverlay) DrawScrollOverlay(_nametableData.ScrollX, _nametableData.ScrollY, graphics);
+
 			}
 			/*
 			if (this._gridOverlay == null && (chkShowTileGrid.Checked || chkShowAttributeGrid.Checked))
@@ -93,8 +94,11 @@ namespace Brewmaster.Modules.Ppu
 			}
 			*/
 		}
+		private int _lastX;
+		private int _lastY;
 		private void DrawScrollOverlay(int xScroll, int yScroll, Graphics ntGraphics)
 		{
+			if (_lastX != xScroll || _lastY != yScroll)
 			using (var g = Graphics.FromImage(_scrollOverlay))
 			{
 				var width = _nametableData.ViewportWidth;
@@ -141,6 +145,8 @@ namespace Brewmaster.Modules.Ppu
 				}
 			}
 			ntGraphics.DrawImage(_scrollOverlay, 0, 0);
+			_lastY = yScroll;
+			_lastX = xScroll;
 		}
 
 	}

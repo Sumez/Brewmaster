@@ -61,6 +61,12 @@ namespace Brewmaster.ProjectExplorer
 
 		public FileNode(AsmProjectFile fileInfo)
 		{
+			UpdateFromFile(fileInfo);
+		}
+		public object UniqueIdentifier { get { return FileInfo.File; } }
+
+		public void UpdateFromFile(AsmProjectFile fileInfo)
+		{
 			FileInfo = fileInfo;
 			Text = fileInfo.File.Name;
 
@@ -77,7 +83,7 @@ namespace Brewmaster.ProjectExplorer
 					ImageIndex = 4;
 					break;
 			}
-			
+
 			if (fileInfo.Mode == CompileMode.LinkerConfig) ImageIndex = 7;
 			if (fileInfo.Missing)
 			{
@@ -92,13 +98,12 @@ namespace Brewmaster.ProjectExplorer
 				foreach (var outputFile in fileInfo.Pipeline.OutputFiles)
 				{
 					if (outputFile == null) continue;
-					
+
 					var file = new FileInfo(outputFile);
 					Nodes.Add(new PipelineNode(fileInfo, file.Name));
 				}
 			}
 		}
-		public object UniqueIdentifier { get { return FileInfo.File; } }
 	}
 	public interface IIdentifiableNode
 	{

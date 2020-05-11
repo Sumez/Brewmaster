@@ -8,7 +8,6 @@ namespace Brewmaster.Modules
 		public ScrollableView(Control child)
 		{
 			Controls.Add(child);
-			child.Size = new Size(100, 100);
 			child.Location = Point.Empty;
 			AutoScroll = true;
 		}

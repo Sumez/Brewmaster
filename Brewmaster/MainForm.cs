@@ -103,6 +103,7 @@ namespace Brewmaster
 			EmulatorStatusChanged(_emulatorStatus);
 
 		    ActiveFileChanged();
+
 	    }
 		private void ActiveFileChanged()
 		{
@@ -260,7 +261,7 @@ namespace Brewmaster
 				southContainer.AddPanel(WatchPanel);
 				southContainer.AddPanel(memoryPanel);
 
-				westContainer.AddPanel(new IdePanel(ProjectExplorer = new ProjectExplorer.ProjectExplorer()) { Label = "Project Explorer" });
+				westContainer.AddPanel(new IdePanel(ProjectExplorer = new ProjectExplorer.ProjectExplorer(_moduleEvents)) { Label = "Project Explorer" });
 				//westContainer.AddPanel(new IdePanel(CartridgeExplorer) { Label = "Cartridge Explorer" });
 				var helperPanel = new IdeGroupedPanel();
 				helperPanel.AddPanel(new IdePanel(OpcodeHelper = new OpcodeHelper(_moduleEvents)) { Label = "Opcodes" });
@@ -579,7 +580,10 @@ namespace Brewmaster
 	    }
 	    private void WriteStatus(string message = null)
 	    {
-		    statusLabel.Text = !string.IsNullOrWhiteSpace(message) ? message : _currentStatus ?? "Ready";
+		    BeginInvoke(new Action(() =>
+		    {
+			    statusLabel.Text = !string.IsNullOrWhiteSpace(message) ? message : _currentStatus ?? "Ready";
+			}));
 	    }
 
 		private void AddExistingFile(string targetFile, string targetDirectory, CompileMode mode)
@@ -888,10 +892,27 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 
 		private void File_SaveAsMenuItem_Click(object sender, EventArgs e)
         {
-			throw new NotImplementedException();
+	        if (!(editorTabs.SelectedTab is ISaveable tab)) return;
+	        tab.Save(GetNewFileName);
         }
 
-        private void File_SaveAllMenuItem_Click(object sender, EventArgs e)
+		private string GetNewFileName(FileInfo file)
+		{
+			CreateNewFileDialog.InitialDirectory = file.DirectoryName;
+			CreateNewFileDialog.FileName = file.Name;
+			CreateNewFileDialog.DefaultExt = file.Extension;
+			CreateNewFileDialog.Filter = "*" + file.Extension + "|*" + file.Extension;
+			if (CreateNewFileDialog.ShowDialog() != DialogResult.OK) return null;
+			var fileInfo = new FileInfo(CreateNewFileDialog.FileName);
+			if (CurrentProject != null && CurrentProject.GetRelativePath(fileInfo.FullName).StartsWith(".."))
+			{
+				Error("New file path must be in the project directory");
+				return null;
+			}
+			return fileInfo.FullName;
+		}
+
+		private void File_SaveAllMenuItem_Click(object sender, EventArgs e)
         {
 			SaveAll();
         }
