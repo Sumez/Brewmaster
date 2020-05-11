@@ -1,6 +1,6 @@
 ﻿using System;
+using System.IO;
 using System.Windows.Forms;
-using Brewmaster.EditorWindows.Text;
 using Brewmaster.Modules;
 using Brewmaster.ProjectModel;
 
@@ -24,7 +24,7 @@ namespace Brewmaster.EditorWindows
 	public abstract class SaveableEditorWindow : EditorWindow, ISaveable
 	{
 		protected SaveableEditorWindow(MainForm form, AsmProjectFile file, Events events) : base(form, file, events) { }
-		public abstract void Save();
+		public abstract void Save(Func<FileInfo, string> getNewFileName = null);
 
 		private bool _pristine;
 		public bool Pristine

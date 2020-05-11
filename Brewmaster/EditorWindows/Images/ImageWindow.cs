@@ -47,8 +47,9 @@ namespace Brewmaster.EditorWindows.Images
 
 		public ImagePipelineSettings PipelineSettings { get; set; }
 
-		public override void Save()
+		public override void Save(Func<FileInfo, string> getNewFileName = null)
 		{
+			if (getNewFileName != null) return;
 			if (Pristine) return;
 
 			ProjectFile.Pipeline = PipelineSettings.Pipeline == null ? null : PipelineSettings.Pipeline.Clone();

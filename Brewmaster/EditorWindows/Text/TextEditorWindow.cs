@@ -112,20 +112,22 @@ namespace Brewmaster.EditorWindows.Text
 			RefreshEditorBuildInfo();
 			Invalidate();
 
-			if (_fileSystemWatcher == null)
+			if (_fileSystemWatcher == null) WatchFile();
+		}
+
+		private void WatchFile()
+		{
+			_fileSystemWatcher = new FileSystemWatcher(ProjectFile.File.DirectoryName, ProjectFile.File.Name);
+			_fileSystemWatcher.Changed += (sender, args) =>
 			{
-				_fileSystemWatcher = new FileSystemWatcher(ProjectFile.File.DirectoryName, ProjectFile.File.Name);
-				_fileSystemWatcher.Changed += (sender, args) =>
-											{
-												lock (_savingLock)
-												{
-													if (RefreshWarningVisible || SavingFile) return;
-												}
-												RefreshWarningVisible = true;
-												Task.Run(() => { Invoke(ThreadSafeRefreshWarning); });
-											};
-				_fileSystemWatcher.EnableRaisingEvents = true;
-			}
+				lock (_savingLock)
+				{
+					if (RefreshWarningVisible || SavingFile) return;
+				}
+				RefreshWarningVisible = true;
+				Task.Run(() => { Invoke(ThreadSafeRefreshWarning); });
+			};
+			_fileSystemWatcher.EnableRaisingEvents = true;
 		}
 
 		public void RefreshEditorBreakpoints()
@@ -148,16 +150,29 @@ namespace Brewmaster.EditorWindows.Text
 			base.Dispose(disposing);
 		}
 
-		public override void Save()
+		public override void Save(Func<FileInfo, string> getNewFileName = null)
 		{
-			if (Pristine) return;
+			if (Pristine && getNewFileName == null) return;
 			lock (_savingLock)
 			{
 				SavingFile = true;
 			}
 
-			var filename = ProjectFile.File.FullName;
-			if (!File.Exists(filename)) throw new Exception(string.Format("File {0} does not exist", ProjectFile.File.Name));
+			string filename;
+			if (getNewFileName != null)
+			{
+				filename = getNewFileName(ProjectFile.File);
+				ProjectFile.File = new FileInfo(filename);
+				ProjectFile.Project.Pristine = false;
+				ModuleEvents.OnFilenameChanged(ProjectFile);
+				if (_fileSystemWatcher != null) _fileSystemWatcher.Dispose();
+				WatchFile();
+			}
+			else
+			{
+				filename = ProjectFile.File.FullName;
+				if (!File.Exists(filename)) throw new Exception(string.Format("File {0} does not exist", ProjectFile.File.Name));
+			}
 
 			if (_fileSystemWatcher != null) _fileSystemWatcher.EnableRaisingEvents = false;
 			using (RichTextBox rtb = new RichTextBox())
@@ -226,12 +241,5 @@ namespace Brewmaster.EditorWindows.Text
 			this.Controls.Add(this.TextEditor);
 			this.ResumeLayout(false);
 		}
-	}
-
-	public interface ISaveable
-	{
-		void Save();
-		bool Pristine { get; }
-		event Action PristineChanged;
 	}
 }

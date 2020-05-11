@@ -469,8 +469,12 @@ namespace Brewmaster.ProjectModel
 			if (_fileSystemWatcher != null) _fileSystemWatcher.Dispose();
 		}
 
-		public void Save()
+		public void Save(Func<FileInfo, string> getNewFileName = null)
 		{
+			if (getNewFileName != null)
+			{
+				throw new NotImplementedException();
+			}
 			try
 			{
 				var fileHeader = ProjectFileHeader.GetFileHeader(this);
