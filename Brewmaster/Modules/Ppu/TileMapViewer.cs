@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using Brewmaster.Emulation;
-using Brewmaster.Ide;
+using Brewmaster.Layout;
 using Brewmaster.ProjectModel;
 
 namespace Brewmaster.Modules.Ppu

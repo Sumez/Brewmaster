@@ -14,7 +14,7 @@ using Brewmaster.EditorWindows.Code;
 using Brewmaster.EditorWindows.Images;
 using Brewmaster.EditorWindows.Text;
 using Brewmaster.Emulation;
-using Brewmaster.Ide;
+using Brewmaster.Layout;
 using Brewmaster.MemoryViewer;
 using Brewmaster.Modules;
 using Brewmaster.Modules.Breakpoints;
@@ -36,6 +36,7 @@ namespace Brewmaster
 	public partial class MainForm : Form, IIdeLayoutParent
 	{
 		public const string SettingsFileName = "user.bwmsettings";
+		public const string LayoutFileName = "user.bwmlayout";
 	    public const string ProgramTitle = "Brewmaster";
 
 	    public AsmProject CurrentProject { get; set; }
@@ -49,7 +50,8 @@ namespace Brewmaster
 		public MemoryTabs MemoryTabs { get; private set; }
 		public ConsolePaletteViewer ConsolePaletteViewer { get; private set; }
 		public GamePaletteViewer GamePaletteViewer { get; private set; }
-	    public LayoutHandler LayoutHandler { get; private set; }
+		public LayoutHandler LayoutHandler { get { return StoredLayoutHandler; } }
+		public StoredLayoutHandler StoredLayoutHandler { get; private set; }
 	    public BuildHandler BuildHandler { get; private set; }
 	    public string RequestFile { get; set; }
 		public OpcodeHelper OpcodeHelper { get; private set; }
@@ -212,9 +214,9 @@ namespace Brewmaster
 				var mainSouthContainer = new MultiSplitContainer { Dock = DockStyle.Fill, Horizontal = false };
 				var tabsWestContainer = new MultiSplitContainer { Dock = DockStyle.Fill };
 
-				var eastContainer = new MultiSplitContainer { Dock = DockStyle.Fill, Horizontal = false };
-				var westContainer = new MultiSplitContainer { Dock = DockStyle.Fill, Horizontal = false };
-				var southContainer = new MultiSplitContainer { Dock = DockStyle.Fill };
+				var eastContainer = new MultiSplitContainer { Name = "east", Dock = DockStyle.Fill, Horizontal = false };
+				var westContainer = new MultiSplitContainer { Name = "west", Dock = DockStyle.Fill, Horizontal = false };
+				var southContainer = new MultiSplitContainer { Name = "south", Dock = DockStyle.Fill };
 
 				InitializeComponent();
 				SuspendLayout();
@@ -229,72 +231,44 @@ namespace Brewmaster
 				lineAddressMappingsMenuItem.Checked = Settings.ShowLineAddresses;
 
 				// Load layout
-				new IdePanel(new ScrollableView(ConsolePaletteViewer = new ConsolePaletteViewer(_moduleEvents))) { Label = "Global palette" };
-				var palette = new IdePanel(new ScrollableView(GamePaletteViewer = new GamePaletteViewer(_moduleEvents))) { Label = "Palette" };
+				LoadModule(ChrViewer = new ChrViewer(_moduleEvents), "Chr");
+				LoadModule(TileMap = new TileMapViewer(_moduleEvents), "Nametables");
+				LoadModule(Sprites = new SpriteViewer(_moduleEvents), "Sprites");
+				LoadModule(new ScrollableView(ConsolePaletteViewer = new ConsolePaletteViewer(_moduleEvents)), "Global Palette");
+				LoadModule(new ScrollableView(GamePaletteViewer = new GamePaletteViewer(_moduleEvents)), "Palette");
 
-				var ppuPanel = new IdeGroupedPanel();
-				ppuPanel.AddPanel(new IdePanel(ChrViewer = new ChrViewer(_moduleEvents)) { Label = "Chr" });
-				ppuPanel.AddPanel(new IdePanel(TileMap = new TileMapViewer(_moduleEvents)) { Label = "Nametables" });
-				ppuPanel.AddPanel(new IdePanel(Sprites = new SpriteViewer(_moduleEvents)) { Label = "Sprites" });
-				ppuPanel.AddPanel(palette);
+				LoadModule(MemoryTabs = new MemoryTabs(_moduleEvents), "Memory Viewer");
+				LoadModule(SpriteList = new SpriteList(_moduleEvents), "Sprite List");
 
-				var memoryPanel = new IdeGroupedPanel();
-				memoryPanel.AddPanel(new IdePanel(MemoryTabs = new MemoryTabs(_moduleEvents)) { Label = "Memory Viewer" });
-				memoryPanel.AddPanel(new IdePanel(SpriteList = new SpriteList(_moduleEvents)) { Label = "Sprite list" });
+				LoadModule(WatchValues = new WatchValues(), "Watch");
+				LoadModule(BreakpointList = new BreakpointList(_moduleEvents), "Breakpoints");
 
-				var watchPanel = new IdeGroupedPanel();
-				watchPanel.AddPanel(new IdePanel(WatchValues = new WatchValues()) { Label = "Watch" });
-				watchPanel.AddPanel(new IdePanel(BreakpointList = new BreakpointList(_moduleEvents)) { Label = "Breakpoints" });
+				LoadModule(OutputWindow = new OutputWindow(), "Output");
+				LoadModule(ErrorList = new ErrorList(), "Build Errors");
 
-				var outputPanel = new IdeGroupedPanel();
-				outputPanel.AddPanel(new IdePanel(OutputWindow = new OutputWindow()) { Label = "Output" });
-				outputPanel.AddPanel(new IdePanel(ErrorList = new ErrorList()) { Label = "Build Errors" });
+				LoadModule(CpuStatus = new CpuStatus(_moduleEvents), "Console Status");
+				LoadModule(Mesen = new MesenControl(), "Mesen");
+
+				LoadModule(ProjectExplorer = new ProjectExplorer.ProjectExplorer(_moduleEvents), "Project Explorer");
+
+				LoadModule(OpcodeHelper = new OpcodeHelper(_moduleEvents), "Opcodes");
+				LoadModule(Ca65Helper = new Ca65CommandDocumentation(_moduleEvents), "Commands");
+				LoadModule(NumberHelper = new NumberHelper(), "Number Formats");
+
 
 				MainEastContainer2.AddPanel(mainSouthContainer);
-				MainEastContainer2.AddPanel(eastContainer).StaticWidth = 300;
+				MainEastContainer2.AddPanel(eastContainer);
 
 				mainSouthContainer.AddPanel(tabsWestContainer);
-				mainSouthContainer.AddPanel(southContainer).StaticWidth = 250;
+				mainSouthContainer.AddPanel(southContainer);
 
-				tabsWestContainer.AddPanel(westContainer).StaticWidth = 250;
+				tabsWestContainer.AddPanel(westContainer);
 				tabsWestContainer.AddPanel(editorTabs);
 
-				eastContainer.AddPanel(ppuPanel);
-				eastContainer.AddPanel(new IdePanel(CpuStatus = new CpuStatus(_moduleEvents)) { Label = "Console Status" });
-				eastContainer.AddPanel(new IdePanel(Mesen = new MesenControl()) { Label = "Mesen" });
-
-				southContainer.AddPanel(outputPanel);
-				southContainer.AddPanel(watchPanel);
-				southContainer.AddPanel(memoryPanel);
-
-				westContainer.AddPanel(new IdePanel(ProjectExplorer = new ProjectExplorer.ProjectExplorer(_moduleEvents)) { Label = "Project Explorer" });
-				//westContainer.AddPanel(new IdePanel(CartridgeExplorer) { Label = "Cartridge Explorer" });
-				var helperPanel = new IdeGroupedPanel();
-				helperPanel.AddPanel(new IdePanel(OpcodeHelper = new OpcodeHelper(_moduleEvents)) { Label = "Opcodes" });
-				helperPanel.AddPanel(new IdePanel(Ca65Helper = new Ca65CommandDocumentation(_moduleEvents)) { Label = "Commands" });
-				helperPanel.AddPanel(new IdePanel(NumberHelper = new NumberHelper()) { Label = "Number Formats" });
-				westContainer.AddPanel(helperPanel);
-
-				LayoutHandler = new LayoutHandler(this);
-				LayoutHandler.SetDockContainers(eastContainer, westContainer, southContainer);
-
-				AddWindowOption(ProjectExplorer);
-				AddWindowOption(NumberHelper);
-				AddWindowOption(OpcodeHelper);
-				AddWindowOption(Ca65Helper);
-				AddWindowOption(Mesen);
-				AddWindowOption(OutputWindow);
-				AddWindowOption(TileMap);
-				AddWindowOption(Sprites);
-				AddWindowOption(SpriteList);
-				AddWindowOption(MemoryTabs);
-				AddWindowOption(CpuStatus);
-				AddWindowOption(WatchValues);
-				AddWindowOption(BreakpointList);
-				AddWindowOption(ErrorList);
-
-				AddWindowOption(ConsolePaletteViewer);
-				AddWindowOption(GamePaletteViewer);
+				StoredLayoutHandler = new StoredLayoutHandler(this);
+				StoredLayoutHandler.SetDockContainers(eastContainer, westContainer, southContainer);
+				StoredLayoutHandler.LoadPanelLayout(_modules, Program.GetUserFilePath(LayoutFileName));
+				AddWindowOptions();
 
 				// Setup features
 				BuildHandler = new BuildHandler();
@@ -367,6 +341,13 @@ namespace Brewmaster
 			ResumeLayout();
         }
 
+		private readonly Dictionary<string, Control> _modules = new Dictionary<string, Control>();
+		private void LoadModule(Control control, string label)
+		{
+			new IdePanel(control) { Label = label };
+			_modules.Add(label, control);
+		}
+
 		private void BindShortcutKeys()
 		{
 			Program.BindKey(Feature.CreateNew, nesProjectMenuItem);
@@ -406,7 +387,10 @@ namespace Brewmaster
 
 		}
 
-
+		private void AddWindowOptions()
+		{
+			foreach (var module in _modules) AddWindowOption(module.Value);
+		}
 		private void AddWindowOption(Control windowControl)
 		{
 			var idePanel = LayoutHandler.GetPanel(windowControl);
@@ -836,6 +820,8 @@ namespace Brewmaster
 	        Settings.ShowScrollOverlay = TileMap.ShowScrollOverlay;
 	        Settings.ResizeTileMap = TileMap.FitImage;
 			Settings.Save();
+
+			StoredLayoutHandler.StorePanelLayout(_modules, Program.GetUserFilePath(LayoutFileName));
         }
 
         private void newNesProjectMenuItem_Click(object sender, EventArgs e)
@@ -1924,6 +1910,13 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 			if (CurrentProject == null) return;
 			var goToAll = new GoToAll(CurrentProject, _moduleEvents);
 			goToAll.Show(this);
+		}
+
+		private void resetLayoutToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			SuspendLayout();
+			StoredLayoutHandler.LoadPanelLayout(_modules);
+			ResumeLayout(true);
 		}
 	}
 

@@ -4,7 +4,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using Brewmaster.ProjectExplorer;
 
-namespace Brewmaster.Ide
+namespace Brewmaster.Layout
 {
 
 	public class HeaderPanel : Panel

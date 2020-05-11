@@ -4,7 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using Brewmaster.BuildProcess;
-using Brewmaster.Ide;
+using Brewmaster.Layout;
 
 namespace Brewmaster.Modules.Build
 {

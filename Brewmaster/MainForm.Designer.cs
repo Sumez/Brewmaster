@@ -1,6 +1,6 @@
 ﻿using System.Windows.Forms;
 using Brewmaster.EditorWindows;
-using Brewmaster.Modules.Ppu;
+using Brewmaster.Layout;
 
 namespace Brewmaster
 {
@@ -216,8 +216,10 @@ namespace Brewmaster
 			this.OpenProjectFileDialog = new System.Windows.Forms.OpenFileDialog();
 			this.OpenFilesFileDialog = new System.Windows.Forms.OpenFileDialog();
 			this.CreateNewFileDialog = new System.Windows.Forms.SaveFileDialog();
-			this.MainEastContainer2 = new Brewmaster.Ide.MultiSplitContainer();
+			this.MainEastContainer2 = new MultiSplitContainer();
 			this._menuHelper = new Brewmaster.Modules.MenuHelper(this.components);
+			this.toolStripSeparator15 = new System.Windows.Forms.ToolStripSeparator();
+			this.resetLayoutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			availableIdePanels = new System.Windows.Forms.Panel();
 			toolStripSeparator14 = new System.Windows.Forms.ToolStripSeparator();
 			toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
@@ -745,6 +747,8 @@ namespace Brewmaster
             this.toolStripSeparator17,
             this.viewLineNumbersMenuItem,
             this.lineAddressMappingsMenuItem,
+            this.toolStripSeparator15,
+            this.resetLayoutToolStripMenuItem,
             this.toolStripSeparator18});
 			this.ViewMenuItem.Name = "ViewMenuItem";
 			this.ViewMenuItem.Size = new System.Drawing.Size(44, 20);
@@ -815,7 +819,7 @@ namespace Brewmaster
 			this.lineAddressMappingsMenuItem.CheckOnClick = true;
 			this.lineAddressMappingsMenuItem.Name = "lineAddressMappingsMenuItem";
 			this.lineAddressMappingsMenuItem.Size = new System.Drawing.Size(197, 22);
-			this.lineAddressMappingsMenuItem.Text = "&Line Address Mappings";
+			this.lineAddressMappingsMenuItem.Text = "Line &Address Mappings";
 			this.lineAddressMappingsMenuItem.Click += new System.EventHandler(this.lineAddressMappingsMenuItem_Click);
 			// 
 			// toolStripSeparator18
@@ -1759,6 +1763,18 @@ namespace Brewmaster
 			this.MainEastContainer2.TabIndex = 1;
 			this.MainEastContainer2.Text = "multiSplitContainer2";
 			// 
+			// toolStripSeparator15
+			// 
+			this.toolStripSeparator15.Name = "toolStripSeparator15";
+			this.toolStripSeparator15.Size = new System.Drawing.Size(194, 6);
+			// 
+			// resetLayoutToolStripMenuItem
+			// 
+			this.resetLayoutToolStripMenuItem.Name = "resetLayoutToolStripMenuItem";
+			this.resetLayoutToolStripMenuItem.Size = new System.Drawing.Size(197, 22);
+			this.resetLayoutToolStripMenuItem.Text = "&Reset Layout";
+			this.resetLayoutToolStripMenuItem.Click += new System.EventHandler(this.resetLayoutToolStripMenuItem_Click);
+			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1930,7 +1946,7 @@ namespace Brewmaster
 		private System.Windows.Forms.ToolStripMenuItem snesProjectMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem settingsMenuItem;
 		private System.Windows.Forms.ToolStripSeparator toolStripSeparator24;
-		public Ide.MultiSplitContainer MainEastContainer2;
+		public MultiSplitContainer MainEastContainer2;
 		private ToolStripMenuItem runNewBuildMenuItem;
 		private ToolStripButton runNewBuild;
 		private ToolStripMenuItem snesGraphicsMenuItem;
@@ -1962,6 +1978,8 @@ namespace Brewmaster
 		public ToolStripStatusLabel toolStripStatusLabel3;
 		private ToolStripMenuItem findInFilesMenuItem;
 		private ToolStripMenuItem goToAllMenuItem;
+		private ToolStripSeparator toolStripSeparator15;
+		private ToolStripMenuItem resetLayoutToolStripMenuItem;
 	}
 }
 

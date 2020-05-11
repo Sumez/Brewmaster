@@ -167,6 +167,7 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Emulation\EmulatorHandler.cs" />
+    <Compile Include="Layout\StoredLayoutHandler.cs" />
     <Compile Include="MemoryViewer\HexEditor.cs">
       <SubType>Component</SubType>
     </Compile>

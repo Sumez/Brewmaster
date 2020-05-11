@@ -4,7 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 
-namespace Brewmaster.Ide
+namespace Brewmaster.Layout
 {
 	public partial class FloatPanel : Form, IIdeLayoutParent
 	{

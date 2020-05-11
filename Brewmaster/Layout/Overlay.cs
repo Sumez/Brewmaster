@@ -2,7 +2,7 @@
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace Brewmaster.Ide
+namespace Brewmaster.Layout
 {
 	public class Overlay : Form
 	{
