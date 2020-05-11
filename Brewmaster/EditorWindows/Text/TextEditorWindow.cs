@@ -162,6 +162,7 @@ namespace Brewmaster.EditorWindows.Text
 			if (getNewFileName != null)
 			{
 				filename = getNewFileName(ProjectFile.File);
+				if (filename == null) return;
 				ProjectFile.File = new FileInfo(filename);
 				ProjectFile.Project.Pristine = false;
 				ModuleEvents.OnFilenameChanged(ProjectFile);

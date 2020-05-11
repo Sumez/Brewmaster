@@ -903,8 +903,13 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 			CreateNewFileDialog.DefaultExt = file.Extension;
 			CreateNewFileDialog.Filter = "*" + file.Extension + "|*" + file.Extension;
 			if (CreateNewFileDialog.ShowDialog() != DialogResult.OK) return null;
-			var filename = CreateNewFileDialog.FileName;
-			return filename;
+			var fileInfo = new FileInfo(CreateNewFileDialog.FileName);
+			if (CurrentProject != null && CurrentProject.GetRelativePath(fileInfo.FullName).StartsWith(".."))
+			{
+				Error("New file path must be in the project directory");
+				return null;
+			}
+			return fileInfo.FullName;
 		}
 
 		private void File_SaveAllMenuItem_Click(object sender, EventArgs e)
