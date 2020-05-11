@@ -191,7 +191,7 @@ namespace Brewmaster.Pipeline
 					palette[assignment.Value] = assignment.Key;
 					knownEntries = Math.Max(knownEntries, assignment.Value + 1);
 				}
-				if (image.Palette.Entries.Length >= paletteEntries)
+				if (image.Palette.Entries.Length > knownEntries)
 				{
 					var j = 0;
 					for (var i = knownEntries; i < paletteEntries; i++)
@@ -199,6 +199,18 @@ namespace Brewmaster.Pipeline
 						palette[i] = image.Palette.Entries[j];
 						knownEntries++;
 						j++;
+					}
+				}
+				for (var y = 0; y < image.Height && knownEntries < paletteEntries; y++)
+				{
+					for (var x = 0; x < image.Width && knownEntries < paletteEntries; x++)
+					{
+						var color = image.GetPixel(x, y);
+						if (!palette.Contains(color))
+						{
+							palette[knownEntries] = color;
+							knownEntries++;
+						}
 					}
 				}
 				if (knownEntries > paletteEntries) throw new Exception("Too many colors in image");
