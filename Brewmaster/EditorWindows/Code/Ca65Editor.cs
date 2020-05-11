@@ -44,7 +44,7 @@ namespace Brewmaster.EditorWindows.Code
 		private static readonly Keys[] NavigationKeys = { Keys.ShiftKey, Keys.ControlKey, Keys.Alt, Keys.Down, Keys.Up, Keys.Left, Keys.Right, Keys.Home, Keys.End, Keys.Enter, Keys.Escape, Keys.PageDown, Keys.PageUp, Keys.Tab, Keys.Return };
 
 		private CodeMenu Menu { get; set; }
-		public Func<string, Task<List<BuildHandler.BuildError>>> ParseErrors { get; set; }
+		public Func<string, Task<IEnumerable<BuildHandler.BuildError>>> ParseErrors { get; set; }
 		public Action<string, bool> AddToWatch { get; set; }
 		public Action<int, Breakpoint.Types> AddAddressBreakpoint { get; set; }
 		public Action<string, Breakpoint.Types> AddSymbolBreakpoint { get; set; }

@@ -297,24 +297,25 @@ namespace Brewmaster.EditorWindows.Code
 			control.Document.DocumentAboutToBeChanged -= DocumentAboutToBeChanged;
 			var data = ListView.SelectedCompletionData;
 			var result = false;
-			if (data != null)
+			if (data == null)
 			{
-				control.BeginUpdate();
-
-				try
-				{
-					if (EndOffset - StartOffset > 0 && StartOffset >= 0)
-					{
-						control.Document.Remove(StartOffset, EndOffset - StartOffset);
-					}
-					result = CompletionDataProvider.InsertAction(data, control.ActiveTextAreaControl.TextArea, StartOffset, ch);
-				}
-				finally
-				{
-					control.EndUpdate();
-				}
+				Close();
+				return false;
 			}
+			control.BeginUpdate();
 
+			try
+			{
+				if (EndOffset - StartOffset > 0 && StartOffset >= 0)
+				{
+					control.Document.Remove(StartOffset, EndOffset - StartOffset);
+				}
+				result = CompletionDataProvider.InsertAction(data, control.ActiveTextAreaControl.TextArea, StartOffset, ch);
+			}
+			finally
+			{
+				control.EndUpdate();
+			}
 			if (result)
 			{
 				Close();
