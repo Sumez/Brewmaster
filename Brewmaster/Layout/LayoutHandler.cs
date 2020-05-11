@@ -358,7 +358,7 @@ namespace Brewmaster.Layout
 			OnPanelStatusChanged(panel, true);
 		}
 
-		private void OnPanelStatusChanged(IdePanel panel, bool visible)
+		protected virtual void OnPanelStatusChanged(IdePanel panel, bool visible)
 		{
 			if (PanelStatusChanged != null) PanelStatusChanged(panel, visible);
 		}

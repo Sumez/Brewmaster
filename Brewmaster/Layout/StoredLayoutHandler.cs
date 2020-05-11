@@ -20,7 +20,7 @@ namespace Brewmaster.Layout
 			var moduleNames = modules.ToDictionary(kvp => kvp.Value, kvp => kvp.Key);
 			var layout = new PanelLayout();
 
-			foreach (var floatPanel in Application.OpenForms.OfType<FloatPanel>())
+			foreach (var floatPanel in Application.OpenForms.OfType<FloatPanel>().Where(p => p.Visible))
 			{
 				// TODO: Maintain a list of all FloatPanels handled by this LayoutHandler
 				var panelLayout = new StoredFloatPanel
@@ -104,6 +104,10 @@ namespace Brewmaster.Layout
 			}
 			else layout = GetDefaultLayout();
 
+			foreach (var control in modules.Values)
+			{
+				OnPanelStatusChanged(GetPanel(control), false);
+			}
 			foreach (var floatPanel in Application.OpenForms.OfType<FloatPanel>().ToList())
 			{
 				// TODO: Maintain a list of all FloatPanels handled by this LayoutHandler
@@ -153,7 +157,9 @@ namespace Brewmaster.Layout
 			{
 				var module = modules.ContainsKey(moduleName) ? modules[moduleName] : null;
 				if (module == null) continue;
-				add(GetPanel(module));
+				var panel = GetPanel(module);
+				add(panel);
+				OnPanelStatusChanged(panel, true);
 			}
 		}
 

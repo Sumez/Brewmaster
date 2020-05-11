@@ -224,12 +224,6 @@ namespace Brewmaster
 				// Makes sure a control's handle is set before setting visible state
 				foreach (Control control in Controls) { var handle = control.Handle; }
 
-				// Load view settings
-				viewToolbarMenuItem.Checked = toolstrippanel.Visible = MainToolStrip.Visible = Settings.ShowToolbar;
-				viewStatusBarMenuItem.Checked = statusBar.Visible = Settings.ShowStatusBar;
-				TextEditor.DefaultCodeProperties.ShowLineNumbers = viewLineNumbersMenuItem.Checked = Settings.ShowLineNumbers;
-				lineAddressMappingsMenuItem.Checked = Settings.ShowLineAddresses;
-
 				// Load layout
 				LoadModule(ChrViewer = new ChrViewer(_moduleEvents), "Chr");
 				LoadModule(TileMap = new TileMapViewer(_moduleEvents), "Nametables");
@@ -297,6 +291,11 @@ namespace Brewmaster
 				_menuHelper.Prepare(new [] { MainWindowMenu, MainToolStrip }, WriteStatus);
 
 				// Apply settings
+				viewToolbarMenuItem.Checked = toolstrippanel.Visible = MainToolStrip.Visible = Settings.ShowToolbar;
+				viewStatusBarMenuItem.Checked = statusBar.Visible = Settings.ShowStatusBar;
+				TextEditor.DefaultCodeProperties.ShowLineNumbers = viewLineNumbersMenuItem.Checked = Settings.ShowLineNumbers;
+				lineAddressMappingsMenuItem.Checked = Settings.ShowLineAddresses;
+
 				updateEveryFrameMenuItem.Checked = (Mesen.UpdateRate = Settings.UpdateRate) == 1;
 				integerScalingMenuItem.Checked = Mesen.IntegerScaling = Settings.EmuIntegerScaling;
 				randomValuesAtPowerOnMenuItem.Checked = Mesen.RandomPowerOnState = Settings.EmuRandomPowerOn;
@@ -335,8 +334,7 @@ namespace Brewmaster
 			}
 			catch (Exception ex)
 			{
-				// TODO: Suggest resetting settings?
-				throw ex;
+				Program.Error(string.Format("An unexpected error happened while loading settings. Check the error log for details:\n\n{0}",Program.GetErrorFilePath()), ex);
 			}
 			ResumeLayout();
         }
@@ -514,7 +512,7 @@ namespace Brewmaster
 
 		private void LoadEmulator(ProjectType projectType)
 	    {
-		    Mesen.SwitchSystem(projectType, (e) => InitializeEmulator(e, projectType));
+		    Mesen.SwitchSystem(projectType, (e) => InitializeEmulator(e, projectType), this);
 		    if (projectType == ProjectType.Nes) GamePaletteViewer.SourcePalette = ConsolePaletteViewer.Palette = Mesen.EmulatorSettings.NesPalette;
 		    if (projectType == ProjectType.Snes) GamePaletteViewer.SourcePalette = ConsolePaletteViewer.Palette = Mesen.EmulatorSettings.SnesPalette;
 			// TODO: Use events object and/or go through mesen control

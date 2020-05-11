@@ -328,7 +328,7 @@ namespace Brewmaster.Layout
 		{
 			if (Splits.Count != newSplits.Count) return;
 			Splits = newSplits;
-			_oldWidth = _oldHeight = Splits[Splits.Count - 1]; // "Hack" to ensure fitting stored sizes into a new layout.
+			if (Splits.Count > 0) _oldWidth = _oldHeight = Splits[Splits.Count - 1]; // "Hack" to ensure fitting stored sizes into a new layout.
 			PerformLayout();
 		}
 	}

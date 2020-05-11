@@ -269,19 +269,19 @@ namespace Brewmaster.Emulation
 		private SmallTrackBar _speedSlider;
 		private IEmulatorHandler _nesEmulator;
 
-		public void SwitchSystem(ProjectType projectType, Action<IEmulatorHandler> initMethod)
+		public void SwitchSystem(ProjectType projectType, Action<IEmulatorHandler> initMethod, Form mainForm)
 		{
 			switch (projectType)
 			{
 				case ProjectType.Snes when _snesEmulator == null:
-					_snesEmulator = new SnesEmulatorHandler(FindForm());
+					_snesEmulator = new SnesEmulatorHandler(mainForm);
 					_snesEmulator.UpdateRate = _updateRate;
 					_snesEmulator.OnStatusChange += ThreadSafeEmulationStatusChanged;
 					initMethod(_snesEmulator);
 					break;
 				
 				case ProjectType.Nes when _nesEmulator == null:
-					_nesEmulator = new NesEmulatorHandler(FindForm());
+					_nesEmulator = new NesEmulatorHandler(mainForm);
 					_nesEmulator.UpdateRate = _updateRate;
 					_nesEmulator.OnStatusChange += ThreadSafeEmulationStatusChanged;
 					initMethod(_nesEmulator);
