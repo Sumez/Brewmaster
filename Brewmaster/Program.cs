@@ -60,12 +60,13 @@ namespace Brewmaster
 
 	    private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
 	    {
-		    throw new Exception(e.ExceptionObject.ToString());
-	    }
+			if (e.ExceptionObject is Exception ex) Error("Unexpected error:\n\n" + ex.Message, ex);
+			else throw new Exception(e.ExceptionObject.ToString());
+		}
 
 	    private static void Application_ThreadException(object sender, ThreadExceptionEventArgs e)
 	    {
-			Error(e.Exception.Message, e.Exception);
+			Error("Unexpected error:\n\n" + e.Exception.Message, e.Exception);
 	    }
 
 		public static string WorkingDirectory { get; set; }
@@ -84,7 +85,7 @@ namespace Brewmaster
 		{
 			if (ex != null)
 			try {
-				File.AppendAllLines(GetUserFilePath("errors.log"), new [] { string.Format("{0}: {1}", DateTime.Now, ex) });
+				File.AppendAllLines(GetErrorFilePath(), new [] { string.Format("{0}: {1}", DateTime.Now, ex) });
 			}
 			catch (Exception loggingError) { }
 			
@@ -138,6 +139,10 @@ namespace Brewmaster
 	    }
 		private static readonly Dictionary<Feature, List<Action<KeyBindingEventArgs>>> BindingCallbacks = new Dictionary<Feature, List<Action<KeyBindingEventArgs>>>();
 
+		public static string GetErrorFilePath()
+		{
+			return GetUserFilePath("errors.log");
+		}
 	    public static string GetUserFilePath(string fileName)
 	    {
 		    return Path.Combine(

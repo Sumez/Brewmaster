@@ -3,16 +3,19 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using Brewmaster.Emulation;
-using Brewmaster.Ide;
+using Brewmaster.Layout;
 using Brewmaster.ProjectModel;
 
 namespace Brewmaster.Modules.Ppu
 {
 	public partial class TileMapViewer : UserControl
 	{
-		public TileMapViewer()
+		public TileMapViewer(Events events)
 		{
 			InitializeComponent();
+
+			events.EmulationStateUpdate += state => UpdateNametableData(state.TileMaps);
+			events.ProjectTypeChanged += type => this.UpdateLabel(type == ProjectType.Nes ? "Nametables" : "Tilemaps");
 		}
 
 		protected override void OnLayout(LayoutEventArgs e)
@@ -87,16 +90,6 @@ namespace Brewmaster.Modules.Ppu
 		{
 			get { return _viewportButton.Checked; }
 			set { _viewportButton.Checked = value; }
-		}
-
-		public Events ModuleEvents
-		{
-			set
-			{
-				var events = value;
-				events.EmulationStateUpdate += state => UpdateNametableData(state.TileMaps);
-				events.ProjectTypeChanged += type => this.UpdateLabel(type == ProjectType.Nes ? "Nametables" : "Tilemaps");
-			}
 		}
 
 		private void _scaleButton_CheckedChanged(object sender, EventArgs e)

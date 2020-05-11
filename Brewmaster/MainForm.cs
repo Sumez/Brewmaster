@@ -14,7 +14,8 @@ using Brewmaster.EditorWindows.Code;
 using Brewmaster.EditorWindows.Images;
 using Brewmaster.EditorWindows.Text;
 using Brewmaster.Emulation;
-using Brewmaster.Ide;
+using Brewmaster.Layout;
+using Brewmaster.MemoryViewer;
 using Brewmaster.Modules;
 using Brewmaster.Modules.Breakpoints;
 using Brewmaster.Modules.Build;
@@ -28,12 +29,14 @@ using Brewmaster.ProjectExplorer;
 using Brewmaster.ProjectModel;
 using Brewmaster.ProjectWizard;
 using Brewmaster.Settings;
+using Brewmaster.StatusView;
 
 namespace Brewmaster
 {
 	public partial class MainForm : Form, IIdeLayoutParent
 	{
 		public const string SettingsFileName = "user.bwmsettings";
+		public const string LayoutFileName = "user.bwmlayout";
 	    public const string ProgramTitle = "Brewmaster";
 
 	    public AsmProject CurrentProject { get; set; }
@@ -41,9 +44,14 @@ namespace Brewmaster
 		public SpriteViewer Sprites { get; private set; }
 		public ChrViewer ChrViewer { get; private set; }
 		public SpriteList SpriteList { get; private set; }
+		public TileMapViewer TileMap { get; private set; }
+		public MesenControl Mesen { get; private set; }
+		public CpuStatus CpuStatus { get; private set; }
+		public MemoryTabs MemoryTabs { get; private set; }
 		public ConsolePaletteViewer ConsolePaletteViewer { get; private set; }
 		public GamePaletteViewer GamePaletteViewer { get; private set; }
-	    public LayoutHandler LayoutHandler { get; private set; }
+		public LayoutHandler LayoutHandler { get { return StoredLayoutHandler; } }
+		public StoredLayoutHandler StoredLayoutHandler { get; private set; }
 	    public BuildHandler BuildHandler { get; private set; }
 	    public string RequestFile { get; set; }
 		public OpcodeHelper OpcodeHelper { get; private set; }
@@ -206,9 +214,9 @@ namespace Brewmaster
 				var mainSouthContainer = new MultiSplitContainer { Dock = DockStyle.Fill, Horizontal = false };
 				var tabsWestContainer = new MultiSplitContainer { Dock = DockStyle.Fill };
 
-				var eastContainer = new MultiSplitContainer { Dock = DockStyle.Fill, Horizontal = false };
-				var westContainer = new MultiSplitContainer { Dock = DockStyle.Fill, Horizontal = false };
-				var southContainer = new MultiSplitContainer { Dock = DockStyle.Fill };
+				var eastContainer = new MultiSplitContainer { Name = "east", Dock = DockStyle.Fill, Horizontal = false };
+				var westContainer = new MultiSplitContainer { Name = "west", Dock = DockStyle.Fill, Horizontal = false };
+				var southContainer = new MultiSplitContainer { Name = "south", Dock = DockStyle.Fill };
 
 				InitializeComponent();
 				SuspendLayout();
@@ -216,79 +224,45 @@ namespace Brewmaster
 				// Makes sure a control's handle is set before setting visible state
 				foreach (Control control in Controls) { var handle = control.Handle; }
 
-				// Load view settings
-				viewToolbarMenuItem.Checked = toolstrippanel.Visible = MainToolStrip.Visible = Settings.ShowToolbar;
-				viewStatusBarMenuItem.Checked = statusBar.Visible = Settings.ShowStatusBar;
-				TextEditor.DefaultCodeProperties.ShowLineNumbers = viewLineNumbersMenuItem.Checked = Settings.ShowLineNumbers;
-				lineAddressMappingsMenuItem.Checked = Settings.ShowLineAddresses;
-
 				// Load layout
-				new IdePanel(new ScrollableView(ConsolePaletteViewer = new ConsolePaletteViewer(_moduleEvents))) { Label = "Global palette" };
-				var palette = new IdePanel(new ScrollableView(GamePaletteViewer = new GamePaletteViewer(_moduleEvents))) { Label = "Palette" };
+				LoadModule(ChrViewer = new ChrViewer(_moduleEvents), "Chr");
+				LoadModule(TileMap = new TileMapViewer(_moduleEvents), "Nametables");
+				LoadModule(Sprites = new SpriteViewer(_moduleEvents), "Sprites");
+				LoadModule(new ScrollableView(ConsolePaletteViewer = new ConsolePaletteViewer(_moduleEvents)), "Global Palette");
+				LoadModule(new ScrollableView(GamePaletteViewer = new GamePaletteViewer(_moduleEvents)), "Palette");
 
-				var ppuPanel = new IdeGroupedPanel();
-				ppuPanel.AddPanel(new IdePanel(ChrViewer = new ChrViewer(_moduleEvents)) { Label = "Chr" });
-				TileMap.ModuleEvents = _moduleEvents;
-				ppuPanel.AddPanel(new IdePanel(TileMap) { Label = "Nametables" });
-				ppuPanel.AddPanel(new IdePanel(Sprites = new SpriteViewer(_moduleEvents)) { Label = "Sprites" });
-				ppuPanel.AddPanel(palette);
+				LoadModule(MemoryTabs = new MemoryTabs(_moduleEvents), "Memory Viewer");
+				LoadModule(SpriteList = new SpriteList(_moduleEvents), "Sprite List");
 
-				var memoryPanel = new IdeGroupedPanel();
-				memoryPanel.AddPanel(new IdePanel(MemoryTabs) { Label = "Memory Viewer" });
-				memoryPanel.AddPanel(new IdePanel(SpriteList = new SpriteList(_moduleEvents)) { Label = "Sprite list" });
+				LoadModule(WatchValues = new WatchValues(), "Watch");
+				LoadModule(BreakpointList = new BreakpointList(_moduleEvents), "Breakpoints");
 
-				WatchPanel.AddPanel(new IdePanel(WatchValues = new WatchValues()) { Label = "Watch" });
-				WatchPanel.AddPanel(new IdePanel(BreakpointList = new BreakpointList(_moduleEvents)) { Label = "Breakpoints" });
+				LoadModule(OutputWindow = new OutputWindow(), "Output");
+				LoadModule(ErrorList = new ErrorList(), "Build Errors");
 
-				OutputPanel.AddPanel(new IdePanel(OutputWindow = new OutputWindow()) { Label = "Output" });
-				OutputPanel.AddPanel(new IdePanel(ErrorList = new ErrorList()) { Label = "Build Errors" });
+				LoadModule(CpuStatus = new CpuStatus(_moduleEvents), "Console Status");
+				LoadModule(Mesen = new MesenControl(), "Mesen");
+
+				LoadModule(ProjectExplorer = new ProjectExplorer.ProjectExplorer(_moduleEvents), "Project Explorer");
+
+				LoadModule(OpcodeHelper = new OpcodeHelper(_moduleEvents), "Opcodes");
+				LoadModule(Ca65Helper = new Ca65CommandDocumentation(_moduleEvents), "Commands");
+				LoadModule(NumberHelper = new NumberHelper(), "Number Formats");
+
 
 				MainEastContainer2.AddPanel(mainSouthContainer);
-				MainEastContainer2.AddPanel(eastContainer).StaticWidth = 300;
+				MainEastContainer2.AddPanel(eastContainer);
 
 				mainSouthContainer.AddPanel(tabsWestContainer);
-				mainSouthContainer.AddPanel(southContainer).StaticWidth = 250;
+				mainSouthContainer.AddPanel(southContainer);
 
-				tabsWestContainer.AddPanel(westContainer).StaticWidth = 250;
+				tabsWestContainer.AddPanel(westContainer);
 				tabsWestContainer.AddPanel(editorTabs);
 
-				eastContainer.AddPanel(ppuPanel);
-				cpuStatus1.ModuleEvents = _moduleEvents; // TODO Initialize object with events instance
-				eastContainer.AddPanel(new IdePanel(cpuStatus1) { Label = "Console Status" });
-				eastContainer.AddPanel(new IdePanel(mesen) { Label = "Mesen" });
-
-				southContainer.AddPanel(OutputPanel);
-				southContainer.AddPanel(WatchPanel);
-				southContainer.AddPanel(memoryPanel);
-
-				westContainer.AddPanel(new IdePanel(ProjectExplorer = new ProjectExplorer.ProjectExplorer(_moduleEvents)) { Label = "Project Explorer" });
-				//westContainer.AddPanel(new IdePanel(CartridgeExplorer) { Label = "Cartridge Explorer" });
-				var helperPanel = new IdeGroupedPanel();
-				helperPanel.AddPanel(new IdePanel(OpcodeHelper = new OpcodeHelper(_moduleEvents)) { Label = "Opcodes" });
-				helperPanel.AddPanel(new IdePanel(Ca65Helper = new Ca65CommandDocumentation(_moduleEvents)) { Label = "Commands" });
-				helperPanel.AddPanel(new IdePanel(NumberHelper = new NumberHelper()) { Label = "Number Formats" });
-				westContainer.AddPanel(helperPanel);
-
-				LayoutHandler = new LayoutHandler(this);
-				LayoutHandler.SetDockContainers(eastContainer, westContainer, southContainer);
-
-				AddWindowOption(ProjectExplorer);
-				AddWindowOption(NumberHelper);
-				AddWindowOption(OpcodeHelper);
-				AddWindowOption(Ca65Helper);
-				AddWindowOption(mesen);
-				AddWindowOption(OutputWindow);
-				AddWindowOption(TileMap);
-				AddWindowOption(Sprites);
-				AddWindowOption(SpriteList);
-				AddWindowOption(MemoryTabs);
-				AddWindowOption(cpuStatus1);
-				AddWindowOption(WatchValues);
-				AddWindowOption(BreakpointList);
-				AddWindowOption(ErrorList);
-
-				AddWindowOption(ConsolePaletteViewer);
-				AddWindowOption(GamePaletteViewer);
+				StoredLayoutHandler = new StoredLayoutHandler(this);
+				StoredLayoutHandler.SetDockContainers(eastContainer, westContainer, southContainer);
+				StoredLayoutHandler.LoadPanelLayout(_modules, Program.GetUserFilePath(LayoutFileName));
+				AddWindowOptions();
 
 				// Setup features
 				BuildHandler = new BuildHandler();
@@ -301,9 +275,6 @@ namespace Brewmaster
 				{
 					_memoryState = state.Memory;
 					WatchValues.SetData(state.Memory);
-					UpdateCpuMemory(state.Memory.CpuData);
-					UpdatePpuMemory(state.Memory.PpuData);
-					UpdateOamMemory(state.Memory.OamData);
 					_moduleEvents.UpdateStates(state);
 				};
 				_moduleEvents.SelectedSpriteChanged += (index) =>
@@ -320,18 +291,23 @@ namespace Brewmaster
 				_menuHelper.Prepare(new [] { MainWindowMenu, MainToolStrip }, WriteStatus);
 
 				// Apply settings
-				updateEveryFrameMenuItem.Checked = (mesen.UpdateRate = Settings.UpdateRate) == 1;
-				integerScalingMenuItem.Checked = mesen.IntegerScaling = Settings.EmuIntegerScaling;
-				randomValuesAtPowerOnMenuItem.Checked = mesen.RandomPowerOnState = Settings.EmuRandomPowerOn;
-				playSpcAudioMenuItem.Checked = mesen.PlayAudio = Settings.EmuPlayAudio;
-				playPulse1MenuItem.Checked = mesen.PlaySquare1 = Settings.EmuPlayPulse1;
-				playPulse2MenuItem.Checked = mesen.PlaySquare2 = Settings.EmuPlayPulse2;
-				playTriangleMenuItem.Checked = mesen.PlayTriangle = Settings.EmuPlayTriangle;
-				playNoiseMenuItem.Checked = mesen.PlayNoise = Settings.EmuPlayNoise;
-				playPcmMenuItem.Checked = mesen.PlayPcm = Settings.EmuPlayPcm;
-				displayNesBgMenuItem.Checked = mesen.ShowBgLayer = Settings.EmuDisplayNesBg;
-				displayNesObjectsMenuItem.Checked = mesen.ShowSpriteLayer = Settings.EmuDisplaySprites;
-				mesen.EmulatorBackgroundColor = Settings.EmuBackgroundColor;
+				viewToolbarMenuItem.Checked = toolstrippanel.Visible = MainToolStrip.Visible = Settings.ShowToolbar;
+				viewStatusBarMenuItem.Checked = statusBar.Visible = Settings.ShowStatusBar;
+				TextEditor.DefaultCodeProperties.ShowLineNumbers = viewLineNumbersMenuItem.Checked = Settings.ShowLineNumbers;
+				lineAddressMappingsMenuItem.Checked = Settings.ShowLineAddresses;
+
+				updateEveryFrameMenuItem.Checked = (Mesen.UpdateRate = Settings.UpdateRate) == 1;
+				integerScalingMenuItem.Checked = Mesen.IntegerScaling = Settings.EmuIntegerScaling;
+				randomValuesAtPowerOnMenuItem.Checked = Mesen.RandomPowerOnState = Settings.EmuRandomPowerOn;
+				playSpcAudioMenuItem.Checked = Mesen.PlayAudio = Settings.EmuPlayAudio;
+				playPulse1MenuItem.Checked = Mesen.PlaySquare1 = Settings.EmuPlayPulse1;
+				playPulse2MenuItem.Checked = Mesen.PlaySquare2 = Settings.EmuPlayPulse2;
+				playTriangleMenuItem.Checked = Mesen.PlayTriangle = Settings.EmuPlayTriangle;
+				playNoiseMenuItem.Checked = Mesen.PlayNoise = Settings.EmuPlayNoise;
+				playPcmMenuItem.Checked = Mesen.PlayPcm = Settings.EmuPlayPcm;
+				displayNesBgMenuItem.Checked = Mesen.ShowBgLayer = Settings.EmuDisplayNesBg;
+				displayNesObjectsMenuItem.Checked = Mesen.ShowSpriteLayer = Settings.EmuDisplaySprites;
+				Mesen.EmulatorBackgroundColor = Settings.EmuBackgroundColor;
 
 				TileMap.ShowScrollOverlay = Settings.ShowScrollOverlay;
 				TileMap.FitImage = Settings.ResizeTileMap;
@@ -358,11 +334,17 @@ namespace Brewmaster
 			}
 			catch (Exception ex)
 			{
-				// TODO: Suggest resetting settings?
-				throw ex;
+				Program.Error(string.Format("An unexpected error happened while loading settings. Check the error log for details:\n\n{0}",Program.GetErrorFilePath()), ex);
 			}
 			ResumeLayout();
         }
+
+		private readonly Dictionary<string, Control> _modules = new Dictionary<string, Control>();
+		private void LoadModule(Control control, string label)
+		{
+			new IdePanel(control) { Label = label };
+			_modules.Add(label, control);
+		}
 
 		private void BindShortcutKeys()
 		{
@@ -403,7 +385,10 @@ namespace Brewmaster
 
 		}
 
-
+		private void AddWindowOptions()
+		{
+			foreach (var module in _modules) AddWindowOption(module.Value);
+		}
 		private void AddWindowOption(Control windowControl)
 		{
 			var idePanel = LayoutHandler.GetPanel(windowControl);
@@ -436,15 +421,15 @@ namespace Brewmaster
 				e.IsInputKey = true;
 			};
 
-			mesen.SetButtonMappings(Settings.NesMappings, Settings.SnesMappings);
+			Mesen.SetButtonMappings(Settings.NesMappings, Settings.SnesMappings);
 			
-		    CpuMemoryViewer.AddWatch += AddWatch;
-			CpuMemoryViewer.AddBreakpoint += (a, t) => AddBreakpoint(a, t, Breakpoint.AddressTypes.Cpu);
-			PpuMemoryViewer.AddBreakpoint += (a, t) => AddBreakpoint(a, t, Breakpoint.AddressTypes.Ppu);
-			OamMemoryViewer.AddBreakpoint += (a, t) => AddBreakpoint(a, t, Breakpoint.AddressTypes.Oam);
-			CpuMemoryViewer.RemoveBreakpoints += RemoveBreakpoints;
-			PpuMemoryViewer.RemoveBreakpoints += RemoveBreakpoints;
-			OamMemoryViewer.RemoveBreakpoints += RemoveBreakpoints;
+		    MemoryTabs.Cpu.AddWatch += AddWatch;
+		    MemoryTabs.Cpu.AddBreakpoint += (a, t) => AddBreakpoint(a, t, Breakpoint.AddressTypes.Cpu);
+		    MemoryTabs.Ppu.AddBreakpoint += (a, t) => AddBreakpoint(a, t, Breakpoint.AddressTypes.Ppu);
+		    MemoryTabs.Oam.AddBreakpoint += (a, t) => AddBreakpoint(a, t, Breakpoint.AddressTypes.Oam);
+		    MemoryTabs.Cpu.RemoveBreakpoints += RemoveBreakpoints;
+		    MemoryTabs.Ppu.RemoveBreakpoints += RemoveBreakpoints;
+		    MemoryTabs.Oam.RemoveBreakpoints += RemoveBreakpoints;
 
 		    _moduleEvents.GetCurrentProject = () => CurrentProject;
 		    _moduleEvents.RemoveBreakpoints = RemoveBreakpoints;
@@ -527,25 +512,25 @@ namespace Brewmaster
 
 		private void LoadEmulator(ProjectType projectType)
 	    {
-		    mesen.SwitchSystem(projectType, (e) => InitializeEmulator(e, projectType));
-		    if (projectType == ProjectType.Nes) GamePaletteViewer.SourcePalette = ConsolePaletteViewer.Palette = mesen.EmulatorSettings.NesPalette;
-		    if (projectType == ProjectType.Snes) GamePaletteViewer.SourcePalette = ConsolePaletteViewer.Palette = mesen.EmulatorSettings.SnesPalette;
+		    Mesen.SwitchSystem(projectType, (e) => InitializeEmulator(e, projectType), this);
+		    if (projectType == ProjectType.Nes) GamePaletteViewer.SourcePalette = ConsolePaletteViewer.Palette = Mesen.EmulatorSettings.NesPalette;
+		    if (projectType == ProjectType.Snes) GamePaletteViewer.SourcePalette = ConsolePaletteViewer.Palette = Mesen.EmulatorSettings.SnesPalette;
 			// TODO: Use events object and/or go through mesen control
-			CpuMemoryViewer.DataChanged = mesen.Emulator.SetCpuMemory;
-		    PpuMemoryViewer.DataChanged = mesen.Emulator.SetPpuMemory;
-		    OamMemoryViewer.DataChanged = mesen.Emulator.SetOamMemory;
+		    MemoryTabs.Cpu.DataChanged = Mesen.Emulator.SetCpuMemory;
+		    MemoryTabs.Ppu.DataChanged = Mesen.Emulator.SetPpuMemory;
+		    MemoryTabs.Oam.DataChanged = Mesen.Emulator.SetOamMemory;
 	    }
 
 	    private void InitializeEmulator(IEmulatorHandler emulator, ProjectType projectType)
 	    {
-		    emulator.InitializeEmulator(Program.EmulatorDirectory, ThreadSafeLogOutput, mesen.GetRenderSurface(projectType));
+		    emulator.InitializeEmulator(Program.EmulatorDirectory, ThreadSafeLogOutput, Mesen.GetRenderSurface(projectType));
 		    emulator.OnBreak += ThreadSafeBreakHandler;
 		    emulator.OnRun += ActivateBreakPointsForCurrentProject;
 		    emulator.OnStatusChange += ThreadSafeStatusHandler;
 		    emulator.OnRegisterUpdate += ThreadSafeDebugStateHandler;
 			emulator.OnFpsUpdate += fps => BeginInvoke(new Action<int>(UpdateFps), fps);
 
-		    cpuStatus1.StateEdited = emulator.ForceNewState;
+		    CpuStatus.StateEdited = emulator.ForceNewState;
 	    }
 
 	    private void UpdateFps(int fps)
@@ -555,10 +540,10 @@ namespace Brewmaster
 
 	    private void UnloadEmulator()
 		{
-			if (mesen.Emulator == null) return;
+			if (Mesen.Emulator == null) return;
 
-			mesen.Emulator.Stop();
-			mesen.UnloadEmulator();
+			Mesen.Emulator.Stop();
+			Mesen.UnloadEmulator();
 		}
 
 		protected override void OnResizeBegin(EventArgs e)
@@ -750,18 +735,6 @@ namespace Brewmaster
 		{
 			return _memoryState;
 		}
-		private void UpdateCpuMemory(byte[] data)
-		{
-			CpuMemoryViewer.SetData(data);
-		}
-		private void UpdatePpuMemory(byte[] data)
-		{
-			PpuMemoryViewer.SetData(data);
-		}
-		private void UpdateOamMemory(byte[] data)
-		{
-			OamMemoryViewer.SetData(data);
-		}
 		private void HideFocusArrow()
 		{
 			if (_currentFocus == null) return;
@@ -845,6 +818,8 @@ namespace Brewmaster
 	        Settings.ShowScrollOverlay = TileMap.ShowScrollOverlay;
 	        Settings.ResizeTileMap = TileMap.FitImage;
 			Settings.Save();
+
+			StoredLayoutHandler.StorePanelLayout(_modules, Program.GetUserFilePath(LayoutFileName));
         }
 
         private void newNesProjectMenuItem_Click(object sender, EventArgs e)
@@ -1080,7 +1055,7 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 			AddFileToRecentProjects(projectFilename);
 
 			ProjectExplorer.SetProject(project);
-			CartridgeExplorer.RefreshTree();
+			//CartridgeExplorer.RefreshTree();
 			CurrentProject = project;
 			LoadProjectState();
 
@@ -1145,11 +1120,11 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 			allBreakpoints = breakpoints.ToList();
 
 		    foreach (var breakpoint in allBreakpoints.Where(bp => bp.Symbol != null)) breakpoint.UpdateFromSymbols(CurrentProject.DebugSymbols);
-			if (mesen.Emulator != null) mesen.Emulator.SetBreakpoints(allBreakpoints.Where(bp => !bp.Broken && !bp.Disabled));
+			if (Mesen.Emulator != null) Mesen.Emulator.SetBreakpoints(allBreakpoints.Where(bp => !bp.Broken && !bp.Disabled));
 		    BreakpointList.SetBreakpoints(allBreakpoints);
-		    CpuMemoryViewer.SetBreakpoints(allBreakpoints.Where(bp => bp.AddressType == Breakpoint.AddressTypes.Cpu));
-		    PpuMemoryViewer.SetBreakpoints(allBreakpoints.Where(bp => bp.AddressType == Breakpoint.AddressTypes.Ppu));
-		    OamMemoryViewer.SetBreakpoints(allBreakpoints.Where(bp => bp.AddressType == Breakpoint.AddressTypes.Oam));
+		    MemoryTabs.Cpu.SetBreakpoints(allBreakpoints.Where(bp => bp.AddressType == Breakpoint.AddressTypes.Cpu));
+		    MemoryTabs.Ppu.SetBreakpoints(allBreakpoints.Where(bp => bp.AddressType == Breakpoint.AddressTypes.Ppu));
+		    MemoryTabs.Oam.SetBreakpoints(allBreakpoints.Where(bp => bp.AddressType == Breakpoint.AddressTypes.Oam));
 
 		    foreach (var editor in editorTabs.TabPages.OfType<TextEditorWindow>()) editor.RefreshEditorBreakpoints();
 		}
@@ -1177,7 +1152,7 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 
 			UnloadEmulator();
 			ProjectExplorer.Nodes.Clear();
-			CartridgeExplorer.Nodes.Clear();
+			//CartridgeExplorer.Nodes.Clear();
 		    editorTabs.TabPages.Clear();
 		    WatchValues.Clear();
 		    configurationSelector.Items.Clear();
@@ -1406,7 +1381,7 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 		private void buildToolStripMenuItem_Click(object sender, EventArgs e)
         {
 	        var buildTask = BuildProject();
-	        if (!mesen.Emulator.IsRunning() || _currentFocus == null) return;
+	        if (!Mesen.Emulator.IsRunning() || _currentFocus == null) return;
 
 			// If emulator is running and an editor is currently focused on a code line, upload the new ROM to the running editor, and continue where we are
 			buildTask.ContinueWith((t, o) =>
@@ -1415,7 +1390,7 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 		        CurrentProject.AwaitDebugTask();
 		        var currentFocusLine = _currentFocus.GetFocusArrow();
 		        if (currentFocusLine == null) return;
-		        mesen.LoadCartridgeAtSameState(CurrentProject.Directory.FullName, CurrentProject.Directory.FullName + @"\" + CurrentProject.CurrentConfiguration.Filename,
+		        Mesen.LoadCartridgeAtSameState(CurrentProject.Directory.FullName, CurrentProject.Directory.FullName + @"\" + CurrentProject.CurrentConfiguration.Filename,
 			        i => currentFocusLine.CpuAddress ?? i);
 	        }, null);
 		}
@@ -1434,11 +1409,11 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 		}
 		private void Run()
 		{
-			mesen.Focus();
-			if (mesen.Emulator.IsRunning())
+			Mesen.Focus();
+			if (Mesen.Emulator.IsRunning())
 			{
 				// While running the game, treat the "run" button as a resume
-				mesen.Emulator.Resume();
+				Mesen.Emulator.Resume();
 				return;
 			}
 
@@ -1452,7 +1427,7 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 					Error(string.Format("Could not find the ROM file: {0}. Did someone delete it?", romFile));
 					return;
 				}
-				mesen.LoadCartridge(CurrentProject.Directory.FullName, romFile);
+				Mesen.LoadCartridge(CurrentProject.Directory.FullName, romFile);
 			}, null);
 		}
 
@@ -1462,7 +1437,7 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 			BuildProject(true).ContinueWith((t, o) =>
 			{
 				if (t.Status != TaskStatus.RanToCompletion || !t.Result) return;
-				mesen.LoadCartridge(CurrentProject.Directory.FullName, CurrentProject.Directory.FullName + @"\" + CurrentProject.CurrentConfiguration.Filename);
+				Mesen.LoadCartridge(CurrentProject.Directory.FullName, CurrentProject.Directory.FullName + @"\" + CurrentProject.CurrentConfiguration.Filename);
 			}, null);
 		}
 	    private void continueWithNewBuildToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1473,19 +1448,19 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 				CurrentProject.AwaitDebugTask();
 			    var currentFocusLine = _currentFocus.GetFocusArrow();
 			    if (currentFocusLine == null) return;
-				mesen.LoadCartridgeAtSameState(CurrentProject.Directory.FullName, CurrentProject.Directory.FullName + @"\" + CurrentProject.CurrentConfiguration.Filename, 
+				Mesen.LoadCartridgeAtSameState(CurrentProject.Directory.FullName, CurrentProject.Directory.FullName + @"\" + CurrentProject.CurrentConfiguration.Filename, 
 				    i => currentFocusLine.CpuAddress ?? i);
 		    }, null);
 	    }
 
 		private void Run_RunAppletMenuItem_Click(object sender, EventArgs e)
         {
-			mesen.Emulator.Pause();
+			Mesen.Emulator.Pause();
 		}
 		
         private void StopMenuItem_Click(object sender, EventArgs e)
         {
-			mesen.Emulator.Stop();
+			Mesen.Emulator.Stop();
 		}
 
         private void Window_CloseAllWindowsMenuItem_Click(object sender, EventArgs e)
@@ -1680,26 +1655,26 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 
 		private void stepOverMenuItem_Click(object sender, EventArgs e)
 		{
-			if (!mesen.Emulator.IsRunning()) return;
-			mesen.Emulator.StepOver();
+			if (!Mesen.Emulator.IsRunning()) return;
+			Mesen.Emulator.StepOver();
 		}
 
 		private void stepIntoToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			if (!mesen.Emulator.IsRunning()) return;
-			mesen.Emulator.StepInto();
+			if (!Mesen.Emulator.IsRunning()) return;
+			Mesen.Emulator.StepInto();
 		}
 
 		private void stepOutToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			if (!mesen.Emulator.IsRunning()) return;
-			mesen.Emulator.StepOut();
+			if (!Mesen.Emulator.IsRunning()) return;
+			Mesen.Emulator.StepOut();
 		}
 
 		private void stepBackToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			if (!mesen.Emulator.IsRunning()) return;
-			mesen.Emulator.StepBack();
+			if (!Mesen.Emulator.IsRunning()) return;
+			Mesen.Emulator.StepBack();
 		}
 
 	    public void AddWatch(string expression, bool word)
@@ -1709,7 +1684,7 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 
 		private void restartToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			mesen.Emulator.Restart();
+			Mesen.Emulator.Restart();
 		}
 
 		private void flashCartridge_Click(object sender, EventArgs e)
@@ -1741,7 +1716,7 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 					    Settings.SnesMappings = newMappings;
 					    break;
 			    }
-			    mesen.SetButtonMappings(Settings.NesMappings, Settings.SnesMappings);
+			    Mesen.SetButtonMappings(Settings.NesMappings, Settings.SnesMappings);
 				Settings.Save();
 			}
 
@@ -1768,9 +1743,9 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 			    ca65highlighting.UpdateColorsFromDefault();
 			    ca65highlighting.MarkTokens(textEditorWindow.TextEditor.Document, textEditorWindow.TextEditor.Document.LineSegmentCollection.ToList());
 			}
-		    mesen.SetButtonMappings(Settings.NesMappings, Settings.SnesMappings);
-		    mesen.EmulatorBackgroundColor = Settings.EmuBackgroundColor;
-			updateEveryFrameMenuItem.Checked = (mesen.UpdateRate = Settings.UpdateRate) == 1;
+		    Mesen.SetButtonMappings(Settings.NesMappings, Settings.SnesMappings);
+		    Mesen.EmulatorBackgroundColor = Settings.EmuBackgroundColor;
+			updateEveryFrameMenuItem.Checked = (Mesen.UpdateRate = Settings.UpdateRate) == 1;
 		}
 		private void buildSettingsMenuItem_Click(object sender, EventArgs e)
 	    {
@@ -1787,12 +1762,12 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 
 		private void updateEveryFrameToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			mesen.UpdateRate = Settings.UpdateRate = updateEveryFrameMenuItem.Checked ? 1 : 30;
+			Mesen.UpdateRate = Settings.UpdateRate = updateEveryFrameMenuItem.Checked ? 1 : 30;
 			Settings.Save();
 		}
 	    private void integerScalingToolStripMenuItem_Click(object sender, EventArgs e)
 	    {
-		    mesen.IntegerScaling = Settings.EmuIntegerScaling = integerScalingMenuItem.Checked;
+		    Mesen.IntegerScaling = Settings.EmuIntegerScaling = integerScalingMenuItem.Checked;
 		    Settings.Save();
 	    }
 
@@ -1825,102 +1800,102 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 
 		private void randomValuesAtPowerOnToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			Settings.EmuRandomPowerOn = mesen.RandomPowerOnState = randomValuesAtPowerOnMenuItem.Checked;
+			Settings.EmuRandomPowerOn = Mesen.RandomPowerOnState = randomValuesAtPowerOnMenuItem.Checked;
 			Settings.Save();
 		}
 
 		private void displayBGToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			Settings.EmuDisplayNesBg = mesen.ShowBgLayer = displayNesBgMenuItem.Checked;
+			Settings.EmuDisplayNesBg = Mesen.ShowBgLayer = displayNesBgMenuItem.Checked;
 			Settings.Save();
 		}
 
 		private void displayObjectsToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			Settings.EmuDisplaySprites = mesen.ShowSpriteLayer = displaySnesSpritesMenuItem.Checked = displayNesObjectsMenuItem.Checked;
+			Settings.EmuDisplaySprites = Mesen.ShowSpriteLayer = displaySnesSpritesMenuItem.Checked = displayNesObjectsMenuItem.Checked;
 			Settings.Save();
 		}
 	    private void displaySpritesToolStripMenuItem_Click(object sender, EventArgs e)
 	    {
-		    Settings.EmuDisplaySprites = mesen.ShowSpriteLayer = displayNesObjectsMenuItem.Checked = displaySnesSpritesMenuItem.Checked;
+		    Settings.EmuDisplaySprites = Mesen.ShowSpriteLayer = displayNesObjectsMenuItem.Checked = displaySnesSpritesMenuItem.Checked;
 		    Settings.Save();
 		}
 
 
 		private void playPulse1ToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			Settings.EmuPlayPulse1 = mesen.PlaySquare1 = playPulse1MenuItem.Checked;
+			Settings.EmuPlayPulse1 = Mesen.PlaySquare1 = playPulse1MenuItem.Checked;
 			Settings.Save();
 		}
 
 		private void playPulse2ToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			Settings.EmuPlayPulse2 = mesen.PlaySquare2 = playPulse2MenuItem.Checked;
+			Settings.EmuPlayPulse2 = Mesen.PlaySquare2 = playPulse2MenuItem.Checked;
 			Settings.Save();
 		}
 
 		private void playTriangleToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			Settings.EmuPlayTriangle = mesen.PlayTriangle = playTriangleMenuItem.Checked;
+			Settings.EmuPlayTriangle = Mesen.PlayTriangle = playTriangleMenuItem.Checked;
 			Settings.Save();
 		}
 
 		private void playNoiseToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			Settings.EmuPlayNoise = mesen.PlayNoise = playNoiseMenuItem.Checked;
+			Settings.EmuPlayNoise = Mesen.PlayNoise = playNoiseMenuItem.Checked;
 			Settings.Save();
 		}
 
 		private void playPCMToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			Settings.EmuPlayPcm = mesen.PlayPcm = playPcmMenuItem.Checked;
+			Settings.EmuPlayPcm = Mesen.PlayPcm = playPcmMenuItem.Checked;
 			Settings.Save();
 		}
 
 		private void playAudioToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			Settings.EmuPlayAudio = mesen.PlayAudio = playSpcAudioMenuItem.Checked = playAudioMenuItem.Checked;
+			Settings.EmuPlayAudio = Mesen.PlayAudio = playSpcAudioMenuItem.Checked = playAudioMenuItem.Checked;
 			Settings.Save();
 		}
 
 		private void playSPCAudioToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			Settings.EmuPlayAudio = mesen.PlayAudio = playAudioMenuItem.Checked = playSpcAudioMenuItem.Checked;
+			Settings.EmuPlayAudio = Mesen.PlayAudio = playAudioMenuItem.Checked = playSpcAudioMenuItem.Checked;
 			Settings.Save();
 		}
 
 		private void displayBGLayer1ToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			Settings.EmuDisplaySnesBg1 = mesen.ShowBgLayer1 = displayBgLayer1MenuItem.Checked;
+			Settings.EmuDisplaySnesBg1 = Mesen.ShowBgLayer1 = displayBgLayer1MenuItem.Checked;
 			Settings.Save();
 		}
 
 		private void displayBGLayer2ToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			Settings.EmuDisplaySnesBg2 = mesen.ShowBgLayer2 = displayBgLayer2MenuItem.Checked;
+			Settings.EmuDisplaySnesBg2 = Mesen.ShowBgLayer2 = displayBgLayer2MenuItem.Checked;
 			Settings.Save();
 		}
 
 		private void displayBGLayer3ToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			Settings.EmuDisplaySnesBg3 = mesen.ShowBgLayer3 = displayBgLayer3MenuItem.Checked;
+			Settings.EmuDisplaySnesBg3 = Mesen.ShowBgLayer3 = displayBgLayer3MenuItem.Checked;
 			Settings.Save();
 		}
 
 		private void displayBGLayer4ToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			Settings.EmuDisplaySnesBg4 = mesen.ShowBgLayer4 = displayBgLayer4MenuItem.Checked;
+			Settings.EmuDisplaySnesBg4 = Mesen.ShowBgLayer4 = displayBgLayer4MenuItem.Checked;
 			Settings.Save();
 		}
 
 		private void saveStateToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			mesen.SaveState();
+			Mesen.SaveState();
 		}
 
 		private void loadStateToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			mesen.LoadState();
+			Mesen.LoadState();
 		}
 
 		private void newProjectToolStripButton_Click(object sender, EventArgs e)
@@ -1933,6 +1908,13 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 			if (CurrentProject == null) return;
 			var goToAll = new GoToAll(CurrentProject, _moduleEvents);
 			goToAll.Show(this);
+		}
+
+		private void resetLayoutToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			SuspendLayout();
+			StoredLayoutHandler.LoadPanelLayout(_modules);
+			ResumeLayout(true);
 		}
 	}
 

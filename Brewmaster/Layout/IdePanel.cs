@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 
-namespace Brewmaster.Ide
+namespace Brewmaster.Layout
 {
 	public static class IdeExtensions
 	{

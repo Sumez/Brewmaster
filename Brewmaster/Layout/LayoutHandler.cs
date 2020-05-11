@@ -4,7 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 
-namespace Brewmaster.Ide
+namespace Brewmaster.Layout
 {
 	public class LayoutHandler
 	{
@@ -71,7 +71,7 @@ namespace Brewmaster.Ide
 			CreateFloatPanel(panel, windowLocation, windowSize);
 			_form.ResumeLayout();
 		}
-		private void CreateFloatPanel(IdePanel panel, Point? location = null, Size? size = null)
+		protected void CreateFloatPanel(IdePanel panel, Point? location = null, Size? size = null)
 		{
 			var floatPanel = new FloatPanel(this);
 			floatPanel.SuspendLayout();
@@ -358,7 +358,7 @@ namespace Brewmaster.Ide
 			OnPanelStatusChanged(panel, true);
 		}
 
-		private void OnPanelStatusChanged(IdePanel panel, bool visible)
+		protected virtual void OnPanelStatusChanged(IdePanel panel, bool visible)
 		{
 			if (PanelStatusChanged != null) PanelStatusChanged(panel, visible);
 		}
@@ -369,6 +369,7 @@ namespace Brewmaster.Ide
 			public MultiSplitContainer SplitContainer;
 			public IdePanel Sibling;
 		}
+
 	}
 
 

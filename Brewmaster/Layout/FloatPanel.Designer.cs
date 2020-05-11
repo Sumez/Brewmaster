@@ -1,6 +1,6 @@
 ﻿using System.Windows.Forms;
 
-namespace Brewmaster.Ide
+namespace Brewmaster.Layout
 {
 	partial class FloatPanel
 	{

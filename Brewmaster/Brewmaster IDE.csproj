@@ -167,12 +167,16 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Emulation\EmulatorHandler.cs" />
+    <Compile Include="Layout\StoredLayoutHandler.cs" />
     <Compile Include="MemoryViewer\HexEditor.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="MemoryViewer\HexEditor.Drawing.cs">
       <SubType>Component</SubType>
       <DependentUpon>HexEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MemoryViewer\MemoryTabs.cs">
+      <SubType>Component</SubType>
     </Compile>
     <Compile Include="Modules\Breakpoints\BreakpointEditor.cs">
       <SubType>Form</SubType>

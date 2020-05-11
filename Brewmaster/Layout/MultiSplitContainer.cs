@@ -7,13 +7,14 @@ using System.Windows.Forms;
 using System.Windows.Forms.Design;
 using Brewmaster.ProjectExplorer;
 
-namespace Brewmaster.Ide
+namespace Brewmaster.Layout
 {
 	[Designer(typeof(ParentControlDesigner))]
 	public class MultiSplitPanel : Panel
 	{
 		private int _staticWidth;
 		public Panel ControlContainer { get; set; }
+		public Control ContainedControl { get { return ControlContainer.Controls[0]; } }
 
 		public int StaticWidth
 		{
@@ -37,7 +38,7 @@ namespace Brewmaster.Ide
 			Controls.Add(ControlContainer);
 
 		}
-
+		
 		public void Add(Control control)
 		{
 			ControlContainer.Controls.Add(control);
@@ -131,6 +132,7 @@ namespace Brewmaster.Ide
 			{
 				Splits[Splits.Count - 2] = Splits[Splits.Count - 1] - Panels[Panels.Count - 1].StaticWidth;
 			}
+			ResizePanels(0, true);
 		}
 		protected virtual void AdjustPanels()
 		{
@@ -200,6 +202,13 @@ namespace Brewmaster.Ide
 				ResumeLayout();
 			}
 		}
+		public void Clear()
+		{
+			Panels = new List<MultiSplitPanel>();
+			Splits = new List<int>();
+			Controls.Clear();
+		}
+
 
 		private int _dragIndex = -1;
 		private bool _dragging = false;
@@ -313,6 +322,14 @@ namespace Brewmaster.Ide
 		protected override void OnPaint(PaintEventArgs e)
 		{
 			base.OnPaint(e);
+		}
+
+		public void SetSplits(List<int> newSplits)
+		{
+			if (Splits.Count != newSplits.Count) return;
+			Splits = newSplits;
+			if (Splits.Count > 0) _oldWidth = _oldHeight = Splits[Splits.Count - 1]; // "Hack" to ensure fitting stored sizes into a new layout.
+			PerformLayout();
 		}
 	}
 
