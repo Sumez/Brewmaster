@@ -30,14 +30,13 @@ namespace Brewmaster.EditorWindows.Images
 
 		private enum ImagePipelines
 		{
-			None, Chr, Palette, Custom
+			None, Chr, Custom
 		}
 
 		private readonly Dictionary<ImagePipelines, object> _imagePipelineChoices = new Dictionary<ImagePipelines, object>()
 		{
 			{ ImagePipelines.None, "Add an image data process..."},
 			{ ImagePipelines.Chr, "Tileset converter (CHR)" },
-			{ ImagePipelines.Palette, "Reduce palette"},
 			{ ImagePipelines.Custom, "Custom..."}
 		};
 
@@ -152,12 +151,10 @@ namespace Brewmaster.EditorWindows.Images
 			switch (option)
 			{
 				case ImagePipelines.Chr:
-					Pipeline = new ChrPipeline(_file, _file.GetRelativeDirectory() + @"/" + Path.GetFileNameWithoutExtension(_file.File.Name) + ".chr");
+					var baseFile = _file.GetRelativeDirectory() + @"/" + Path.GetFileNameWithoutExtension(_file.File.Name);
+					Pipeline = new ChrPipeline(_file, baseFile + ".chr", baseFile + ".pal");
 					ChrPipelinePanel.Pipeline = Pipeline as ChrPipeline;
 					PaletteReductionPanel.Pipeline = Pipeline as ChrPipeline;
-					RegisterChange();
-					break;
-				case ImagePipelines.Palette:
 					RegisterChange();
 					break;
 			}

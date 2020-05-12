@@ -18,11 +18,11 @@ namespace Brewmaster.Pipeline
 	public class ChrPipeline : DataPipeline
 	{
 		public ChrOutputType Type = ChrOutputType.Bpp2;
-		// TODO: Implement (and save) the settings below
-		public bool DiscardRedundantTiles = false;
 		public bool ReducePalette = false;
+		public bool ExportPalette = false;
 		public Dictionary<Color, int> PaletteAssignment;
 		public List<Dictionary<Color, int>> TilePalettes { get; set; }
+		public bool DiscardRedundantTiles = false;
 
 		public override IEnumerable<string> OutputFiles
 		{
@@ -35,9 +35,10 @@ namespace Brewmaster.Pipeline
 		public string ChrOutput;
 		public string PaletteOutput;
 
-		public ChrPipeline(AsmProjectFile file, string chrOutput, DateTime? lastProcessed = null) : base(file, lastProcessed)
+		public ChrPipeline(AsmProjectFile file, string chrOutput, string paletteOutput, DateTime? lastProcessed = null) : base(file, lastProcessed)
 		{
 			ChrOutput = chrOutput;
+			PaletteOutput = paletteOutput;
 			PaletteAssignment = new Dictionary<Color, int>();
 		}
 
@@ -271,8 +272,33 @@ namespace Brewmaster.Pipeline
 					outputFile.Write(bytes, 0, tileByteOffset);
 					outputFile.Close();
 				}
+
+				if (ExportPalette)
+				{
+					var paletteData = new byte[knownEntries * 2];
+					for (var i = 0; i < knownEntries; i++)
+					{
+						var color = GetColorValue(palette[i]);
+						paletteData[i * 2] = (byte)(color & 0xFF);
+						paletteData[i * 2 + 1] = (byte)((color >> 8) & 0xFF);
+					}
+					using (var outputFile = System.IO.File.Create(PaletteOutput))
+					{
+						outputFile.Write(paletteData, 0, paletteData.Length);
+						outputFile.Close();
+					}
+
+				}
 			}
 			LastProcessed = DateTime.Now;
+		}
+		public static int GetColorValue(Color color)
+		{
+			var red = color.R / 8;
+			var green = color.G / 8;
+			var blue = color.B / 8;
+
+			return red | (green << 5) | (blue << 10);
 		}
 
 		public override void GetSettings(ProjectModel.Properties headerSettings)
@@ -281,6 +307,7 @@ namespace Brewmaster.Pipeline
 
 			headerSettings["DiscardRedundant"] = DiscardRedundantTiles ? "1" : "0";
 			headerSettings["ReducePalette"] = ReducePalette ? "1" : "0";
+			headerSettings["ExportPalette"] = ExportPalette ? "1" : "0";
 			headerSettings["ChrType"] = Type.ToString();
 			headerSettings["Palette"] = SerializePalette(PaletteAssignment);
 			if (TilePalettes != null) headerSettings["TilePalettes"] = string.Join(":", TilePalettes.Select(SerializePalette));
@@ -291,8 +318,7 @@ namespace Brewmaster.Pipeline
 			Func<string, string> convertFilePath = (s) => Path.Combine(File.Project.Directory.FullName, s);
 			if (toEditor) convertFilePath = (s) => File.Project.GetRelativePath(s);
 
-			var pipeline = new ChrPipeline(File, convertFilePath(ChrOutput));
-			pipeline.PaletteOutput = String.IsNullOrWhiteSpace(PaletteOutput) ? null : convertFilePath(PaletteOutput);
+			var pipeline = new ChrPipeline(File, convertFilePath(ChrOutput), String.IsNullOrWhiteSpace(PaletteOutput) ? null : convertFilePath(PaletteOutput));
 			var settings = new ProjectModel.Properties();
 			GetSettings(settings);
 			pipeline.SetSettings(settings);
@@ -317,6 +343,7 @@ namespace Brewmaster.Pipeline
 		{
 			DiscardRedundantTiles = (headerSettings["DiscardRedundant"] == "1");
 			ReducePalette = (headerSettings["ReducePalette"] == "1");
+			ExportPalette = (headerSettings["ExportPalette"] == "1");
 			Enum.TryParse(headerSettings["ChrType"], true, out Type);
 			if (!string.IsNullOrWhiteSpace(headerSettings["Palette"]))
 			{
