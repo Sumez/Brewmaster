@@ -90,6 +90,7 @@ namespace Brewmaster.EditorWindows.Code
 					case AsmWord.AsmWordType.LabelReference:
 					case AsmWord.AsmWordType.LabelAbsolute:
 					case AsmWord.AsmWordType.LabelDefinition:
+					case AsmWord.AsmWordType.AddressReference:
 						AddToWatch(word.Word, false);
 						break;
 				}
@@ -102,7 +103,7 @@ namespace Brewmaster.EditorWindows.Code
 				{
 					case AsmWord.AsmWordType.NumberWord:
 					case AsmWord.AsmWordType.NumberByte:
-						AddAddressBreakpoint(WatchValue.ParseNumber(word.Word), type);
+						AddAddressBreakpoint(AddressReference.ParseNumber(word.Word), type);
 						break;
 					case AsmWord.AsmWordType.LabelReference:
 					case AsmWord.AsmWordType.LabelAbsolute:
@@ -182,6 +183,9 @@ namespace Brewmaster.EditorWindows.Code
 					case AsmWord.AsmWordType.LabelDefinition:
 					case AsmWord.AsmWordType.Macro:
 						e.ShowToolTip(GetSymbolDescription(word.Word));
+						break;
+					case AsmWord.AsmWordType.AddressReference:
+						e.ShowToolTip(GetParsedAddress(word.Word));
 						break;
 					case AsmWord.AsmWordType.Command:
 						var command = Ca65Parser.GetCommandFromWord(word.Word);
@@ -324,16 +328,23 @@ namespace Brewmaster.EditorWindows.Code
 			var memoryState = GetCpuMemory();
 			if (memoryState == null) return string.Format("{0} ({1})", word, WatchValue.FormatHexAddress(symbol.Value));
 
-			var val8 = memoryState.ReadAddress(symbol.Value);
-			var val16 = memoryState.ReadAddress(symbol.Value, true);
-			// TODO: Show where symbol is defined?
+			return GetParsedAddress(word);
+		}
+
+		protected string GetParsedAddress(string word)
+		{
+			var memoryState = GetCpuMemory();
+			if (memoryState == null) return word;
+			
+			var addressReference = new AddressReference(word, s => File.Project.DebugSymbols.ContainsKey(s) ? File.Project.DebugSymbols[s] : null);
+			var val8 = memoryState.ReadAddress(addressReference.BaseAddress, false, addressReference.OffsetRegister, out var address);
+			var val16 = memoryState.ReadAddress(addressReference.BaseAddress, true, addressReference.OffsetRegister);
 			return string.Format("{0} ({1})\n\nValue: {2} ({3})\nWord value: {4} ({5})",
 				word,
-				WatchValue.FormatHexAddress(symbol.Value),
+				WatchValue.FormatHexAddress(address),
 				WatchValue.FormatHex(val8, 2), val8,
 				WatchValue.FormatHex(val16, 4), val16
 			);
-
 		}
 
 		private bool _changedSinceLastCheck = true;
@@ -395,6 +406,18 @@ namespace Brewmaster.EditorWindows.Code
 			if (IsIncludeLine(line) && asmWord != null && asmWord.WordType == AsmWord.AsmWordType.String)
 			{
 				asmWord.WordType = AsmWord.AsmWordType.FileReference;
+			}
+
+			if (asmWord == null)
+			{
+				
+				var addressMatch = Regex.Match(Document.GetText(line), @"(\(?)(?:#?(\$|%)?[0-9A-F]+|[@a-zA-Z_][0-9a-zA-Z_]*)(?:\s*(\)?)\s*,\s*(?:x|y|X|Y))(\)?)");
+				var location = position.Column - addressMatch.Index;
+				if (addressMatch.Success && location >= 0 && location < addressMatch.Length)
+				{
+					if (addressMatch.Groups[3].Length + addressMatch.Groups[4].Length != addressMatch.Groups[1].Length) return null; // Confirm matching parantheses
+					return new AsmWord(Document, line, addressMatch.Index, addressMatch.Length, new HighlightColor(Color.Black, false, false), true, AsmWord.AsmWordType.AddressReference);
+				}
 			}
 			return asmWord;
 		}
