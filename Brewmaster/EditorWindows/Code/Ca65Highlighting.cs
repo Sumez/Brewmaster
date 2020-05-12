@@ -21,7 +21,7 @@ namespace Brewmaster.EditorWindows.Code
 
 		public enum AsmWordType {
 			None, Opcode, LabelDefinition, LabelReference, LabelAbsolute, Macro, NumberWord, NumberByte, String,
-			Command, Comment, FileReference
+			Command, Comment, FileReference, AddressReference
 		}
 
 		public bool IsLabel
@@ -67,6 +67,7 @@ namespace Brewmaster.EditorWindows.Code
 		private HighlightColor DigitColor { get; set; }
 		public HighlightColor OpcodeColor { get; set; }
 		public Ca65WordType StringWord { get; set; }
+		public Ca65WordType AddressWord { get; set; }
 		public Ca65WordType NumberWord { get; set; }
 		public Ca65WordType CommandWord { get; set; }
 		public Ca65Span CommentSpan { get; set; }
@@ -116,6 +117,7 @@ namespace Brewmaster.EditorWindows.Code
 		const string CommandMatch = @"^\.[a-zA-Z0-9]+";
 		const string StringMatch = @"^('|"").*?\1";
 		const string NumberMatch = @"^(\$[0-9a-fA-F]+|[0-9]+|%[01]+|[0-9][0-9a-fA-F]*h)(?=\b)";
+		const string AddressMatch = @"^(\(?)(#?(\$|%)?[0-9A-F]+|[@a-zA-Z_][0-9a-zA-Z_]*)(\s*\)?\s*,\s*(x|y|X|Y))\)?";
 		public Ca65Highlighting(ProjectType projectType)
 		{
 			Extensions = new[] {"s", "h"};
@@ -135,6 +137,11 @@ namespace Brewmaster.EditorWindows.Code
 				Type = AsmWord.AsmWordType.String,
 				Match = StringMatch
 			};
+			AddressWord = new Ca65WordType
+			{
+				Type = AsmWord.AsmWordType.AddressReference,
+				Match = AddressMatch
+			};
 			CommandWord = new Ca65WordType
 			{
 				Type = AsmWord.AsmWordType.Command,
@@ -149,7 +156,7 @@ namespace Brewmaster.EditorWindows.Code
 
 			UpdateColorsFromDefault();
 
-			Type = new List<Ca65WordType> { NumberWord, StringWord, CommandWord };
+			Type = new List<Ca65WordType> { NumberWord, StringWord, CommandWord }; //, AddressWord };
 			Spans = new List<Ca65Span> { CommentSpan };
 
 		}
@@ -289,7 +296,7 @@ namespace Brewmaster.EditorWindows.Code
 						var lookAhead = document.GetText(currentLineOffset + i, (currentLineLength - i));
 
 						var match = Regex.Match(lookAhead, OperatorMatch);
-						if (match.Success)
+						if (match.Success) // && !Type.Any(t => Regex.IsMatch(lookAhead, t.Match))) ; Condition only necessary if a match type conflicts with operators
 						{
 							PushCurWord(document, ref markNext, words, firstWord);
 							if (isWord) firstWord = false;
@@ -593,6 +600,7 @@ namespace Brewmaster.EditorWindows.Code
 			{
 				case "Default":
 					DefaultTextColor = color;
+					AddressWord.Color = color;
 					Colors["Selection"] = new HighlightBackground(DefaultTextColor.Color, Color.LightBlue, false, false);
 					Colors["Highlighted word"] = new HighlightBackground(DefaultTextColor.Color, Colors["Highlighted word"].BackgroundColor, DefaultTextColor.Bold, DefaultTextColor.Italic);
 					Colors["Assembler error"] = new HighlightColor(Colors["Assembler error"].Color, DefaultTextColor.Bold, DefaultTextColor.Italic);

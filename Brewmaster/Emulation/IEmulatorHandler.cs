@@ -60,7 +60,7 @@ namespace Brewmaster.Emulation
 		public SpriteData Sprites = new SpriteData();
 		public CharacterData CharacterData = new CharacterData();
 		public TileMapData TileMaps;
-		public MemoryState Memory = new MemoryState(null, null, null);
+		public MemoryState Memory = new MemoryState();
 	}
 
 	public class CharacterData
@@ -109,27 +109,36 @@ namespace Brewmaster.Emulation
 
 	public class MemoryState
 	{
-		public MemoryState(byte[] cpuData, byte[] ppuData, byte[] oamData)
-		{
-			CpuData = cpuData;
-			PpuData = ppuData;
-			OamData = oamData;
-		}
-
 		public byte[] CpuData;
 		public byte[] PpuData;
 		public byte[] OamData;
 		public byte[] CgRam;
 
+		public int Y;
+		public int X;
+
 		// TODO: Check size of symbols (24/16/8) and use knowledge of CPU bank registers (K/DP/DB) to look at correct address
-
-		public int ReadAddress(int index, bool readWord = false)
+		public int ReadAddress(int index, bool readWord, OffsetRegister offset, out int address)
 		{
-			if (index >= CpuData.Length || (readWord && index + 1 >= CpuData.Length)) return -1;
-			return CpuData[index] + (readWord ? (CpuData[index + 1] << 8) : 0);
+			address = index;
 
+			if (offset == OffsetRegister.X) address += X;
+			if (offset == OffsetRegister.Y) address += Y;
+			if (offset == OffsetRegister.IndirectY) address = ReadAddress(address, true) + Y; // TODO: Page boundary crossing issue
+			if (offset == OffsetRegister.IndirectX) address = ReadAddress(address + X, true);
+
+			if (address >= CpuData.Length || (readWord && address + 1 >= CpuData.Length)) return -1;
+			return CpuData[address] + (readWord ? (CpuData[address + 1] << 8) : 0);
 		}
+
+		public int ReadAddress(int index, bool readWord = false, OffsetRegister offset = OffsetRegister.None)
+		{
+			return ReadAddress(index, readWord, offset, out var dummy);
+		}
+
 	}
+	public enum OffsetRegister { None, X, Y, IndirectX, IndirectY };
+
 	public enum Language
 	{
 		SystemDefault = 0,

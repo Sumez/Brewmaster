@@ -244,6 +244,9 @@ namespace Brewmaster.Emulation
 					_debugState.Memory.CgRam = InteropEmu.DebugGetMemoryState(DebugMemoryType.PaletteMemory);
 
 					InteropEmu.DebugGetState(ref _debugState.NesState);
+					_debugState.Memory.X = _debugState.NesState.CPU.X;
+					_debugState.Memory.Y = _debugState.NesState.CPU.Y;
+
 					_debugState.Sprites.PixelData = InteropEmu.DebugGetSprites();
 					_debugState.Sprites.Details = Sprite.GetNesSprites(_debugState.Memory.OamData, _debugState.NesState.PPU.ControlFlags.LargeSprites == 1);
 

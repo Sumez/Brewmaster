@@ -61,7 +61,8 @@ namespace Brewmaster.EditorWindows.Code
 				else
 				{
 					GoToDefinitionOption.Enabled = (value.WordType == AsmWord.AsmWordType.LabelAbsolute || value.WordType == AsmWord.AsmWordType.LabelReference || value.WordType == AsmWord.AsmWordType.Macro || value.WordType == AsmWord.AsmWordType.FileReference);
-					BreakOnWriteOption.Enabled = BreakOnReadOption.Enabled = AddToWatchOption.Enabled = (value.WordType == AsmWord.AsmWordType.LabelReference || value.WordType == AsmWord.AsmWordType.LabelDefinition || value.WordType == AsmWord.AsmWordType.NumberByte || value.WordType == AsmWord.AsmWordType.NumberWord);
+					BreakOnWriteOption.Enabled = BreakOnReadOption.Enabled = (value.WordType == AsmWord.AsmWordType.LabelReference || value.WordType == AsmWord.AsmWordType.LabelDefinition || value.WordType == AsmWord.AsmWordType.NumberByte || value.WordType == AsmWord.AsmWordType.NumberWord);
+					AddToWatchOption.Enabled = BreakOnWriteOption.Enabled || value.WordType == AsmWord.AsmWordType.AddressReference;
 				}
 				AddToWatchOption.Text = AddToWatchOption.Enabled ? string.Format("Add '{0}' To Watch", value.Word)  : "Add To Watch";
 			}

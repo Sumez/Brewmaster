@@ -111,8 +111,8 @@ namespace Brewmaster.Modules.Watch
 		{
 			if (AddBreakpoint == null) return;
 			var parseExpression = watchValue.Text.Trim();
-			var addressReference = WatchValue.ParseNumber(parseExpression);
-			AddBreakpoint(addressReference, type, Breakpoint.AddressTypes.Cpu, addressReference < 0 ? parseExpression: null);
+			var addressReference = new AddressReference(parseExpression, GetSymbol);
+			AddBreakpoint(addressReference.BaseAddress, type, Breakpoint.AddressTypes.Cpu, addressReference.BaseAddress < 0 ? parseExpression: null);
 		}
 
 		protected override bool DoubleBuffered { get { return true;  } }
@@ -163,10 +163,10 @@ namespace Brewmaster.Modules.Watch
 			}
 			EndUpdate();
 		}
-		private int ReadAddress(int index, bool readWord)
+		private int ReadAddress(int index, bool readWord, OffsetRegister offset)
 		{
 			if (_memoryState == null) return -2;
-			return _memoryState == null ? -2 : _memoryState.ReadAddress(index, readWord);
+			return _memoryState.ReadAddress(index, readWord, offset);
 		}
 
 		public void ClearValues()
@@ -386,9 +386,9 @@ namespace Brewmaster.Modules.Watch
 
 	public class WatchValue : ListViewItem
 	{
-		private readonly Func<int, bool, int> _readAddress;
+		private readonly Func<int, bool, OffsetRegister, int> _readAddress;
 		private readonly Func<string, DebugSymbol> _getSymbol;
-		private int _addressReference = -1;
+		private AddressReference _addressReference;
 
 		public bool ShowAsDecimal
 		{
@@ -409,7 +409,7 @@ namespace Brewmaster.Modules.Watch
 		private bool _showAsWord;
 
 
-		public WatchValue(string expression, bool showAsWord, bool showAsDecimal, Func<int, bool, int> readAddress, Func<string, DebugSymbol> getSymbol)
+		public WatchValue(string expression, bool showAsWord, bool showAsDecimal, Func<int, bool, OffsetRegister, int> readAddress, Func<string, DebugSymbol> getSymbol)
 		{
 			_readAddress = readAddress;
 			_getSymbol = getSymbol;
@@ -424,36 +424,10 @@ namespace Brewmaster.Modules.Watch
 			Parse();
 		}
 
-		private static Regex _parseHex = new Regex(@"^(?:0x|\$|&)([0-9a-f]+)$", RegexOptions.IgnoreCase);
-		private static Regex _parseDec = new Regex(@"^([0-9]+)$");
-
 		public void Parse()
 		{
-			var parseExpression = Text.Trim();
-			
-			_addressReference = ParseNumber(parseExpression);
-			if (_addressReference < 0 && _getSymbol != null)
-			{
-				var symbol = _getSymbol(parseExpression);
-				if (symbol != null) _addressReference = symbol.Value;
-			}
+			_addressReference = new AddressReference(Text.Trim(), _getSymbol);
 			Update();
-		}
-
-		public static int ParseNumber(string input)
-		{
-			var match = _parseHex.Match(input);
-			if (match.Success)
-			{
-				return int.Parse(match.Groups[1].Value, NumberStyles.HexNumber);
-			}
-			match = _parseDec.Match(input);
-			if (match.Success)
-			{
-				return int.Parse(match.Groups[1].Value);
-			}
-
-			return -1;
 		}
 
 		public void Update()
@@ -466,7 +440,7 @@ namespace Brewmaster.Modules.Watch
 
 		public string GetValue()
 		{
-			return _addressReference < 0 ? "<unable to parse>" : Format(_readAddress(_addressReference, ShowAsWord));
+			return _addressReference.BaseAddress < 0 ? "<unable to parse>" : Format(_readAddress(_addressReference.BaseAddress, ShowAsWord, _addressReference.OffsetRegister));
 		}
 
 		private string Format(int value)
@@ -485,5 +459,61 @@ namespace Brewmaster.Modules.Watch
 				? string.Format("${0}:{1}", Convert.ToString(value >> 16, 16).ToUpper().PadLeft(2, '0'), Convert.ToString(value & 0xffff, 16).ToUpper().PadLeft(4, '0'))
 				: string.Format("${0}", Convert.ToString(value, 16).ToUpper().PadLeft(value > 0xff ? 4 : 2, '0'));
 		}
+	}
+
+	public class AddressReference
+	{
+		private static Regex _parseHex = new Regex(@"^(?:0x|\$|&)([0-9a-f]+)$", RegexOptions.IgnoreCase);
+		private static Regex _parseDec = new Regex(@"^([0-9]+)$");
+
+		private static Regex _parseOffset = new Regex(@"^([^\(\s]+)\s*,\s*(x|y)$", RegexOptions.IgnoreCase);
+		private static Regex _parseIndirectY = new Regex(@"^\(([^\s]+)\s*\)\s*,\s*y$", RegexOptions.IgnoreCase);
+		private static Regex _parseIndirectX = new Regex(@"^\/([^\s]+)\s*,\s*x\s*\)$", RegexOptions.IgnoreCase);
+
+		public OffsetRegister OffsetRegister = OffsetRegister.None;
+		public int BaseAddress = -1;
+
+		public AddressReference(string parseExpression, Func<string, DebugSymbol> getSymbol)
+		{
+			var match = _parseOffset.Match(parseExpression);
+			if (match.Success)
+			{
+				OffsetRegister = match.Groups[2].Value.Equals("x", StringComparison.InvariantCultureIgnoreCase) ? OffsetRegister.X : OffsetRegister.Y;
+				parseExpression = match.Groups[1].Value;
+			}
+			else if ((match = _parseIndirectY.Match(parseExpression)).Success)
+			{
+				OffsetRegister = OffsetRegister.IndirectY;
+				parseExpression = match.Groups[1].Value;
+			}
+			else if ((match = _parseIndirectX.Match(parseExpression)).Success)
+			{
+				OffsetRegister = OffsetRegister.IndirectX;
+				parseExpression = match.Groups[1].Value;
+			}
+
+			BaseAddress = ParseNumber(parseExpression);
+			if (BaseAddress < 0 && getSymbol != null)
+			{
+				var symbol = getSymbol(parseExpression);
+				if (symbol != null) BaseAddress = symbol.Value;
+			}
+		}
+		public static int ParseNumber(string input)
+		{
+			var match = _parseHex.Match(input);
+			if (match.Success)
+			{
+				return int.Parse(match.Groups[1].Value, NumberStyles.HexNumber);
+			}
+			match = _parseDec.Match(input);
+			if (match.Success)
+			{
+				return int.Parse(match.Groups[1].Value);
+			}
+
+			return -1;
+		}
+
 	}
 }
