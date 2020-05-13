@@ -5,6 +5,7 @@ using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using Brewmaster.Layout;
 using Brewmaster.Modules;
 using Brewmaster.Pipeline;
 using Brewmaster.ProjectModel;
@@ -24,9 +25,10 @@ namespace Brewmaster.EditorWindows.Images
 		{
 			base.OnCreateControl();
 
-			_image = new ImageRenderControl(ProjectFile.File.FullName);
-			Controls.Add(_image);
-			_image.Dock = DockStyle.Fill;
+			var splitContainer = new MultiSplitContainer { Dock = DockStyle.Fill };
+
+			_image = new ImageRenderControl(ProjectFile.File.FullName) { Width = 300, Height = 300 };
+			splitContainer.AddPanel(new ScrollableView(_image));
 			/* Image = new Bitmap(picture.HorizontalResolution, picture.VerticalResolution);
 
 			g = Graphics.FromImage(b);
@@ -37,12 +39,11 @@ namespace Brewmaster.EditorWindows.Images
 
 			g.DrawImage(picture, rect, sourceRect, GraphicsUnit.Pixel);*/
 
-			PipelineSettings = new ImagePipelineSettings(ProjectFile, _image)
-			{
-				Dock = DockStyle.Right, Width = 310
-			};
+			PipelineSettings = new ImagePipelineSettings(ProjectFile, _image);
 			PipelineSettings.PipelineChanged += () => { Pristine = false; };
-			Controls.Add(PipelineSettings);
+			splitContainer.AddPanel(PipelineSettings).StaticWidth = 310;
+			
+			Controls.Add(splitContainer);
 		}
 
 		public ImagePipelineSettings PipelineSettings { get; set; }
@@ -76,6 +77,9 @@ namespace Brewmaster.EditorWindows.Images
 				ImageSource = ChrPipeline.LoadImageFile(filename);
 				Palette = new List<Color>();
 				RefreshPalette(ImageSource);
+
+				_wantedWidth = ImageSource.Width;
+				_wantedHeight = ImageSource.Height;
 			}
 			catch (Exception ex)
 			{
@@ -116,8 +120,14 @@ namespace Brewmaster.EditorWindows.Images
 		{
 			if (e.Delta > 0) _scale++;
 			else _scale--;
-			Refresh();
+			if (_scale < 1) _scale = 1;
+			if (_scale > 50) _scale = 50;
+			Invalidate();
+			PerformLayout();
 		}
+
+		private int _wantedWidth;
+		private int _wantedHeight;
 
 		protected override void OnPaint(PaintEventArgs e)
 		{
@@ -137,6 +147,11 @@ namespace Brewmaster.EditorWindows.Images
 				e.Graphics.DrawImage(preview, destinationSize, size, GraphicsUnit.Pixel);
 				offset += destinationSize.Height + 2;
 			}
+
+			_wantedHeight = offset - 2;
+			_wantedWidth = destinationSize.Width;
+
+			if (_wantedHeight != Height || _wantedWidth != Width) Size = new Size(_wantedWidth, _wantedHeight);
 		}
 
 		protected override void Dispose(bool disposing)
@@ -160,6 +175,7 @@ namespace Brewmaster.EditorWindows.Images
 
 			RefreshPalette(_previews.Count > 0 ? _previews[0] : ImageSource);
 			Refresh();
+			PerformLayout();
 		}
 	}
 }

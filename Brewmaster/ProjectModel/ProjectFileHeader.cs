@@ -109,8 +109,10 @@ namespace Brewmaster.ProjectModel
 					{
 						case "chr":
 							// TODO: Deserialization method on the pipeline itself
-							var pipeline = new ChrPipeline(file, Path.Combine(project.Directory.FullName, fileHeader.Pipeline.Output[0]), fileHeader.Pipeline.LastProcessed);
-							pipeline.PaletteOutput = fileHeader.Pipeline.Output.Length < 2 || fileHeader.Pipeline.Output[1] == null ? null : Path.Combine(project.Directory.FullName, fileHeader.Pipeline.Output[1]);
+							var chrOutput = Path.Combine(project.Directory.FullName, fileHeader.Pipeline.Output[0]);
+							var paletteOutput = fileHeader.Pipeline.Output.Length < 2 || fileHeader.Pipeline.Output[1] == null ? null : Path.Combine(project.Directory.FullName, fileHeader.Pipeline.Output[1]);
+
+							var pipeline = new ChrPipeline(file, chrOutput, paletteOutput, fileHeader.Pipeline.LastProcessed);
 							pipeline.SetSettings(fileHeader.Pipeline.Settings);
 							file.Pipeline = pipeline;
 							break;

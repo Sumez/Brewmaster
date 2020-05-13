@@ -411,7 +411,8 @@ namespace Brewmaster.ProjectModel
 				if (newFile.Type == FileType.Image)
 				{
 					newFile.Mode = CompileMode.ContentPipeline;
-					newFile.Pipeline = new ChrPipeline(newFile, newFile.File.DirectoryName + @"\" + Path.GetFileNameWithoutExtension(newFile.File.Name) + ".chr");
+					var baseFile = newFile.File.DirectoryName + @"\" + Path.GetFileNameWithoutExtension(newFile.File.Name);
+					newFile.Pipeline = new ChrPipeline(newFile, baseFile + ".chr", baseFile + ".pal");
 					//var directory = Path.GetDirectoryName(relativeFilePath);
 					//if (!string.IsNullOrWhiteSpace(directory)) directory += @"\";
 					//newFile.Pipeline = new ChrPipeline(newFile, directory + Path.GetFileNameWithoutExtension(relativeFilePath) + ".chr");

@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using Brewmaster.Pipeline;
-using Brewmaster.ProjectModel;
 
 namespace Brewmaster.EditorWindows.Images
 {
@@ -14,14 +12,14 @@ namespace Brewmaster.EditorWindows.Images
 		private ComboBox comboBox1;
 		private ComboBox ChrPipelineOutput;
 		private TextBox OutputFile;
-		private FlowLayoutPanel ChrPipelinePanel;
+		private Panel ChrPipelinePanel;
 		private GroupBox PaletteGroup;
 		private bool _loading;
 		private PaletteEntries PaletteEntries;
 		private CheckBox _enablePaletteAssignments;
 		private readonly IEnumerable<Color> _paletteSource;
 		private CheckBox _exportPalette;
-		private TextBox textBox1;
+		private TextBox PaletteOutputFile;
 		private CheckBox _ignoreDuplicates;
 		private TextBox rgbValue;
 		private ContextMenuStrip contextMenuStrip1;
@@ -79,9 +77,11 @@ namespace Brewmaster.EditorWindows.Images
 			if (Pipeline == null) return;
 
 			OutputFile.Text = Pipeline.ChrOutput;
+			PaletteOutputFile.Text = Pipeline.PaletteOutput;
 			ChrPipelineOutput.SelectedIndex = (int)Pipeline.Type;
 			_enablePaletteAssignments.Checked = Pipeline.PaletteAssignment.Count > 0;
 			_ignoreDuplicates.Checked = Pipeline.DiscardRedundantTiles;
+			PaletteOutputFile.Enabled = _exportPalette.Checked = Pipeline.ExportPalette;
 			RefreshPalette();
 		}
 
@@ -122,13 +122,13 @@ namespace Brewmaster.EditorWindows.Images
 			System.Windows.Forms.GroupBox ExportPaletteGroup;
 			System.Windows.Forms.GroupBox ChrGroup;
 			System.Windows.Forms.Label BitDepthLabel;
-			this.textBox1 = new System.Windows.Forms.TextBox();
+			this.PaletteOutputFile = new System.Windows.Forms.TextBox();
 			this._exportPalette = new System.Windows.Forms.CheckBox();
 			this._ignoreDuplicates = new System.Windows.Forms.CheckBox();
 			this.ChrPipelineOutput = new System.Windows.Forms.ComboBox();
 			this.OutputFile = new System.Windows.Forms.TextBox();
 			this.comboBox1 = new System.Windows.Forms.ComboBox();
-			this.ChrPipelinePanel = new System.Windows.Forms.FlowLayoutPanel();
+			this.ChrPipelinePanel = new System.Windows.Forms.Panel();
 			this.PaletteGroup = new System.Windows.Forms.GroupBox();
 			this.rgbValue = new System.Windows.Forms.TextBox();
 			this.PaletteEntries = new Brewmaster.EditorWindows.Images.PaletteEntries();
@@ -145,22 +145,25 @@ namespace Brewmaster.EditorWindows.Images
 			// 
 			// ExportPaletteGroup
 			// 
-			ExportPaletteGroup.Controls.Add(this.textBox1);
+			ExportPaletteGroup.Controls.Add(this.PaletteOutputFile);
 			ExportPaletteGroup.Controls.Add(this._exportPalette);
 			ExportPaletteGroup.Dock = System.Windows.Forms.DockStyle.Top;
-			ExportPaletteGroup.Location = new System.Drawing.Point(3, 246);
+			ExportPaletteGroup.Location = new System.Drawing.Point(0, 231);
 			ExportPaletteGroup.Name = "ExportPaletteGroup";
-			ExportPaletteGroup.Size = new System.Drawing.Size(300, 42);
+			ExportPaletteGroup.Size = new System.Drawing.Size(342, 42);
 			ExportPaletteGroup.TabIndex = 5;
 			ExportPaletteGroup.TabStop = false;
 			ExportPaletteGroup.Text = "Export palette";
 			// 
-			// textBox1
+			// PaletteOutputFile
 			// 
-			this.textBox1.Location = new System.Drawing.Point(28, 16);
-			this.textBox1.Name = "textBox1";
-			this.textBox1.Size = new System.Drawing.Size(179, 20);
-			this.textBox1.TabIndex = 1;
+			this.PaletteOutputFile.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.PaletteOutputFile.Location = new System.Drawing.Point(28, 16);
+			this.PaletteOutputFile.Name = "PaletteOutputFile";
+			this.PaletteOutputFile.Size = new System.Drawing.Size(308, 20);
+			this.PaletteOutputFile.TabIndex = 1;
+			this.PaletteOutputFile.TextChanged += new System.EventHandler(this.PaletteOutputFile_TextChanged);
 			// 
 			// _exportPalette
 			// 
@@ -170,6 +173,7 @@ namespace Brewmaster.EditorWindows.Images
 			this._exportPalette.Size = new System.Drawing.Size(15, 14);
 			this._exportPalette.TabIndex = 0;
 			this._exportPalette.UseVisualStyleBackColor = true;
+			this._exportPalette.CheckedChanged += new System.EventHandler(this._exportPalette_CheckedChanged);
 			// 
 			// ChrGroup
 			// 
@@ -178,9 +182,9 @@ namespace Brewmaster.EditorWindows.Images
 			ChrGroup.Controls.Add(this.ChrPipelineOutput);
 			ChrGroup.Controls.Add(this.OutputFile);
 			ChrGroup.Dock = System.Windows.Forms.DockStyle.Top;
-			ChrGroup.Location = new System.Drawing.Point(3, 3);
+			ChrGroup.Location = new System.Drawing.Point(0, 0);
 			ChrGroup.Name = "ChrGroup";
-			ChrGroup.Size = new System.Drawing.Size(300, 98);
+			ChrGroup.Size = new System.Drawing.Size(342, 98);
 			ChrGroup.TabIndex = 6;
 			ChrGroup.TabStop = false;
 			ChrGroup.Text = "Tile data (CHR)";
@@ -207,6 +211,8 @@ namespace Brewmaster.EditorWindows.Images
 			// 
 			// ChrPipelineOutput
 			// 
+			this.ChrPipelineOutput.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
 			this.ChrPipelineOutput.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.ChrPipelineOutput.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
 			this.ChrPipelineOutput.FormattingEnabled = true;
@@ -218,16 +224,18 @@ namespace Brewmaster.EditorWindows.Images
 			this.ChrPipelineOutput.Location = new System.Drawing.Point(78, 45);
 			this.ChrPipelineOutput.MinimumSize = new System.Drawing.Size(100, 0);
 			this.ChrPipelineOutput.Name = "ChrPipelineOutput";
-			this.ChrPipelineOutput.Size = new System.Drawing.Size(128, 21);
+			this.ChrPipelineOutput.Size = new System.Drawing.Size(258, 21);
 			this.ChrPipelineOutput.TabIndex = 1;
 			this.ChrPipelineOutput.SelectedIndexChanged += new System.EventHandler(this.ChrPipelineOutput_SelectedIndexChanged);
 			// 
 			// OutputFile
 			// 
+			this.OutputFile.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
 			this.OutputFile.Location = new System.Drawing.Point(7, 19);
 			this.OutputFile.MinimumSize = new System.Drawing.Size(150, 0);
 			this.OutputFile.Name = "OutputFile";
-			this.OutputFile.Size = new System.Drawing.Size(200, 20);
+			this.OutputFile.Size = new System.Drawing.Size(329, 20);
 			this.OutputFile.TabIndex = 2;
 			this.OutputFile.TextChanged += new System.EventHandler(this.OutputFile_TextChanged);
 			// 
@@ -241,14 +249,15 @@ namespace Brewmaster.EditorWindows.Images
 			// 
 			// ChrPipelinePanel
 			// 
+			this.ChrPipelinePanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
 			this.ChrPipelinePanel.AutoSize = true;
-			this.ChrPipelinePanel.Controls.Add(ChrGroup);
-			this.ChrPipelinePanel.Controls.Add(this.PaletteGroup);
 			this.ChrPipelinePanel.Controls.Add(ExportPaletteGroup);
-			this.ChrPipelinePanel.Dock = System.Windows.Forms.DockStyle.Top;
+			this.ChrPipelinePanel.Controls.Add(this.PaletteGroup);
+			this.ChrPipelinePanel.Controls.Add(ChrGroup);
 			this.ChrPipelinePanel.Location = new System.Drawing.Point(0, 0);
 			this.ChrPipelinePanel.Name = "ChrPipelinePanel";
-			this.ChrPipelinePanel.Size = new System.Drawing.Size(309, 291);
+			this.ChrPipelinePanel.Size = new System.Drawing.Size(342, 273);
 			this.ChrPipelinePanel.TabIndex = 3;
 			// 
 			// PaletteGroup
@@ -259,10 +268,10 @@ namespace Brewmaster.EditorWindows.Images
 			this.PaletteGroup.Controls.Add(this.PaletteEntries);
 			this.PaletteGroup.Controls.Add(this._enablePaletteAssignments);
 			this.PaletteGroup.Dock = System.Windows.Forms.DockStyle.Top;
-			this.PaletteGroup.Location = new System.Drawing.Point(3, 107);
+			this.PaletteGroup.Location = new System.Drawing.Point(0, 98);
 			this.PaletteGroup.MinimumSize = new System.Drawing.Size(300, 0);
 			this.PaletteGroup.Name = "PaletteGroup";
-			this.PaletteGroup.Size = new System.Drawing.Size(300, 133);
+			this.PaletteGroup.Size = new System.Drawing.Size(342, 133);
 			this.PaletteGroup.TabIndex = 5;
 			this.PaletteGroup.TabStop = false;
 			this.PaletteGroup.Text = "Palette assignments";
@@ -270,19 +279,23 @@ namespace Brewmaster.EditorWindows.Images
 			// 
 			// rgbValue
 			// 
+			this.rgbValue.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
 			this.rgbValue.Location = new System.Drawing.Point(9, 94);
 			this.rgbValue.Name = "rgbValue";
-			this.rgbValue.Size = new System.Drawing.Size(200, 20);
+			this.rgbValue.Size = new System.Drawing.Size(327, 20);
 			this.rgbValue.TabIndex = 2;
 			this.rgbValue.Visible = false;
 			// 
 			// PaletteEntries
 			// 
+			this.PaletteEntries.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
 			this.PaletteEntries.AutoSize = true;
 			this.PaletteEntries.EnableEdit = false;
 			this.PaletteEntries.Location = new System.Drawing.Point(7, 43);
 			this.PaletteEntries.Name = "PaletteEntries";
-			this.PaletteEntries.Size = new System.Drawing.Size(287, 26);
+			this.PaletteEntries.Size = new System.Drawing.Size(329, 26);
 			this.PaletteEntries.TabIndex = 1;
 			// 
 			// _enablePaletteAssignments
@@ -303,9 +316,10 @@ namespace Brewmaster.EditorWindows.Images
 			// 
 			// ChrPipelineSettings
 			// 
+			this.AutoSize = true;
 			this.Controls.Add(this.ChrPipelinePanel);
 			this.Name = "ChrPipelineSettings";
-			this.Size = new System.Drawing.Size(309, 546);
+			this.Size = new System.Drawing.Size(345, 276);
 			ExportPaletteGroup.ResumeLayout(false);
 			ExportPaletteGroup.PerformLayout();
 			ChrGroup.ResumeLayout(false);
@@ -363,6 +377,18 @@ namespace Brewmaster.EditorWindows.Images
 		private void PaletteGroup_Enter(object sender, EventArgs e)
 		{
 
+		}
+
+		private void _exportPalette_CheckedChanged(object sender, EventArgs e)
+		{
+			PaletteOutputFile.Enabled = Pipeline.ExportPalette = _exportPalette.Checked;
+			RegisterChange();
+		}
+
+		private void PaletteOutputFile_TextChanged(object sender, EventArgs e)
+		{
+			Pipeline.PaletteOutput = PaletteOutputFile.Text;
+			RegisterChange();
 		}
 	}
 }

@@ -150,7 +150,7 @@ namespace Brewmaster.ProjectExplorer
 			var editableNode = node as EditableNode;
 
 			var root = ProjectExplorer.GetRoot(node);
-			if (root.ImageIndex == 19)
+			if (root.Name == "data")
 			{
 				// Data pipeline
 				NewMenu.Visible = AddExistingOption.Visible = false;
@@ -170,7 +170,7 @@ namespace Brewmaster.ProjectExplorer
 			OpenFolderSeperator.Visible = OpenFolderOption.Visible = dirNode;
 
 			MoveSeparator.Visible = RemoveFromProjectOption.Visible = AddToPipelineOption.Visible = fileNode;
-			AddToPipelineOption.Enabled = (root.ImageIndex != 19);
+			AddToPipelineOption.Enabled = (root.Name != "data");
 			Enabled = true;
 		}
 	}
