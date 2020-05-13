@@ -496,13 +496,13 @@ namespace Brewmaster.Emulation
 					if (breakpoint.AddressType == Breakpoint.AddressTypes.Apu) emuBreakpoint.MemoryType = SnesMemoryType.SpcMemory;
 
 					// Map mirrored CPU addresses to their actual address
-					if (IsRunning() && breakpoint.AddressType == Breakpoint.AddressTypes.Cpu)
+					if (IsRunning() && breakpoint.AddressType == Breakpoint.AddressTypes.Cpu && breakpoint.StartAddress < 0x1000000)
 					{
 						var realAddress = SnesDebugApi.GetAbsoluteAddress(new AddressInfo { Address = breakpoint.StartAddress, Type = SnesMemoryType.CpuMemory });
 						emuBreakpoint.MemoryType = realAddress.Type;
 						emuBreakpoint.StartAddress = realAddress.Address;
 
-						if (breakpoint.EndAddress != null)
+						if (breakpoint.EndAddress != null && breakpoint.EndAddress < 0x1000000)
 						{
 							realAddress = SnesDebugApi.GetAbsoluteAddress(new AddressInfo { Address = breakpoint.EndAddress.Value, Type = SnesMemoryType.CpuMemory });
 							emuBreakpoint.EndAddress = realAddress.Address;
