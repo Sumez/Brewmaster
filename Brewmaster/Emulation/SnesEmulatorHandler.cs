@@ -123,6 +123,7 @@ namespace Brewmaster.Emulation
 				//SnesApi.;
 			}, 30000000);
 			task.Start();
+			ParseBreakpoints();
 		}
 		private void StartEmulatorProcess(string baseDir)
 		{
@@ -450,23 +451,29 @@ namespace Brewmaster.Emulation
 		}
 
 		private List<SnesBreakpoint> _breakpoints = new List<SnesBreakpoint>();
-
+		private IEnumerable<Breakpoint> _ideBreakpoints;
 		private static readonly EmulationConfig EmulationConfig = new EmulationConfig { RamPowerOnState = RamState.Random };
 		private static readonly VideoConfig VideoConfig = new VideoConfig
 		{
 			AspectRatio = SnesAspectRatio.NoStretching,
 			VideoScale = 1
 		};
-
 		public void SetBreakpoints(IEnumerable<Breakpoint> breakpoints)
 		{
+			_ideBreakpoints = breakpoints;
+			ParseBreakpoints();
+		}
+
+		private void ParseBreakpoints()
+		{
+			if (_ideBreakpoints == null) return;
 			lock (_breakpoints)
 			{
 				_breakpoints = new List<SnesBreakpoint>();
 				var id = 0;
 				byte[] condition = Encoding.UTF8.GetBytes("");
 
-				foreach (var breakpoint in breakpoints)
+				foreach (var breakpoint in _ideBreakpoints)
 				{
 					var emuBreakpoint = new SnesBreakpoint
 					{
@@ -487,6 +494,20 @@ namespace Brewmaster.Emulation
 					if (breakpoint.AddressType == Breakpoint.AddressTypes.Cpu) emuBreakpoint.MemoryType = SnesMemoryType.CpuMemory;
 					if (breakpoint.AddressType == Breakpoint.AddressTypes.Ppu) emuBreakpoint.MemoryType = SnesMemoryType.VideoRam;
 					if (breakpoint.AddressType == Breakpoint.AddressTypes.Apu) emuBreakpoint.MemoryType = SnesMemoryType.SpcMemory;
+
+					// Map mirrored CPU addresses to their actual address
+					if (IsRunning() && breakpoint.AddressType == Breakpoint.AddressTypes.Cpu)
+					{
+						var realAddress = SnesDebugApi.GetAbsoluteAddress(new AddressInfo { Address = breakpoint.StartAddress, Type = SnesMemoryType.CpuMemory });
+						emuBreakpoint.MemoryType = realAddress.Type;
+						emuBreakpoint.StartAddress = realAddress.Address;
+
+						if (breakpoint.EndAddress != null)
+						{
+							realAddress = SnesDebugApi.GetAbsoluteAddress(new AddressInfo { Address = breakpoint.EndAddress.Value, Type = SnesMemoryType.CpuMemory });
+							emuBreakpoint.EndAddress = realAddress.Address;
+						}
+					}
 
 					_breakpoints.Add(emuBreakpoint);
 
