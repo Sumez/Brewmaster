@@ -35,22 +35,41 @@ namespace Brewmaster.ProjectModel
 		public static readonly Regex IncludeFileRegex = new Regex(@"^\s*\.include\s+\""(.+?)\""\s*$", RegexOptions.IgnoreCase);
 		public static readonly Regex MacroRegex = new Regex(@"^\s*\.mac(?:ro){0,1}\s+([@a-z_][0-9a-z_]*)(?:\s+(.+)){0,1}$", RegexOptions.IgnoreCase);
 
-		private static readonly string[] ImageFileTypes = new[] { ".png", ".jpg", ".bmp", ".gif" };
-		private static readonly string[] SourceFileTypes = new[] { ".asm", ".s" };
-		private static readonly string[] IncludeFileTypes = new[] { ".h", ".inc", ".include", ".i" };
-		private static readonly string[] TextFileTypes = new[] { ".txt", ".md", ".ini", ".cfg", ".py", ".js" };
+		private static readonly Dictionary<FileType, string[]> FileTypes = new Dictionary<FileType, string[]>
+		{
+			{FileType.Image, new[] {".png", ".jpg", ".bmp", ".gif", ".chr"}},
+			{FileType.Source, new[] {".asm", ".s"}},
+			{FileType.Include, new[] {".h", ".inc", ".include", ".i"}},
+			{FileType.Text, new[] {".txt", ".md", ".ini", ".cfg", ".json", ".xml", ".csv"}},
+			{FileType.Script, new[] {".py", ".js", ".bat", ".php", ".yaml"}},
+			{FileType.Audio, new[] {".wav", ".pcm", ".dmc", ".nsf", ".wma", ".mp3", ".mid", ".ogg", ".xm", ".ft", ".it", ".mod"}},
+			{FileType.FamiTracker, new[] {".ftm"}},
+		};
+
+		private static readonly FileType[] TextFiles = {
+			FileType.Script,
+			FileType.Source,
+			FileType.Text,
+			FileType.Include
+		};
+		private static readonly FileType[] ContentFiles = {
+			FileType.Image,
+			FileType.Audio,
+			FileType.FamiTracker
+		};
+		private static readonly string[] ContentFileExtensions = {".bin", ".json", ".xml"};
 
 		private FileType _type = FileType.Unknown;
 		public FileType Type { get
 			{
 				if (_type != FileType.Unknown) return _type;
-				var extension = File.Extension.ToLower();
 				if (Mode == CompileMode.IncludeInAssembly) return FileType.Source;
 				if (Mode == CompileMode.LinkerConfig) return FileType.Text;
-				if (ImageFileTypes.Contains(extension)) return FileType.Image;
-				if (SourceFileTypes.Contains(extension)) return FileType.Source;
-				if (IncludeFileTypes.Contains(extension)) return FileType.Include;
-				if (TextFileTypes.Contains(extension)) return FileType.Text;
+				var extension = File.Extension.ToLower();
+				foreach (var type in FileTypes)
+				{
+					if (type.Value.Contains(extension)) return type.Key;
+				}
 				return FileType.Unknown;
 			}
 			set { _type = value; }
@@ -58,7 +77,12 @@ namespace Brewmaster.ProjectModel
 
 		public bool IsTextFile
 		{
-			get { return Type == FileType.Text || Type == FileType.Source || Type == FileType.Include; }
+			get { return TextFiles.Contains(Type); }
+		}
+
+		public bool IsDataFile
+		{
+			get { return ContentFiles.Contains(Type) || ContentFileExtensions.Contains(File.Extension.ToLower()); }
 		}
 
 		public override string ToString()
@@ -177,7 +201,9 @@ namespace Brewmaster.ProjectModel
 	}
 	public enum FileType
 	{
-		Unknown, Image, Source, Text, Include
+		Unknown, Image, Source, Text, Include,
+		Script, FamiTracker,
+		Audio
 	}
 	public enum CompileMode
 	{

@@ -21,8 +21,10 @@ namespace Brewmaster.ProjectExplorer
 		private readonly ToolStripItem RemoveFromProjectOption;
 		private readonly ToolStripSeparator MoveSeparator;
 		private readonly ToolStripSeparator OpenFolderSeperator;
+		private readonly ToolStripSeparator EditSeparator;
 		private TreeNode CurrentNode;
 
+		public bool AllowFileEditing { get; set; }
 		public Action<string, FileTemplate, string> CreateNewFile;
 		public Action<string, string, CompileMode> AddExistingFile;
 		public Action<TreeNode> OpenNode;
@@ -56,7 +58,7 @@ namespace Brewmaster.ProjectExplorer
 			Items.Add(PipelineNewMenu);
 			Items.Add(PipelineAddExistingOption);
 			Items.Add(OpenOption);
-			Items.Add(new ToolStripSeparator());
+			Items.Add(EditSeparator = new ToolStripSeparator());
 			Items.Add(DeleteOption);
 			Items.Add(RenameOption);
 			Items.Add(OpenFolderSeperator = new ToolStripSeparator());
@@ -154,24 +156,27 @@ namespace Brewmaster.ProjectExplorer
 			{
 				// Data pipeline
 				NewMenu.Visible = AddExistingOption.Visible = false;
-				PipelineNewMenu.Visible = PipelineAddExistingOption.Visible = dirNode;
+				PipelineNewMenu.Visible = PipelineAddExistingOption.Visible = dirNode && AllowFileEditing;
 			}
 			else
 			{
-				NewMenu.Visible = AddExistingOption.Visible = dirNode;
+				NewMenu.Visible = AddExistingOption.Visible = dirNode && AllowFileEditing;
 				PipelineNewMenu.Visible = PipelineAddExistingOption.Visible = false;
 			}
-			OpenOption.Visible = fileNode;
+
+			EditSeparator.Visible = AllowFileEditing;
+			OpenOption.Visible = fileNode && AllowFileEditing;
 			DeleteOption.Enabled = node != root;
-			DeleteOption.Visible = fileNode || dirNode;
-			RenameOption.Visible = editableNode != null;
-			RenameOption.Enabled = editableNode.Editable;
+			DeleteOption.Visible = (fileNode || dirNode) && AllowFileEditing;
+			RenameOption.Enabled = editableNode != null && editableNode.Editable;
+			RenameOption.Visible = editableNode != null && AllowFileEditing;
 
 			OpenFolderSeperator.Visible = OpenFolderOption.Visible = dirNode;
 
-			MoveSeparator.Visible = RemoveFromProjectOption.Visible = AddToPipelineOption.Visible = fileNode;
+			RemoveFromProjectOption.Visible = AddToPipelineOption.Visible = fileNode;
+			MoveSeparator.Visible = fileNode && AllowFileEditing;
 			AddToPipelineOption.Enabled = (root.Name != "data");
-			Enabled = true;
+			Enabled = AllowFileEditing || fileNode;
 		}
 	}
 }

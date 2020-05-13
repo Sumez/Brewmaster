@@ -55,6 +55,24 @@ namespace Brewmaster.ProjectExplorer
 		public object UniqueIdentifier { get { return DirectoryInfo.FullName.TrimEnd('\\', '/'); } }
 	}
 
+	public class NonIncludedFileNode: TreeNode, IIdentifiableNode
+	{
+		public NonIncludedFileNode(FileInfo fileInfo)
+		{
+			FileInfo = fileInfo;
+			Text = fileInfo.Name;
+			ImageIndex = 8;
+			SelectedImageIndex = 8;
+			ForeColor = SystemColors.GrayText;
+		}
+
+		public object UniqueIdentifier
+		{
+			get { return FileInfo.FullName; }
+		}
+		public FileInfo FileInfo { get; }
+	}
+
 	public class FileNode : EditableNode, IIdentifiableNode
 	{
 		public AsmProjectFile FileInfo { get; set; }
@@ -87,7 +105,7 @@ namespace Brewmaster.ProjectExplorer
 			if (fileInfo.Mode == CompileMode.LinkerConfig) ImageIndex = 7;
 			if (fileInfo.Missing)
 			{
-				ImageIndex = 100;
+				ImageIndex = 8;
 				ForeColor = SystemColors.GrayText;
 				Text += " (missing)";
 			}

@@ -679,6 +679,7 @@
     <None Include="Resources\Files\file_text.png" />
     <None Include="Resources\Files\data.png" />
     <None Include="Resources\Files\snesproject.png" />
+    <None Include="Resources\Files\file_missing.png" />
     <Content Include="Resources\Other\error.png" />
     <None Include="Resources\Other\smallload.png" />
     <None Include="Resources\Other\smallsave.png" />

@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Windows.Forms;
 using Brewmaster.ProjectModel;
 
 namespace Brewmaster.ProjectWizard
@@ -16,6 +17,7 @@ namespace Brewmaster.ProjectWizard
 			_importFiles = new ImportProjectFiles();
 
 			AddSteps(_importProjectPath, _importFiles);
+			FormBorderStyle = FormBorderStyle.Sizable;
 		}
 
 		protected override void ChangeStep(int step)
@@ -25,13 +27,23 @@ namespace Brewmaster.ProjectWizard
 				var directory = new DirectoryInfo(_importProjectPath.Directory);
 				if (Project == null || Project.Directory.Name != directory.Name)
 				{
-					_importFiles.Project = Project = AsmProject.ImportFromDirectory(directory);
+					// TODO: Identify existing .nesproject or .bwm file in directory
+					Project = AsmProject.ImportFromDirectory(directory);
+					_importFiles.Project = Project;
 				}
 				Project.Name = _importProjectPath.ProjectName;
 				Project.ProjectFile = new FileInfo(_importProjectPath.ProjectFile);
+				// TODO: Refresh tree in _importfiles to update project name
 			}
 			base.ChangeStep(step);
 		}
 
+		protected override void Save()
+		{
+			if (Project == null) return;
+			Project.Save();
+			DialogResult = DialogResult.OK;
+			Close();
+		}
 	}
 }

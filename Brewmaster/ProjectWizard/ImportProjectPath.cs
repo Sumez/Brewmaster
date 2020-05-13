@@ -11,7 +11,6 @@ namespace Brewmaster.ProjectWizard
 	public partial class ImportProjectPath : WizardStep
 	{
 		private bool _projectNameChanged;
-		public override event Action ValidChanged;
 
 		public string Directory
 		{
@@ -51,9 +50,7 @@ namespace Brewmaster.ProjectWizard
 			_projectPathPreview.ForeColor = valid ? SystemColors.ControlText : Color.Red;
 			_projectPathPreview.Text = path;
 
-			if (valid == Valid) return;
 			Valid = valid;
-			if (ValidChanged != null) ValidChanged();
 		}
 
 		private bool GetFilePath(out string path)

@@ -41,6 +41,9 @@ namespace Brewmaster.ProjectWizard
 			// 
 			// FilePanel
 			// 
+			this.FilePanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
 			this.FilePanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
 			this.FilePanel.Controls.Add(this.FileList);
 			this.FilePanel.Controls.Add(this.ScrollBar);
@@ -51,10 +54,13 @@ namespace Brewmaster.ProjectWizard
 			// 
 			// FileList
 			// 
+			this.FileList.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
 			this.FileList.Location = new System.Drawing.Point(3, 0);
 			this.FileList.Name = "FileList";
 			this.FileList.Size = new System.Drawing.Size(564, 307);
 			this.FileList.TabIndex = 1;
+			this.FileList.Visible = false;
 			// 
 			// ScrollBar
 			// 
@@ -63,6 +69,7 @@ namespace Brewmaster.ProjectWizard
 			this.ScrollBar.Name = "ScrollBar";
 			this.ScrollBar.Size = new System.Drawing.Size(17, 258);
 			this.ScrollBar.TabIndex = 0;
+			this.ScrollBar.Visible = false;
 			// 
 			// ImportProjectFiles
 			// 

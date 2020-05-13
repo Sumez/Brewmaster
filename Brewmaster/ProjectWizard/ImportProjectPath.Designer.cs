@@ -83,6 +83,8 @@ namespace Brewmaster.ProjectWizard
 			// 
 			// _projectName
 			// 
+			this._projectName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
 			this._projectName.Location = new System.Drawing.Point(87, 165);
 			this._projectName.Name = "_projectName";
 			this._projectName.Size = new System.Drawing.Size(408, 20);
@@ -91,6 +93,8 @@ namespace Brewmaster.ProjectWizard
 			// 
 			// _projectDirectory
 			// 
+			this._projectDirectory.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
 			this._projectDirectory.Location = new System.Drawing.Point(87, 191);
 			this._projectDirectory.Name = "_projectDirectory";
 			this._projectDirectory.Size = new System.Drawing.Size(408, 20);
@@ -107,6 +111,7 @@ namespace Brewmaster.ProjectWizard
 			// 
 			// _browseProjectPath
 			// 
+			this._browseProjectPath.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this._browseProjectPath.Location = new System.Drawing.Point(502, 191);
 			this._browseProjectPath.Name = "_browseProjectPath";
 			this._browseProjectPath.Size = new System.Drawing.Size(75, 23);

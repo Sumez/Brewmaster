@@ -183,7 +183,7 @@ namespace Brewmaster.Settings
 			var newState = new ProjectUserSettings
 			{
 				Filename = project.ProjectFile.FullName,
-				CurrentConfiguration = project.CurrentConfiguration.Name,
+				CurrentConfiguration = project.CurrentConfiguration != null ? project.CurrentConfiguration.Name : null,
 				OpenFiles = openWindows.Select(w => w.ProjectFile.File.FullName).ToArray(),
 				WatchData = watchData.ToArray(),
 				Breakpoints = breakpoints.Select(bp => bp.GetSerializable()).ToArray()

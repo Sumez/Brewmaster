@@ -847,7 +847,10 @@ namespace Brewmaster
 		    {
 			    importProjectDialog.StartPosition = FormStartPosition.CenterParent;
 			    importProjectDialog.ShowDialog();
-			    //if (!CloseCurrentProject()) return;
+			    if (importProjectDialog.DialogResult == DialogResult.Cancel || importProjectDialog.Project == null) return;
+			    if (!CloseCurrentProject()) return;
+
+				LoadProject(importProjectDialog.Project.ProjectFile.FullName);
 		    }
 		}
 
@@ -1564,38 +1567,41 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 					Error("Could not find the file: " + file.File.FullName);
 					return null;
 				}
-				switch (file.Type)
-				{
-					case FileType.Text:
-					case FileType.Source:
-					case FileType.Include:
-						var textEditor = new TextEditorWindow(this, file, _moduleEvents);
-						textEditor.RefreshEditorContents();
-						tab = textEditor;
-						break;
-					case FileType.Image:
-						tab = new ImageWindow(this, file, _moduleEvents);
-						break;
-					default:
-						// TODO: "Open with..." dialog
-						var recommendedPrograms = OsFeatures.RecommendedPrograms(file.File.Extension);
-						if (!recommendedPrograms.Any())
-						{
-							Error("No program identified for this file type");
-							return null;
-						}
 
-						var command = recommendedPrograms[0].Open;
-						var arguments = file.File.FullName;
-						var matches = Regex.Match(command, @"^(.*?)(?:\s+(?=(?:[^\""]*\""[^\""]*\"")*[^\""]*$))(.*)$");
-						if (matches.Success)
-						{
-							command = matches.Groups[1].Value;
-							arguments = matches.Groups[2].Value.Replace("%1", file.File.FullName);
-						}
-						Process.Start(command, arguments);
-						return null;
+				if (file.IsTextFile)
+				{
+					var textEditor = new TextEditorWindow(this, file, _moduleEvents);
+					textEditor.RefreshEditorContents();
+					tab = textEditor;
 				}
+				else
+					switch (file.Type)
+					{
+						case FileType.Image:
+							tab = new ImageWindow(this, file, _moduleEvents);
+							break;
+						default:
+							// TODO: "Open with..." dialog
+							var recommendedPrograms = OsFeatures.RecommendedPrograms(file.File.Extension);
+							if (!recommendedPrograms.Any())
+							{
+								Error("No program identified for this file type");
+								return null;
+							}
+
+							var command = recommendedPrograms[0].Open;
+							var arguments = file.File.FullName;
+							var matches = Regex.Match(command,
+								@"^(.*?)(?:\s+(?=(?:[^\""]*\""[^\""]*\"")*[^\""]*$))(.*)$");
+							if (matches.Success)
+							{
+								command = matches.Groups[1].Value.Replace("%1", file.File.FullName);
+								arguments = matches.Groups[2].Value.Replace("%1", file.File.FullName);
+							}
+
+							Process.Start(command, arguments);
+							return null;
+					}
 
 				if (tab is TextEditorWindow textEditorTab)
 				{

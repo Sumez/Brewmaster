@@ -16,11 +16,20 @@ namespace Brewmaster.ProjectExplorer
 		private EditableNode _dataRootNode;
 		private EditableNode _projectRootNode;
 		private Events _events;
+		private bool _showAllFiles;
 
 		public Action<AsmProjectFile> OpenFile;
 		public Action<string, FileTemplate, string> CreateNewFile { set { _menu.CreateNewFile = value; } }
 		public Action<string, string, CompileMode> AddExistingFile { set { _menu.AddExistingFile = value; } get { return _menu.AddExistingFile; } }
-
+		public bool ShowAllFiles
+		{
+			get { return _showAllFiles; }
+			set
+			{
+				_showAllFiles = value;
+				RefreshTree();
+			}
+		}
 
 		private void InitializeComponent()
 		{
@@ -35,25 +44,29 @@ namespace Brewmaster.ProjectExplorer
 			// ProjectExplorer
 			// 
 			this.ContextMenuStrip = this._menu;
-			this.LabelEdit = true;
 			this.ShowLines = false;
-			this.AllowDrop = true;
 			this.ResumeLayout(false);
 
 		}
 
-		public ProjectExplorer(Events events)
+		public ProjectExplorer(Events events, bool showAllFiles = false, bool allowFileEditing = true)
 		{
 			_events = events;
+			_showAllFiles = showAllFiles;
 			InitializeComponent();
+			LabelEdit = allowFileEditing;
+			AllowDrop = allowFileEditing;
 
+			_menu.AllowFileEditing = allowFileEditing;
 			AfterSelect += (sender, args) => _menu.SetNode(args.Node);
 			NodeMouseDoubleClick += (sender, args) => OpenNode(args.Node);
-			_menu.OpenNode = OpenNode;
-			_menu.AddSubdirectory = AddSubdirectory;
-			_menu.DeleteFile = DeleteFile;
-			_menu.EditNode = EditNode;
-			_menu.DeleteDirectory = DeleteDirectory;
+			if (allowFileEditing) {
+				_menu.OpenNode = OpenNode;
+				_menu.AddSubdirectory = AddSubdirectory;
+				_menu.DeleteFile = DeleteFile;
+				_menu.EditNode = EditNode;
+				_menu.DeleteDirectory = DeleteDirectory;
+			}
 			_menu.MoveToPipeline = MoveFileToPipeline;
 			_menu.RemoveFromProject = (file) => _project.RemoveProjectFile(file);
 
@@ -72,6 +85,7 @@ namespace Brewmaster.ProjectExplorer
 			ImageList.Images.Add(Resources.file_image);
 			ImageList.Images.Add(Resources.file_text);
 			ImageList.Images.Add(Resources.file_config);
+			ImageList.Images.Add(Resources.file_missing);
 
 			_events.FilenameChanged += file =>
 			{
@@ -234,7 +248,7 @@ namespace Brewmaster.ProjectExplorer
 		private void OpenNode(TreeNode node)
 		{
 			var fileNode = node as FileNode;
-			if (fileNode != null) OpenFile(fileNode.FileInfo);
+			if (fileNode != null && OpenFile != null) OpenFile(fileNode.FileInfo);
 		}
 
 		public void SetProject(AsmProject project)
@@ -289,14 +303,27 @@ namespace Brewmaster.ProjectExplorer
 				else if (!extraDirectories.Any(d => d.FullName == subDirectory.FullName)) continue;
 				node.Nodes.Add(subDirNode);
 			}
+
+			var fileNodes = new List<TreeNode>();
 			foreach (var projectFile in _project.Files.Where(f => f.File.DirectoryName == directory.FullName).OrderBy(f => f.File.Name))
 			{
 				if ((projectFile.Mode == CompileMode.ContentPipeline) != pipeline) continue;
 
 				var fileNode = new FileNode(projectFile);
 				fileNode.Edited += (e) => RenameFile(projectFile, e);
-				node.Nodes.Add(fileNode);
+				fileNodes.Add(fileNode);
 			}
+
+			if (ShowAllFiles && !pipeline)
+			{
+				foreach (var fileInfo in directory.GetFiles().Where(f => _project.Files.All(n => n.File.FullName != f.FullName)))
+				{
+					fileNodes.Add(new NonIncludedFileNode(fileInfo));
+				}
+				fileNodes = fileNodes.OrderBy(n => n.Text).ToList();
+			}
+			node.Nodes.AddRange(fileNodes.ToArray());
+
 			return node;
 		}
 		private void RenameFile(AsmProjectFile file, NodeLabelEditEventArgs e)
@@ -386,7 +413,8 @@ namespace Brewmaster.ProjectExplorer
 		private List<object> _expandedStateSource;
 		private List<object> _expandedStateData;
 		private object _selectedState;
-
+		private object _firstVisibleNode;
+		
 		private void GetExpandedState()
 		{
 			_expandedStateSource = new List<object>();
@@ -394,13 +422,21 @@ namespace Brewmaster.ProjectExplorer
 			var selectedNode = SelectedNode as IIdentifiableNode;
 			_selectedState = selectedNode == null ? null : selectedNode.UniqueIdentifier;
 
+			var firstVisibleNode = GetNode<TreeNode>(Nodes, n => n.IsVisible);
+			if (firstVisibleNode == _projectRootNode) _firstVisibleNode = "project";
+			else if (firstVisibleNode == _dataRootNode) _firstVisibleNode = "data";
+			else if (firstVisibleNode is IIdentifiableNode identifiable) _firstVisibleNode = identifiable.UniqueIdentifier;
+			else _firstVisibleNode = null;
+
 			if (_projectRootNode != null)
 			{
+				if (_firstVisibleNode == null && _projectRootNode.IsVisible) _firstVisibleNode = "project";
 				if (_projectRootNode.IsExpanded) _expandedStateSource.Add("!root");
 				GetExpandedState(_projectRootNode.Nodes, _expandedStateSource);
 			}
 			if (_dataRootNode != null)
 			{
+				if (_firstVisibleNode == null && _projectRootNode.IsVisible) _firstVisibleNode = "data";
 				if (_dataRootNode.IsExpanded) _expandedStateData.Add("!root");
 				GetExpandedState(_dataRootNode.Nodes, _expandedStateData);
 			}
@@ -430,6 +466,14 @@ namespace Brewmaster.ProjectExplorer
 				var identifiable = n as IIdentifiableNode;
 				return identifiable != null && identifiable.UniqueIdentifier.Equals(_selectedState);
 			});
+
+			if (_firstVisibleNode == "project") _projectRootNode.EnsureVisible();
+			else if (_firstVisibleNode == "data") _dataRootNode.EnsureVisible();
+			else if (_firstVisibleNode != null)
+			{
+				var node = GetNode<TreeNode>(Nodes, n => n is IIdentifiableNode identifiable && identifiable.UniqueIdentifier.Equals(_firstVisibleNode));
+				if (node != null) node.EnsureVisible();
+			}
 		}
 		private static void SetExpandedState(TreeNodeCollection nodes, List<object> states)
 		{

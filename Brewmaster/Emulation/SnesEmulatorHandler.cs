@@ -80,7 +80,20 @@ namespace Brewmaster.Emulation
 
 		public void LoadCartridgeAtSameState(string baseDir, string cartridgeFile, Func<int, int> getNewPc)
 		{
-			throw new NotImplementedException();
+			return; // TODO: Feature unusable until Mesen-S gets "Debugger.SetNextStatement()"
+
+			if (!IsRunning()) return;
+			SnesDebugApi.Step(CpuType.Cpu, 0);
+			var state = SnesDebugApi.GetState();
+
+			var prgSize = SnesDebugApi.GetMemorySize(SnesMemoryType.PrgRom);
+			using (var file = File.OpenRead(cartridgeFile))
+			{
+				var buffer = new byte[prgSize];
+				file.Read(buffer, 0, prgSize);
+				SnesDebugApi.SetMemoryValues(SnesMemoryType.PrgRom, 0, buffer, prgSize);
+			}
+			//SnesDebugApi.SetNextStatement((ushort)getNewPc(state.Cpu.PC));
 		}
 
 		public void InitializeEmulator(string baseDir, Action<LogData> logHandler, Control renderControl)

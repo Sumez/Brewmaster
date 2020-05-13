@@ -37,6 +37,9 @@
 			// 
 			// StepPanel
 			// 
+			this.StepPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
 			this.StepPanel.Location = new System.Drawing.Point(12, 12);
 			this.StepPanel.Name = "StepPanel";
 			this.StepPanel.Size = new System.Drawing.Size(592, 299);
@@ -44,6 +47,7 @@
 			// 
 			// _finishButton
 			// 
+			this._finishButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this._finishButton.Enabled = false;
 			this._finishButton.Location = new System.Drawing.Point(448, 340);
 			this._finishButton.Name = "_finishButton";
@@ -55,6 +59,7 @@
 			// 
 			// _nextButton
 			// 
+			this._nextButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this._nextButton.Enabled = false;
 			this._nextButton.Location = new System.Drawing.Point(367, 340);
 			this._nextButton.Name = "_nextButton";
@@ -66,6 +71,7 @@
 			// 
 			// _previousButton
 			// 
+			this._previousButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this._previousButton.Enabled = false;
 			this._previousButton.Location = new System.Drawing.Point(286, 340);
 			this._previousButton.Name = "_previousButton";
@@ -77,6 +83,7 @@
 			// 
 			// _cancelButton
 			// 
+			this._cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this._cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
 			this._cancelButton.Location = new System.Drawing.Point(529, 340);
 			this._cancelButton.Name = "_cancelButton";
@@ -97,6 +104,7 @@
 			this.Controls.Add(this._finishButton);
 			this.Controls.Add(this.StepPanel);
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+			this.MinimumSize = new System.Drawing.Size(632, 414);
 			this.Name = "WizardDialog";
 			this.ShowIcon = false;
 			this.ShowInTaskbar = false;

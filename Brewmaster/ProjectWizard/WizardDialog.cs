@@ -9,6 +9,11 @@ namespace Brewmaster.ProjectWizard
 	{
 		protected readonly Settings.Settings Settings;
 
+		protected WizardDialog()
+		{
+
+		}
+
 		public WizardDialog(Settings.Settings settings)
 		{
 			Settings = settings;
@@ -22,6 +27,7 @@ namespace Brewmaster.ProjectWizard
 			foreach (var step in steps)
 			{
 				step.Visible = false;
+				step.Dock = DockStyle.Fill;
 				StepPanel.Controls.Add(step);
 				Steps.Add(step);
 				step.ValidChanged += UpdateButtons;
@@ -91,8 +97,19 @@ namespace Brewmaster.ProjectWizard
 
 	public class WizardStep : UserControl
 	{
-		public virtual event Action ValidChanged;
-		public bool Valid { get; protected set; }
+		public event Action ValidChanged;
+		private bool _valid;
+		public bool Valid
+		{
+			get { return _valid; }
+			protected set
+			{
+				if (_valid == value) return;
+				_valid = value;
+				if (ValidChanged != null) ValidChanged();
+			}
+
+		}
 
 		public virtual void OnEnable() { }
 	}

@@ -60,7 +60,7 @@ namespace Brewmaster.ProjectModel
 
 		public NesCartridge CurrentConfiguration
 		{
-			get { return BuildConfigurations[CurrentConfigurationIndex]; }
+			get { return BuildConfigurations.Count > 0 ? BuildConfigurations[CurrentConfigurationIndex] : null; }
 			set
 			{
 				if (value != null && BuildConfigurations.Contains(value)) CurrentConfigurationIndex = BuildConfigurations.IndexOf(value);
@@ -352,9 +352,15 @@ namespace Brewmaster.ProjectModel
 		{
 			foreach (var file in directory.GetFiles())
 			{
-				var newFile = new AsmProjectFile { Project = project, Mode = CompileMode.Ignore, File = file };
+				if (file.Name[0] == '.') continue;
+				if (file.Extension.Equals(".pb53", StringComparison.InvariantCultureIgnoreCase)) continue;
+				if (file.Extension.Equals(".zip", StringComparison.InvariantCultureIgnoreCase)) continue;
+				if (file.Extension.Equals(".bwm", StringComparison.InvariantCultureIgnoreCase)) continue;
+				if (file.Extension.Equals(".nesproject", StringComparison.InvariantCultureIgnoreCase)) continue;
 				
-				if (newFile.Type == FileType.Image) newFile.Mode = CompileMode.ContentPipeline;
+				var newFile = new AsmProjectFile { Project = project, Mode = CompileMode.Ignore, File = file };
+
+				if (newFile.IsDataFile) newFile.Mode = CompileMode.ContentPipeline;
 				if (newFile.Type == FileType.Source) newFile.Mode = CompileMode.IncludeInAssembly;
 
 				project.Files.Add(newFile);
@@ -362,6 +368,8 @@ namespace Brewmaster.ProjectModel
 			foreach (var subDirectory in directory.GetDirectories())
 			{
 				if (subDirectory.Name[0] == '.') continue;
+				if (subDirectory.Name.Equals("bin", StringComparison.InvariantCultureIgnoreCase)) continue;
+				if (subDirectory.Name.Equals("obj", StringComparison.InvariantCultureIgnoreCase)) continue;
 				AddFilesFromDirectory(project, subDirectory);
 			}
 		}

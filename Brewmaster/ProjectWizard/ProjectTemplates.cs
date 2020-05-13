@@ -11,7 +11,6 @@ namespace Brewmaster.ProjectWizard
 	public partial class ProjectTemplates: WizardStep
 	{
 		private bool _folderNameChanged;
-		public override event Action ValidChanged;
 
 		public ProjectTemplates()
 		{

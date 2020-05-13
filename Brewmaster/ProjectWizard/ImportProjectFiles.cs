@@ -2,23 +2,28 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
+using Brewmaster.Modules;
 using Brewmaster.ProjectModel;
 
 namespace Brewmaster.ProjectWizard
 {
 	public partial class ImportProjectFiles : WizardStep
 	{
+		public ProjectExplorer.ProjectExplorer ProjectExplorer { get; }
 		private AsmProject _project;
 		private readonly List<ImportFile> _fileControls = new List<ImportFile>();
 		private int _focusControl = -1;
 		private ImportFile.FocusType _focusType = ImportFile.FocusType.None;
 		private int _firstIndex;
 
-		public override event Action ValidChanged;
-
 		public ImportProjectFiles()
 		{
 			InitializeComponent();
+
+			ProjectExplorer = new ProjectExplorer.ProjectExplorer(new Events(), true, false) { Dock = DockStyle.Fill };
+			FilePanel.Controls.Add(ProjectExplorer);
+			return;
+
 			ScrollBar.Scroll += (sender, args) =>
 			{
 				RefreshScroll(args.NewValue);
@@ -72,9 +77,15 @@ namespace Brewmaster.ProjectWizard
 
 		public AsmProject Project
 		{
+			get { return _project; }
 			set
 			{
 				_project = value;
+				ProjectExplorer.SetProject(_project);
+				ProjectExplorer.Nodes[0].EnsureVisible();
+				Valid = true;
+				return;
+				
 				ImportSettings = value.Files.Select(f => new FileImportInfo(f)).ToList();
 
 				ScrollBar.Minimum = 0;
@@ -85,7 +96,6 @@ namespace Brewmaster.ProjectWizard
 		}
 
 		public List<FileImportInfo> ImportSettings { get; set; }
-
 		public class FileImportInfo
 		{
 			public AsmProjectFile ProjectFile { get; }
