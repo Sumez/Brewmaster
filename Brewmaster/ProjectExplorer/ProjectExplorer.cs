@@ -246,6 +246,7 @@ namespace Brewmaster.ProjectExplorer
 		private void RefreshTree()
 		{
 			var projectNode = CreateNodeFromDirectory(_project.Directory, false, _project.Directories);
+			projectNode.Name = "project";
 			projectNode.Edited += (e) => _project.Name = e.Label; // TODO: Update window title
 			projectNode.Text = _project.Name;
 			var projectImage = _project.Type == ProjectType.Snes ? 1 : 0;
@@ -253,6 +254,7 @@ namespace Brewmaster.ProjectExplorer
 			projectNode.SelectedImageIndex = projectImage;
 
 			var dataNode = CreateNodeFromDirectory(_project.Directory, true, new List<DirectoryInfo>());
+			dataNode.Name = "data";
 			dataNode.Editable = false;
 			dataNode.Text = "Data pipeline";
 			dataNode.ImageIndex = 2;
