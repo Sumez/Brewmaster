@@ -1,5 +1,6 @@
 ﻿using System.Drawing;
 using System.Windows.Forms;
+using Brewmaster.ProjectExplorer;
 
 namespace Brewmaster.Modules
 {

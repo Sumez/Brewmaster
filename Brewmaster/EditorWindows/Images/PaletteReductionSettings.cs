@@ -4,13 +4,12 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using Brewmaster.Pipeline;
-using Brewmaster.ProjectModel;
 
 namespace Brewmaster.EditorWindows.Images
 {
 	public class PaletteReductionSettings : UserControl
 	{
-		private FlowLayoutPanel ChrPipelinePanel;
+		private Panel ChrPipelinePanel;
 		private GroupBox PaletteGroup;
 		private readonly ImageRenderControl _image;
 		private bool _loading;
@@ -57,16 +56,17 @@ namespace Brewmaster.EditorWindows.Images
 			PaletteContainer.Controls.Clear();
 			PaletteEntries = new List<PaletteEntries>();
 
-			if (!chrPipeline.ReducePalette) return;
-
-			if (chrPipeline.TilePalettes == null) AssignDefaultPalettes();
-			foreach (var palette in chrPipeline.TilePalettes)
+			if (chrPipeline.ReducePalette)
 			{
-				var entryEditor = new PaletteEntries { EnableEdit = true, Height = 30, Width = PaletteContainer.MaximumSize.Width };
-				PaletteContainer.Controls.Add(entryEditor);
-				PaletteEntries.Add(entryEditor);
+				if (chrPipeline.TilePalettes == null) AssignDefaultPalettes();
+				foreach (var palette in chrPipeline.TilePalettes)
+				{
+					var entryEditor = new PaletteEntries { EnableEdit = true, Height = 30, Width = PaletteContainer.MaximumSize.Width };
+					PaletteContainer.Controls.Add(entryEditor);
+					PaletteEntries.Add(entryEditor);
+				}
 			}
-			ResumeLayout();
+			ResumeLayout(true);
 			RegisterChange();
 		}
 
@@ -135,20 +135,21 @@ namespace Brewmaster.EditorWindows.Images
 		private void InitializeComponent()
 		{
 			this.components = new System.ComponentModel.Container();
-			this.ChrPipelinePanel = new System.Windows.Forms.FlowLayoutPanel();
+			this.ChrPipelinePanel = new System.Windows.Forms.Panel();
 			this.PaletteGroup = new System.Windows.Forms.GroupBox();
+			this.PaletteContainer = new System.Windows.Forms.FlowLayoutPanel();
 			this._enablePaletteReduction = new System.Windows.Forms.CheckBox();
 			this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
-			this.PaletteContainer = new System.Windows.Forms.FlowLayoutPanel();
 			this.ChrPipelinePanel.SuspendLayout();
 			this.PaletteGroup.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// ChrPipelinePanel
 			// 
+			this.ChrPipelinePanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
 			this.ChrPipelinePanel.AutoSize = true;
 			this.ChrPipelinePanel.Controls.Add(this.PaletteGroup);
-			this.ChrPipelinePanel.Dock = System.Windows.Forms.DockStyle.Top;
 			this.ChrPipelinePanel.Location = new System.Drawing.Point(0, 0);
 			this.ChrPipelinePanel.Name = "ChrPipelinePanel";
 			this.ChrPipelinePanel.Size = new System.Drawing.Size(309, 65);
@@ -161,12 +162,24 @@ namespace Brewmaster.EditorWindows.Images
 			this.PaletteGroup.Controls.Add(this.PaletteContainer);
 			this.PaletteGroup.Controls.Add(this._enablePaletteReduction);
 			this.PaletteGroup.Dock = System.Windows.Forms.DockStyle.Top;
-			this.PaletteGroup.Location = new System.Drawing.Point(3, 3);
+			this.PaletteGroup.Location = new System.Drawing.Point(0, 0);
 			this.PaletteGroup.Name = "PaletteGroup";
-			this.PaletteGroup.Size = new System.Drawing.Size(300, 59);
+			this.PaletteGroup.Size = new System.Drawing.Size(309, 59);
 			this.PaletteGroup.TabIndex = 5;
 			this.PaletteGroup.TabStop = false;
 			this.PaletteGroup.Text = "Reduce palette per tile";
+			// 
+			// PaletteContainer
+			// 
+			this.PaletteContainer.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.PaletteContainer.AutoSize = true;
+			this.PaletteContainer.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
+			this.PaletteContainer.Location = new System.Drawing.Point(7, 40);
+			this.PaletteContainer.MaximumSize = new System.Drawing.Size(287, 0);
+			this.PaletteContainer.Name = "PaletteContainer";
+			this.PaletteContainer.Size = new System.Drawing.Size(287, 0);
+			this.PaletteContainer.TabIndex = 1;
 			// 
 			// _enablePaletteReduction
 			// 
@@ -184,22 +197,13 @@ namespace Brewmaster.EditorWindows.Images
 			this.contextMenuStrip1.Name = "contextMenuStrip1";
 			this.contextMenuStrip1.Size = new System.Drawing.Size(61, 4);
 			// 
-			// PaletteContainer
-			// 
-			this.PaletteContainer.AutoSize = true;
-			this.PaletteContainer.Location = new System.Drawing.Point(7, 40);
-			this.PaletteContainer.MaximumSize = new System.Drawing.Size(287, 0);
-			this.PaletteContainer.Name = "PaletteContainer";
-			this.PaletteContainer.Size = new System.Drawing.Size(287, 0);
-			this.PaletteContainer.TabIndex = 1;
-			// 
 			// PaletteReductionSettings
 			// 
 			this.AutoSize = true;
 			this.Controls.Add(this.ChrPipelinePanel);
 			this.MinimumSize = new System.Drawing.Size(309, 0);
 			this.Name = "PaletteReductionSettings";
-			this.Size = new System.Drawing.Size(309, 65);
+			this.Size = new System.Drawing.Size(312, 68);
 			this.ChrPipelinePanel.ResumeLayout(false);
 			this.ChrPipelinePanel.PerformLayout();
 			this.PaletteGroup.ResumeLayout(false);

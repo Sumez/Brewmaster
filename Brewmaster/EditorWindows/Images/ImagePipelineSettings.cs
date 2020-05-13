@@ -137,9 +137,10 @@ namespace Brewmaster.EditorWindows.Images
 			// 
 			// ImagePipelineSettings
 			// 
+			this.AutoScroll = true;
 			this.Controls.Add(this.NoPipelinePanel);
 			this.Name = "ImagePipelineSettings";
-			this.Size = new System.Drawing.Size(309, 546);
+			this.Size = new System.Drawing.Size(309, 283);
 			this.NoPipelinePanel.ResumeLayout(false);
 			this.ResumeLayout(false);
 

@@ -110,7 +110,7 @@ namespace Brewmaster.Pipeline
 			var bitmap = new Bitmap(image.Width, image.Height);
 			var tileCount = (image.Width / 8) * (image.Height / 8);
 
-			var basePalette = TilePalettes.OrderByDescending(p => p.Count >= 4).First().ToDictionary(k => k.Value, k => k.Key);
+			var basePalette = TilePalettes.OrderByDescending(p => p.Count).First().ToDictionary(k => k.Value, k => k.Key);
 
 			for (var i = 0; i < tileCount; i++)
 			{
