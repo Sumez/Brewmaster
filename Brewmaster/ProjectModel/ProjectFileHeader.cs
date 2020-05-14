@@ -64,14 +64,8 @@ namespace Brewmaster.ProjectModel
 			{
 				var buildConfigurationHeader = new BuildConfigurationHeader
 				{
-					Data = new[]
-					{
-						c.ChrBuildPath, c.PrgBuildPath, c.BuildPath, c.ChrFile,
-						c.DebugFile, c.Filename, c.LinkerConfigFile, c.MapFile, c.PrgFile,
-						c.Name, string.Join(",", c.Symbols), c.CalculateChecksum ? "1" : "0"
-					},
-					ChrBankFileIds = c.ChrBanks.Select(b =>
-						b.Sources.Select(f => fileReferences[f]).ToArray()).ToArray()
+					Configuration = c,
+					ChrBankFileIds = c.ChrBanks.Select(b => b.Sources.Select(f => fileReferences[f]).ToArray()).ToArray()
 				};
 				if (buildConfigurationHeader.ChrBankFileIds.Length == 0) buildConfigurationHeader.ChrBankFileIds = null;
 				configurations.Add(buildConfigurationHeader);
@@ -80,7 +74,6 @@ namespace Brewmaster.ProjectModel
 
 			return header;
 		}
-
 
 		// IMPORT
 		public void GetProjectModel(AsmProject project)
@@ -130,7 +123,7 @@ namespace Brewmaster.ProjectModel
 			foreach (var configurationHeader in buildConfigurations)
 			{
 				var cData = configurationHeader.Data;
-				var configuration = new NesCartridge
+				var configuration = configurationHeader.Configuration ?? new NesCartridge
 				{
 					ChrBuildPath = cData[0],
 					PrgBuildPath = cData[1],
@@ -143,7 +136,7 @@ namespace Brewmaster.ProjectModel
 					PrgFile = cData[8],
 					Name = cData.Length > 9 ? cData[9] : null,
 					Symbols = cData.Length > 10 ? cData[10].Split(new [] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToList() : new List<string>(),
-					CalculateChecksum = cData.Length > 11 ? cData[11] != "0" : true,
+					CalculateChecksum = cData.Length > 11 ? cData[11] != "0" : true
 				};
 				if (configurationHeader.ChrBankFileIds != null)
 				foreach (var bank in configurationHeader.ChrBankFileIds)
@@ -188,6 +181,8 @@ namespace Brewmaster.ProjectModel
 	{
 		public string[] Data;
 		public int[][] ChrBankFileIds { get; set; }
+
+		[XmlElement(ElementName = "Settings")] public NesCartridge Configuration;
 	}
 
 

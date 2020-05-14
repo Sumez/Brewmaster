@@ -1,7 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Xml.Serialization;
 
 namespace Brewmaster.ProjectModel
 {
+	[Serializable]
 	public class NesCartridge
 	{
 		public string Name { get; set; }
@@ -14,16 +17,20 @@ namespace Brewmaster.ProjectModel
 		public string LinkerConfigFile { get; set; }
 		public string ChrBuildPath { get; set; }
 		public string MapFile { get; set; }
+		[XmlElement(ElementName = "Symbol")]
 		public List<string> Symbols { get; set; }
-		public List<ChrBank> ChrBanks { get; set; }
 		public bool CalculateChecksum { get; set; }
+		public bool Custom { get; set; }
+		[XmlElement(ElementName = "Script")]
+		public List<string> ScriptCommands { get; set; }
 
 		public NesCartridge()
 		{
 			ChrBanks = new List<ChrBank>();
 			Symbols = new List<string>();
 		}
-
+		[XmlIgnore]
+		public List<ChrBank> ChrBanks { get; set; }
 		public override string ToString()
 		{
 			return string.IsNullOrWhiteSpace(Name) ? Filename : Name;

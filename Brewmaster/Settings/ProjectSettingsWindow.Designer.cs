@@ -38,11 +38,11 @@
 			this.cancelButton = new System.Windows.Forms.Button();
 			this.ConfigurationBox = new System.Windows.Forms.GroupBox();
 			this.configurationSettings1 = new Brewmaster.ProjectWizard.ConfigurationSettings();
+			this.DeleteConfigurationButton = new System.Windows.Forms.Button();
 			this.ConfigurationSelector = new System.Windows.Forms.ComboBox();
 			this.ProjectName = new System.Windows.Forms.TextBox();
 			this.tabControl = new System.Windows.Forms.TabControl();
 			this.projectTab = new System.Windows.Forms.TabPage();
-			this.DeleteConfigurationButton = new System.Windows.Forms.Button();
 			panel1 = new System.Windows.Forms.Panel();
 			label7 = new System.Windows.Forms.Label();
 			label8 = new System.Windows.Forms.Label();
@@ -62,7 +62,7 @@
 			panel1.Controls.Add(this.okButton);
 			panel1.Controls.Add(this.cancelButton);
 			panel1.Dock = System.Windows.Forms.DockStyle.Bottom;
-			panel1.Location = new System.Drawing.Point(0, 433);
+			panel1.Location = new System.Drawing.Point(0, 466);
 			panel1.Name = "panel1";
 			panel1.Size = new System.Drawing.Size(607, 38);
 			panel1.TabIndex = 1;
@@ -112,27 +112,42 @@
 			panel2.Dock = System.Windows.Forms.DockStyle.Fill;
 			panel2.Location = new System.Drawing.Point(0, 0);
 			panel2.Name = "panel2";
-			panel2.Size = new System.Drawing.Size(607, 433);
+			panel2.Size = new System.Drawing.Size(607, 466);
 			panel2.TabIndex = 2;
 			// 
 			// ConfigurationBox
 			// 
+			this.ConfigurationBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
 			this.ConfigurationBox.Controls.Add(this.configurationSettings1);
 			this.ConfigurationBox.Controls.Add(this.DeleteConfigurationButton);
 			this.ConfigurationBox.Controls.Add(this.ConfigurationSelector);
 			this.ConfigurationBox.Location = new System.Drawing.Point(7, 68);
 			this.ConfigurationBox.Name = "ConfigurationBox";
-			this.ConfigurationBox.Size = new System.Drawing.Size(594, 357);
+			this.ConfigurationBox.Size = new System.Drawing.Size(594, 390);
 			this.ConfigurationBox.TabIndex = 1;
 			this.ConfigurationBox.TabStop = false;
 			this.ConfigurationBox.Text = "Build configuration";
 			// 
 			// configurationSettings1
 			// 
+			this.configurationSettings1.AutoSize = true;
 			this.configurationSettings1.Location = new System.Drawing.Point(9, 45);
+			this.configurationSettings1.MinimumSize = new System.Drawing.Size(579, 309);
 			this.configurationSettings1.Name = "configurationSettings1";
-			this.configurationSettings1.Size = new System.Drawing.Size(579, 311);
+			this.configurationSettings1.Size = new System.Drawing.Size(579, 324);
 			this.configurationSettings1.TabIndex = 1;
+			// 
+			// DeleteConfigurationButton
+			// 
+			this.DeleteConfigurationButton.Location = new System.Drawing.Point(190, 15);
+			this.DeleteConfigurationButton.Name = "DeleteConfigurationButton";
+			this.DeleteConfigurationButton.Size = new System.Drawing.Size(129, 23);
+			this.DeleteConfigurationButton.TabIndex = 2;
+			this.DeleteConfigurationButton.Text = "Delete configuration";
+			this.DeleteConfigurationButton.UseVisualStyleBackColor = true;
+			this.DeleteConfigurationButton.Click += new System.EventHandler(this.DeleteConfigurationButton_Click);
 			// 
 			// ConfigurationSelector
 			// 
@@ -145,11 +160,13 @@
 			// 
 			// groupBox1
 			// 
+			groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
 			groupBox1.Controls.Add(this.ProjectName);
 			groupBox1.Controls.Add(label1);
 			groupBox1.Location = new System.Drawing.Point(7, 12);
 			groupBox1.Name = "groupBox1";
-			groupBox1.Size = new System.Drawing.Size(585, 50);
+			groupBox1.Size = new System.Drawing.Size(594, 50);
 			groupBox1.TabIndex = 0;
 			groupBox1.TabStop = false;
 			groupBox1.Text = "General";
@@ -178,7 +195,7 @@
 			this.tabControl.Name = "tabControl";
 			this.tabControl.Padding = new System.Drawing.Point(10, 5);
 			this.tabControl.SelectedIndex = 0;
-			this.tabControl.Size = new System.Drawing.Size(607, 471);
+			this.tabControl.Size = new System.Drawing.Size(607, 504);
 			this.tabControl.TabIndex = 0;
 			this.tabControl.Visible = false;
 			// 
@@ -190,31 +207,21 @@
 			this.projectTab.Location = new System.Drawing.Point(4, 26);
 			this.projectTab.Name = "projectTab";
 			this.projectTab.Padding = new System.Windows.Forms.Padding(3);
-			this.projectTab.Size = new System.Drawing.Size(599, 441);
+			this.projectTab.Size = new System.Drawing.Size(599, 474);
 			this.projectTab.TabIndex = 2;
 			this.projectTab.Text = "Assembler";
-			// 
-			// DeleteConfigurationButton
-			// 
-			this.DeleteConfigurationButton.Location = new System.Drawing.Point(190, 15);
-			this.DeleteConfigurationButton.Name = "DeleteConfigurationButton";
-			this.DeleteConfigurationButton.Size = new System.Drawing.Size(129, 23);
-			this.DeleteConfigurationButton.TabIndex = 2;
-			this.DeleteConfigurationButton.Text = "Delete configuration";
-			this.DeleteConfigurationButton.UseVisualStyleBackColor = true;
-			this.DeleteConfigurationButton.Click += new System.EventHandler(this.DeleteConfigurationButton_Click);
 			// 
 			// ProjectSettingsWindow
 			// 
 			this.AcceptButton = this.okButton;
 			this.CancelButton = this.cancelButton;
-			this.ClientSize = new System.Drawing.Size(607, 471);
+			this.ClientSize = new System.Drawing.Size(607, 504);
 			this.Controls.Add(panel2);
 			this.Controls.Add(panel1);
 			this.Controls.Add(this.tabControl);
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
 			this.MaximizeBox = false;
-			this.MaximumSize = new System.Drawing.Size(623, 510);
+			this.MaximumSize = new System.Drawing.Size(623, 700);
 			this.MinimizeBox = false;
 			this.MinimumSize = new System.Drawing.Size(623, 510);
 			this.Name = "ProjectSettingsWindow";
@@ -224,6 +231,7 @@
 			panel1.ResumeLayout(false);
 			panel2.ResumeLayout(false);
 			this.ConfigurationBox.ResumeLayout(false);
+			this.ConfigurationBox.PerformLayout();
 			groupBox1.ResumeLayout(false);
 			groupBox1.PerformLayout();
 			this.tabControl.ResumeLayout(false);

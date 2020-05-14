@@ -41,7 +41,7 @@ namespace Brewmaster.ProjectModel
 			{FileType.Source, new[] {".asm", ".s"}},
 			{FileType.Include, new[] {".h", ".inc", ".include", ".i"}},
 			{FileType.Text, new[] {".txt", ".md", ".ini", ".cfg", ".json", ".xml", ".csv"}},
-			{FileType.Script, new[] {".py", ".js", ".bat", ".php", ".yaml"}},
+			{FileType.Script, new[] {".py", ".js", ".bat", ".php", ".yaml", ".mk"}},
 			{FileType.Audio, new[] {".wav", ".pcm", ".dmc", ".nsf", ".wma", ".mp3", ".mid", ".ogg", ".xm", ".ft", ".it", ".mod"}},
 			{FileType.FamiTracker, new[] {".ftm"}},
 		};

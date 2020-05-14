@@ -388,6 +388,9 @@
     <Compile Include="ProjectModel\Compatibility\LegacyProjectFileHeaderV1.cs" />
     <Compile Include="ProjectModel\NesCartridge.cs" />
     <Compile Include="ProjectModel\ProjectFileHeader.cs" />
+    <Compile Include="ProjectWizard\BuildConfigurationStep.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="ProjectWizard\ConfigurationManager.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -417,6 +420,9 @@
     </Compile>
     <Compile Include="ProjectWizard\ImportProjectPath.Designer.cs">
       <DependentUpon>ImportProjectPath.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ProjectWizard\SelectBuildProcessType.cs">
+      <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="ProjectWizard\WizardDialog.cs">
       <SubType>Form</SubType>
@@ -575,6 +581,9 @@
     <EmbeddedResource Include="ProjectExplorer\ProjectExplorer.resx">
       <DependentUpon>ProjectExplorer.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="ProjectWizard\BuildConfigurationStep.resx">
+      <DependentUpon>BuildConfigurationStep.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="ProjectWizard\ConfigurationManager.resx">
       <DependentUpon>ConfigurationManager.cs</DependentUpon>
       <SubType>Designer</SubType>
@@ -587,6 +596,10 @@
     </EmbeddedResource>
     <EmbeddedResource Include="ProjectWizard\ImportProjectPath.resx">
       <DependentUpon>ImportProjectPath.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ProjectWizard\SelectBuildProcessType.resx">
+      <DependentUpon>SelectBuildProcessType.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="ProjectWizard\WizardDialog.resx">
       <DependentUpon>WizardDialog.cs</DependentUpon>

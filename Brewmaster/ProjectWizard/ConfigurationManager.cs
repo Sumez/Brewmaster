@@ -12,12 +12,7 @@ namespace Brewmaster.ProjectWizard
 			InitializeComponent();
 
 			ConfigurationSettings.Project = project;
-			ConfigurationSettings.ConfigurationName.Text = project.Type == ProjectType.Snes ? "SNES" : "NES";
-			var defaultConfigFile = project.Files.FirstOrDefault(f => f.Mode == CompileMode.LinkerConfig);
-			if (defaultConfigFile != null)
-				ConfigurationSettings.ConfigurationFile.Text = defaultConfigFile.GetRelativePath();
-
-			ConfigurationSettings.OutputFile.Text = project.Type == ProjectType.Snes ? "bin/game.sfc" : "bin/game.nes";
+			ConfigurationSettings.SetDefaults();
 		}
 
 		public NesCartridge Configuration { get; set; }
