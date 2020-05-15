@@ -91,7 +91,8 @@ namespace Brewmaster.ProjectModel
 		}
 
 		// TODO: Is a "same dir" include path in an included file relative to the original file, or the included file
-		private static void GetSymbolsFromText(string source, List<Symbol> newSymbols, List<string> exportedSymbols, string[] includePaths, List<string> files = null)
+		private static void GetSymbolsFromText(string source, List<Symbol> newSymbols, List<string> exportedSymbols,
+			string[] includePaths, Dictionary<string, List<AsmProject.FileInclude>> includeChain, List<string> files = null)
 		{
 			if (files == null) files = new List<string>();
 			if (!System.IO.File.Exists(source)) return;
@@ -115,10 +116,13 @@ namespace Brewmaster.ProjectModel
 					if (!System.IO.File.Exists(childFilename)) continue;
 
 					childFilename = new FileInfo(childFilename).FullName;
+					var include = new AsmProject.FileInclude { IncludingFile = source, Line = lineNumber };
+					if (!includeChain.ContainsKey(childFilename)) includeChain.Add(childFilename, new List<AsmProject.FileInclude>());
+					if (!includeChain[childFilename].Contains(include)) includeChain[childFilename].Add(include);
 					if (files.Contains(childFilename)) continue;
 					files.Add(childFilename);
 
-					GetSymbolsFromText(childFilename, newSymbols, exportedSymbols, includePaths, files);
+					GetSymbolsFromText(childFilename, newSymbols, exportedSymbols, includePaths, includeChain, files);
 					continue;
 				}
 
@@ -164,11 +168,11 @@ namespace Brewmaster.ProjectModel
 
 		public event Action ParsedLocalSymbols;
 		public List<Symbol> LocalSymbols = new List<Symbol>();
-		public void AddSymbolsFromFile(List<KeyValuePair<string, Symbol>> symbols)
+		public void AddSymbolsFromFile(List<KeyValuePair<string, Symbol>> symbols, Dictionary<string, List<AsmProject.FileInclude>> includeChain)
 		{
 			var exportedSymbols = new List<string>();
 			LocalSymbols = new List<Symbol>();
-			GetSymbolsFromText(File.FullName, LocalSymbols, exportedSymbols, new [] { File.DirectoryName, Project.Directory.FullName });
+			GetSymbolsFromText(File.FullName, LocalSymbols, exportedSymbols, new [] { File.DirectoryName, Project.Directory.FullName }, includeChain);
 			foreach (var symbol in LocalSymbols)
 			{
 				symbol.LocalToFile = File.FullName; // TODO: Save individual list on each file instead?

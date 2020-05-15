@@ -237,17 +237,25 @@ namespace Brewmaster.ProjectModel
 			}
 		}
 
+		public Dictionary<string, List<FileInclude>> IncludeChain = new Dictionary<string, List<FileInclude>>();
 
+		public struct FileInclude
+		{
+			public int Line;
+			public string IncludingFile;
+		}
 		private void LoadAllSymbols()
 		{
 			var symbols = new List<KeyValuePair<string, Symbol>>();
+			var includeChain = new Dictionary<string, List<FileInclude>>();
 			foreach (var sourceFile in Files.Where(f => f.IsTextFile && f.Mode != CompileMode.ContentPipeline && f.Mode != CompileMode.LinkerConfig))
 			{
-				sourceFile.AddSymbolsFromFile(symbols);
+				sourceFile.AddSymbolsFromFile(symbols, includeChain);
 			}
 			lock (_lockSymbols)
 			{
 				Symbols = symbols;
+				IncludeChain = includeChain;
 			}
 		}
 

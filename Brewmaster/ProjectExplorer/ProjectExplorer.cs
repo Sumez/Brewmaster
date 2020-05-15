@@ -86,6 +86,7 @@ namespace Brewmaster.ProjectExplorer
 			ImageList.Images.Add(Resources.file_text);
 			ImageList.Images.Add(Resources.file_config);
 			ImageList.Images.Add(Resources.file_missing);
+			
 
 			_events.FilenameChanged += file =>
 			{

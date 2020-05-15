@@ -1363,10 +1363,6 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 		    }
 
 		    SaveAll();
-			if (!CurrentProject.Files.Any(l => l.Mode == CompileMode.LinkerConfig))
-			{
-				Error("Error: No linker configuration was found.\nEither create a new one from a template, or add an existing file.");
-			}
 			return BuildHandler.Build(CurrentProject);
 		}
 
