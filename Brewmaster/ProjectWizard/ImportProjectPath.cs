@@ -4,7 +4,6 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
-using Brewmaster.ProjectModel;
 
 namespace Brewmaster.ProjectWizard
 {
@@ -12,6 +11,7 @@ namespace Brewmaster.ProjectWizard
 	{
 		private bool _projectNameChanged;
 
+		public string BaseFilename { get; private set; }
 		public string Directory
 		{
 			get { return _projectDirectory.Text; }
@@ -69,12 +69,12 @@ namespace Brewmaster.ProjectWizard
 				error = "Directory does not exist";
 			}
 
-			filename = filename.Trim();
+			BaseFilename = filename.Trim();
 
 			path = error ??
 			       new DirectoryInfo(Path.Combine(
 				       _projectDirectory.Text,
-				       filename + ".bwm")).FullName;
+				       BaseFilename + ".bwm")).FullName;
 
 			return error == null;
 		}
