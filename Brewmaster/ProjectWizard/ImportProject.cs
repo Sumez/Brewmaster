@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 using Brewmaster.ProjectModel;
 
@@ -27,13 +29,26 @@ namespace Brewmaster.ProjectWizard
 				var directory = new DirectoryInfo(_importProjectPath.Directory);
 				if (Project == null || Project.Directory.Name != directory.Name)
 				{
-					// TODO: Identify existing .nesproject or .bwm file in directory
-					Project = AsmProject.ImportFromDirectory(directory);
+					Project = null;
+					var nesProject = directory.GetFiles().FirstOrDefault(f => f.Extension.ToLower() == ".nesproject");
+					if (nesProject != null && MessageBox.Show(this, string.Format("Do you want to try loading '{0}'?", nesProject.Name), "Import file", MessageBoxButtons.YesNo) == DialogResult.Yes)
+					{
+						try
+						{
+							Project = AsmProject.ImportFromFile(nesProject);
+						}
+						catch (Exception ex)
+						{
+							Program.Error("An error occured while trying to load the file:\n\n" + ex.Message, ex);
+							Project = null;
+						}
+					}
+					if (Project == null) Project = AsmProject.ImportFromDirectory(directory);
 					_importFiles.Project = Project;
 				}
 				Project.Name = _importProjectPath.ProjectName;
 				Project.ProjectFile = new FileInfo(_importProjectPath.ProjectFile);
-				// TODO: Refresh tree in _importfiles to update project name
+				_importFiles.RefreshTree();
 			}
 			base.ChangeStep(step);
 		}

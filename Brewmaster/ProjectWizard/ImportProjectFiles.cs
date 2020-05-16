@@ -41,6 +41,11 @@ namespace Brewmaster.ProjectWizard
 			}
 		}
 
+		public void RefreshTree()
+		{
+			ProjectExplorer.RefreshTree();
+		}
+
 		private void RefreshScroll(int scrollAmount)
 		{
 

@@ -257,7 +257,7 @@ namespace Brewmaster.ProjectExplorer
 			_project.ContentsChanged += RefreshTree; // TODO: Retain open nodes
 			RefreshTree();
 		}
-		private void RefreshTree()
+		public void RefreshTree()
 		{
 			var projectNode = CreateNodeFromDirectory(_project.Directory, false, _project.Directories);
 			projectNode.Name = "project";
