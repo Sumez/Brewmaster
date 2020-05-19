@@ -38,6 +38,7 @@ namespace Brewmaster.ProjectModel
 		private static readonly Dictionary<FileType, string[]> FileTypes = new Dictionary<FileType, string[]>
 		{
 			{FileType.Image, new[] {".png", ".jpg", ".bmp", ".gif", ".chr"}},
+			{FileType.TileMap, new[] {".bwmap"}},
 			{FileType.Source, new[] {".asm", ".s"}},
 			{FileType.Include, new[] {".h", ".inc", ".include", ".i"}},
 			{FileType.Text, new[] {".txt", ".md", ".ini", ".cfg", ".json", ".xml", ".csv"}},
@@ -206,8 +207,7 @@ namespace Brewmaster.ProjectModel
 	public enum FileType
 	{
 		Unknown, Image, Source, Text, Include,
-		Script, FamiTracker,
-		Audio
+		Script, FamiTracker, Audio, TileMap
 	}
 	public enum CompileMode
 	{

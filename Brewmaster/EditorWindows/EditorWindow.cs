@@ -11,6 +11,7 @@ namespace Brewmaster.EditorWindows
 		protected MainForm MainWindow { get; set; }
 		public AsmProjectFile ProjectFile { get; protected set; }
 		public Events ModuleEvents { get; protected set; }
+		public virtual ToolStrip ToolBar { get; }
 
 		public EditorWindow(MainForm form, AsmProjectFile file, Events events)
 		{

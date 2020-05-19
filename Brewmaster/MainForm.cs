@@ -13,6 +13,7 @@ using Brewmaster.EditorWindows;
 using Brewmaster.EditorWindows.Code;
 using Brewmaster.EditorWindows.Images;
 using Brewmaster.EditorWindows.Text;
+using Brewmaster.EditorWindows.TileMaps;
 using Brewmaster.Emulation;
 using Brewmaster.Layout;
 using Brewmaster.MemoryViewer;
@@ -148,6 +149,11 @@ namespace Brewmaster
 
 			if (editorTab is TextEditorWindow textEditorWindow) SetCaretInformation(textEditorWindow);
 			else lineLabel.Text = charLabel.Text = "";
+
+			if (editorTab != null && editorTab.ToolBar != null)
+			{
+				toolstrippanel.Controls.Add(editorTab.ToolBar);
+			}
 
 			UpdateTabListInWindowMenu();
 		}
@@ -1572,6 +1578,9 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 				}
 				else switch (file.Type)
 				{
+					case FileType.TileMap:
+						tab = new MapEditorWindow(this, file, _moduleEvents);
+						break;
 					case FileType.Image:
 						tab = new ImageWindow(this, file, _moduleEvents);
 						break;
@@ -1790,13 +1799,13 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 		private void sourceFileMenuItem_Click(object sender, EventArgs e)
 		{
 			if (CurrentProject == null) return;
-			CreateNewFile(CurrentProject.ProjectFile.DirectoryName, FileTemplate.AssemblyCode, ".s");
+			CreateNewFile(CurrentProject.ProjectFile.DirectoryName, FileTemplate.AssemblyCode, ".s", CompileMode.IncludeInAssembly);
 		}
 
 		private void includeFileMenuItem_Click(object sender, EventArgs e)
 		{
 			if (CurrentProject == null) return;
-			CreateNewFile(CurrentProject.ProjectFile.DirectoryName, FileTemplate.AssemblyInclude, ".inc");
+			CreateNewFile(CurrentProject.ProjectFile.DirectoryName, FileTemplate.AssemblyInclude, ".inc", CompileMode.Ignore);
 		}
 
 		private void importProjectMenuItem_Click(object sender, EventArgs e)
