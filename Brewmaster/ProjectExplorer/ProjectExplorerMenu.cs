@@ -25,7 +25,7 @@ namespace Brewmaster.ProjectExplorer
 		private TreeNode CurrentNode;
 
 		public bool AllowFileEditing { get; set; }
-		public Action<string, FileTemplate, string> CreateNewFile;
+		public Action<string, FileTemplate, string, CompileMode> CreateNewFile;
 		public Action<string, string, CompileMode> AddExistingFile;
 		public Action<TreeNode> OpenNode;
 		public Action<TreeNode> EditNode;
@@ -38,13 +38,15 @@ namespace Brewmaster.ProjectExplorer
 		public ProjectExplorerMenu()
 		{
 			NewMenu = new ToolStripMenuItem { Text = "Add" };
-			NewMenu.DropDownItems.Add("New Source File...", null, (s, e) => { NewFile(".s", FileTemplate.AssemblyCode); });
-			NewMenu.DropDownItems.Add("New Include File...", null, (s, e) => { NewFile(".inc", FileTemplate.AssemblyInclude); });
+			NewMenu.DropDownItems.Add("New Source File...", null, (s, e) => { NewFile(".s", FileTemplate.AssemblyCode, CompileMode.IncludeInAssembly); });
+			NewMenu.DropDownItems.Add("New Include File...", null, (s, e) => { NewFile(".inc", FileTemplate.AssemblyInclude, CompileMode.Ignore); });
+			NewMenu.DropDownItems.Add("New Linker Configuration...", null, (s, e) => { NewFile(".cfg", FileTemplate.LinkerConfig, CompileMode.LinkerConfig); });
 			NewMenu.DropDownItems.Add("New Directory", null, (s, e) => { NewDirectory(); });
 
 			PipelineNewMenu = new ToolStripMenuItem { Text = "Add" };
-			PipelineNewMenu.DropDownItems.Add("New Famitracker Project...", null, (s, e) => { NewFile(".ftm", FileTemplate.Famitracker); });
-			PipelineNewMenu.DropDownItems.Add("New Level Data...", null, (s, e) => { NewFile(".level", FileTemplate.None); });
+			PipelineNewMenu.DropDownItems.Add("New Tile Map ...", null, (s, e) => { NewFile(".bwmap", FileTemplate.TileMap, CompileMode.ContentPipeline); });
+			PipelineNewMenu.DropDownItems.Add("New Famitracker Project...", null, (s, e) => { NewFile(".ftm", FileTemplate.Famitracker, CompileMode.ContentPipeline); });
+			PipelineNewMenu.DropDownItems.Add("New Level Data...", null, (s, e) => { NewFile(".level", FileTemplate.None, CompileMode.ContentPipeline); });
 
 			AddExistingOption = new ToolStripMenuItem("Add existing File...", null, (s, e) => ExistingFile(CompileMode.IncludeInAssembly));
 			PipelineAddExistingOption = new ToolStripMenuItem("Add existing File...", null, (s, e) => ExistingFile(CompileMode.ContentPipeline));
@@ -104,11 +106,11 @@ namespace Brewmaster.ProjectExplorer
 			if (directoryNode == null) return;
 			if (AddSubdirectory != null) AddSubdirectory(directoryNode.DirectoryInfo);
 		}
-		private void NewFile(string extension, FileTemplate template)
+		private void NewFile(string extension, FileTemplate template, CompileMode compileMode)
 		{
 			var directoryNode = CurrentNode as DirectoryNode;
 			if (directoryNode == null) return;
-			if (CreateNewFile != null) CreateNewFile(directoryNode.DirectoryInfo.FullName, template, extension);
+			if (CreateNewFile != null) CreateNewFile(directoryNode.DirectoryInfo.FullName, template, extension, compileMode);
 		}
 
 		private void ExistingFile(CompileMode mode)

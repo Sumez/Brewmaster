@@ -19,7 +19,7 @@ namespace Brewmaster.ProjectExplorer
 		private bool _showAllFiles;
 
 		public Action<AsmProjectFile> OpenFile;
-		public Action<string, FileTemplate, string> CreateNewFile { set { _menu.CreateNewFile = value; } }
+		public Action<string, FileTemplate, string, CompileMode> CreateNewFile { set { _menu.CreateNewFile = value; } }
 		public Action<string, string, CompileMode> AddExistingFile { set { _menu.AddExistingFile = value; } get { return _menu.AddExistingFile; } }
 		public bool ShowAllFiles
 		{

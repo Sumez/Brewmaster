@@ -617,7 +617,7 @@ namespace Brewmaster
 		    CurrentProject.AddNewProjectFile(projectFile);
 			ProjectExplorer.FocusNode(projectFile);
 	    }
-		private void CreateNewFile(string target, FileTemplate template, string extension)
+		private void CreateNewFile(string target, FileTemplate template, string extension, CompileMode mode)
 	    {
 		    var filename = target;
 		    if (Directory.Exists(target))
@@ -638,7 +638,7 @@ namespace Brewmaster
 		    }
 
 		    string sourceFilename = null;
-		    var projectFile = new AsmProjectFile { Mode = CompileMode.Ignore, Project = CurrentProject };
+		    var projectFile = new AsmProjectFile { Mode = mode, Project = CurrentProject };
 		    switch (template)
 		    {
 			    case FileTemplate.Famitracker:

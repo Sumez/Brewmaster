@@ -10,7 +10,6 @@ using System.Xml;
 using System.Xml.Serialization;
 using Brewmaster.EditorWindows;
 using Brewmaster.EditorWindows.Code;
-using Brewmaster.EditorWindows.Text;
 using Brewmaster.Pipeline;
 using Brewmaster.ProjectExplorer;
 using Brewmaster.ProjectModel.Compatibility;
@@ -24,7 +23,9 @@ namespace Brewmaster.ProjectModel
 	}
 	public enum FileTemplate
 	{
-		None, Famitracker, Chr, AssemblyCode, AssemblyInclude
+		None, Famitracker, Chr, AssemblyCode, AssemblyInclude,
+		TileMap,
+		LinkerConfig
 	}
 	public class AsmProject : IDisposable, ISaveable, ISymbolSource
 	{
