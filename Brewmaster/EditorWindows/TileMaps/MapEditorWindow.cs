@@ -2,9 +2,13 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
+using System.Xml.Serialization;
 using Brewmaster.Modules;
 using Brewmaster.ProjectModel;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace Brewmaster.EditorWindows.TileMaps
 {
@@ -12,17 +16,65 @@ namespace Brewmaster.EditorWindows.TileMaps
 	{
 		protected static MapEditorToolBar MapEditorToolBar = new MapEditorToolBar();
 		private MapScreenView _screenView;
+		private TilePalette _tilePalette;
 		private int _zoom = 2;
 		public override ToolStrip ToolBar { get { return MapEditorToolBar; } }
 
 		public MapEditorWindow(MainForm form, AsmProjectFile file, Events events) : base(form, file, events)
 		{
-			Map = new TileMap();
-			Map.Screens.Add(new List<TileMapScreen>(new [] { new TileMapScreen(Map.ScreenSize, Map.BaseTileSize) }));
+			var json = File.ReadAllText(ProjectFile.File.FullName);
+			var map = JsonConvert.DeserializeObject<SerializableTileMap>(json, new JsonSerializerSettings { ContractResolver = new CamelCasePropertyNamesContractResolver() });
+			if (map != null)
+			{
+				Map = map.GetMap();
+				if (!string.IsNullOrWhiteSpace(map.ChrSource))
+				{
+					ChrSource = Path.Combine(file.Project.Directory.FullName, map.ChrSource);
+				}
+				Pristine = true;
+			}
+			else
+			{
+				Map = new TileMap();
+				Map.Screens.Add(new List<TileMapScreen>(new[] { new TileMapScreen(Map.ScreenSize, Map.BaseTileSize) }));
+			}
+
+			foreach (var screen in Map.Screens.SelectMany(l => l))
+			{
+				screen.TileChanged += (x, y) => Pristine = false;
+			}
 			FocusedScreen = Map.Screens[0][0];
 
-			_screenView = new MapScreenView(Map, FocusedScreen) { Dock = DockStyle.Fill, Zoom = _zoom };
+			_tilePalette = new TilePalette { Width = 256, Height = 256, Top = 0, Left = Width - 256 };
+			_tilePalette.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+			Controls.Add(_tilePalette);
+
+			_screenView = new MapScreenView(Map, FocusedScreen) { Dock = DockStyle.Fill, Zoom = _zoom, TilePalette = _tilePalette };
 			Controls.Add(_screenView);
+			_screenView.ContextMenu = new ContextMenu();
+
+			LoadChrSource();
+			SelectTilePen();
+		}
+
+		private void SelectTilePen()
+		{
+			var tool = new TilePen();
+			_screenView.Tool = tool;
+			tool.SelectedTileChanged += () => { _tilePalette.SelectedTile = tool.SelectedTile; };
+			_tilePalette.SelectedTile = tool.SelectedTile;
+		}
+
+		private void LoadChrSource()
+		{
+			if (!File.Exists(ChrSource)) return;
+			using (var stream = File.OpenRead(ChrSource))
+			{
+				var data = new byte[stream.Length];
+				stream.Read(data, 0, data.Length);
+				_tilePalette.ChrData = data;
+			}
+			_screenView.RefreshAllTiles(_tilePalette);
 		}
 
 		public TileMapScreen FocusedScreen { get; set; }
@@ -34,6 +86,32 @@ namespace Brewmaster.EditorWindows.TileMaps
 			base.OnVisibleChanged(e);
 			if (!Visible) return;
 			MapEditorToolBar.ImportImage = ImportImage;
+			MapEditorToolBar.ImportChr = ImportChr;
+			MapEditorToolBar.ImportMap = ImportMap;
+		}
+
+		private void ImportMap()
+		{
+			string fileName = null;
+			using (var dialog = new OpenFileDialog())
+			{
+				if (dialog.ShowDialog() != DialogResult.OK) return;
+				fileName = dialog.FileName;
+			}
+
+			PyxelMap map;
+			using (var stream = File.OpenRead(fileName))
+			{
+				map = (PyxelMap) new XmlSerializer(typeof(PyxelMap)).Deserialize(stream);
+			}
+
+			foreach (var tile in map.Layers[0].Tiles)
+			{
+				if (tile.Index < 0) continue;
+				FocusedScreen.PrintTile(tile.X, tile.Y, tile.Index);
+			}
+
+			Pristine = false;
 		}
 
 		protected override void OnMouseWheel(MouseEventArgs e)
@@ -63,32 +141,46 @@ namespace Brewmaster.EditorWindows.TileMaps
 			}
 			_screenView.Invalidate();
 		}
+		private void ImportChr()
+		{
+			using (var dialog = new OpenFileDialog())
+			{
+				if (dialog.ShowDialog() != DialogResult.OK) return;
+				ChrSource = dialog.FileName;
+			}
+			LoadChrSource();
+			Pristine = false;
+		}
+
+		public string ChrSource { get; set; }
 
 		public override void Save(Func<FileInfo, string> getNewFileName = null)
 		{
-			
+			var map = Map.GetSerializable();
+			map.ChrSource = ProjectFile.Project.GetRelativePath(ChrSource);
+			var jsonSettings = new JsonSerializerSettings { Formatting = Formatting.Indented, ContractResolver = new CamelCasePropertyNamesContractResolver() };
+			jsonSettings.Converters.Add(new CondensedArrayConverter());
+			var json = JsonConvert.SerializeObject(map, jsonSettings);
+			File.WriteAllText(ProjectFile.File.FullName, json);
+			Pristine = true;
 		}
 	}
 
-	public class TileMap
+	public class CondensedArrayConverter : JsonConverter
 	{
-		public Size BaseTileSize = new Size(8, 8);
-		public Size AttributeSize = new Size(2, 2);
-		public Size ScreenSize = new Size(32, 30);
-		public int BitsPerPixel = 2;
-		public int Colors { get { return (int)Math.Pow(2, BitsPerPixel); } }
-		public List<List<TileMapScreen>> Screens = new List<List<TileMapScreen>>();
-	}
-
-	public class TileMapScreen
-	{
-		public TileMapScreen(Size screenSize, Size tileSize)
+		public override bool CanConvert(Type objectType)
 		{
-			Tiles = new int[screenSize.Width * screenSize.Height];
-			Image = new Bitmap(screenSize.Width * tileSize.Width, screenSize.Height * tileSize.Height);
+			return objectType == typeof(int[]);
 		}
 
-		public Bitmap Image;
-		public int[] Tiles;
+		public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+		{
+			throw new NotImplementedException();
+		}
+
+		public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+		{
+			writer.WriteRawValue(JsonConvert.SerializeObject(value, Formatting.None));
+		}
 	}
 }
