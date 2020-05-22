@@ -152,8 +152,11 @@ namespace Brewmaster
 
 			if (editorTab != null && editorTab.ToolBar != null)
 			{
+				_buildToolStrip.Visible = false;
+				editorTab.ToolBar.Visible = true;
 				toolstrippanel.Controls.Add(editorTab.ToolBar);
 			}
+			else _buildToolStrip.Visible = true;
 
 			UpdateTabListInWindowMenu();
 		}

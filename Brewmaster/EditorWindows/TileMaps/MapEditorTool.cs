@@ -10,7 +10,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 		public abstract void EyeDrop(int x, int y, TileMapScreen screen);
 	}
 
-	public class TilePen : MapEditorTool
+	public class TilePen : MapEditorTool, IPaletteTool
 	{
 		public event Action SelectedTileChanged;
 		private int _selectedTile;
@@ -38,11 +38,41 @@ namespace Brewmaster.EditorWindows.TileMaps
 		public override void Paint(int x, int y, TileMapScreen screen)
 		{
 			screen.PrintTile(x, y, SelectedTile);
+			screen.SetColorTile(x, y, GetSelectedPalette());
 		}
 
 		public override void EyeDrop(int x, int y, TileMapScreen screen)
 		{
 			SelectedTile = screen.GetTile(x, y);
+			SetSelectedPalette(screen.GetColorTile(x, y));
 		}
+		public Func<int> GetSelectedPalette { get; set; }
+		public Action<int> SetSelectedPalette { get; set; }
+	}
+
+	public class PalettePen : MapEditorTool, IPaletteTool
+	{
+		public PalettePen(Size attributeSize)
+		{
+			Size = attributeSize;
+		}
+		public override void Paint(int x, int y, TileMapScreen screen)
+		{
+			screen.SetColorAttribute(x, y, GetSelectedPalette());
+		}
+
+		public override void EyeDrop(int x, int y, TileMapScreen screen)
+		{
+			SetSelectedPalette(screen.GetColorAttribute(x, y));
+		}
+
+		public Func<int> GetSelectedPalette { get; set; }
+		public Action<int> SetSelectedPalette { get; set; }
+	}
+
+	public interface IPaletteTool
+	{
+		Func<int> GetSelectedPalette { get; set; }
+		Action<int> SetSelectedPalette { get; set; }
 	}
 }

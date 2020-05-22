@@ -41,14 +41,12 @@ namespace Brewmaster
 			System.Windows.Forms.ToolStripSeparator toolStripSeparator26;
 			System.Windows.Forms.ToolStripSeparator toolStripSeparator30;
 			System.Windows.Forms.ToolStripSeparator toolStripSeparator22;
-			System.Windows.Forms.ToolStripSeparator toolStripSeparator31;
 			System.Windows.Forms.ToolStripSeparator toolStripSeparator16;
 			System.Windows.Forms.ToolStripSeparator toolStripSeparator19;
 			System.Windows.Forms.ToolStripSeparator toolStripSeparator23;
 			System.Windows.Forms.ToolStripSeparator toolStripSeparator13;
 			System.Windows.Forms.ToolStripSeparator toolStripSeparator27;
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
-			this.editorTabs = new Brewmaster.EditorWindows.EditorTabs();
 			this.MainWindowMenu = new System.Windows.Forms.MenuStrip();
 			this.FileMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.File_NewMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -109,6 +107,8 @@ namespace Brewmaster
 			this.toolStripSeparator17 = new System.Windows.Forms.ToolStripSeparator();
 			this.viewLineNumbersMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.lineAddressMappingsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.toolStripSeparator15 = new System.Windows.Forms.ToolStripSeparator();
+			this.resetLayoutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.toolStripSeparator18 = new System.Windows.Forms.ToolStripSeparator();
 			this.BuildMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.buildProjectMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -169,6 +169,7 @@ namespace Brewmaster
 			this.cutToolStripButton = new System.Windows.Forms.ToolStripButton();
 			this.copyToolStripButton = new System.Windows.Forms.ToolStripButton();
 			this.pasteToolStripButton = new System.Windows.Forms.ToolStripButton();
+			this._buildToolStrip = new System.Windows.Forms.ToolStrip();
 			this.configurationSelector = new System.Windows.Forms.ToolStripComboBox();
 			this.buildSettings = new System.Windows.Forms.ToolStripButton();
 			this.build = new System.Windows.Forms.ToolStripButton();
@@ -216,10 +217,9 @@ namespace Brewmaster
 			this.OpenProjectFileDialog = new System.Windows.Forms.OpenFileDialog();
 			this.OpenFilesFileDialog = new System.Windows.Forms.OpenFileDialog();
 			this.CreateNewFileDialog = new System.Windows.Forms.SaveFileDialog();
-			this.MainEastContainer2 = new MultiSplitContainer();
+			this.editorTabs = new Brewmaster.EditorWindows.EditorTabs();
+			this.MainEastContainer2 = new Brewmaster.Layout.MultiSplitContainer();
 			this._menuHelper = new Brewmaster.Modules.MenuHelper(this.components);
-			this.toolStripSeparator15 = new System.Windows.Forms.ToolStripSeparator();
-			this.resetLayoutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			availableIdePanels = new System.Windows.Forms.Panel();
 			toolStripSeparator14 = new System.Windows.Forms.ToolStripSeparator();
 			toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
@@ -227,7 +227,6 @@ namespace Brewmaster
 			toolStripSeparator26 = new System.Windows.Forms.ToolStripSeparator();
 			toolStripSeparator30 = new System.Windows.Forms.ToolStripSeparator();
 			toolStripSeparator22 = new System.Windows.Forms.ToolStripSeparator();
-			toolStripSeparator31 = new System.Windows.Forms.ToolStripSeparator();
 			toolStripSeparator16 = new System.Windows.Forms.ToolStripSeparator();
 			toolStripSeparator19 = new System.Windows.Forms.ToolStripSeparator();
 			toolStripSeparator23 = new System.Windows.Forms.ToolStripSeparator();
@@ -237,6 +236,7 @@ namespace Brewmaster
 			this.MainWindowMenu.SuspendLayout();
 			this.toolstrippanel.SuspendLayout();
 			this.MainToolStrip.SuspendLayout();
+			this._buildToolStrip.SuspendLayout();
 			this.statusBar.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -248,21 +248,6 @@ namespace Brewmaster
 			availableIdePanels.Size = new System.Drawing.Size(856, 450);
 			availableIdePanels.TabIndex = 3;
 			availableIdePanels.Visible = false;
-			// 
-			// editorTabs
-			// 
-			this.editorTabs.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.editorTabs.DrawMode = System.Windows.Forms.TabDrawMode.OwnerDrawFixed;
-			this.editorTabs.HotTrack = true;
-			this.editorTabs.Location = new System.Drawing.Point(0, 0);
-			this.editorTabs.Name = "editorTabs";
-			this.editorTabs.Padding = new System.Drawing.Point(30, 4);
-			this.editorTabs.SelectedIndex = 0;
-			this.editorTabs.ShowToolTips = true;
-			this.editorTabs.Size = new System.Drawing.Size(856, 450);
-			this.editorTabs.TabIndex = 0;
-			this.editorTabs.TextColor = System.Drawing.Color.Navy;
-			this.editorTabs.TextColorInactive = System.Drawing.Color.Navy;
 			// 
 			// toolStripSeparator14
 			// 
@@ -293,11 +278,6 @@ namespace Brewmaster
 			// 
 			toolStripSeparator22.Name = "toolStripSeparator22";
 			toolStripSeparator22.Size = new System.Drawing.Size(6, 25);
-			// 
-			// toolStripSeparator31
-			// 
-			toolStripSeparator31.Name = "toolStripSeparator31";
-			toolStripSeparator31.Size = new System.Drawing.Size(6, 25);
 			// 
 			// toolStripSeparator16
 			// 
@@ -822,6 +802,18 @@ namespace Brewmaster
 			this.lineAddressMappingsMenuItem.Text = "Line &Address Mappings";
 			this.lineAddressMappingsMenuItem.Click += new System.EventHandler(this.lineAddressMappingsMenuItem_Click);
 			// 
+			// toolStripSeparator15
+			// 
+			this.toolStripSeparator15.Name = "toolStripSeparator15";
+			this.toolStripSeparator15.Size = new System.Drawing.Size(194, 6);
+			// 
+			// resetLayoutToolStripMenuItem
+			// 
+			this.resetLayoutToolStripMenuItem.Name = "resetLayoutToolStripMenuItem";
+			this.resetLayoutToolStripMenuItem.Size = new System.Drawing.Size(197, 22);
+			this.resetLayoutToolStripMenuItem.Text = "&Reset Layout";
+			this.resetLayoutToolStripMenuItem.Click += new System.EventHandler(this.resetLayoutToolStripMenuItem_Click);
+			// 
 			// toolStripSeparator18
 			// 
 			this.toolStripSeparator18.Name = "toolStripSeparator18";
@@ -1275,6 +1267,7 @@ namespace Brewmaster
 			// 
 			this.toolstrippanel.BackColor = System.Drawing.SystemColors.MenuBar;
 			this.toolstrippanel.Controls.Add(this.MainToolStrip);
+			this.toolstrippanel.Controls.Add(this._buildToolStrip);
 			this.toolstrippanel.Dock = System.Windows.Forms.DockStyle.Top;
 			this.toolstrippanel.Location = new System.Drawing.Point(0, 24);
 			this.toolstrippanel.Name = "toolstrippanel";
@@ -1295,29 +1288,11 @@ namespace Brewmaster
             toolStripSeparator22,
             this.cutToolStripButton,
             this.copyToolStripButton,
-            this.pasteToolStripButton,
-            toolStripSeparator31,
-            this.configurationSelector,
-            this.buildSettings,
-            toolStripSeparator16,
-            this.build,
-            this.runNewBuild,
-            this.continueWithNewBuild,
-            this.run,
-            this.pause,
-            this.stop,
-            this.restart,
-            toolStripSeparator19,
-            this.flashCartridge,
-            toolStripSeparator23,
-            this.stepOver,
-            this.stepInto,
-            this.stepOut,
-            this.stepBack});
+            this.pasteToolStripButton});
 			this.MainToolStrip.Location = new System.Drawing.Point(0, 0);
 			this.MainToolStrip.Name = "MainToolStrip";
 			this.MainToolStrip.RenderMode = System.Windows.Forms.ToolStripRenderMode.Professional;
-			this.MainToolStrip.Size = new System.Drawing.Size(654, 25);
+			this.MainToolStrip.Size = new System.Drawing.Size(231, 25);
 			this.MainToolStrip.TabIndex = 0;
 			// 
 			// newProjectToolStripButton
@@ -1410,6 +1385,33 @@ namespace Brewmaster
 			this.pasteToolStripButton.Size = new System.Drawing.Size(23, 22);
 			this.pasteToolStripButton.Text = "Paste";
 			this.pasteToolStripButton.Click += new System.EventHandler(this.Paste_ToolStripButton_Click);
+			// 
+			// _buildToolStrip
+			// 
+			this._buildToolStrip.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
+			this._buildToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.configurationSelector,
+            this.buildSettings,
+            toolStripSeparator16,
+            this.build,
+            this.runNewBuild,
+            this.continueWithNewBuild,
+            this.run,
+            this.pause,
+            this.stop,
+            this.restart,
+            toolStripSeparator19,
+            this.flashCartridge,
+            toolStripSeparator23,
+            this.stepOver,
+            this.stepInto,
+            this.stepOut,
+            this.stepBack});
+			this._buildToolStrip.Location = new System.Drawing.Point(231, 0);
+			this._buildToolStrip.Name = "_buildToolStrip";
+			this._buildToolStrip.Size = new System.Drawing.Size(420, 25);
+			this._buildToolStrip.TabIndex = 1;
+			this._buildToolStrip.Text = "toolStrip1";
 			// 
 			// configurationSelector
 			// 
@@ -1753,6 +1755,21 @@ namespace Brewmaster
 			this.CreateNewFileDialog.OverwritePrompt = false;
 			this.CreateNewFileDialog.Title = "Save File";
 			// 
+			// editorTabs
+			// 
+			this.editorTabs.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.editorTabs.DrawMode = System.Windows.Forms.TabDrawMode.OwnerDrawFixed;
+			this.editorTabs.HotTrack = true;
+			this.editorTabs.Location = new System.Drawing.Point(0, 0);
+			this.editorTabs.Name = "editorTabs";
+			this.editorTabs.Padding = new System.Drawing.Point(30, 4);
+			this.editorTabs.SelectedIndex = 0;
+			this.editorTabs.ShowToolTips = true;
+			this.editorTabs.Size = new System.Drawing.Size(856, 450);
+			this.editorTabs.TabIndex = 0;
+			this.editorTabs.TextColor = System.Drawing.Color.Navy;
+			this.editorTabs.TextColorInactive = System.Drawing.Color.Navy;
+			// 
 			// MainEastContainer2
 			// 
 			this.MainEastContainer2.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -1762,18 +1779,6 @@ namespace Brewmaster
 			this.MainEastContainer2.Size = new System.Drawing.Size(1287, 489);
 			this.MainEastContainer2.TabIndex = 1;
 			this.MainEastContainer2.Text = "multiSplitContainer2";
-			// 
-			// toolStripSeparator15
-			// 
-			this.toolStripSeparator15.Name = "toolStripSeparator15";
-			this.toolStripSeparator15.Size = new System.Drawing.Size(194, 6);
-			// 
-			// resetLayoutToolStripMenuItem
-			// 
-			this.resetLayoutToolStripMenuItem.Name = "resetLayoutToolStripMenuItem";
-			this.resetLayoutToolStripMenuItem.Size = new System.Drawing.Size(197, 22);
-			this.resetLayoutToolStripMenuItem.Text = "&Reset Layout";
-			this.resetLayoutToolStripMenuItem.Click += new System.EventHandler(this.resetLayoutToolStripMenuItem_Click);
 			// 
 			// MainForm
 			// 
@@ -1799,6 +1804,8 @@ namespace Brewmaster
 			this.toolstrippanel.PerformLayout();
 			this.MainToolStrip.ResumeLayout(false);
 			this.MainToolStrip.PerformLayout();
+			this._buildToolStrip.ResumeLayout(false);
+			this._buildToolStrip.PerformLayout();
 			this.statusBar.ResumeLayout(false);
 			this.statusBar.PerformLayout();
 			this.ResumeLayout(false);
@@ -1980,6 +1987,7 @@ namespace Brewmaster
 		private ToolStripMenuItem goToAllMenuItem;
 		private ToolStripSeparator toolStripSeparator15;
 		private ToolStripMenuItem resetLayoutToolStripMenuItem;
+		private ToolStrip _buildToolStrip;
 	}
 }
 

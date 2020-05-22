@@ -6,9 +6,12 @@ namespace Brewmaster.Modules.Ppu
 
 	public class ConsolePaletteViewer : PaletteViewer
 	{
-		public ConsolePaletteViewer(Events events)
+		public ConsolePaletteViewer()
 		{
 			Columns = 16;
+		}
+		public ConsolePaletteViewer(Events events) : this()
+		{
 
 			// TODO configurable palettes:
 			/*ColorClicked += index =>

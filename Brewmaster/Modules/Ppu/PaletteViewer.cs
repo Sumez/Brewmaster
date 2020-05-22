@@ -7,21 +7,24 @@ namespace Brewmaster.Modules.Ppu
 	public class PaletteViewer : Control
 	{
 		private Palette _palette;
-		protected int HoverIndex { get; private set; }
+		public int HoverIndex { get; private set; }
 		public int Columns { get; set; }
 		public int CellHeight { get; set; }
 		public int CellWidth { get; set; }
+		public bool AllowHover { get; set; }
 
-		protected event Action<int> ColorClicked;
+		public event Action<int> ColorClicked;
 
 		public PaletteViewer()
 		{
+			AllowHover = true;
 			HoverIndex = -1;
 			CellWidth = 20;
 			CellHeight = 20;
 			DoubleBuffered = true;
 			Font = new Font("Consolas", 12, FontStyle.Bold, GraphicsUnit.Pixel);
 			Layout += (s, a) => FitSize();
+			SetStyle(ControlStyles.Selectable, true);
 		}
 
 		public Palette Palette
@@ -67,7 +70,7 @@ namespace Brewmaster.Modules.Ppu
 				DrawColor(e.Graphics, i, CellWidth * (i % Columns), CellHeight * (i / Columns));
 			}
 
-			if (HoverIndex >= 0)
+			if (HoverIndex >= 0 && AllowHover)
 			{
 				var i = HoverIndex;
 				e.Graphics.DrawRectangle(Pens.White, CellWidth * (i % Columns), CellHeight * (i / Columns), CellWidth - 1, CellHeight - 1);

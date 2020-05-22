@@ -1,14 +1,26 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
+using Brewmaster.Modules.Ppu;
 using Brewmaster.ProjectModel;
 
 namespace Brewmaster.EditorWindows.TileMaps
 {
 	public class TilePalette : Control
 	{
-		public List<Color> Palette { get; set; }
+		public event Action UserSelectedTile;
+		public Palette Palette
+		{
+			get { return _palette; }
+			set
+			{
+				_palette = value;
+				RefreshImage();
+			}
+		}
+
 		public int Zoom
 		{
 			get { return _zoom; }
@@ -52,6 +64,9 @@ namespace Brewmaster.EditorWindows.TileMaps
 		private int _zoom;
 		private Bitmap _grid;
 		private int _selectedTile = -1;
+		private int _hoverTile = -1;
+		private Palette _palette;
+		private SolidBrush _solidBrush;
 
 		public byte[] ChrData
 		{
@@ -71,18 +86,50 @@ namespace Brewmaster.EditorWindows.TileMaps
 				Invalidate();
 			}
 		}
+		protected int HoverTile
+		{
+			get { return _hoverTile; }
+			set
+			{
+				if (_hoverTile == value) return;
+				_hoverTile = value;
+				Invalidate();
+			}
+		}
+
+		protected override void OnMouseMove(MouseEventArgs e)
+		{
+			var x = e.Location.X / (8 * _zoom);
+			var y = e.Location.Y / (8 * _zoom);
+
+			if (x < 0 || x >= 16 || y < 0 || y >= 16) HoverTile = -1;
+			else HoverTile = y * 16 + x;
+			base.OnMouseMove(e);
+		}
+
+		protected override void OnMouseLeave(EventArgs e)
+		{
+			HoverTile = -1;
+			base.OnMouseLeave(e);
+		}
+
+		protected override void OnMouseDown(MouseEventArgs e)
+		{
+			if (HoverTile >= 0)
+			{
+				SelectedTile = HoverTile;
+				if (UserSelectedTile != null) UserSelectedTile();
+			}
+			base.OnMouseDown(e);
+		}
 
 		public TilePalette()
 		{
 			DoubleBuffered = true;
-			Palette = new List<Color>(new [] { Color.Blue, Color.DarkGray, Color.Brown, Color.Black });
-			/*Palette = new List<Color>(new[] { Color.Black,
-				Color.SaddleBrown, Color.Brown, Color.Red, Color.Orange,
-				Color.DarkSlateGray, Color.DarkCyan, Color.DodgerBlue, Color.Cyan,
-				Color.DarkBlue, Color.DodgerBlue, Color.DeepSkyBlue, Color.LightSeaGreen, Color.SaddleBrown, Color.SandyBrown, Color.Bisque
-			});*/
+			Palette = new Palette { Colors = new List<Color>(new [] { Color.Blue, Color.DarkGray, Color.Brown, Color.Black }) };
 			var gridColor = Color.FromArgb(128, 255, 255, 255);
 			_solid = new Pen(gridColor, 1);
+			_solidBrush = new SolidBrush(gridColor);
 			Zoom = 2;
 		}
 
@@ -90,7 +137,8 @@ namespace Brewmaster.EditorWindows.TileMaps
 		{
 			using (var graphics = Graphics.FromImage(_image))
 			{
-				graphics.Clear(Palette[0]);
+				graphics.Clear(Palette.Colors[0]);
+				if (ChrData == null) return;
 
 				for (var i = 0; i < 256; i++)
 				{
@@ -106,7 +154,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 		public Bitmap GetTileImage(int index)
 		{
-			return GetTileImage(ChrData, index, Palette);
+			return GetTileImage(ChrData, index, Palette.Colors);
 		}
 
 		public static Bitmap GetTileImage(byte[] data, int index, List<Color> palette, int bitDepth = 2, ProjectType projectType = ProjectType.Nes)
@@ -154,14 +202,20 @@ namespace Brewmaster.EditorWindows.TileMaps
 			e.Graphics.CompositingMode = CompositingMode.SourceOver;
 			e.Graphics.PixelOffsetMode = PixelOffsetMode.None;
 			e.Graphics.DrawImageUnscaled(_grid, 0, 0);
-
+			if (_hoverTile >= 0)
+			{
+				var x = _hoverTile % 16;
+				var y = _hoverTile / 16;
+				e.Graphics.FillRectangle(_solidBrush, x * 8 * Zoom, y * 8 * Zoom, 8 * Zoom, 8 * Zoom);
+			}
+			
 			e.Graphics.CompositingMode = CompositingMode.SourceCopy;
 			if (_selectedTile >= 0)
 			{
 				var x = _selectedTile % 16;
 				var y = _selectedTile / 16;
-				e.Graphics.DrawRectangle(Pens.Black, x * 8 * Zoom, y * 8 * Zoom, 8 * Zoom, 8 * Zoom);
-				e.Graphics.DrawRectangle(Pens.White, x * 8 * Zoom + 1, y * 8 * Zoom + 1, 8 * Zoom - 2, 8 * Zoom - 2);
+				e.Graphics.DrawRectangle(Pens.White, x * 8 * Zoom, y * 8 * Zoom, 8 * Zoom, 8 * Zoom);
+				e.Graphics.DrawRectangle(Pens.Black, x * 8 * Zoom + 1, y * 8 * Zoom + 1, 8 * Zoom - 2, 8 * Zoom - 2);
 			}
 		}
 	}

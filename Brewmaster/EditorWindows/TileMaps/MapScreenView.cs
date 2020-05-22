@@ -18,8 +18,8 @@ namespace Brewmaster.EditorWindows.TileMaps
 		private Pen _solid;
 		private Pen _dashed;
 		private Bitmap _grid;
-		private int _cursorX;
-		private int _cursorY;
+		private int _cursorX = -1;
+		private int _cursorY = -1;
 		private bool _mouseDown;
 		private SolidBrush _toolBrush;
 
@@ -173,7 +173,9 @@ namespace Brewmaster.EditorWindows.TileMaps
 		public void RefreshTile(int x, int y, TilePalette tilePalette)
 		{
 			var index = y * _map.ScreenSize.Width + x;
-			using (var tile = tilePalette.GetTileImage(_screen.Tiles[index]))
+			var attributeIndex = (y / _map.AttributeSize.Height) * (_map.ScreenSize.Width / _map.AttributeSize.Width) + (x / _map.AttributeSize.Width);
+			var paletteIndex = _screen.ColorAttributes[attributeIndex];
+			using (var tile = TilePalette.GetTileImage(tilePalette.ChrData, _screen.Tiles[index], _map.Palettes[paletteIndex].Colors))
 			{
 				if (tile == null) return;
 				using (var graphics = Graphics.FromImage(_screen.Image))
