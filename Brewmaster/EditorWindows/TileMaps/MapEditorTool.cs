@@ -5,6 +5,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 {
 	public abstract class MapEditorTool {
 		public virtual Size Size { get; protected set; }
+		public Image Image { get; set; }
 
 		public abstract void Paint(int x, int y, TileMapScreen screen);
 		public abstract void EyeDrop(int x, int y, TileMapScreen screen);
@@ -43,8 +44,8 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 		public override void EyeDrop(int x, int y, TileMapScreen screen)
 		{
-			SelectedTile = screen.GetTile(x, y);
 			SetSelectedPalette(screen.GetColorTile(x, y));
+			SelectedTile = screen.GetTile(x, y);
 		}
 		public Func<int> GetSelectedPalette { get; set; }
 		public Action<int> SetSelectedPalette { get; set; }

@@ -19,12 +19,15 @@ namespace Brewmaster.EditorWindows.TileMaps
 		protected static MapEditorToolBar MapEditorToolBar = new MapEditorToolBar();
 		private MapScreenView _screenView;
 		private TilePalette _tilePalette;
-		private int _zoom = 2;
+		private MapOverview _mapOverview;
 		private ColorPaletteView _colorPalette;
 		public override ToolStrip ToolBar { get { return MapEditorToolBar; } }
+		public MapEditorState State { get; set; }
+
 
 		public MapEditorWindow(MainForm form, AsmProjectFile file, Events events) : base(form, file, events)
 		{
+			State = new MapEditorState();
 			var json = File.ReadAllText(ProjectFile.File.FullName);
 			var map = JsonConvert.DeserializeObject<SerializableTileMap>(json, new JsonSerializerSettings { ContractResolver = new CamelCasePropertyNamesContractResolver() });
 			if (map != null)
@@ -39,7 +42,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 			else
 			{
 				Map = new TileMap();
-				Map.Screens.Add(new List<TileMapScreen>(new[] { new TileMapScreen(Map.ScreenSize, Map.BaseTileSize, Map.AttributeSize) }));
+				Map.Screens.Add(new List<TileMapScreen>(new[] { new TileMapScreen(Map) }));
 			}
 
 			var paletteBase = 1;
@@ -58,53 +61,96 @@ namespace Brewmaster.EditorWindows.TileMaps
 			}
 
 
-			foreach (var screen in Map.Screens.SelectMany(l => l))
-			{
-				screen.TileChanged += (x, y) => Pristine = false;
-			}
-			FocusedScreen = Map.Screens[0][0];
+			State.Palette = Map.Palettes[0];
 
-			_tilePalette = new TilePalette { Width = 256, Height = 256, Top = 0, Left = Width - 256 };
+			_mapOverview = new MapOverview(Map);
+			_mapOverview.MapSizeChanged += () => { Pristine = false; };
+			_mapOverview.ActivateScreen = ActivateScreen;
+
+			_tilePalette = new TilePalette(State) { Width = 256, Height = 256, Top = 0, Left = Width - 256 };
 			_tilePalette.Anchor = AnchorStyles.Top | AnchorStyles.Right;
 			//Controls.Add(_tilePalette);
-			_tilePalette.Palette = Map.Palettes[0];
 			_tilePalette.UserSelectedTile += SelectTilePen;
 
 			_colorPalette = new ColorPaletteView(Map.Palettes) { Width = 256, Height = 40 };
 			_colorPalette.Dock = DockStyle.Bottom;
 			Controls.Add(_colorPalette);
-			_colorPalette.SelectedPaletteChanged += (paletteIndex) => _tilePalette.Palette = Map.Palettes[paletteIndex];
+			_colorPalette.SelectedPaletteChanged += (paletteIndex) =>
+			{
+				State.Palette = Map.Palettes[paletteIndex];
+				SetToolImage(_screenView.Tool as TilePen);
+			};
 			_colorPalette.PalettesChanged += () =>
 			{
-				_tilePalette.Palette = _tilePalette.Palette;
-				_screenView.RefreshAllTiles(_tilePalette);
+				State.OnPaletteChanged();
+				_screenView.RefreshAllTiles();
+				SetToolImage(_screenView.Tool as TilePen);
 				Pristine = false;
 			};
 
-			_screenView = new MapScreenView(Map, FocusedScreen) { Dock = DockStyle.Fill, Zoom = _zoom, TilePalette = _tilePalette };
-			Controls.Add(_screenView);
-			_screenView.ContextMenu = new ContextMenu();
-
 			form.LayoutHandler.ShowPanel(new IdePanel(_tilePalette) { Label = "CHR Tiles" });
 			//form.LayoutHandler.ShowPanel(new IdePanel(_colorPalette) { Label = "Tile Map Palettes" });
+			form.LayoutHandler.ShowPanel(new IdePanel(_mapOverview) { Label = "Map Overview" });
 
 			LoadChrSource();
 			SelectTilePen();
+
+			foreach (var screen in Map.Screens.SelectMany(l => l).Where(s => s != null)) InitScreen(screen);
+			ActivateScreen(0, 0);
+		}
+
+		private void ActivateScreen(int x, int y)
+		{
+			while (y >= Map.Screens.Count) Map.Screens.Add(new List<TileMapScreen>());
+			while (x >= Map.Screens[y].Count) Map.Screens[y].Add(null);
+
+			if (Map.Screens[y][x] == null)
+			{
+				Map.Screens[y][x] = new TileMapScreen(Map);
+				InitScreen(Map.Screens[y][x]);
+			}
+			FocusedScreen = Map.Screens[y][x];
+			if (_screenView != null)
+			{
+				Controls.Remove(_screenView);
+			}
+			_screenView = new MapScreenView(Map, FocusedScreen, State) { Dock = DockStyle.Fill };
+			_screenView.ContextMenu = new ContextMenu();
+			_screenView.RefreshAllTiles();
+			Controls.Add(_screenView);
+
+		}
+
+		private void InitScreen(TileMapScreen screen)
+		{
+			screen.TileChanged += (x, y) => { Pristine = false; };
+			screen.RefreshAllTiles(State);
 		}
 
 		private void SelectTilePen()
 		{
 			var tool = new TilePen();
-			if (_tilePalette.SelectedTile >= 0) tool.SelectedTile = _tilePalette.SelectedTile;
-			_screenView.Tool = tool;
-			tool.SelectedTileChanged += () => { _tilePalette.SelectedTile = tool.SelectedTile; };
-			_tilePalette.SelectedTile = tool.SelectedTile;
+			State.Tool = tool;
+			tool.SelectedTileChanged += () =>
+			{
+				_tilePalette.SelectedTile = tool.SelectedTile;
+				SetToolImage(tool);
+			};
+			tool.SelectedTile = _tilePalette.SelectedTile >= 0 ? _tilePalette.SelectedTile : 0;
 			InitPaletteTool(tool);
 		}
+
+		private void SetToolImage(TilePen tool)
+		{
+			if (tool == null) return;
+			if (tool.Image != null) tool.Image.Dispose();
+			tool.Image = TilePalette.GetTileImage(State.ChrData, tool.SelectedTile, Map.Palettes[_colorPalette.SelectedPaletteIndex].Colors);
+		}
+
 		private void SelectPalettePen()
 		{
 			var tool = new PalettePen(Map.AttributeSize);
-			_screenView.Tool = tool;
+			State.Tool = tool;
 			InitPaletteTool(tool);
 		}
 
@@ -121,9 +167,9 @@ namespace Brewmaster.EditorWindows.TileMaps
 			{
 				var data = new byte[stream.Length];
 				stream.Read(data, 0, data.Length);
-				_tilePalette.ChrData = data;
+				State.ChrData = data;
 			}
-			_screenView.RefreshAllTiles(_tilePalette);
+			if (_screenView != null) _screenView.RefreshAllTiles();
 		}
 
 		public TileMapScreen FocusedScreen { get; set; }
@@ -168,11 +214,12 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 		protected override void OnMouseWheel(MouseEventArgs e)
 		{
-			if (e.Delta > 0) _zoom++;
-			else _zoom--;
-			if (_zoom < 1) _zoom = 1;
-			if (_zoom > 50) _zoom = 50;
-			_screenView.Zoom = _zoom;
+			var zoom = State.Zoom;
+			if (e.Delta > 0) zoom++;
+			else zoom--;
+			if (zoom < 1) zoom = 1;
+			if (zoom > 20) zoom = 20;
+			State.Zoom = zoom;
 		}
 
 		private void ImportImage()
@@ -235,4 +282,58 @@ namespace Brewmaster.EditorWindows.TileMaps
 			writer.WriteRawValue(JsonConvert.SerializeObject(value, Formatting.None));
 		}
 	}
+
+	public class MapEditorState
+	{
+		private MapEditorTool _tool;
+		private byte[] _chrData;
+		private Palette _palette;
+		private int _zoom = 2;
+
+		public MapEditorTool Tool
+		{
+			get { return _tool; }
+			set { _tool = value; OnToolChanged(); }
+		}
+		public byte[] ChrData
+		{
+			get { return _chrData; }
+			set { _chrData = value; OnChrDataChanged(); }
+		}
+
+		public Palette Palette
+		{
+			get { return _palette; }
+			set { _palette = value; OnPaletteChanged(); }
+		}
+
+		public int Zoom
+		{
+			get { return _zoom; }
+			set { _zoom = value; OnZoomChanged(); }
+		}
+
+
+		public event Action PaletteChanged;
+		public event Action ChrDataChanged;
+		public event Action ToolChanged;
+		public event Action ZoomChanged;
+		public void OnPaletteChanged()
+		{
+			if (PaletteChanged != null) PaletteChanged();
+		}
+		public void OnChrDataChanged()
+		{
+			if (ChrDataChanged != null) ChrDataChanged();
+		}
+		public void OnToolChanged()
+		{
+			if (ToolChanged != null) ToolChanged();
+		}
+		public void OnZoomChanged()
+		{
+			if (ZoomChanged != null) ZoomChanged();
+		}
+	}
+
 }

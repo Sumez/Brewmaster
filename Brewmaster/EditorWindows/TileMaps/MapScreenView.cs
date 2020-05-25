@@ -8,12 +8,10 @@ namespace Brewmaster.EditorWindows.TileMaps
 {
 	public class MapScreenView : Control
 	{
-		public MapEditorTool Tool { get; set; }
-		public TilePalette TilePalette { get; set; }
+		public MapEditorTool Tool { get { return _state.Tool; } }
 
 		private readonly TileMap _map;
 		private TileMapScreen _screen;
-		private int _zoom;
 		private Pen _dotted;
 		private Pen _solid;
 		private Pen _dashed;
@@ -22,11 +20,13 @@ namespace Brewmaster.EditorWindows.TileMaps
 		private int _cursorY = -1;
 		private bool _mouseDown;
 		private SolidBrush _toolBrush;
+		private MapEditorState _state;
 
-		public MapScreenView(TileMap map, TileMapScreen screen)
+		public MapScreenView(TileMap map, TileMapScreen screen, MapEditorState state)
 		{
 			_map = map;
 			_screen = screen;
+			_state = state;
 
 			DoubleBuffered = true;
 
@@ -43,12 +43,10 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 			_toolBrush = new SolidBrush(Color.FromArgb(128, 255, 255, 255));
 
-			Zoom = 2;
+			_state.ZoomChanged += RefreshView;
+			RefreshView();
 
-			_screen.TileChanged += (x, y) =>
-			{
-				RefreshTile(x, y, TilePalette);
-			};
+			_screen.TileChanged += RefreshTile;
 
 			var mouseHandler = new OsFeatures.GlobalMouseHandler();
 			mouseHandler.MouseUp += MouseButtonUp;
@@ -58,6 +56,21 @@ namespace Brewmaster.EditorWindows.TileMaps
 				mouseHandler.MouseUp -= MouseButtonUp;
 				Application.RemoveMessageFilter(mouseHandler);
 			};
+		}
+
+		protected override void Dispose(bool disposing)
+		{
+			_state.ZoomChanged -= RefreshView;
+			base.Dispose(disposing);
+		}
+
+		private void RefreshView()
+		{
+			var width = _map.ScreenSize.Width * _map.BaseTileSize.Width * Zoom;
+			var height = _map.ScreenSize.Height * _map.BaseTileSize.Height * Zoom;
+			if (Width != width || Height != height) Size = new Size(width, height);
+			GenerateGrid();
+			Invalidate();
 		}
 
 		private bool MouseButtonUp(Point location)
@@ -139,15 +152,8 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 		public int Zoom
 		{
-			get { return _zoom; }
-			set
-			{
-				_zoom = value;
-				GenerateGrid();
-				Invalidate();
-			}
+			get { return _state.Zoom; }
 		}
-
 		protected override void OnPaint(PaintEventArgs e)
 		{
 			base.OnPaint(e);
@@ -157,44 +163,36 @@ namespace Brewmaster.EditorWindows.TileMaps
 			e.Graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
 			e.Graphics.DrawImage(_screen.Image, new Rectangle(0, 0, _screen.Image.Width * Zoom, _screen.Image.Height * Zoom));
 
+			if (_cursorX >= 0 && _cursorY >= 0 && Tool.Image != null)
+			{
+				e.Graphics.DrawImage(Tool.Image, new Rectangle(_cursorX * ToolWidth, _cursorY * ToolHeight, Tool.Image.Width * Zoom, Tool.Image.Height * Zoom));
+			}
+
 			e.Graphics.CompositingMode = CompositingMode.SourceOver;
 			e.Graphics.PixelOffsetMode = PixelOffsetMode.None;
 			e.Graphics.DrawImageUnscaled(_grid, 0, 0);
 
 			if (_cursorX >= 0 && _cursorY >= 0)
 			{
-				e.Graphics.FillRectangle(_toolBrush, _cursorX * ToolWidth, _cursorY * ToolHeight, ToolWidth, ToolHeight);
+				if (Tool.Image == null) e.Graphics.FillRectangle(_toolBrush, _cursorX * ToolWidth, _cursorY * ToolHeight, ToolWidth, ToolHeight);
+				else e.Graphics.DrawRectangle(Pens.Black, _cursorX * ToolWidth, _cursorY * ToolHeight, ToolWidth, ToolHeight);
 			}
 		}
 
-		public int ToolWidth { get { return _map.BaseTileSize.Width * Tool.Size.Width * _zoom; } }
-		public int ToolHeight { get { return _map.BaseTileSize.Height * Tool.Size.Height * _zoom; } }
+		public int ToolWidth { get { return _map.BaseTileSize.Width * Tool.Size.Width * Zoom; } }
+		public int ToolHeight { get { return _map.BaseTileSize.Height * Tool.Size.Height * Zoom; } }
 
-		public void RefreshTile(int x, int y, TilePalette tilePalette)
+		public void RefreshTile(int x, int y)
 		{
-			var index = y * _map.ScreenSize.Width + x;
-			var attributeIndex = (y / _map.AttributeSize.Height) * (_map.ScreenSize.Width / _map.AttributeSize.Width) + (x / _map.AttributeSize.Width);
-			var paletteIndex = _screen.ColorAttributes[attributeIndex];
-			using (var tile = TilePalette.GetTileImage(tilePalette.ChrData, _screen.Tiles[index], _map.Palettes[paletteIndex].Colors))
-			{
-				if (tile == null) return;
-				using (var graphics = Graphics.FromImage(_screen.Image))
-				{
-					graphics.CompositingMode = CompositingMode.SourceCopy;
-					graphics.DrawImageUnscaled(tile, x * _map.BaseTileSize.Width, y * _map.BaseTileSize.Height);
-				}
-			}
+			_screen.RefreshTile(x, y, _state);
 			Invalidate();
 		}
 
 
-		public void RefreshAllTiles(TilePalette tilePalette)
+		public void RefreshAllTiles()
 		{
-			for (var x = 0; x < _map.ScreenSize.Width; x++)
-			for (var y = 0; y < _map.ScreenSize.Height; y++)
-			{
-				RefreshTile(x, y, tilePalette);
-			}
+			_screen.RefreshAllTiles(_state);
+			Invalidate();
 		}
 	}
 }

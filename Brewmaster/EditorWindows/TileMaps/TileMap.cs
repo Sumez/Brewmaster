@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Xml.Serialization;
 using Brewmaster.Modules.Ppu;
@@ -9,6 +10,9 @@ namespace Brewmaster.EditorWindows.TileMaps
 {
 	public class TileMap
 	{
+		public int Width = 1;
+		public int Height = 1;
+		public List<int> MetaTileResolutions = new List<int> {2, 4};
 		public List<Palette> Palettes = new List<Palette>();
 		public Size BaseTileSize = new Size(8, 8);
 		public Size AttributeSize = new Size(2, 2);
@@ -21,30 +25,42 @@ namespace Brewmaster.EditorWindows.TileMaps
 		{
 			return new SerializableTileMap
 			{
-				Width = Screens[0].Count,
-				Height = Screens.Count,
+				Width = Width,
+				Height = Height,
 				ScreenSize = ScreenSize,
 				AttributeSize = AttributeSize,
 				BitsPerPixel = BitsPerPixel,
-				Screens = Screens.SelectMany(l => l).Select(s => new SerializableScreen {Tiles = s.Tiles, ColorAttributes = s.ColorAttributes}).ToArray(),
+				Screens = GetScreenArray(),
 				Palettes = Palettes.Select(p => p.Colors).ToList()
 			};
+		}
+
+		private SerializableScreen[] GetScreenArray()
+		{
+			var screens = new SerializableScreen[Width * Height];
+			for (var y = 0; y < Height; y++)
+			for (var x = 0; x < Width; x++)
+			{
+				if (Screens.Count <= y || Screens[y].Count <= x || Screens[y][x] == null) continue;
+				screens[y * Width + x] = new SerializableScreen
+				{
+					Tiles = Screens[y][x].Tiles,
+					ColorAttributes = Screens[y][x].ColorAttributes
+				};
+			}
+			return screens;
 		}
 	}
 	public class TileMapScreen
 	{
-		private readonly Size _screenSize;
-		private readonly Size _tileSize;
-		private readonly Size _attributeSize;
+		private readonly TileMap _map;
 
-		public TileMapScreen(Size screenSize, Size tileSize, Size attributeSize)
+		public TileMapScreen(TileMap map)
 		{
-			_screenSize = screenSize;
-			_tileSize = tileSize;
-			_attributeSize = attributeSize;
-			Tiles = new int[screenSize.Width * screenSize.Height];
-			ColorAttributes = new int[(screenSize.Width / attributeSize.Width) * (screenSize.Height / attributeSize.Height)];
-			Image = new Bitmap(screenSize.Width * tileSize.Width, screenSize.Height * tileSize.Height);
+			_map = map;
+			Tiles = new int[map.ScreenSize.Width * map.ScreenSize.Height];
+			ColorAttributes = new int[(map.ScreenSize.Width / map.AttributeSize.Width) * (map.ScreenSize.Height / map.AttributeSize.Height)];
+			Image = new Bitmap(map.ScreenSize.Width * map.BaseTileSize.Width, map.ScreenSize.Height * map.BaseTileSize.Height);
 		}
 
 		public Bitmap Image;
@@ -54,39 +70,66 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 		public void PrintTile(int x, int y, int index)
 		{
-			Tiles[y * _screenSize.Width + x] = index;
+			Tiles[y * _map.ScreenSize.Width + x] = index;
 			if (TileChanged != null) TileChanged(x, y);
 		}
 
 		public int GetTile(int x, int y)
 		{
-			return Tiles[y * _screenSize.Width + x];
+			return Tiles[y * _map.ScreenSize.Width + x];
 		}
 
 		public void SetColorAttribute(int x, int y, int paletteIndex)
 		{
-			ColorAttributes[y * (_screenSize.Width / _attributeSize.Width) + x] = paletteIndex;
+			ColorAttributes[y * (_map.ScreenSize.Width / _map.AttributeSize.Width) + x] = paletteIndex;
 			
 			if (TileChanged == null) return;
-			for (var i = 0; i < _attributeSize.Width; i++)
-			for (var j = 0; j < _attributeSize.Height; j++)
+			for (var i = 0; i < _map.AttributeSize.Width; i++)
+			for (var j = 0; j < _map.AttributeSize.Height; j++)
 			{
-				TileChanged(x * _attributeSize.Width + i, y * _attributeSize.Height + j);
+				TileChanged(x * _map.AttributeSize.Width + i, y * _map.AttributeSize.Height + j);
 			}
 		}
 
 		public int GetColorAttribute(int x, int y)
 		{
-			return ColorAttributes[y * (_screenSize.Width / _attributeSize.Width) + x];
+			return ColorAttributes[y * (_map.ScreenSize.Width / _map.AttributeSize.Width) + x];
 		}
 
 		public void SetColorTile(int x, int y, int paletteIndex)
 		{
-			SetColorAttribute(x / _attributeSize.Width, y / _attributeSize.Height, paletteIndex);
+			SetColorAttribute(x / _map.AttributeSize.Width, y / _map.AttributeSize.Height, paletteIndex);
 		}
 		public int GetColorTile(int x, int y)
 		{
-			return GetColorAttribute(x / _attributeSize.Width, y / _attributeSize.Height);
+			return GetColorAttribute(x / _map.AttributeSize.Width, y / _map.AttributeSize.Height);
+		}
+
+		public void RefreshTile(int x, int y, MapEditorState state)
+		{
+			var index = y * _map.ScreenSize.Width + x;
+			var attributeIndex = (y / _map.AttributeSize.Height) * (_map.ScreenSize.Width / _map.AttributeSize.Width) + (x / _map.AttributeSize.Width);
+			var paletteIndex = ColorAttributes[attributeIndex];
+			using (var tile = TilePalette.GetTileImage(state.ChrData, Tiles[index], _map.Palettes[paletteIndex].Colors))
+			{
+				if (tile == null) return;
+				using (var graphics = Graphics.FromImage(Image))
+				{
+					graphics.CompositingMode = CompositingMode.SourceCopy;
+					graphics.DrawImageUnscaled(tile, x * _map.BaseTileSize.Width, y * _map.BaseTileSize.Height);
+				}
+			}
+
+		}
+
+		public void RefreshAllTiles(MapEditorState state)
+		{
+			for (var x = 0; x < _map.ScreenSize.Width; x++)
+			for (var y = 0; y < _map.ScreenSize.Height; y++)
+			{
+				RefreshTile(x, y, state);
+			}
+
 		}
 	}
 
@@ -106,6 +149,8 @@ namespace Brewmaster.EditorWindows.TileMaps
 		{
 			var map = new TileMap
 			{
+				Width = Width,
+				Height = Height,
 				ScreenSize = ScreenSize,
 				BitsPerPixel = BitsPerPixel,
 				AttributeSize = AttributeSize,
@@ -117,8 +162,14 @@ namespace Brewmaster.EditorWindows.TileMaps
 				map.Screens.Add(row);
 				for (var x = 0; x < Width; x++)
 				{
+					if (Screens.Length <= y * Width + x) break;
 					var screenSource = Screens[y * Width + x];
-					var screen = new TileMapScreen(ScreenSize, map.BaseTileSize, map.AttributeSize);
+					if (screenSource == null)
+					{
+						row.Add(null);
+						continue;
+					}
+					var screen = new TileMapScreen(map);
 					if (screenSource.Tiles != null) screen.Tiles = screenSource.Tiles;
 					if (screenSource.ColorAttributes != null) screen.ColorAttributes = screenSource.ColorAttributes;
 					row.Add(screen);

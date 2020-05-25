@@ -10,15 +10,11 @@ namespace Brewmaster.EditorWindows.TileMaps
 {
 	public class TilePalette : Control
 	{
+		private MapEditorState _state;
 		public event Action UserSelectedTile;
-		public Palette Palette
+		private Palette Palette
 		{
-			get { return _palette; }
-			set
-			{
-				_palette = value;
-				RefreshImage();
-			}
+			get { return _state.Palette; }
 		}
 
 		public int Zoom
@@ -59,7 +55,6 @@ namespace Brewmaster.EditorWindows.TileMaps
 		}
 
 		private Image _image = new Bitmap(128, 128);
-		private byte[] _chrData;
 		private Pen _solid;
 		private int _zoom;
 		private Bitmap _grid;
@@ -68,13 +63,9 @@ namespace Brewmaster.EditorWindows.TileMaps
 		private Palette _palette;
 		private SolidBrush _solidBrush;
 
-		public byte[] ChrData
+		private byte[] ChrData
 		{
-			get { return _chrData; }
-			set {
-				_chrData = value;
-				RefreshImage();
-			}
+			get { return _state.ChrData; }
 		}
 
 		public int SelectedTile
@@ -123,14 +114,17 @@ namespace Brewmaster.EditorWindows.TileMaps
 			base.OnMouseDown(e);
 		}
 
-		public TilePalette()
+		public TilePalette(MapEditorState state)
 		{
+			_state = state;
 			DoubleBuffered = true;
-			Palette = new Palette { Colors = new List<Color>(new [] { Color.Blue, Color.DarkGray, Color.Brown, Color.Black }) };
 			var gridColor = Color.FromArgb(128, 255, 255, 255);
 			_solid = new Pen(gridColor, 1);
 			_solidBrush = new SolidBrush(gridColor);
 			Zoom = 2;
+
+			state.ChrDataChanged += RefreshImage;
+			state.PaletteChanged += RefreshImage;
 		}
 
 		private void RefreshImage()
