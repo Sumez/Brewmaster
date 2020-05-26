@@ -19,6 +19,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 		private int _cursorX = -1;
 		private int _cursorY = -1;
 		private bool _mouseDown;
+		private bool _alteredByTool;
 		private SolidBrush _toolBrush;
 		private MapEditorState _state;
 
@@ -75,7 +76,10 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 		private bool MouseButtonUp(Point location)
 		{
+			if (_mouseDown && _alteredByTool) _screen.OnEditEnd();
+
 			_mouseDown = false;
+			_alteredByTool = false;
 			return false;
 		}
 
@@ -89,7 +93,8 @@ namespace Brewmaster.EditorWindows.TileMaps
 			{
 				case MouseButtons.Left:
 					_mouseDown = true;
-					if (Tool != null) Tool.Paint(_cursorX, _cursorY, _screen);
+					_alteredByTool = false;
+					if (Tool != null) PaintTool();
 					break;
 				case MouseButtons.Right:
 					if (Tool != null) Tool.EyeDrop(_cursorX, _cursorY, _screen);
@@ -108,10 +113,16 @@ namespace Brewmaster.EditorWindows.TileMaps
 			_cursorX = x;
 			_cursorY = y;
 
-			if (_mouseDown && _cursorX >= 0 && _cursorY >= 0) Tool.Paint(_cursorX, _cursorY, _screen);
+			if (_mouseDown && _cursorX >= 0 && _cursorY >= 0) PaintTool();
 
 			base.OnMouseMove(e);
 			Invalidate();
+		}
+
+		private void PaintTool()
+		{
+			Tool.Paint(_cursorX, _cursorY, _screen);
+			_alteredByTool = true;
 		}
 
 		
@@ -136,11 +147,13 @@ namespace Brewmaster.EditorWindows.TileMaps
 				graphics.CompositingQuality = CompositingQuality.HighSpeed;
 				for (var i = 1; i < _map.ScreenSize.Width; i++)
 				{
+					if (Zoom == 1 && i % 2 == 1) continue;
 					var pen = i % 4 == 0 ? _solid : i % 2 == 0 ? _dashed : _dotted;
 					graphics.DrawLine(pen, i * tileWidth, 0, i * tileWidth, height);
 				}
 				for (var i = 1; i < _map.ScreenSize.Height; i++)
 				{
+					if (Zoom == 1 && i % 2 == 1) continue;
 					var pen = i % 4 == 0 ? _solid : i % 2 == 0 ? _dashed : _dotted;
 					graphics.DrawLine(pen, 0, i * tileHeight, width, i * tileHeight);
 				}

@@ -169,6 +169,9 @@
     <Compile Include="EditorWindows\Text\FindResults.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="EditorWindows\TileMaps\ChrTilePalette.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="EditorWindows\TileMaps\MapEditorTool.cs" />
     <Compile Include="EditorWindows\TileMaps\MapEditorToolBar.cs">
       <SubType>Component</SubType>
@@ -184,6 +187,9 @@
     </Compile>
     <Compile Include="EditorWindows\TileMaps\ColorPaletteView.cs">
       <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="EditorWindows\TileMaps\MetaTilePalette.cs">
+      <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="EditorWindows\TileMaps\MiniMap.cs">
       <SubType>Component</SubType>
@@ -546,8 +552,14 @@
     <EmbeddedResource Include="EditorWindows\Code\SourceNavigator.resx">
       <DependentUpon>SourceNavigator.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="EditorWindows\TileMaps\ChrTilePalette.resx">
+      <DependentUpon>ChrTilePalette.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="EditorWindows\TileMaps\MapOverview.resx">
       <DependentUpon>MapOverview.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EditorWindows\TileMaps\MetaTilePalette.resx">
+      <DependentUpon>MetaTilePalette.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Emulation\MesenControl.resx">
       <DependentUpon>MesenControl.cs</DependentUpon>

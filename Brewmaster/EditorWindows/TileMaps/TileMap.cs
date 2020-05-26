@@ -67,6 +67,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 		public int[] Tiles;
 		public int[] ColorAttributes;
 		public event Action<int, int> TileChanged;
+		public event Action EditEnd;
 
 		public void PrintTile(int x, int y, int index)
 		{
@@ -76,7 +77,8 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 		public int GetTile(int x, int y)
 		{
-			return Tiles[y * _map.ScreenSize.Width + x];
+			var index = y * _map.ScreenSize.Width + x;
+			return Tiles.Length > index ? Tiles[index] : -1;
 		}
 
 		public void SetColorAttribute(int x, int y, int paletteIndex)
@@ -130,6 +132,11 @@ namespace Brewmaster.EditorWindows.TileMaps
 				RefreshTile(x, y, state);
 			}
 
+		}
+
+		public void OnEditEnd()
+		{
+			if (EditEnd != null) EditEnd();
 		}
 	}
 
