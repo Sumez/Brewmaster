@@ -22,6 +22,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 		private MapOverview _mapOverview;
 		private ColorPaletteView _colorPalette;
 		private Dictionary<int, MetaTilePalette> _metaTilePalettes;
+		private ScreenPanel _screenPanel;
 		public override ToolStrip ToolBar { get { return MapEditorToolBar; } }
 		public MapEditorState State { get; set; }
 
@@ -73,6 +74,9 @@ namespace Brewmaster.EditorWindows.TileMaps
 			//Controls.Add(_tilePalette);
 			_tilePalette.UserSelectedTile += () => SelectTilePen(_tilePalette.SelectedTile);
 
+			_screenPanel = new ScreenPanel { Dock = DockStyle.Fill };
+			Controls.Add(_screenPanel);
+
 			_colorPalette = new ColorPaletteView(Map.Palettes) { Width = 256, Height = 40 };
 			_colorPalette.Dock = DockStyle.Bottom;
 			Controls.Add(_colorPalette);
@@ -122,15 +126,10 @@ namespace Brewmaster.EditorWindows.TileMaps
 				InitScreen(Map.Screens[y][x]);
 			}
 			FocusedScreen = Map.Screens[y][x];
-			if (_screenView != null)
-			{
-				Controls.Remove(_screenView);
-			}
-			_screenView = new MapScreenView(Map, FocusedScreen, State) { Dock = DockStyle.Fill };
+			_screenView = new MapScreenView(Map, FocusedScreen, State);
 			_screenView.ContextMenu = new ContextMenu();
 			_screenView.RefreshAllTiles();
-			Controls.Add(_screenView);
-
+			_screenPanel.Add(_screenView);
 		}
 
 		private void InitScreen(TileMapScreen screen)
