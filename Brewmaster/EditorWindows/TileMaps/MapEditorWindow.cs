@@ -221,12 +221,36 @@ namespace Brewmaster.EditorWindows.TileMaps
 			MapEditorToolBar.ImportImage = ImportImage;
 			MapEditorToolBar.ImportChr = ImportChr;
 			MapEditorToolBar.ImportMap = ImportMap;
+			MapEditorToolBar.ImportPalette = ImportPalette;
 
 			MapEditorToolBar.TileTool = () => SelectTilePen(0);
 			MapEditorToolBar.ColorTool = SelectPalettePen;
 			MapEditorToolBar.PixelTool = SelectPixelPen;
 		}
 
+		private void ImportPalette()
+		{
+			string fileName = null;
+			using (var dialog = new OpenFileDialog())
+			{
+				if (dialog.ShowDialog() != DialogResult.OK) return;
+				fileName = dialog.FileName;
+			}
+
+			using (var stream = File.OpenRead(fileName))
+			{
+				foreach (var palette in Map.Palettes)
+				{
+					if (stream.Position >= stream.Length) break;
+					palette.Colors = new List<Color>();
+					for (var i = 0; i < 4; i++)
+					{
+						palette.Colors.Add(NesColorPicker.NesPalette.Colors[stream.ReadByte()]);
+					}
+				}
+			}
+			Pristine = false;
+		}
 		private void ImportMap()
 		{
 			string fileName = null;
@@ -236,6 +260,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 				fileName = dialog.FileName;
 			}
 
+			/*
 			PyxelMap map;
 			using (var stream = File.OpenRead(fileName))
 			{
@@ -246,6 +271,38 @@ namespace Brewmaster.EditorWindows.TileMaps
 			{
 				if (tile.Index < 0) continue;
 				FocusedScreen.PrintTile(tile.X, tile.Y, tile.Index);
+			}*/
+
+			using (var stream = File.OpenRead(fileName))
+			{
+				stream.Position = stream.Length - 4;
+				var width = stream.ReadByte() | (stream.ReadByte() << 8);
+				var height = stream.ReadByte() | (stream.ReadByte() << 8);
+				Map.ScreenSize = new Size(width, height);
+				Map.AttributeSize = new Size(2, 2);
+				
+				var screen = new TileMapScreen(Map);
+				Map.Screens[0] = new List<TileMapScreen>(new[] { screen });
+
+
+				stream.Position = 0;
+				for (var y = 0; y < height; y++)
+					for (var x = 0; x < width; x++)
+						screen.PrintTile(x, y, stream.ReadByte());
+
+				var attributeBytes = new byte[stream.Length - stream.Position - 4];
+				stream.Read(attributeBytes, 0, attributeBytes.Length);
+				for (var y = 0; y < height; y += 2)
+					for (var x = 0; x < width; x += 2)
+					{
+						var i = x / 4 + (y / 4) * (Map.ScreenSize.Width / 4);
+						var attribute = attributeBytes[i];
+						if (x % 4 == 2) attribute >>= 2;
+						if (y % 4 == 2) attribute >>= 4;
+						screen.SetColorTile(x, y, attribute & 3);
+					}
+
+				ActivateScreen(0, 0);
 			}
 
 			Pristine = false;
@@ -325,7 +382,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 	public class MapEditorState
 	{
 		private MapEditorTool _tool;
-		private byte[] _chrData;
+		private byte[] _chrData = new byte[0x1000];
 		private Palette _palette;
 		private int _zoom = 2;
 

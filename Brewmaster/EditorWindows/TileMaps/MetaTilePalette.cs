@@ -18,7 +18,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 		public MetaTile GetMetaTile(int index)
 		{
 			if (index < 0 || index >= _metaTiles.Count) return new MetaTile();
-			return _metaTiles[index];
+			return _metaTiles[index].Clone();
 		}
 
 		public event Action UserSelectedTile;

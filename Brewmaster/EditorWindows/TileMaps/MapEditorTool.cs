@@ -115,7 +115,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 		{
 			return other != null &&
 			       other.Tiles.SequenceEqual(Tiles) &&
-			       other.Attributes.SequenceEqual(Attributes) &&
+			       ((Attributes.Length == 1 && other.Attributes.Length == 1) || other.Attributes.SequenceEqual(Attributes)) &&
 			       other.MetaValues.SequenceEqual(MetaValues);
 		}
 
@@ -130,6 +130,16 @@ namespace Brewmaster.EditorWindows.TileMaps
 			return (Tiles != null && Tiles.Length > 0 ? Tiles[0] : 0) << 8 +
 			       (Attributes != null && Attributes.Length > 0 ? Attributes[0] : 0) << 16 +
 			       (MetaValues != null && MetaValues.Length > 0 ? MetaValues[0] : 0) << 24;
+		}
+
+		internal MetaTile Clone()
+		{
+			return new MetaTile
+			{
+				Tiles = Tiles.ToArray(),
+				Attributes = Attributes.ToArray(),
+				MetaValues = MetaValues.ToArray()
+			};
 		}
 	}
 	public class MetaTilePen : TilePen

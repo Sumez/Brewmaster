@@ -9,6 +9,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 		public Action ImportImage { get; set; }
 		public Action ImportChr { get; set; }
 		public Action ImportMap { get; set; }
+		public Action ImportPalette { get; set; }
 
 		public Action TileTool { get; set; }
 		public Action ColorTool { get; set; }
@@ -21,6 +22,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 			Items.AddRange(new[] { new ToolStripButton("import image", Resources.image, (s, a) => ImportImage()) });
 			Items.AddRange(new[] { new ToolStripButton("import CHR", Resources.image, (s, a) => ImportChr()) });
 			Items.AddRange(new[] { new ToolStripButton("import map", Resources.macro, (s, a) => ImportMap()) });
+			Items.AddRange(new[] { new ToolStripButton("import Palette", Resources.image, (s, a) => ImportPalette()) });
 
 			Items.AddRange(new[] { new ToolStripButton("Tile", Resources.image, (s, a) => TileTool()) });
 			Items.AddRange(new[] { new ToolStripButton("Color", Resources.data, (s, a) => ColorTool()) });
