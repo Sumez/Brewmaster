@@ -757,6 +757,7 @@
     <None Include="Resources\Toolbar\stepover.png" />
     <None Include="Resources\Toolbar\build2.png" />
     <None Include="Resources\Toolbar\build3.png" />
+    <Content Include="Resources\pen.cur" />
     <Content Include="Templates\ftm">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

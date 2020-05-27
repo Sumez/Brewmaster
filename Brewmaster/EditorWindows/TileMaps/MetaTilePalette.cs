@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -9,12 +10,14 @@ namespace Brewmaster.EditorWindows.TileMaps
 	{
 		private TileMap _map;
 		private readonly int _metaTileSize;
-		private readonly Dictionary<TileMapScreen, List<int[]>> _screenCollections;
+		private readonly bool _includeMetaValues;
+		private readonly bool _includeAttributes;
+		private readonly Dictionary<TileMapScreen, List<MetaTile>> _screenCollections;
 		private TilePalette _tilePalette;
-		private List<int[]> _metaTiles;
-		public int[] GetMetaTile(int index)
+		private List<MetaTile> _metaTiles;
+		public MetaTile GetMetaTile(int index)
 		{
-			if (index < 0 || index >= _metaTiles.Count) return new int[0];
+			if (index < 0 || index >= _metaTiles.Count) return new MetaTile();
 			return _metaTiles[index];
 		}
 
@@ -25,16 +28,18 @@ namespace Brewmaster.EditorWindows.TileMaps
 			set { _tilePalette.SelectedTile = value; }
 		}
 
-		public void SelectMetaTile(int[] metaTile)
+		public void SelectMetaTile(MetaTile metaTile)
 		{
-			SelectedTile = _metaTiles.FindIndex(mt => mt.SequenceEqual(metaTile));
+			SelectedTile = _metaTiles.FindIndex(mt => mt.Equals(metaTile));
 		}
-
-		public MetaTilePalette(TileMap map, int metaTileSize, MapEditorState state)
+		
+		public MetaTilePalette(TileMap map, int metaTileSize, MapEditorState state, bool includeMetaValues, bool includeAttributes)
 		{
 			_map = map;
 			_metaTileSize = metaTileSize;
-			_screenCollections = new Dictionary<TileMapScreen, List<int[]>>();
+			_includeMetaValues = includeMetaValues;
+			_includeAttributes = includeAttributes;
+			_screenCollections = new Dictionary<TileMapScreen, List<MetaTile>>();
 
 			InitializeComponent();
 
@@ -43,6 +48,13 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 			_tilePalette.State = state;
 			_tilePalette.MetaTileWidth = metaTileSize;
+			_tilePalette.GetTileColors = (tile, i) =>
+			{
+				var x = (i % metaTileSize) / map.AttributeSize.Width;
+				var y = (i / metaTileSize) / map.AttributeSize.Height;
+				i = y * (metaTileSize / map.AttributeSize.Width) + x;
+				return (tile.Attributes[i] & 0xff) == 0xff ? state.Palette.Colors : map.Palettes[tile.Attributes[i] & 0xff].Colors;
+			};
 			RefreshMetaTiles();
 			_tilePalette.TileClick += (index) =>
 			{
@@ -53,22 +65,17 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 		private void GetMetaTilesFromScreen(TileMapScreen screen)
 		{
-			var metaTiles = new List<int[]>();
-			for (var y = 0; y < _map.ScreenSize.Height; y += _metaTileSize)
-			for (var x = 0; x < _map.ScreenSize.Width; x += _metaTileSize)
+			var metaTiles = new List<MetaTile>();
+			var metaTileRow = _map.ScreenSize.Width / _metaTileSize;
+			var metaTileCol = _map.ScreenSize.Height / _metaTileSize;
+			for (var y = 0; y < metaTileCol; y++)
+			for (var x = 0; x < metaTileRow; x++)
 			{
-				var metaTile = new int[_metaTileSize * _metaTileSize];
+				var metaTile = screen.GetMetaTile(x, y, _metaTileSize);
+				if (metaTile.Attributes.Length == 1) metaTile.Attributes[0] = metaTile.Attributes[0] & 0xff00 | 0xff;
 				metaTiles.Add(metaTile);
-
-				for (var i = 0; i < _metaTileSize * _metaTileSize; i++)
-				{
-					var iX = x + (i % _metaTileSize);
-					var iY = (y + i / _metaTileSize);
-					if (iX >= _map.ScreenSize.Width || iY >= _map.ScreenSize.Height) metaTile[i] = -1;
-					else metaTile[i] = screen.Tiles[iY * _map.ScreenSize.Width + iX];
-				}
 			}
-			_screenCollections[screen] = metaTiles.Distinct(new MetaTileComparer()).ToList();
+			_screenCollections[screen] = metaTiles.Distinct().ToList();
 		}
 
 		public void RefreshMetaTiles(TileMapScreen screen = null)
@@ -82,9 +89,9 @@ namespace Brewmaster.EditorWindows.TileMaps
 			}
 			else GetMetaTilesFromScreen(screen);
 
-			int[] selectedMetaTile = null;
+			MetaTile selectedMetaTile = null;
 			if (SelectedTile >= 0) selectedMetaTile = GetMetaTile(SelectedTile);
-			_metaTiles = _screenCollections.Values.SelectMany(mt => mt).Distinct(new MetaTileComparer()).ToList();
+			_metaTiles = _screenCollections.Values.SelectMany(mt => mt).Distinct().ToList();
 			_tilePalette.Tiles = _metaTiles;
 			if (selectedMetaTile != null) SelectMetaTile(selectedMetaTile);
 		}
@@ -119,10 +126,10 @@ namespace Brewmaster.EditorWindows.TileMaps
 		}
 	}
 
-	public class MetaTileComparer : IEqualityComparer<int[]>
+	public class MetaTileComparer : IEqualityComparer<MetaTile>
 	{
-		public bool Equals(int[] a, int[] b) { return a.SequenceEqual(b); }
+		public bool Equals(MetaTile a, MetaTile b) { return a.Equals(b); }
 
-		public int GetHashCode(int[] obj) { return 0; }
+		public int GetHashCode(MetaTile obj) { return obj.GetHashCode(); }
 	}
 }

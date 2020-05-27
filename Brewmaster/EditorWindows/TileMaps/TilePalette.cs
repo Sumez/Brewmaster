@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using Brewmaster.Modules.Ppu;
 using Brewmaster.ProjectModel;
@@ -62,7 +63,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 		private int _hoverTile = -1;
 		private Palette _palette;
 		private SolidBrush _solidBrush;
-		private List<int[]> _tiles;
+		private List<MetaTile> _tiles;
 
 		private int _tileWidth = 8;
 		private int _tileHeight = 8;
@@ -110,7 +111,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 			}
 		}
 
-		public List<int[]> Tiles
+		public List<MetaTile> Tiles
 		{
 			get { return _tiles; }
 			set
@@ -148,42 +149,59 @@ namespace Brewmaster.EditorWindows.TileMaps
 			var gridColor = Color.FromArgb(128, 255, 255, 255);
 			_solid = new Pen(gridColor, 1);
 			_solidBrush = new SolidBrush(gridColor);
+
+			GetTileColors = (tile, i) => Palette.Colors;
 		}
 
+		private readonly object _backBufferLock = new object();
+		private Task _backBufferTask;
 		public void RefreshImage()
 		{
 			if (Tiles == null) return;
-			using (var graphics = Graphics.FromImage(_image))
+			// TODO: Just cancel task if not finished
+
+			if (_backBufferTask != null && !_backBufferTask.IsCompleted) _backBufferTask.Wait();
+
+			_backBufferTask = Task.Run(() =>
 			{
-				graphics.Clear(Palette.Colors[0]);
-				if (ChrData == null) return;
-
-				var metaTileWidth = _tileWidth * _metaTileWidth;
-				var metaTileHeight = _tileHeight * _metaTileWidth;
-
-				for (var i = 0; i < Tiles.Count; i++)
+				lock (_backBufferLock)
 				{
-					var metaTile = Tiles[i];
-					for (var j = 0; j < metaTile.Length; j++)
+					var image = new Bitmap(_tileWidth * _metaTileWidth * _rowWidth, _tileHeight * _metaTileWidth * _colHeight);
+					using (var graphics = Graphics.FromImage(image))
 					{
-						using (var tile = GetTileImage(metaTile[j]))
+						graphics.Clear(Palette.Colors[0]);
+						if (ChrData != null)
 						{
-							if (tile == null) continue;
+							var metaTileWidth = _tileWidth * _metaTileWidth;
+							var metaTileHeight = _tileHeight * _metaTileWidth;
 
-							graphics.DrawImageUnscaled(tile, 
-								(i % _rowWidth) * metaTileWidth + (j % _metaTileWidth) * _tileWidth, 
-								(i / _rowWidth) * metaTileHeight + (j / _metaTileWidth) * _tileHeight);
+							for (var i = 0; i < Tiles.Count; i++)
+							{
+								var metaTile = Tiles[i];
+								for (var j = 0; j < metaTile.Tiles.Length; j++)
+								{
+									using (var tile = GetTileImage(ChrData, metaTile.Tiles[j], GetTileColors(metaTile, j)))
+									{
+										if (tile == null) continue;
+
+										graphics.DrawImageUnscaled(tile,
+											(i % _rowWidth) * metaTileWidth + (j % _metaTileWidth) * _tileWidth,
+											(i / _rowWidth) * metaTileHeight + (j / _metaTileWidth) * _tileHeight);
+									}
+								}
+							}
 						}
 					}
+
+					var oldImage = _image;
+					_image = image;
+					oldImage.Dispose();
 				}
-			}
-			Invalidate();
+				Invalidate();
+			});
 		}
 
-		public Bitmap GetTileImage(int index)
-		{
-			return GetTileImage(ChrData, index, Palette.Colors);
-		}
+		public Func<MetaTile, int, List<Color>> GetTileColors;
 
 		public static Bitmap GetTileImage(byte[] data, int index, List<Color> palette, int bitDepth = 2, ProjectType projectType = ProjectType.Nes)
 		{

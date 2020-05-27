@@ -83,7 +83,8 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 		public void SetColorAttribute(int x, int y, int paletteIndex)
 		{
-			ColorAttributes[y * (_map.ScreenSize.Width / _map.AttributeSize.Width) + x] = paletteIndex;
+			var attributeIndex = y * (_map.ScreenSize.Width / _map.AttributeSize.Width) + x;
+			ColorAttributes[attributeIndex] = (ColorAttributes[attributeIndex] & 0xF8) | paletteIndex;
 			
 			if (TileChanged == null) return;
 			for (var i = 0; i < _map.AttributeSize.Width; i++)
@@ -95,7 +96,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 		public int GetColorAttribute(int x, int y)
 		{
-			return ColorAttributes[y * (_map.ScreenSize.Width / _map.AttributeSize.Width) + x];
+			return ColorAttributes[y * (_map.ScreenSize.Width / _map.AttributeSize.Width) + x] & 0x07;
 		}
 
 		public void SetColorTile(int x, int y, int paletteIndex)
@@ -137,6 +138,48 @@ namespace Brewmaster.EditorWindows.TileMaps
 		public void OnEditEnd()
 		{
 			if (EditEnd != null) EditEnd();
+		}
+
+		public MetaTile GetMetaTile(int x, int y, int size)
+		{
+			var tiles = new int[size * size];
+			var attributes = new int[(size / _map.AttributeSize.Width) * (size / _map.AttributeSize.Height)];
+			for (var i = 0; i < tiles.Length; i++)
+			{
+				var iX = x * size + (i % size); // (xoffset) + (local X)
+				var iY = y * size + (i / size); // (yoffset) + (local Y)
+				//attributes[((i/size) / _map.AttributeSize.Height) * _map.AttributeSize.Width + ((i % size) / _map.AttributeSize.Width)] = GetColorTile(iX, iY);
+				tiles[i] = GetTile(iX, iY);
+			}
+
+			for (var i = 0; i < attributes.Length; i++)
+			{
+				var iX = x * size + (i % (size / _map.AttributeSize.Width)) * _map.AttributeSize.Width;
+				var iY = y * size + (i / (size / _map.AttributeSize.Width)) * _map.AttributeSize.Height;
+				attributes[i] = GetColorTile(iX, iY);
+			}
+
+			return new MetaTile
+			{
+				Tiles = tiles,
+				Attributes = attributes
+			};
+		}
+
+		public void PrintMetaTile(int x, int y, MetaTile metaTile, int size)
+		{
+			for (var i = 0; i < metaTile.Tiles.Length; i++)
+			{
+				var iX = x * size + (i % size);
+				var iY = y * size + (i / size);
+				PrintTile(iX, iY, metaTile.Tiles[i]);
+			}
+			for (var i = 0; i < metaTile.Attributes.Length; i++)
+			{
+				var iX = x * size + (i % (size / _map.AttributeSize.Width)) * _map.AttributeSize.Width;
+				var iY = y * size + (i / (size / _map.AttributeSize.Width)) * _map.AttributeSize.Height;
+				SetColorTile(iX, iY, metaTile.Attributes[i]);
+			}
 		}
 	}
 

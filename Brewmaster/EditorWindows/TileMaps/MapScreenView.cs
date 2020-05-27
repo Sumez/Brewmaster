@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.IO;
 using System.Windows.Forms;
 using Brewmaster.ProjectExplorer;
+using Brewmaster.Properties;
 
 namespace Brewmaster.EditorWindows.TileMaps
 {
@@ -57,8 +60,8 @@ namespace Brewmaster.EditorWindows.TileMaps
 				mouseHandler.MouseUp -= MouseButtonUp;
 				Application.RemoveMessageFilter(mouseHandler);
 			};
+			state.ToolChanged += () => { Cursor = state.Tool.Pixel ? new Cursor(new MemoryStream(Resources.pen)) : Cursors.Default; };
 		}
-
 		protected override void Dispose(bool disposing)
 		{
 			_state.ZoomChanged -= RefreshView;
@@ -104,19 +107,23 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 		protected override void OnMouseMove(MouseEventArgs e)
 		{
-			var x = e.Location.X / (ToolWidth);
-			if (x < 0 || x >= _map.ScreenSize.Width / Tool.Size.Width) x = -1;
+			var x = e.Location.X / ToolWidth;
+			if (x < 0 || x >= (_map.ScreenSize.Width * _map.BaseTileSize.Width) / (Tool.Size.Width * (Tool.Pixel ? 1 : _map.BaseTileSize.Width))) x = -1;
 
-			var y = e.Location.Y / (ToolHeight);
-			if (y < 0 || y >= _map.ScreenSize.Height / Tool.Size.Height) y = -1;
+			var y = e.Location.Y / ToolHeight;
+			if (y < 0 || y >= (_map.ScreenSize.Height * _map.BaseTileSize.Height) / (Tool.Size.Height * (Tool.Pixel ? 1 : _map.BaseTileSize.Height))) y = -1;
 
+			if (_cursorX == x && _cursorY == y) return;
+			var oldX = _cursorX;
+			var oldY = _cursorY;
 			_cursorX = x;
 			_cursorY = y;
+			InvalidateToolPosition(oldX, oldY);
+			InvalidateToolPosition(_cursorX, _cursorY);
 
 			if (_mouseDown && _cursorX >= 0 && _cursorY >= 0) PaintTool();
 
 			base.OnMouseMove(e);
-			Invalidate();
 		}
 
 		private void PaintTool()
@@ -128,9 +135,17 @@ namespace Brewmaster.EditorWindows.TileMaps
 		
 		protected override void OnMouseLeave(EventArgs e)
 		{
+			var oldX = _cursorX;
+			var oldY = _cursorY;
 			_cursorX = _cursorY = -1;
 			base.OnMouseLeave(e);
-			Invalidate();
+			InvalidateToolPosition(oldX, oldY);
+		}
+
+		private void InvalidateToolPosition(int x, int y)
+		{
+			if (x < 0 || y < 0) return;
+			Invalidate(new Rectangle(x * ToolWidth, y * ToolHeight, ToolWidth + 1, ToolHeight + 1));
 		}
 
 		private void GenerateGrid()
@@ -170,6 +185,8 @@ namespace Brewmaster.EditorWindows.TileMaps
 		protected override void OnPaint(PaintEventArgs e)
 		{
 			base.OnPaint(e);
+			//var timer = new Stopwatch();
+			//timer.Start();
 			e.Graphics.CompositingMode = CompositingMode.SourceCopy;
 			e.Graphics.CompositingQuality = CompositingQuality.HighSpeed;
 			e.Graphics.PixelOffsetMode = PixelOffsetMode.Half;
@@ -178,6 +195,8 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 			if (_cursorX >= 0 && _cursorY >= 0 && Tool.Image != null)
 			{
+				var attributeIndex = (_cursorY / (_map.BaseTileSize.Height * _map.AttributeSize.Height)) * (_map.ScreenSize.Width / _map.AttributeSize.Width) + (_cursorX / (_map.BaseTileSize.Width * _map.AttributeSize.Width));
+				Tool.RefreshImage(_map.Palettes[_screen.ColorAttributes[attributeIndex] & 0xff]);
 				e.Graphics.DrawImage(Tool.Image, new Rectangle(_cursorX * ToolWidth, _cursorY * ToolHeight, Tool.Image.Width * Zoom, Tool.Image.Height * Zoom));
 			}
 
@@ -188,17 +207,19 @@ namespace Brewmaster.EditorWindows.TileMaps
 			if (_cursorX >= 0 && _cursorY >= 0)
 			{
 				if (Tool.Image == null) e.Graphics.FillRectangle(_toolBrush, _cursorX * ToolWidth, _cursorY * ToolHeight, ToolWidth, ToolHeight);
-				else e.Graphics.DrawRectangle(Pens.Black, _cursorX * ToolWidth, _cursorY * ToolHeight, ToolWidth, ToolHeight);
+				else if (!Tool.Pixel) e.Graphics.DrawRectangle(Pens.Black, _cursorX * ToolWidth, _cursorY * ToolHeight, ToolWidth, ToolHeight);
 			}
+			//timer.Stop();
+			//Debug.WriteLine("Paint: " + timer.Elapsed.TotalMilliseconds);
 		}
 
-		public int ToolWidth { get { return _map.BaseTileSize.Width * Tool.Size.Width * Zoom; } }
-		public int ToolHeight { get { return _map.BaseTileSize.Height * Tool.Size.Height * Zoom; } }
+		public int ToolWidth { get { return (Tool.Pixel ? 1 : _map.BaseTileSize.Width) * Tool.Size.Width * Zoom; } }
+		public int ToolHeight { get { return (Tool.Pixel ? 1 : _map.BaseTileSize.Height) * Tool.Size.Height * Zoom; } }
 
 		public void RefreshTile(int x, int y)
 		{
 			_screen.RefreshTile(x, y, _state);
-			Invalidate();
+			Invalidate(new Rectangle(x * _map.BaseTileSize.Width * Zoom, y * _map.BaseTileSize.Width * Zoom, _map.BaseTileSize.Width * Zoom, _map.BaseTileSize.Height * Zoom));
 		}
 
 

@@ -24,8 +24,8 @@ namespace Brewmaster.EditorWindows.TileMaps
 			state.ChrDataChanged += _tilePalette.RefreshImage;
 			state.PaletteChanged += _tilePalette.RefreshImage;
 
-			var tiles = new List<int[]>();
-			for (var i = 0; i < 256; i++) tiles.Add(new [] { i });
+			var tiles = new List<MetaTile>();
+			for (var i = 0; i < 256; i++) tiles.Add(new MetaTile { Tiles = new [] {i}, Attributes = new [] { -1 } });
 			_tilePalette.State = state;
 			_tilePalette.Tiles = tiles;
 			_tilePalette.TileClick += (index) =>

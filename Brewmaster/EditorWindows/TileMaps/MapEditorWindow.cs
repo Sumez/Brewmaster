@@ -86,6 +86,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 				State.OnPaletteChanged();
 				_screenView.RefreshAllTiles();
 				SetToolImage(_screenView.Tool as TilePen);
+				if (_screenView.Tool is PixelPen pixelPen) pixelPen.PrepareImages(Map);
 				Pristine = false;
 			};
 
@@ -94,9 +95,9 @@ namespace Brewmaster.EditorWindows.TileMaps
 			_metaTilePalettes = new Dictionary<int, MetaTilePalette>();
 			foreach (var metaTileSize in Map.MetaTileResolutions)
 			{
-				var includeCollision = metaTileSize >= 2;
+				var includeMetaValues = metaTileSize >= 2;
 				var includeAttributes = metaTileSize >= 4;
-				_metaTilePalettes[metaTileSize] = new MetaTilePalette(Map, metaTileSize, State) { Width = 256, Height = 256 };
+				_metaTilePalettes[metaTileSize] = new MetaTilePalette(Map, metaTileSize, State, includeMetaValues, includeAttributes) { Width = 256, Height = 256 };
 				_metaTilePalettes[metaTileSize].UserSelectedTile += () => SelectMetaTilePen(metaTileSize, _metaTilePalettes[metaTileSize], _metaTilePalettes[metaTileSize].SelectedTile);
 				form.LayoutHandler.ShowPanel(new IdePanel(_metaTilePalettes[metaTileSize]) { Label = string.Format("{0}x{0} Metatiles", metaTileSize) });
 			}
@@ -184,6 +185,13 @@ namespace Brewmaster.EditorWindows.TileMaps
 			State.Tool = tool;
 			InitPaletteTool(tool);
 		}
+		private void SelectPixelPen()
+		{
+			var tool = new PixelPen();
+			tool.PrepareImages(Map);
+			State.Tool = tool;
+			tool.SelectedColor = 3;
+		}
 
 		private void InitPaletteTool(IPaletteTool tool)
 		{
@@ -217,6 +225,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 			MapEditorToolBar.TileTool = () => SelectTilePen(0);
 			MapEditorToolBar.ColorTool = SelectPalettePen;
+			MapEditorToolBar.PixelTool = SelectPixelPen;
 		}
 
 		private void ImportMap()
