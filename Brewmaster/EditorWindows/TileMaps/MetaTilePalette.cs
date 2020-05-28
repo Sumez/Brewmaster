@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Brewmaster.EditorWindows.TileMaps
@@ -63,7 +64,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 			};
 		}
 
-		private void GetMetaTilesFromScreen(TileMapScreen screen)
+		private void GetMetaTilesFromScreen(TileMapScreen screen, CancellationToken token)
 		{
 			var metaTiles = new List<MetaTile>();
 			var metaTileRow = _map.ScreenSize.Width / _metaTileSize;
@@ -74,26 +75,52 @@ namespace Brewmaster.EditorWindows.TileMaps
 				var metaTile = screen.GetMetaTile(x, y, _metaTileSize);
 				if (metaTile.Attributes.Length == 1) metaTile.Attributes[0] = metaTile.Attributes[0] & 0xff00 | 0xff;
 				metaTiles.Add(metaTile);
+
+				if (token.IsCancellationRequested) return;
 			}
-			_screenCollections[screen] = metaTiles.Distinct().ToList();
+			var distinctMetaTiles = metaTiles.Distinct().TakeWhile((tile, i) => !token.IsCancellationRequested).ToList();
+			if (token.IsCancellationRequested) return;
+			_screenCollections[screen] = distinctMetaTiles;
 		}
+
+		private Task _refreshAllTask;
+		private readonly Dictionary<TileMapScreen, Action> _cancelRefresh = new Dictionary<TileMapScreen, Action>();
 
 		public void RefreshMetaTiles(TileMapScreen screen = null)
 		{
-			if (screen == null)
+			if (screen != null && _cancelRefresh.ContainsKey(screen)) _cancelRefresh[screen]();
+			if (_refreshAllTask != null)
 			{
-				foreach (var s in _map.Screens.SelectMany(s => s).Where(s => s != null))
-				{
-					GetMetaTilesFromScreen(s);
-				}
+				_refreshAllTask.Wait();
+				_refreshAllTask = null;
 			}
-			else GetMetaTilesFromScreen(screen);
+			
+			var tokenSource = new CancellationTokenSource();
+			if (screen != null) _cancelRefresh[screen] = () => tokenSource.Cancel();
 
-			MetaTile selectedMetaTile = null;
-			if (SelectedTile >= 0) selectedMetaTile = GetMetaTile(SelectedTile);
-			_metaTiles = _screenCollections.Values.SelectMany(mt => mt).Distinct().ToList();
-			_tilePalette.Tiles = _metaTiles;
-			if (selectedMetaTile != null) SelectMetaTile(selectedMetaTile);
+			var token = tokenSource.Token;
+			var task = Task.Run(() =>
+			{
+				if (screen == null)
+				{
+					foreach (var s in _map.Screens.SelectMany(s => s).Where(s => s != null))
+					{
+						GetMetaTilesFromScreen(s, token);
+					}
+				}
+				else GetMetaTilesFromScreen(screen, token);
+
+				MetaTile selectedMetaTile = null;
+				if (SelectedTile >= 0) selectedMetaTile = GetMetaTile(SelectedTile);
+				var distinctMetaTiles = _screenCollections.Values.SelectMany(mt => mt).Distinct().TakeWhile((tile, i) => !token.IsCancellationRequested).ToList();
+				if (token.IsCancellationRequested) return;
+				
+				_metaTiles = distinctMetaTiles;
+				_tilePalette.Tiles = _metaTiles;
+				if (selectedMetaTile != null) SelectMetaTile(selectedMetaTile);
+
+			}, token);
+			if (screen == null) _refreshAllTask = task;
 		}
 
 		private void InitializeComponent()

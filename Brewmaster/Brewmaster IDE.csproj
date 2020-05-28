@@ -179,6 +179,7 @@
     <Compile Include="EditorWindows\TileMaps\MapEditorWindow.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="EditorWindows\TileMaps\MapGrid.cs" />
     <Compile Include="EditorWindows\TileMaps\MapOverview.cs">
       <SubType>UserControl</SubType>
     </Compile>

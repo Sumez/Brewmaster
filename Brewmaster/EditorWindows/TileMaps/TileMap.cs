@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Xml.Serialization;
 using Brewmaster.Modules.Ppu;
 
@@ -68,6 +70,16 @@ namespace Brewmaster.EditorWindows.TileMaps
 		public int[] ColorAttributes;
 		public event Action<int, int> TileChanged;
 		public event Action EditEnd;
+		public event Action ImageUpdated;
+
+		public void Unload()
+		{
+			if (_cancelRefresh != null) _cancelRefresh();
+			TileChanged = null;
+			EditEnd = null;
+			ImageUpdated = null;
+		}
+
 
 		public void PrintTile(int x, int y, int index)
 		{
@@ -108,31 +120,52 @@ namespace Brewmaster.EditorWindows.TileMaps
 			return GetColorAttribute(x / _map.AttributeSize.Width, y / _map.AttributeSize.Height);
 		}
 
-		public void RefreshTile(int x, int y, MapEditorState state)
+		public readonly object TileDrawLock = new Object();
+		public void RefreshTile(int x, int y, MapEditorState state, bool force = false)
 		{
+			if (_updatedTiles == null || !force && _updatedTiles.ContainsKey(new Point(x, y))) return;
+
 			var index = y * _map.ScreenSize.Width + x;
 			var attributeIndex = (y / _map.AttributeSize.Height) * (_map.ScreenSize.Width / _map.AttributeSize.Width) + (x / _map.AttributeSize.Width);
 			var paletteIndex = ColorAttributes[attributeIndex];
-			using (var tile = TilePalette.GetTileImage(state.ChrData, Tiles[index], _map.Palettes[paletteIndex].Colors))
+			var tile = state.GetTileImage(Tiles[index], _map.Palettes[paletteIndex]);
+			if (tile == null) return;
+			lock (TileDrawLock)
+			using (var graphics = Graphics.FromImage(Image))
 			{
-				if (tile == null) return;
-				using (var graphics = Graphics.FromImage(Image))
-				{
-					graphics.CompositingMode = CompositingMode.SourceCopy;
-					graphics.DrawImageUnscaled(tile, x * _map.BaseTileSize.Width, y * _map.BaseTileSize.Height);
-				}
+				graphics.CompositingMode = CompositingMode.SourceCopy;
+				lock (tile) graphics.DrawImageUnscaled(tile, x * _map.BaseTileSize.Width, y * _map.BaseTileSize.Height);
 			}
-
+			
+			lock (_updatedTiles)
+			if (!_updatedTiles.ContainsKey(new Point(x, y))) _updatedTiles.Add(new Point(x, y), true);
 		}
 
+		private Task _fullRefreshTask;
+		private Dictionary<Point, bool> _updatedTiles;
+		private Action _cancelRefresh;
 		public void RefreshAllTiles(MapEditorState state)
 		{
-			for (var x = 0; x < _map.ScreenSize.Width; x++)
-			for (var y = 0; y < _map.ScreenSize.Height; y++)
-			{
-				RefreshTile(x, y, state);
-			}
+			_updatedTiles = new Dictionary<Point, bool>();
 
+			if (_cancelRefresh != null)
+			{
+				_cancelRefresh();
+				_fullRefreshTask.Wait();
+			}
+			var tokenSource = new CancellationTokenSource();
+			_cancelRefresh = () => tokenSource.Cancel();
+			var token = tokenSource.Token;
+			_fullRefreshTask = Task.Run(() =>
+			{
+				for (var x = 0; x < _map.ScreenSize.Width; x++)
+				for (var y = 0; y < _map.ScreenSize.Height; y++)
+				{
+					RefreshTile(x, y, state);
+					if (token.IsCancellationRequested) return;
+				}
+				if (ImageUpdated != null) ImageUpdated();
+			}, token);
 		}
 
 		public void OnEditEnd()
@@ -181,6 +214,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 				SetColorTile(iX, iY, metaTile.Attributes[i]);
 			}
 		}
+
 	}
 
 	[Serializable]

@@ -72,7 +72,6 @@ namespace Brewmaster.EditorWindows.TileMaps
 			var width = _map.ScreenSize.Width * _map.BaseTileSize.Width * Zoom;
 			var height = _map.ScreenSize.Height * _map.BaseTileSize.Height * Zoom;
 			if (Width != width || Height != height) Size = new Size(width, height);
-			GenerateGrid();
 			Invalidate();
 		}
 
@@ -146,37 +145,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 			if (x < 0 || y < 0) return;
 			Invalidate(new Rectangle(x * ToolWidth, y * ToolHeight, ToolWidth + 1, ToolHeight + 1));
 		}
-
-		private void GenerateGrid()
-		{
-			var width = _map.ScreenSize.Width * _map.BaseTileSize.Width * Zoom;
-			var height = _map.ScreenSize.Height * _map.BaseTileSize.Height * Zoom;
-			var tileWidth = _map.BaseTileSize.Width * Zoom;
-			var tileHeight = _map.BaseTileSize.Height * Zoom;
-
-			var grid = new Bitmap(Zoom * _map.ScreenSize.Width * _map.BaseTileSize.Width, Zoom * _map.ScreenSize.Height * _map.BaseTileSize.Height);
-			using (var graphics = Graphics.FromImage(grid))
-			{
-				graphics.CompositingMode = CompositingMode.SourceCopy;
-				graphics.CompositingQuality = CompositingQuality.HighSpeed;
-				for (var i = 1; i < _map.ScreenSize.Width; i++)
-				{
-					if (Zoom == 1 && i % 2 == 1) continue;
-					var pen = i % 4 == 0 ? _solid : i % 2 == 0 ? _dashed : _dotted;
-					graphics.DrawLine(pen, i * tileWidth, 0, i * tileWidth, height);
-				}
-				for (var i = 1; i < _map.ScreenSize.Height; i++)
-				{
-					if (Zoom == 1 && i % 2 == 1) continue;
-					var pen = i % 4 == 0 ? _solid : i % 2 == 0 ? _dashed : _dotted;
-					graphics.DrawLine(pen, 0, i * tileHeight, width, i * tileHeight);
-				}
-			}
-
-			if (_grid != null) _grid.Dispose();
-			_grid = grid;
-		}
-
+		
 		public int Zoom
 		{
 			get { return _state.Zoom; }
@@ -190,7 +159,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 			e.Graphics.CompositingQuality = CompositingQuality.HighSpeed;
 			e.Graphics.PixelOffsetMode = PixelOffsetMode.Half;
 			e.Graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
-			e.Graphics.DrawImage(_screen.Image, new Rectangle(0, 0, _screen.Image.Width * Zoom, _screen.Image.Height * Zoom));
+			lock (_screen.TileDrawLock) e.Graphics.DrawImage(_screen.Image, new Rectangle(0, 0, _screen.Image.Width * Zoom, _screen.Image.Height * Zoom));
 
 			if (_cursorX >= 0 && _cursorY >= 0 && Tool.Image != null)
 			{
@@ -201,7 +170,22 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 			e.Graphics.CompositingMode = CompositingMode.SourceOver;
 			e.Graphics.PixelOffsetMode = PixelOffsetMode.None;
-			e.Graphics.DrawImageUnscaled(_grid, 0, 0);
+			if (Grid != null && e.Graphics.ClipBounds.Left >= 0)
+			{
+				var tileWidth = _map.BaseTileSize.Width * Zoom;
+				var tileHeight = _map.BaseTileSize.Height * Zoom;
+				var minX = Math.Max(0, (int) (e.Graphics.ClipBounds.Left / tileWidth) / MapGrid.Factor * MapGrid.Factor);
+				var minY = Math.Max(0, (int) (e.Graphics.ClipBounds.Top / tileHeight) / MapGrid.Factor * MapGrid.Factor);
+				var maxX = Math.Min(_map.ScreenSize.Width, (int)(e.Graphics.ClipBounds.Right / tileWidth) + MapGrid.Factor);
+				var maxY = Math.Min(_map.ScreenSize.Height, (int)(e.Graphics.ClipBounds.Bottom / tileHeight) + MapGrid.Factor);
+				for (var x = minX; x < maxX; x += MapGrid.Factor)
+				{
+					for (var y = minY; y < maxY; y += MapGrid.Factor)
+					{
+						Grid.Draw(e.Graphics, x * tileWidth, y * tileHeight);
+					}
+				}
+			}
 
 			if (_cursorX >= 0 && _cursorY >= 0)
 			{
@@ -214,17 +198,39 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 		public int ToolWidth { get { return (Tool.Pixel ? 1 : _map.BaseTileSize.Width) * Tool.Size.Width * Zoom; } }
 		public int ToolHeight { get { return (Tool.Pixel ? 1 : _map.BaseTileSize.Height) * Tool.Size.Height * Zoom; } }
+		public MapGrid Grid { get; set; }
 
 		public void RefreshTile(int x, int y)
 		{
-			_screen.RefreshTile(x, y, _state);
+			_screen.RefreshTile(x, y, _state, true);
 			Invalidate(new Rectangle(x * _map.BaseTileSize.Width * Zoom, y * _map.BaseTileSize.Width * Zoom, _map.BaseTileSize.Width * Zoom, _map.BaseTileSize.Height * Zoom));
 		}
-
 
 		public void RefreshAllTiles()
 		{
 			_screen.RefreshAllTiles(_state);
+			RefreshVisibleTiles();
+			Invalidate();
+		}
+
+		public void RefreshVisibleTiles()
+		{
+			if (Parent == null) return;
+			var tileWidth = _map.BaseTileSize.Width * Zoom;
+			var tileHeight = _map.BaseTileSize.Height * Zoom;
+
+			var minX = Math.Max(0, -Location.X) / tileWidth;
+			var minY = Math.Max(0, -Location.Y) / tileHeight;
+			var maxX = Parent.DisplayRectangle.Size.Width / tileWidth - Location.X / tileWidth;
+			var maxY = Parent.DisplayRectangle.Size.Height / tileHeight - Location.Y / tileHeight;
+
+			for (var x = minX; x <= maxX && x < _map.ScreenSize.Width; x++)
+			{
+				for (var y = minY; y <= maxY && y < _map.ScreenSize.Height; y++)
+				{
+					_screen.RefreshTile(x, y, _state, true);
+				}
+			}
 			Invalidate();
 		}
 	}

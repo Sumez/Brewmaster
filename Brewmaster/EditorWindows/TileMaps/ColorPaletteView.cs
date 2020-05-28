@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using Brewmaster.Modules.Ppu;
@@ -69,6 +70,21 @@ namespace Brewmaster.EditorWindows.TileMaps
 				if (SelectedPaletteChanged != null) SelectedPaletteChanged(_selectedPaletteIndex);
 
 			}
+		}
+
+		public void ImportPaletteData(FileStream stream)
+		{
+			foreach (var paletteControl in _paletteControls)
+			{
+				if (stream.Position >= stream.Length) break;
+				paletteControl.Palette.Colors = new List<Color>();
+				for (var i = 0; i < 4; i++)
+				{
+					paletteControl.Palette.Colors.Add(NesColorPicker.NesPalette.Colors[stream.ReadByte()]);
+				}
+				paletteControl.Invalidate();
+			}
+			if (PalettesChanged != null) PalettesChanged();
 		}
 	}
 

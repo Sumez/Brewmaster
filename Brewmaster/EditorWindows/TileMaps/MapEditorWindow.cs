@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Serialization;
 using Brewmaster.Layout;
@@ -74,7 +75,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 			//Controls.Add(_tilePalette);
 			_tilePalette.UserSelectedTile += () => SelectTilePen(_tilePalette.SelectedTile);
 
-			_screenPanel = new ScreenPanel { Dock = DockStyle.Fill };
+			_screenPanel = new ScreenPanel(State, Map) { Dock = DockStyle.Fill };
 			Controls.Add(_screenPanel);
 
 			_colorPalette = new ColorPaletteView(Map.Palettes) { Width = 256, Height = 40 };
@@ -87,6 +88,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 			};
 			_colorPalette.PalettesChanged += () =>
 			{
+				State.ClearTileCache();
 				State.OnPaletteChanged();
 				_screenView.RefreshAllTiles();
 				SetToolImage(_screenView.Tool as TilePen);
@@ -115,6 +117,12 @@ namespace Brewmaster.EditorWindows.TileMaps
 			ActivateScreen(0, 0);
 		}
 
+		protected override void OnControlRemoved(ControlEventArgs e)
+		{
+			base.OnControlRemoved(e);
+			foreach (var screen in Map.Screens.SelectMany(s => s)) screen.Unload();
+		}
+
 		private void ActivateScreen(int x, int y)
 		{
 			while (y >= Map.Screens.Count) Map.Screens.Add(new List<TileMapScreen>());
@@ -128,8 +136,8 @@ namespace Brewmaster.EditorWindows.TileMaps
 			FocusedScreen = Map.Screens[y][x];
 			_screenView = new MapScreenView(Map, FocusedScreen, State);
 			_screenView.ContextMenu = new ContextMenu();
-			_screenView.RefreshAllTiles();
 			_screenPanel.Add(_screenView);
+			_screenView.RefreshAllTiles();
 		}
 
 		private void InitScreen(TileMapScreen screen)
@@ -141,6 +149,11 @@ namespace Brewmaster.EditorWindows.TileMaps
 				{
 					metaTilePalette.RefreshMetaTiles(screen);
 				}
+			};
+			screen.ImageUpdated += () =>
+			{
+				if (Parent == null) return;
+				BeginInvoke(new Action(() => _mapOverview.UpdateScreenImage(screen)));
 			};
 			screen.RefreshAllTiles(State);
 		}
@@ -239,15 +252,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 			using (var stream = File.OpenRead(fileName))
 			{
-				foreach (var palette in Map.Palettes)
-				{
-					if (stream.Position >= stream.Length) break;
-					palette.Colors = new List<Color>();
-					for (var i = 0; i < 4; i++)
-					{
-						palette.Colors.Add(NesColorPicker.NesPalette.Colors[stream.ReadByte()]);
-					}
-				}
+				_colorPalette.ImportPaletteData(stream);
 			}
 			Pristine = false;
 		}
@@ -399,13 +404,22 @@ namespace Brewmaster.EditorWindows.TileMaps
 		public byte[] ChrData
 		{
 			get { return _chrData; }
-			set { _chrData = value; OnChrDataChanged(); }
+			set
+			{
+				_chrData = value;
+				ClearTileCache();
+				OnChrDataChanged();
+			}
 		}
 
 		public Palette Palette
 		{
 			get { return _palette; }
-			set { _palette = value; OnPaletteChanged(); }
+			set
+			{
+				_palette = value;
+				OnPaletteChanged();
+			}
 		}
 
 		public int Zoom
@@ -434,6 +448,27 @@ namespace Brewmaster.EditorWindows.TileMaps
 		public void OnZoomChanged()
 		{
 			if (ZoomChanged != null) ZoomChanged();
+		}
+
+		private Dictionary<int, Dictionary<Palette, Image>> _cachedTiles = new Dictionary<int, Dictionary<Palette, Image>>();
+		public Image GetTileImage(int index, Palette palette)
+		{
+			lock (_cachedTiles)
+			{
+				if (!_cachedTiles.ContainsKey(index)) _cachedTiles.Add(index, new Dictionary<Palette, Image>());
+				if (!_cachedTiles[index].ContainsKey(palette)) _cachedTiles[index].Add(palette, TilePalette.GetTileImage(ChrData, index, palette.Colors));
+			}
+			return _cachedTiles[index][palette];
+		}
+		public void ClearTileCache()
+		{
+			IEnumerable<Image> oldImages;
+			lock (_cachedTiles)
+			{
+				oldImages = _cachedTiles.Values.SelectMany(x => x.Values);
+				_cachedTiles = new Dictionary<int, Dictionary<Palette, Image>>();
+			}
+			Task.Run(() => { foreach (var image in oldImages) image.Dispose(); });
 		}
 	}
 

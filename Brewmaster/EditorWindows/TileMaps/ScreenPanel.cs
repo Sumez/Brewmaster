@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Drawing;
 using System.Windows.Forms;
 using Brewmaster.ProjectExplorer;
 
@@ -11,8 +6,13 @@ namespace Brewmaster.EditorWindows.TileMaps
 {
 	public class ScreenPanel : Panel, IMessageFilter
 	{
-		public ScreenPanel()
+		private readonly MapEditorState _state;
+		private readonly TileMap _map;
+
+		public ScreenPanel(MapEditorState state, TileMap map)
 		{
+			_state = state;
+			_map = map;
 			_offset = Point.Empty;
 			var mouseHandler = new OsFeatures.GlobalMouseHandler();
 			Application.AddMessageFilter(mouseHandler);
@@ -39,9 +39,19 @@ namespace Brewmaster.EditorWindows.TileMaps
 				if (!_panOffset.HasValue) return false;
 				_offset.Offset(point.X - _panOffset.Value.X, point.Y - _panOffset.Value.Y);
 				_panOffset = point;
-				Controls[0].Location = _offset;
+				if (_singleView != null) _singleView.Location = _offset;
 				return true;
 			};
+
+			_grid = new MapGrid();
+			_state.ZoomChanged += () => _grid.GenerateGrid(_map, _state.Zoom);
+			_grid.GenerateGrid(_map, _state.Zoom);
+		}
+
+		protected override void OnLayout(LayoutEventArgs levent)
+		{
+			base.OnLayout(levent);
+			if (_singleView != null) _singleView.RefreshVisibleTiles();
 		}
 
 		private const int WM_KEYDOWN = 0x0100;
@@ -49,6 +59,8 @@ namespace Brewmaster.EditorWindows.TileMaps
 		private bool _holdingMoveModifier = false;
 		private Point? _panOffset;
 		private Point _offset;
+		private MapScreenView _singleView;
+		private MapGrid _grid;
 
 		public bool PreFilterMessage(ref Message m)
 		{
@@ -70,8 +82,15 @@ namespace Brewmaster.EditorWindows.TileMaps
 		public void Add(MapScreenView screenView)
 		{
 			_offset = Point.Empty;
-			while (Controls.Count > 0) Controls.Remove(Controls[0]);
-			Controls.Add(screenView);
+			if (_singleView != null)
+			{
+				Controls.Remove(_singleView);
+				_singleView.Dispose();
+			}
+
+			screenView.Grid = _grid;
+			Controls.Add(_singleView = screenView);
+			//Controls.SetChildIndex(_singleView, 0);
 		}
 	}
 }

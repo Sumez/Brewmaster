@@ -92,7 +92,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 					if (screen == null || screen.Image == null) continue;
 
 					// TODO: Draw grid of scaled screen images to a backbuffer
-					e.Graphics.DrawImage(screen.Image, x * screenWidth, y * screenHeight, screenWidth, screenHeight);
+					lock (screen.TileDrawLock) e.Graphics.DrawImage(screen.Image, x * screenWidth, y * screenHeight, screenWidth, screenHeight);
 				}
 			}
 
@@ -101,6 +101,13 @@ namespace Brewmaster.EditorWindows.TileMaps
 				e.Graphics.CompositingMode = CompositingMode.SourceOver;
 				e.Graphics.FillRectangle(_hoverBrush, _hoverX * screenWidth, _hoverY * screenHeight, screenWidth, screenHeight);
 			}
+		}
+
+		public void UpdateScreenImage(int x, int y)
+		{
+			var screenWidth = Map.BaseTileSize.Width * Map.ScreenSize.Width * Scale;
+			var screenHeight = Map.BaseTileSize.Height * Map.ScreenSize.Height * Scale;
+			Invalidate(new Region(new RectangleF(screenWidth * x, screenHeight * y, screenWidth, screenHeight)));
 		}
 	}
 }
