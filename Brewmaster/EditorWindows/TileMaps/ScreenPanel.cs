@@ -39,7 +39,11 @@ namespace Brewmaster.EditorWindows.TileMaps
 				if (!_panOffset.HasValue) return false;
 				_offset.Offset(point.X - _panOffset.Value.X, point.Y - _panOffset.Value.Y);
 				_panOffset = point;
-				if (_singleView != null) _singleView.Location = _offset;
+				if (_singleView != null)
+				{
+					_singleView.Location = _offset;
+					_singleView.Refresh();
+				}
 				return true;
 			};
 
