@@ -11,12 +11,40 @@ namespace Brewmaster.Layout
 {
 	public class StoredLayoutHandler : LayoutHandler
 	{
+		private LayoutMode _mode;
+		private Dictionary<LayoutMode, PanelLayout> _layouts = new Dictionary<LayoutMode, PanelLayout>();
+
 		public StoredLayoutHandler(MainForm mainForm) : base(mainForm)
 		{
+			_mode = LayoutMode.None;
 		}
 
-		public void StorePanelLayout(Dictionary<string, Control> modules, string filename)
+		public void StorePanelLayout(Dictionary<string, Control> modules, LayoutMode mode, string filename)
 		{
+			if (mode == _mode) RememberPanelLayout(modules);
+			try
+			{
+				var parentPath = Directory.GetParent(filename);
+				if (!parentPath.Exists) parentPath.Create();
+				var xmlDocument = new XmlDocument();
+				var serializer = new XmlSerializer(typeof(PanelLayout));
+				using (var stream = new MemoryStream())
+				{
+					serializer.Serialize(stream, _layouts[mode]);
+					stream.Position = 0;
+					xmlDocument.Load(stream);
+					xmlDocument.Save(filename);
+				}
+			}
+			catch (Exception ex)
+			{
+				Program.Error("Error saving layout: " + ex.Message, ex);
+			}
+		}
+
+		private void RememberPanelLayout(Dictionary<string, Control> modules)
+		{
+			if (_mode == LayoutMode.None) return;
 			var moduleNames = modules.ToDictionary(kvp => kvp.Value, kvp => kvp.Key);
 			var layout = new PanelLayout();
 
@@ -49,24 +77,7 @@ namespace Brewmaster.Layout
 				}
 			}
 
-			try
-			{
-				var parentPath = Directory.GetParent(filename);
-				if (!parentPath.Exists) parentPath.Create();
-				var xmlDocument = new XmlDocument();
-				var serializer = new XmlSerializer(typeof(PanelLayout));
-				using (var stream = new MemoryStream())
-				{
-					serializer.Serialize(stream, layout);
-					stream.Position = 0;
-					xmlDocument.Load(stream);
-					xmlDocument.Save(filename);
-				}
-			}
-			catch (Exception ex)
-			{
-				Program.Error("Error saving layout: " + ex.Message, ex);
-			}
+			_layouts[_mode] = layout;
 		}
 
 		private void AddPanelNamesToGroup(Dictionary<Control, string> moduleNames, IdePanel parent, List<string> groupPanels)
@@ -83,27 +94,8 @@ namespace Brewmaster.Layout
 
 		}
 
-		public void LoadPanelLayout(Dictionary<string, Control> modules, string filename = null)
+		private void LoadLayout(Dictionary<string, Control> modules, PanelLayout layout)
 		{
-			PanelLayout layout;
-
-			if (filename != null && File.Exists(filename))
-			{
-				var xmlDocument = new XmlDocument();
-				xmlDocument.Load(filename);
-				string xmlString = xmlDocument.OuterXml;
-
-				using (var read = new StringReader(xmlString))
-				{
-					var serializer = new XmlSerializer(typeof(PanelLayout));
-					using (var reader = new XmlTextReader(read))
-					{
-						layout = (PanelLayout) serializer.Deserialize(reader);
-					}
-				}
-			}
-			else layout = GetDefaultLayout();
-
 			foreach (var control in modules.Values)
 			{
 				OnPanelStatusChanged(GetPanel(control), false);
@@ -122,15 +114,15 @@ namespace Brewmaster.Layout
 
 				var parent = container.Parent;
 				if (panelLayout.Size >= 0)
-				while (parent != null)
-				{
-					if (parent is MultiSplitPanel splitPanel)
+					while (parent != null)
 					{
-						splitPanel.StaticWidth = panelLayout.Size;
-						break;
+						if (parent is MultiSplitPanel splitPanel)
+						{
+							splitPanel.StaticWidth = panelLayout.Size;
+							break;
+						}
+						parent = parent.Parent;
 					}
-					parent = parent.Parent;
-				}
 
 				foreach (var group in panelLayout.PanelGroups)
 				{
@@ -143,6 +135,47 @@ namespace Brewmaster.Layout
 			{
 				AddPanelGroup(panelLayout.Panels, p => CreateFloatPanel(p, new Point(panelLayout.Left, panelLayout.Top), new Size(panelLayout.Width, panelLayout.Height)), modules);
 			}
+		}
+		public void LoadPanelLayout(Dictionary<string, Control> modules, LayoutMode? requestedMode = null, string filename = null)
+		{
+			var mode = requestedMode ?? _mode;
+			if (filename == null || !File.Exists(filename))
+			{
+				switch (mode)
+				{
+					case LayoutMode.Default:
+						_layouts[mode] = GetDefaultLayout();
+						break;
+					case LayoutMode.MapEditor:
+						_layouts[mode] = GetMapEditorLayout();
+						break;
+				}
+				return;
+			}
+
+			var xmlDocument = new XmlDocument();
+			xmlDocument.Load(filename);
+			var xmlString = xmlDocument.OuterXml;
+
+			using (var read = new StringReader(xmlString))
+			{
+				var serializer = new XmlSerializer(typeof(PanelLayout));
+				using (var reader = new XmlTextReader(read)) _layouts[mode] = (PanelLayout) serializer.Deserialize(reader);
+			}
+		}
+
+		public void RefreshLayout(Dictionary<string, Control> modules)
+		{
+			LoadLayout(modules, _layouts[_mode]);
+		}
+		public void LoadEditorLayout(Dictionary<string, Control> modules, LayoutMode? requestedMode = null)
+		{
+			var mode = requestedMode ?? _mode;
+			if (_mode == mode) return;
+			RememberPanelLayout(modules);
+			_mode = mode;
+			if (!_layouts.ContainsKey(_mode)) LoadPanelLayout(modules, _mode);
+			RefreshLayout(modules);
 		}
 
 		private void AddPanelGroup(List<string> panels, Action<IdePanel> add, Dictionary<string, Control> modules)
@@ -203,6 +236,40 @@ namespace Brewmaster.Layout
 			});
 			return layout;
 		}
+
+		private PanelLayout GetMapEditorLayout()
+		{
+			var layout = new PanelLayout();
+			layout.SplitPanels.AddRange(new[]
+			{
+				new StoredSplitPanelLayout
+				{
+					Name = "west",
+					Size = 250,
+					PanelGroups = new [] {
+						new PanelGroup { Panels = new [] { "Project Explorer" }.ToList() }
+					}.ToList()
+				},
+				new StoredSplitPanelLayout
+				{
+					Name = "south",
+					Size = 1,
+					PanelGroups = new List<PanelGroup>()
+				},
+				new StoredSplitPanelLayout
+				{
+					Name = "east",
+					Size = 266,
+					PanelGroups = new []
+					{
+						new PanelGroup { Panels = new [] { "Chr Tiles" }.ToList() },
+						new PanelGroup { Panels = new [] { "2x2 Metatiles", "4x4 Metatiles" }.ToList() },
+						new PanelGroup { Panels = new [] { "Map Overview" }.ToList() }
+					}.ToList()
+				}
+			});
+			return layout;
+		}
 	}
 
 	public class PanelLayout
@@ -230,5 +297,10 @@ namespace Brewmaster.Layout
 	{
 		public int Size = -1;
 		[XmlElement(ElementName = "Panel")] public List<string> Panels = new List<string>();
+	}
+
+	public enum LayoutMode
+	{
+		None, Default, MapEditor
 	}
 }

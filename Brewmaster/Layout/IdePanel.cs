@@ -49,12 +49,20 @@ namespace Brewmaster.Layout
 
 		public IdePanel(Control childControl): this()
 		{
+			SetChild(childControl);
+		}
+
+		public void SetChild(Control childControl)
+		{
+			if (Child != null)
+			{
+				Controls.Remove(Child);
+			}
+
 			Child = childControl;
 			childControl.Dock = DockStyle.Fill;
 			Controls.Add(childControl);
 			Controls.SetChildIndex(childControl, 0);
-			var headerManupulator = childControl as IHeaderManupulator;
-			if (headerManupulator != null) headerManupulator.Header = Header;
 		}
 
 		public Control Child { get; protected set; }

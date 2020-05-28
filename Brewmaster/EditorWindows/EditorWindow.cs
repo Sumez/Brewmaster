@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Windows.Forms;
+using Brewmaster.Layout;
 using Brewmaster.Modules;
 using Brewmaster.ProjectModel;
 
@@ -12,6 +13,7 @@ namespace Brewmaster.EditorWindows
 		public AsmProjectFile ProjectFile { get; protected set; }
 		public Events ModuleEvents { get; protected set; }
 		public virtual ToolStrip ToolBar { get; }
+		public virtual LayoutMode LayoutMode { get { return LayoutMode.Default; } }
 
 		public EditorWindow(MainForm form, AsmProjectFile file, Events events)
 		{
@@ -19,6 +21,10 @@ namespace Brewmaster.EditorWindows
 			ProjectFile = file;
 			ModuleEvents = events;
 			Text = ProjectFile.File.Name;
+		}
+
+		public virtual void TabActivated()
+		{
 		}
 	}
 

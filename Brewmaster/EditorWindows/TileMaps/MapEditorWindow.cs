@@ -25,6 +25,8 @@ namespace Brewmaster.EditorWindows.TileMaps
 		private Dictionary<int, MetaTilePalette> _metaTilePalettes;
 		private ScreenPanel _screenPanel;
 		public override ToolStrip ToolBar { get { return MapEditorToolBar; } }
+		public override LayoutMode LayoutMode { get { return LayoutMode.MapEditor; } }
+
 		public MapEditorState State { get; set; }
 
 
@@ -96,8 +98,6 @@ namespace Brewmaster.EditorWindows.TileMaps
 				Pristine = false;
 			};
 
-			form.LayoutHandler.ShowPanel(new IdePanel(_tilePalette) { Label = "CHR Tiles" });
-
 			_metaTilePalettes = new Dictionary<int, MetaTilePalette>();
 			foreach (var metaTileSize in Map.MetaTileResolutions)
 			{
@@ -105,16 +105,33 @@ namespace Brewmaster.EditorWindows.TileMaps
 				var includeAttributes = metaTileSize >= 4;
 				_metaTilePalettes[metaTileSize] = new MetaTilePalette(Map, metaTileSize, State, includeMetaValues, includeAttributes) { Width = 256, Height = 256 };
 				_metaTilePalettes[metaTileSize].UserSelectedTile += () => SelectMetaTilePen(metaTileSize, _metaTilePalettes[metaTileSize], _metaTilePalettes[metaTileSize].SelectedTile);
-				form.LayoutHandler.ShowPanel(new IdePanel(_metaTilePalettes[metaTileSize]) { Label = string.Format("{0}x{0} Metatiles", metaTileSize) });
 			}
 			//form.LayoutHandler.ShowPanel(new IdePanel(_colorPalette) { Label = "Tile Map Palettes" });
-			form.LayoutHandler.ShowPanel(new IdePanel(_mapOverview) { Label = "Map Overview" });
 
 			LoadChrSource();
 			SelectTilePen(0);
 
 			foreach (var screen in Map.Screens.SelectMany(l => l).Where(s => s != null)) InitScreen(screen);
 			ActivateScreen(0, 0);
+		}
+
+		public override void TabActivated()
+		{
+			MainWindow.LoadModule(_mapOverview, "Map Overview");
+			MainWindow.LoadModule(_tilePalette, "Chr Tiles");
+			foreach (var metaTile in _metaTilePalettes)
+			{
+				MainWindow.LoadModule(metaTile.Value, string.Format("{0}x{0} Metatiles", metaTile.Key));
+			}
+
+			MapEditorToolBar.ImportImage = ImportImage;
+			MapEditorToolBar.ImportChr = ImportChr;
+			MapEditorToolBar.ImportMap = ImportMap;
+			MapEditorToolBar.ImportPalette = ImportPalette;
+
+			MapEditorToolBar.TileTool = () => SelectTilePen(0);
+			MapEditorToolBar.ColorTool = SelectPalettePen;
+			MapEditorToolBar.PixelTool = SelectPixelPen;
 		}
 
 		protected override void OnControlRemoved(ControlEventArgs e)
@@ -226,20 +243,6 @@ namespace Brewmaster.EditorWindows.TileMaps
 		public TileMapScreen FocusedScreen { get; set; }
 
 		public TileMap Map { get; set; }
-
-		protected override void OnVisibleChanged(EventArgs e)
-		{
-			base.OnVisibleChanged(e);
-			if (!Visible) return;
-			MapEditorToolBar.ImportImage = ImportImage;
-			MapEditorToolBar.ImportChr = ImportChr;
-			MapEditorToolBar.ImportMap = ImportMap;
-			MapEditorToolBar.ImportPalette = ImportPalette;
-
-			MapEditorToolBar.TileTool = () => SelectTilePen(0);
-			MapEditorToolBar.ColorTool = SelectPalettePen;
-			MapEditorToolBar.PixelTool = SelectPixelPen;
-		}
 
 		private void ImportPalette()
 		{

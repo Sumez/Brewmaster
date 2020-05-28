@@ -37,8 +37,9 @@ namespace Brewmaster
 	public partial class MainForm : Form, IIdeLayoutParent
 	{
 		public const string SettingsFileName = "user.bwmsettings";
-		public const string LayoutFileName = "user.bwmlayout";
-	    public const string ProgramTitle = "Brewmaster";
+		public const string LayoutFileName = "default.user.bwmlayout";
+		public const string MapEditorLayoutFileName = "mapeditor.user.bwmlayout";
+		public const string ProgramTitle = "Brewmaster";
 
 	    public AsmProject CurrentProject { get; set; }
 	    public Settings.Settings Settings { get; private set; }
@@ -158,6 +159,10 @@ namespace Brewmaster
 			}
 			else _buildToolStrip.Visible = true;
 
+				// TODO: Do this dynamically when switching active editor tab
+			if (editorTab != null) StoredLayoutHandler.LoadEditorLayout(_modules, editorTab.LayoutMode);
+			else StoredLayoutHandler.LoadEditorLayout(_modules, LayoutMode.Default); // TODO: Default mode per project type
+
 			UpdateTabListInWindowMenu();
 		}
 
@@ -270,7 +275,8 @@ namespace Brewmaster
 
 				StoredLayoutHandler = new StoredLayoutHandler(this);
 				StoredLayoutHandler.SetDockContainers(eastContainer, westContainer, southContainer);
-				StoredLayoutHandler.LoadPanelLayout(_modules, Program.GetUserFilePath(LayoutFileName));
+				StoredLayoutHandler.LoadPanelLayout(_modules, LayoutMode.Default, Program.GetUserFilePath(LayoutFileName));
+				StoredLayoutHandler.LoadPanelLayout(_modules, LayoutMode.MapEditor, Program.GetUserFilePath(MapEditorLayoutFileName));
 				AddWindowOptions();
 
 				// Setup features
@@ -293,10 +299,7 @@ namespace Brewmaster
 				};
 
 
-				editorTabs.TabWindowsChanged += (tabs) => ActiveFileChanged();
-				editorTabs.SelectedIndexChanged += (o, a) => ActiveFileChanged();
-				editorTabs.ControlAdded += (o, a) => ActiveFileChanged();
-
+				editorTabs.ActiveTabChanged += ActiveFileChanged;
 				_menuHelper.Prepare(new [] { MainWindowMenu, MainToolStrip }, WriteStatus);
 
 				// Apply settings
@@ -349,8 +352,15 @@ namespace Brewmaster
         }
 
 		private readonly Dictionary<string, Control> _modules = new Dictionary<string, Control>();
-		private void LoadModule(Control control, string label)
+		public void LoadModule(Control control, string label)
 		{
+			if (_modules.ContainsKey(label))
+			{
+				var panel = _modules[label].Parent as IdePanel;
+				panel.SetChild(control);
+				_modules[label] = control;
+				return;
+			}
 			new IdePanel(control) { Label = label };
 			_modules.Add(label, control);
 		}
@@ -828,10 +838,11 @@ namespace Brewmaster
 	        Settings.ResizeTileMap = TileMap.FitImage;
 			Settings.Save();
 
-			StoredLayoutHandler.StorePanelLayout(_modules, Program.GetUserFilePath(LayoutFileName));
+			StoredLayoutHandler.StorePanelLayout(_modules, LayoutMode.Default, Program.GetUserFilePath(LayoutFileName));
+	        StoredLayoutHandler.StorePanelLayout(_modules, LayoutMode.MapEditor, Program.GetUserFilePath(MapEditorLayoutFileName));
         }
 
-        private void newNesProjectMenuItem_Click(object sender, EventArgs e)
+		private void newNesProjectMenuItem_Click(object sender, EventArgs e)
         {
 	        CreateNewProject(ProjectType.Nes);
         }
@@ -1937,6 +1948,7 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 		{
 			SuspendLayout();
 			StoredLayoutHandler.LoadPanelLayout(_modules);
+			StoredLayoutHandler.RefreshLayout(_modules);
 			ResumeLayout(true);
 		}
 	}

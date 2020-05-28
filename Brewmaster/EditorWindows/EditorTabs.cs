@@ -13,8 +13,9 @@ namespace Brewmaster.EditorWindows
 	public class EditorTabs : TabControl
     {
 		public event Action<TabPageCollection> TabWindowsChanged;
+		public event Action ActiveTabChanged;
 
-        private Color forecolor = Color.White;
+		private Color forecolor = Color.White;
 	    private Color textColorInactive = Color.Navy;
 
         public Color TextColor
@@ -41,8 +42,19 @@ namespace Brewmaster.EditorWindows
 	        {
 		        if (SelectedTab is TextEditorWindow editorWindow) editorWindow.TextEditor.Focus();
 	        };
+
+	        TabWindowsChanged += (tabs) => CheckActiveTabChanged();
+	        SelectedIndexChanged += (o, a) => CheckActiveTabChanged();
+	        ControlAdded += (o, a) => CheckActiveTabChanged();
         }
 
+	    private void CheckActiveTabChanged()
+	    {
+		    if (!(SelectedTab is EditorWindow) || _activeTab == SelectedTab) return;
+			_activeTab = SelectedTab as EditorWindow;
+			_activeTab.TabActivated();
+			if (ActiveTabChanged != null) ActiveTabChanged();
+	    }
 
 
 	    protected override void OnPaintBackground(PaintEventArgs e)
@@ -146,6 +158,8 @@ namespace Brewmaster.EditorWindows
 	    private TabPage _dragTab = null;
 	    private int _previousDragIndex;
 	    private int _dragOffset;
+	    private EditorWindow _activeTab;
+
 	    protected override void OnMouseDown(MouseEventArgs e)
 	    {
 		    var hoverTab = GetTabFromCoordinates(e.Location);
