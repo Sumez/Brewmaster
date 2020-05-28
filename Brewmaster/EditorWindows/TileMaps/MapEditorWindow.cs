@@ -11,6 +11,7 @@ using Brewmaster.Modules;
 using Brewmaster.Modules.Ppu;
 using Brewmaster.ProjectModel;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 
 namespace Brewmaster.EditorWindows.TileMaps
@@ -127,6 +128,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 			MapEditorToolBar.ImportImage = ImportImage;
 			MapEditorToolBar.ImportChr = ImportChr;
 			MapEditorToolBar.ImportMap = ImportMap;
+			MapEditorToolBar.ImportJsonSession = ImportJson;
 			MapEditorToolBar.ImportPalette = ImportPalette;
 
 			MapEditorToolBar.TileTool = () => SelectTilePen(0);
@@ -249,6 +251,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 			string fileName = null;
 			using (var dialog = new OpenFileDialog())
 			{
+				dialog.Filter = "*.pal|*.pal|*.*|*.*";
 				if (dialog.ShowDialog() != DialogResult.OK) return;
 				fileName = dialog.FileName;
 			}
@@ -259,11 +262,72 @@ namespace Brewmaster.EditorWindows.TileMaps
 			}
 			Pristine = false;
 		}
+		private void ImportJson()
+		{
+			string fileName = null;
+			using (var dialog = new OpenFileDialog())
+			{
+				dialog.Filter = "*.json|*.json|*.*|*.*";
+				if (dialog.ShowDialog() != DialogResult.OK) return;
+				fileName = dialog.FileName;
+			}
+
+			var json = File.ReadAllText(fileName);
+			int stageNumber = 0;
+			using (var prompt = new Form { Size = new Size(100, 100) })
+			{
+				var textBox = new TextBox() { Width = 50, Text = "0" } ;
+				prompt.Controls.Add(textBox);
+				var button = new Button() { Text = "Ok", Width = 50, Top = 30 };
+				prompt.Controls.Add(button);
+				button.Click += (s, a) => { prompt.Close(); };
+
+				prompt.ShowDialog(this);
+				if (!int.TryParse(textBox.Text, out stageNumber)) return;
+			}
+			dynamic data = JObject.Parse(json);
+			var paletteData = JsonConvert.DeserializeObject<List<List<List<int>>>>(data.palettes.ToString());
+			for (var i = 0; i < paletteData.Count; i++)
+			{
+				Map.Palettes[i].Colors.Clear();
+				foreach (var color in paletteData[i])
+				{
+					Map.Palettes[i].Colors.Add(Color.FromArgb(color[0], color[1], color[2]));
+				}
+			}
+			var stages = JsonConvert.DeserializeObject<dynamic[]>(data.stages.ToString());
+			if (stageNumber < 0 || stageNumber >= stages.Length) stageNumber = 0;
+			var stage = stages[stageNumber];
+			Map.AttributeSize = new Size(2, 2);
+			Map.ScreenSize = new Size(32, stage.screens[0].tiles.Count / 32);
+			Map.Screens = new List<List<TileMapScreen>>();
+			var row = new List<TileMapScreen>();
+			Map.Screens.Add(row);
+			foreach (var sourceScreen in stage.screens)
+			{
+				var screen = new TileMapScreen(Map);
+				row.Add(screen);
+				for (var i = 0; i < sourceScreen.tiles.Count && i < screen.Tiles.Length; i++)
+				{
+					if (sourceScreen.tiles[i] != null) screen.Tiles[i] = sourceScreen.tiles[i];
+				}
+				for (var i = 0; i < sourceScreen.colors.Count && i < screen.ColorAttributes.Length; i++)
+				{
+					if (sourceScreen.colors[i] != null) screen.ColorAttributes[i] = sourceScreen.colors[i];
+				}
+			}
+			foreach (var screen in Map.Screens.SelectMany(s => s)) InitScreen(screen);
+			ActivateScreen(0, 0);
+			_colorPalette.Invalidate();
+
+		   Pristine = false;
+		}
 		private void ImportMap()
 		{
 			string fileName = null;
 			using (var dialog = new OpenFileDialog())
 			{
+				dialog.Filter = "*.map|*.map|*.*|*.*";
 				if (dialog.ShowDialog() != DialogResult.OK) return;
 				fileName = dialog.FileName;
 			}
@@ -348,6 +412,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 		{
 			using (var dialog = new OpenFileDialog())
 			{
+				dialog.Filter = "*.chr|*.chr|*.*|*.*";
 				if (dialog.ShowDialog() != DialogResult.OK) return;
 				ChrSource = dialog.FileName;
 			}
