@@ -69,9 +69,12 @@ namespace Brewmaster.EditorWindows.TileMaps
 			_grid = new MapGrid();
 			_state.ZoomChanged += (oldZoom, newZoom) =>
 			{
-				var x = _offset.X * newZoom;
-				var y = _offset.Y * newZoom;
-				Offset = new Point(x / oldZoom, y / oldZoom);
+				var hotSpot = _panel.PointToClient(Cursor.Position);
+				if (!_panel.DisplayRectangle.Contains(hotSpot)) hotSpot = Point.Empty;
+
+				var x = ((_offset.X - hotSpot.X) * newZoom) / oldZoom;
+				var y = ((_offset.Y - hotSpot.Y) * newZoom) / oldZoom;
+				Offset = new Point(x + hotSpot.X, y + hotSpot.Y);
 				RefreshView();
 				_grid.GenerateGrid(_map, _state.Zoom);
 			};
@@ -160,6 +163,14 @@ namespace Brewmaster.EditorWindows.TileMaps
 			screenView.Grid = _grid;
 			_panel.Controls.Add(_singleView = screenView);
 			//_panel.Controls.SetChildIndex(_singleView, 0);
+		}
+
+		public void Pan(int deltaX, int deltaY)
+		{
+			Offset = new Point(
+				Math.Max(- (_hScrollBar.Maximum), Math.Min(- _hScrollBar.Minimum, Offset.X - deltaX)),
+				Math.Max(- (_vScrollBar.Maximum), Math.Min(- _vScrollBar.Minimum, Offset.Y - deltaY))
+			);
 		}
 	}
 }

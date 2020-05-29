@@ -391,12 +391,23 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 		protected override void OnMouseWheel(MouseEventArgs e)
 		{
-			var zoom = State.Zoom;
-			if (e.Delta > 0) zoom++;
-			else zoom--;
-			if (zoom < 1) zoom = 1;
-			if (zoom > 20) zoom = 20;
-			State.Zoom = zoom;
+			if (ModifierKeys.HasFlag(Keys.Control))
+			{
+				var zoom = State.Zoom;
+				if (e.Delta > 0) zoom++;
+				else zoom--;
+				if (zoom < 1) zoom = 1;
+				if (zoom > 20) zoom = 20;
+				State.Zoom = zoom;
+
+				return;
+			}
+
+			if (ModifierKeys.HasFlag(Keys.Shift))
+			{
+				_screenPanel.Pan(-e.Delta, 0);
+			}
+			else _screenPanel.Pan(0, -e.Delta);
 		}
 
 		private void ImportImage()
