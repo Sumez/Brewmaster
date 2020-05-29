@@ -201,6 +201,7 @@
     <Compile Include="EditorWindows\TileMaps\ScreenPanel.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="EditorWindows\TileMaps\TileImage.cs" />
     <Compile Include="EditorWindows\TileMaps\TileMap.cs" />
     <Compile Include="EditorWindows\TileMaps\TilePalette.cs">
       <SubType>Component</SubType>

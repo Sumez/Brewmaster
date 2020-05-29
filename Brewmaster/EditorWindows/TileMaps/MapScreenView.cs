@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
@@ -46,9 +47,6 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 			_toolBrush = new SolidBrush(Color.FromArgb(128, 255, 255, 255));
 
-			_state.ZoomChanged += RefreshView;
-			RefreshView();
-
 			_screen.TileChanged += RefreshTile;
 
 			var mouseHandler = new OsFeatures.GlobalMouseHandler();
@@ -61,17 +59,21 @@ namespace Brewmaster.EditorWindows.TileMaps
 			};
 			state.ToolChanged += () => { Cursor = state.Tool.Pixel ? new Cursor(new MemoryStream(Resources.pen)) : Cursors.Default; };
 		}
-		protected override void Dispose(bool disposing)
+		public void RefreshView()
 		{
-			_state.ZoomChanged -= RefreshView;
-			base.Dispose(disposing);
-		}
+			RenderSize = new Size(
+				_map.ScreenSize.Width * _map.BaseTileSize.Width * Zoom,
+				_map.ScreenSize.Height * _map.BaseTileSize.Height * Zoom);
+			if (Parent == null) return;
 
-		private void RefreshView()
-		{
-			var width = _map.ScreenSize.Width * _map.BaseTileSize.Width * Zoom;
-			var height = _map.ScreenSize.Height * _map.BaseTileSize.Height * Zoom;
+			// TODO: Set visible = false when outside visible range 
+			//var width = Math.Min(Parent.DisplayRectangle.Width, RenderSize.Width);
+			//var height = Math.Min(Parent.DisplayRectangle.Height, RenderSize.Height);
+			var width = Parent.DisplayRectangle.Width;
+			var height = Parent.DisplayRectangle.Height;
+
 			if (Width != width || Height != height) Size = new Size(width, height);
+			RefreshVisibleTiles();
 			Invalidate();
 		}
 
@@ -83,7 +85,6 @@ namespace Brewmaster.EditorWindows.TileMaps
 			_alteredByTool = false;
 			return false;
 		}
-
 
 		protected override void OnMouseDown(MouseEventArgs e)
 		{
@@ -105,10 +106,10 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 		protected override void OnMouseMove(MouseEventArgs e)
 		{
-			var x = e.Location.X / ToolWidth;
+			var x = (e.Location.X - Offset.X) / ToolWidth;
 			if (x < 0 || x >= (_map.ScreenSize.Width * _map.BaseTileSize.Width) / (Tool.Size.Width * (Tool.Pixel ? 1 : _map.BaseTileSize.Width))) x = -1;
 
-			var y = e.Location.Y / ToolHeight;
+			var y = (e.Location.Y - Offset.Y) / ToolHeight;
 			if (y < 0 || y >= (_map.ScreenSize.Height * _map.BaseTileSize.Height) / (Tool.Size.Height * (Tool.Pixel ? 1 : _map.BaseTileSize.Height))) y = -1;
 
 			if (_cursorX == x && _cursorY == y) return;
@@ -143,18 +144,23 @@ namespace Brewmaster.EditorWindows.TileMaps
 		private void InvalidateToolPosition(int x, int y)
 		{
 			if (x < 0 || y < 0) return;
-			Invalidate(new Rectangle(x * ToolWidth, y * ToolHeight, ToolWidth + 1, ToolHeight + 1));
+			Invalidate(new Rectangle(x * ToolWidth + Offset.X, y * ToolHeight + Offset.Y, ToolWidth + 1, ToolHeight + 1));
 		}
-		
+
 		public int Zoom
 		{
 			get { return _state.Zoom; }
 		}
+		public Size RenderSize { get; set; }
+		public Point Offset { get; set; }
 		protected override void OnPaint(PaintEventArgs e)
 		{
 			base.OnPaint(e);
 			//var timer = new Stopwatch();
 			//timer.Start();
+			e.Graphics.SetClip(Rectangle.Intersect(e.ClipRectangle, new Rectangle(Offset.X, Offset.Y, RenderSize.Width, RenderSize.Height)));
+			e.Graphics.TranslateTransform(Offset.X, Offset.Y);
+
 			e.Graphics.CompositingMode = CompositingMode.SourceCopy;
 			e.Graphics.CompositingQuality = CompositingQuality.HighSpeed;
 			e.Graphics.PixelOffsetMode = PixelOffsetMode.Half;
@@ -170,14 +176,14 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 			e.Graphics.CompositingMode = CompositingMode.SourceOver;
 			e.Graphics.PixelOffsetMode = PixelOffsetMode.None;
-			if (Grid != null && e.Graphics.ClipBounds.Left >= 0)
+			if (Grid != null && e.ClipRectangle.Left >= 0)
 			{
 				var tileWidth = _map.BaseTileSize.Width * Zoom;
 				var tileHeight = _map.BaseTileSize.Height * Zoom;
-				var minX = Math.Max(0, (int) (e.Graphics.ClipBounds.Left / tileWidth) / MapGrid.Factor * MapGrid.Factor);
-				var minY = Math.Max(0, (int) (e.Graphics.ClipBounds.Top / tileHeight) / MapGrid.Factor * MapGrid.Factor);
-				var maxX = Math.Min(_map.ScreenSize.Width, (int)(e.Graphics.ClipBounds.Right / tileWidth) + MapGrid.Factor);
-				var maxY = Math.Min(_map.ScreenSize.Height, (int)(e.Graphics.ClipBounds.Bottom / tileHeight) + MapGrid.Factor);
+				var minX = Math.Max(0, (int) ((e.ClipRectangle.Left - Offset.X) / tileWidth) / MapGrid.Factor * MapGrid.Factor);
+				var minY = Math.Max(0, (int) ((e.ClipRectangle.Top - Offset.Y) / tileHeight) / MapGrid.Factor * MapGrid.Factor);
+				var maxX = Math.Min(_map.ScreenSize.Width, (int)((e.ClipRectangle.Right - Offset.X) / tileWidth) + MapGrid.Factor);
+				var maxY = Math.Min(_map.ScreenSize.Height, (int)((e.ClipRectangle.Bottom - Offset.Y) / tileHeight) + MapGrid.Factor);
 				for (var x = minX; x < maxX; x += MapGrid.Factor)
 				{
 					for (var y = minY; y < maxY; y += MapGrid.Factor)
@@ -203,7 +209,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 		public void RefreshTile(int x, int y)
 		{
 			_screen.RefreshTile(x, y, _state, true);
-			Invalidate(new Rectangle(x * _map.BaseTileSize.Width * Zoom, y * _map.BaseTileSize.Width * Zoom, _map.BaseTileSize.Width * Zoom, _map.BaseTileSize.Height * Zoom));
+			Invalidate(new Rectangle(x * _map.BaseTileSize.Width * Zoom + Offset.X, y * _map.BaseTileSize.Width * Zoom + Offset.Y, _map.BaseTileSize.Width * Zoom, _map.BaseTileSize.Height * Zoom));
 		}
 
 		public void RefreshAllTiles()
@@ -219,10 +225,10 @@ namespace Brewmaster.EditorWindows.TileMaps
 			var tileWidth = _map.BaseTileSize.Width * Zoom;
 			var tileHeight = _map.BaseTileSize.Height * Zoom;
 
-			var minX = Math.Max(0, -Location.X) / tileWidth;
-			var minY = Math.Max(0, -Location.Y) / tileHeight;
-			var maxX = Parent.DisplayRectangle.Size.Width / tileWidth - Location.X / tileWidth;
-			var maxY = Parent.DisplayRectangle.Size.Height / tileHeight - Location.Y / tileHeight;
+			var minX = Math.Max(0, -Offset.X) / tileWidth;
+			var minY = Math.Max(0, -Offset.Y) / tileHeight;
+			var maxX = Parent.DisplayRectangle.Size.Width / tileWidth - Offset.X / tileWidth + 1;
+			var maxY = Parent.DisplayRectangle.Size.Height / tileHeight - Offset.Y / tileHeight + 1;
 
 			for (var x = minX; x <= maxX && x < _map.ScreenSize.Width; x++)
 			{

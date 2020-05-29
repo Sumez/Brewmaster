@@ -95,7 +95,6 @@ namespace Brewmaster.EditorWindows.TileMaps
 				State.OnPaletteChanged();
 				_screenView.RefreshAllTiles();
 				SetToolImage(_screenView.Tool as TilePen);
-				if (_screenView.Tool is PixelPen pixelPen) pixelPen.PrepareImages(Map);
 				Pristine = false;
 			};
 
@@ -219,7 +218,6 @@ namespace Brewmaster.EditorWindows.TileMaps
 		private void SelectPixelPen()
 		{
 			var tool = new PixelPen();
-			tool.PrepareImages(Map);
 			State.Tool = tool;
 			tool.SelectedColor = 3;
 		}
@@ -529,23 +527,23 @@ namespace Brewmaster.EditorWindows.TileMaps
 			if (ZoomChanged != null) ZoomChanged();
 		}
 
-		private Dictionary<int, Dictionary<Palette, Image>> _cachedTiles = new Dictionary<int, Dictionary<Palette, Image>>();
-		public Image GetTileImage(int index, Palette palette)
+		private Dictionary<int, Dictionary<Palette, TileImage>> _cachedTiles = new Dictionary<int, Dictionary<Palette, TileImage>>();
+		public TileImage GetTileImage(int index, Palette palette)
 		{
 			lock (_cachedTiles)
 			{
-				if (!_cachedTiles.ContainsKey(index)) _cachedTiles.Add(index, new Dictionary<Palette, Image>());
-				if (!_cachedTiles[index].ContainsKey(palette)) _cachedTiles[index].Add(palette, TilePalette.GetTileImage(ChrData, index, palette.Colors));
+				if (!_cachedTiles.ContainsKey(index)) _cachedTiles.Add(index, new Dictionary<Palette, TileImage>());
+				if (!_cachedTiles[index].ContainsKey(palette)) _cachedTiles[index].Add(palette, TileImage.GetTileImage(ChrData, index, palette.Colors));
 			}
 			return _cachedTiles[index][palette];
 		}
 		public void ClearTileCache()
 		{
-			IEnumerable<Image> oldImages;
+			IEnumerable<TileImage> oldImages;
 			lock (_cachedTiles)
 			{
 				oldImages = _cachedTiles.Values.SelectMany(x => x.Values).ToList();
-				_cachedTiles = new Dictionary<int, Dictionary<Palette, Image>>();
+				_cachedTiles = new Dictionary<int, Dictionary<Palette, TileImage>>();
 			}
 			Task.Run(() => { foreach (var image in oldImages.Where(i => i != null)) image.Dispose(); });
 		}

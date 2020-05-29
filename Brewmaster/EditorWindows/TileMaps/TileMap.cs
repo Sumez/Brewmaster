@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
@@ -132,9 +133,9 @@ namespace Brewmaster.EditorWindows.TileMaps
 		public readonly object TileDrawLock = new Object();
 		public void RefreshTile(int x, int y, MapEditorState state, bool force = false)
 		{
-			if (_updatedTiles == null || !force && _updatedTiles.ContainsKey(new Point(x, y))) return;
-
 			var index = y * _map.ScreenSize.Width + x;
+			if (_updatedTiles == null || !force && _updatedTiles.ContainsKey(index)) return;
+
 			var attributeIndex = (y / _map.AttributeSize.Height) * (_map.ScreenSize.Width / _map.AttributeSize.Width) + (x / _map.AttributeSize.Width);
 			var paletteIndex = ColorAttributes[attributeIndex];
 			var tile = state.GetTileImage(Tiles[index], _map.Palettes[paletteIndex]);
@@ -143,36 +144,42 @@ namespace Brewmaster.EditorWindows.TileMaps
 			using (var graphics = Graphics.FromImage(Image))
 			{
 				graphics.CompositingMode = CompositingMode.SourceCopy;
-				lock (tile) graphics.DrawImageUnscaled(tile, x * _map.BaseTileSize.Width, y * _map.BaseTileSize.Height);
+				lock (tile) graphics.DrawImageUnscaled(tile.Image, x * _map.BaseTileSize.Width, y * _map.BaseTileSize.Height);
 			}
 			
 			lock (_updatedTiles)
-			if (!_updatedTiles.ContainsKey(new Point(x, y))) _updatedTiles.Add(new Point(x, y), true);
+			if (!_updatedTiles.ContainsKey(index)) _updatedTiles.Add(index, true);
 		}
 
 		private Task _fullRefreshTask;
-		private Dictionary<Point, bool> _updatedTiles;
+		private Dictionary<int, bool> _updatedTiles;
 		private Action _cancelRefresh;
 		public void RefreshAllTiles(MapEditorState state)
 		{
-			_updatedTiles = new Dictionary<Point, bool>();
+			_updatedTiles = new Dictionary<int, bool>();
 
 			if (_cancelRefresh != null)
 			{
 				_cancelRefresh();
-				_fullRefreshTask.Wait();
+				if (!_fullRefreshTask.IsCompleted) _fullRefreshTask.Wait();
 			}
 			var tokenSource = new CancellationTokenSource();
 			_cancelRefresh = () => tokenSource.Cancel();
 			var token = tokenSource.Token;
 			_fullRefreshTask = Task.Run(() =>
 			{
+				//var timer = new Stopwatch();
+				//timer.Start();
+
 				for (var x = 0; x < _map.ScreenSize.Width; x++)
 				for (var y = 0; y < _map.ScreenSize.Height; y++)
 				{
 					RefreshTile(x, y, state);
 					if (token.IsCancellationRequested) return;
 				}
+
+				//timer.Stop();
+				//Debug.WriteLine("Full redraw: " + timer.Elapsed.TotalMilliseconds);
 				if (ImageUpdated != null) ImageUpdated();
 			}, token);
 		}

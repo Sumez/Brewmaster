@@ -41,21 +41,30 @@ namespace Brewmaster.EditorWindows.TileMaps
 				_panOffset = point;
 				if (_singleView != null)
 				{
-					_singleView.Location = _offset;
+					_singleView.Offset = _offset;
+					_singleView.RefreshVisibleTiles();
 					_singleView.Refresh();
 				}
 				return true;
 			};
 
 			_grid = new MapGrid();
-			_state.ZoomChanged += () => _grid.GenerateGrid(_map, _state.Zoom);
+			_state.ZoomChanged += () =>
+			{
+				if (_singleView != null) _singleView.RefreshView();
+				_grid.GenerateGrid(_map, _state.Zoom);
+			};
 			_grid.GenerateGrid(_map, _state.Zoom);
 		}
 
 		protected override void OnLayout(LayoutEventArgs levent)
 		{
 			base.OnLayout(levent);
-			if (_singleView != null) _singleView.RefreshVisibleTiles();
+			if (_singleView != null)
+			{
+				if (_singleView != null) _singleView.RefreshView();
+				_singleView.RefreshVisibleTiles();
+			}
 		}
 
 		private const int WM_KEYDOWN = 0x0100;

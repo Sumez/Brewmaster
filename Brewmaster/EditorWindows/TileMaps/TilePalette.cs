@@ -180,11 +180,11 @@ namespace Brewmaster.EditorWindows.TileMaps
 								var metaTile = Tiles[i];
 								for (var j = 0; j < metaTile.Tiles.Length; j++)
 								{
-									using (var tile = GetTileImage(ChrData, metaTile.Tiles[j], GetTileColors(metaTile, j)))
+									using (var tile = TileImage.GetTileImage(ChrData, metaTile.Tiles[j], GetTileColors(metaTile, j)))
 									{
 										if (tile == null) continue;
 
-										graphics.DrawImageUnscaled(tile,
+										graphics.DrawImageUnscaled(tile.Image,
 											(i % _rowWidth) * metaTileWidth + (j % _metaTileWidth) * _tileWidth,
 											(i / _rowWidth) * metaTileHeight + (j / _metaTileWidth) * _tileHeight);
 									}
@@ -202,39 +202,6 @@ namespace Brewmaster.EditorWindows.TileMaps
 		}
 
 		public Func<MetaTile, int, List<Color>> GetTileColors;
-
-		public static Bitmap GetTileImage(byte[] data, int index, List<Color> palette, int bitDepth = 2, ProjectType projectType = ProjectType.Nes)
-		{
-			var tileSize = 8 * bitDepth;
-			var offset = index * tileSize;
-			if (data.Length < offset + tileSize || index < 0) return null;
-
-			var tile = new Bitmap(8, 8);
-			for (var y = 0; y < 8; y++)
-			{
-				for (var x = 0; x < 8; x++)
-				{
-					var colorIndex = 0;
-					for (var j = 0; j <= (bitDepth / 2); j += 2)
-					{
-						var byte0Index = (8 * j) + (projectType == ProjectType.Snes ? y * 2 : y);
-						var byte1Index = (8 * j) + (projectType == ProjectType.Snes ? y * 2 + 1 : y + 8);
-
-						var byte0 = data[offset + byte0Index];
-						var byte1 = data[offset + byte1Index];
-
-						var bit0 = (byte0 >> (7 - x)) & 1;
-						var bit1 = (byte1 >> (7 - x)) & 1;
-
-						colorIndex |= bit0 << j;
-						colorIndex |= bit1 << (j + 1);
-					}
-					tile.SetPixel(x, y, palette[colorIndex]);
-				}
-			}
-
-			return tile;
-		}
 
 		protected override void OnPaint(PaintEventArgs e)
 		{

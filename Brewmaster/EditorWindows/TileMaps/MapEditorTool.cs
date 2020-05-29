@@ -10,7 +10,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 	{
 		public event Action Unselected;
 		public virtual Size Size { get; protected set; }
-		public Image Image { get; protected set; }
+		public virtual Image Image { get; protected set; }
 		public virtual bool Pixel { get { return false; } }
 
 		public abstract void Paint(int x, int y, TileMapScreen screen);
@@ -47,27 +47,16 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 		public int SelectedColor { get; set; }
 
-		private static Dictionary<Color, Image> _colorImages = new Dictionary<Color, Image>();
 		private Bitmap _pixelImage;
 
-		public void PrepareImages(TileMap map)
-		{
-			foreach (var color in map.Palettes.SelectMany(p => p.Colors))
-			{
-				if (!_colorImages.ContainsKey(color))
-				{
-					var image = new Bitmap(1, 1);
-					image.SetPixel(0, 0, color);
-					_colorImages[color] = image;
-				}
-			}
-		}
 	}
 
 	public class TilePen : MapEditorTool, IPaletteTool
 	{
 		public event Action SelectedTileChanged;
 		private int _selectedTile;
+		private TileImage _imageTile;
+
 		public int SelectedTile
 		{
 			get { return _selectedTile; }
@@ -100,8 +89,10 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 		public virtual void SetImage(byte[] chrData, TileMap map)
 		{
-			if (Image != null) Image.Dispose();
-			Image = TilePalette.GetTileImage(chrData, SelectedTile, map.Palettes[GetSelectedPalette()].Colors);
+			var imageTile = TileImage.GetTileImage(chrData, SelectedTile, map.Palettes[GetSelectedPalette()].Colors);
+			Image = imageTile.Image;
+			if (_imageTile != null) _imageTile.Dispose();
+			_imageTile = imageTile;
 		}
 	}
 
@@ -182,9 +173,9 @@ namespace Brewmaster.EditorWindows.TileMaps
 				for (var i = 0; i < MetaTile.Tiles.Length; i++)
 				{
 					var paletteIndex = MetaTile.Attributes[((i/_metaTileSize) / map.AttributeSize.Height) * map.AttributeSize.Width + ((i % _metaTileSize) / map.AttributeSize.Width)];
-					using (var tile = TilePalette.GetTileImage(chrData, MetaTile.Tiles[i], map.Palettes[paletteIndex].Colors))
+					using (var tile = TileImage.GetTileImage(chrData, MetaTile.Tiles[i], map.Palettes[paletteIndex].Colors))
 					{
-						graphics.DrawImageUnscaled(tile, (i % _metaTileSize) * map.BaseTileSize.Width, (i / _metaTileSize) * map.BaseTileSize.Height);
+						graphics.DrawImageUnscaled(tile.Image, (i % _metaTileSize) * map.BaseTileSize.Width, (i / _metaTileSize) * map.BaseTileSize.Height);
 					}
 				}
 			}
