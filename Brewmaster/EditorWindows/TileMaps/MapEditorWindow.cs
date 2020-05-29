@@ -502,14 +502,16 @@ namespace Brewmaster.EditorWindows.TileMaps
 		public int Zoom
 		{
 			get { return _zoom; }
-			set { _zoom = value; OnZoomChanged(); }
+			set
+			{
+				var oldValue = _zoom; _zoom = value; OnZoomChanged(oldValue, _zoom); }
 		}
 
 
 		public event Action PaletteChanged;
 		public event Action ChrDataChanged;
 		public event Action ToolChanged;
-		public event Action ZoomChanged;
+		public event Action<int, int> ZoomChanged;
 		public void OnPaletteChanged()
 		{
 			if (PaletteChanged != null) PaletteChanged();
@@ -522,9 +524,9 @@ namespace Brewmaster.EditorWindows.TileMaps
 		{
 			if (ToolChanged != null) ToolChanged();
 		}
-		public void OnZoomChanged()
+		public void OnZoomChanged(int oldValue, int newValue)
 		{
-			if (ZoomChanged != null) ZoomChanged();
+			if (ZoomChanged != null) ZoomChanged(oldValue, newValue);
 		}
 
 		private Dictionary<int, Dictionary<Palette, TileImage>> _cachedTiles = new Dictionary<int, Dictionary<Palette, TileImage>>();

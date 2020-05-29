@@ -161,7 +161,14 @@ namespace Brewmaster.EditorWindows.TileMaps
 			if (_cancelRefresh != null)
 			{
 				_cancelRefresh();
-				if (!_fullRefreshTask.IsCompleted) _fullRefreshTask.Wait();
+				try
+				{
+					_fullRefreshTask.Wait();
+				}
+				catch (AggregateException ex)
+				{
+					if (ex.InnerException != null && !(ex.InnerException is TaskCanceledException)) throw ex.InnerException;
+				}
 			}
 			var tokenSource = new CancellationTokenSource();
 			_cancelRefresh = () => tokenSource.Cancel();
