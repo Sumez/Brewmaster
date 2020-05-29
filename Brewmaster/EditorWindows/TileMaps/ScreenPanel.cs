@@ -121,7 +121,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 				{
 					_singleView.Offset = _offset;
 					_singleView.RefreshVisibleTiles();
-					_singleView.Invalidate();
+					_singleView.Refresh();
 
 					_hScrollBar.Maximum = Math.Max(_singleView.RenderSize.Width - _panel.Width + _hScrollBar.LargeChange, -_offset.X);
 					_vScrollBar.Maximum = Math.Max(_singleView.RenderSize.Height - _panel.Height + _vScrollBar.LargeChange, -_offset.Y);
