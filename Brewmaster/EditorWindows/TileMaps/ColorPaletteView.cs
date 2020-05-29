@@ -132,7 +132,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 				var colorPicker = new NesColorPicker();
 				colorPicker.Color = Palette.Colors[paletteIndex];
 				colorPicker.StartPosition = FormStartPosition.Manual;
-				colorPicker.Location = PointToScreen(new Point(0, Height));
+				colorPicker.Location = PointToScreen(new Point(0, -colorPicker.Height));
 				colorPicker.Show(this);
 				colorPicker.FormClosing += (s, a) =>
 				{

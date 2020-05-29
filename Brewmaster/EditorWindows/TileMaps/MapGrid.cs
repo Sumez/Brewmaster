@@ -1,5 +1,6 @@
 ﻿using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
 using System.Windows.Forms;
 
 namespace Brewmaster.EditorWindows.TileMaps
@@ -38,7 +39,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 			{
 			*/
 				//using (var gridTile = new Bitmap(tileWidth * Factor, tileHeight * Factor))
-			var gridTile = new Bitmap(tileWidth * Factor, tileHeight * Factor);
+			var gridTile = new Bitmap(tileWidth * Factor, tileHeight * Factor, PixelFormat.Format32bppPArgb);
 			{
 				using (var tileGraphics = Graphics.FromImage(gridTile))
 				{

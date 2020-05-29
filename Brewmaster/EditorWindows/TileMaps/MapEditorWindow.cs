@@ -296,8 +296,8 @@ namespace Brewmaster.EditorWindows.TileMaps
 			var stages = JsonConvert.DeserializeObject<dynamic[]>(data.stages.ToString());
 			if (stageNumber < 0 || stageNumber >= stages.Length) stageNumber = 0;
 			var stage = stages[stageNumber];
-			Map.Width = stage.width;
-			Map.Height = stage.height;
+			Map.Width = stage.width != null ? stage.width : stage.screens.Count;
+			Map.Height = stage.height != null ? stage.height : 1;
 			Map.AttributeSize = new Size(2, 2);
 			Map.ScreenSize = new Size(32, stage.screens[0].tiles.Count / 32);
 			Map.Screens = new List<List<TileMapScreen>>();

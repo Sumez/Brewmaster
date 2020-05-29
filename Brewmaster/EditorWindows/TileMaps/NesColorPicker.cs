@@ -34,7 +34,15 @@ namespace Brewmaster.EditorWindows.TileMaps
 			LostFocus += (s, a) => Close();
 		}
 
-		public Color Color { get; set; }
+		private Color _color;
+		public Color Color {
+			get { return _color; }
+			set
+			{
+				_color = value;
+				_paletteView.DefaultIndex = NesPalette.Colors.IndexOf(_color);
+			}
+		}
 
 		protected override void OnShown(EventArgs e)
 		{

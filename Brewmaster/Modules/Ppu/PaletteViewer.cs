@@ -7,7 +7,18 @@ namespace Brewmaster.Modules.Ppu
 	public class PaletteViewer : Control
 	{
 		private Palette _palette;
-		public int HoverIndex { get; private set; }
+		private int _defaultIndex = -1;
+		public int DefaultIndex {
+			get { return _defaultIndex; }
+			set
+			{
+				if (HoverIndex == _defaultIndex) HoverIndex = -1;
+				_defaultIndex = value;
+				if (HoverIndex < 0) HoverIndex = _defaultIndex;
+				Invalidate();
+			}
+		}
+		public int HoverIndex { get; protected set; }
 		public int Columns { get; set; }
 		public int CellHeight { get; set; }
 		public int CellWidth { get; set; }
@@ -18,7 +29,7 @@ namespace Brewmaster.Modules.Ppu
 		public PaletteViewer()
 		{
 			AllowHover = true;
-			HoverIndex = -1;
+			HoverIndex = DefaultIndex;
 			CellWidth = 20;
 			CellHeight = 20;
 			DoubleBuffered = true;
@@ -42,7 +53,7 @@ namespace Brewmaster.Modules.Ppu
 		{
 			base.OnMouseMove(e);
 			var hoverIndex = (e.Location.Y / CellHeight) * Columns + (e.Location.X / CellWidth);
-			if (hoverIndex >= Palette.Colors.Count || e.Location.X > Columns * CellWidth) hoverIndex = -1;
+			if (hoverIndex >= Palette.Colors.Count || e.Location.X > Columns * CellWidth) hoverIndex = DefaultIndex;
 			if (hoverIndex == HoverIndex) return;
 			HoverIndex = hoverIndex;
 			if (ColorClicked != null) Cursor = HoverIndex >= 0 ? Cursors.Hand : Cursors.Default;
@@ -52,7 +63,7 @@ namespace Brewmaster.Modules.Ppu
 		protected override void OnMouseLeave(EventArgs e)
 		{
 			base.OnMouseLeave(e);
-			HoverIndex = -1;
+			HoverIndex = DefaultIndex;
 			Invalidate();
 		}
 
