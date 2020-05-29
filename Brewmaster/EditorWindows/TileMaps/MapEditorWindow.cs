@@ -298,13 +298,19 @@ namespace Brewmaster.EditorWindows.TileMaps
 			var stages = JsonConvert.DeserializeObject<dynamic[]>(data.stages.ToString());
 			if (stageNumber < 0 || stageNumber >= stages.Length) stageNumber = 0;
 			var stage = stages[stageNumber];
+			Map.Width = stage.width;
+			Map.Height = stage.height;
 			Map.AttributeSize = new Size(2, 2);
 			Map.ScreenSize = new Size(32, stage.screens[0].tiles.Count / 32);
 			Map.Screens = new List<List<TileMapScreen>>();
-			var row = new List<TileMapScreen>();
-			Map.Screens.Add(row);
+			List<TileMapScreen> row = null;
 			foreach (var sourceScreen in stage.screens)
 			{
+				if (row == null || row.Count == Map.Width)
+				{
+					row = new List<TileMapScreen>();
+					Map.Screens.Add(row);
+				}
 				var screen = new TileMapScreen(Map);
 				row.Add(screen);
 				for (var i = 0; i < sourceScreen.tiles.Count && i < screen.Tiles.Length; i++)
@@ -315,6 +321,11 @@ namespace Brewmaster.EditorWindows.TileMaps
 				{
 					if (sourceScreen.colors[i] != null) screen.ColorAttributes[i] = sourceScreen.colors[i];
 				}
+				for (var i = 0; i < sourceScreen.collisions.Count && i < screen.MetaValues.Length; i++)
+				{
+					if (sourceScreen.collisions[i] != null) screen.MetaValues[i] = sourceScreen.collisions[i];
+				}
+
 			}
 			foreach (var screen in Map.Screens.SelectMany(s => s)) InitScreen(screen);
 			ActivateScreen(0, 0);
@@ -533,10 +544,10 @@ namespace Brewmaster.EditorWindows.TileMaps
 			IEnumerable<Image> oldImages;
 			lock (_cachedTiles)
 			{
-				oldImages = _cachedTiles.Values.SelectMany(x => x.Values);
+				oldImages = _cachedTiles.Values.SelectMany(x => x.Values).ToList();
 				_cachedTiles = new Dictionary<int, Dictionary<Palette, Image>>();
 			}
-			Task.Run(() => { foreach (var image in oldImages) image.Dispose(); });
+			Task.Run(() => { foreach (var image in oldImages.Where(i => i != null)) image.Dispose(); });
 		}
 	}
 

@@ -18,6 +18,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 		public List<Palette> Palettes = new List<Palette>();
 		public Size BaseTileSize = new Size(8, 8);
 		public Size AttributeSize = new Size(2, 2);
+		public Size MetaValueSize = new Size(2, 2);
 		public Size ScreenSize = new Size(32, 30);
 		public int BitsPerPixel = 2;
 		public int ColorCount { get { return (int)Math.Pow(2, BitsPerPixel); } }
@@ -31,6 +32,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 				Height = Height,
 				ScreenSize = ScreenSize,
 				AttributeSize = AttributeSize,
+				MetaValueSize = MetaValueSize,
 				BitsPerPixel = BitsPerPixel,
 				Screens = GetScreenArray(),
 				Palettes = Palettes.Select(p => p.Colors).ToList()
@@ -47,7 +49,9 @@ namespace Brewmaster.EditorWindows.TileMaps
 				screens[y * Width + x] = new SerializableScreen
 				{
 					Tiles = Screens[y][x].Tiles,
-					ColorAttributes = Screens[y][x].ColorAttributes
+					ColorAttributes = Screens[y][x].ColorAttributes,
+					MetaValues = Screens[y][x].MetaValues,
+					Objects = Screens[y][x].Objects
 				};
 			}
 			return screens;
@@ -55,6 +59,17 @@ namespace Brewmaster.EditorWindows.TileMaps
 	}
 	public class TileMapScreen
 	{
+		public int[] Tiles;
+		public int[] ColorAttributes;
+		public int[] MetaValues;
+		public MapObject[] Objects;
+
+		public Bitmap Image;
+
+		public event Action<int, int> TileChanged;
+		public event Action EditEnd;
+		public event Action ImageUpdated;
+
 		private readonly TileMap _map;
 
 		public TileMapScreen(TileMap map)
@@ -62,15 +77,9 @@ namespace Brewmaster.EditorWindows.TileMaps
 			_map = map;
 			Tiles = new int[map.ScreenSize.Width * map.ScreenSize.Height];
 			ColorAttributes = new int[(map.ScreenSize.Width / map.AttributeSize.Width) * (map.ScreenSize.Height / map.AttributeSize.Height)];
+			MetaValues = new int[(map.ScreenSize.Width / map.MetaValueSize.Width) * (map.ScreenSize.Height / map.MetaValueSize.Height)];
 			Image = new Bitmap(map.ScreenSize.Width * map.BaseTileSize.Width, map.ScreenSize.Height * map.BaseTileSize.Height);
 		}
-
-		public Bitmap Image;
-		public int[] Tiles;
-		public int[] ColorAttributes;
-		public event Action<int, int> TileChanged;
-		public event Action EditEnd;
-		public event Action ImageUpdated;
 
 		public void Unload()
 		{
@@ -218,10 +227,19 @@ namespace Brewmaster.EditorWindows.TileMaps
 	}
 
 	[Serializable]
+	public struct MapObject
+	{
+		public int X;
+		public int Y;
+		public int Id;
+	}
+
+	[Serializable]
 	public class SerializableTileMap
 	{
 		public Size ScreenSize = new Size(32, 30);
 		public Size AttributeSize = new Size(2, 2);
+		public Size MetaValueSize = new Size(2, 2);
 		public int BitsPerPixel;
 		public int Width;
 		public int Height;
@@ -238,6 +256,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 				ScreenSize = ScreenSize,
 				BitsPerPixel = BitsPerPixel,
 				AttributeSize = AttributeSize,
+				MetaValueSize = MetaValueSize,
 				Palettes = Palettes != null ? Palettes.Select(c => new Palette { Colors = c }).ToList() : new List<Palette>()
 			};
 			for (var y = 0; y < Height; y++)
@@ -256,6 +275,8 @@ namespace Brewmaster.EditorWindows.TileMaps
 					var screen = new TileMapScreen(map);
 					if (screenSource.Tiles != null) screen.Tiles = screenSource.Tiles;
 					if (screenSource.ColorAttributes != null) screen.ColorAttributes = screenSource.ColorAttributes;
+					if (screenSource.MetaValues != null) screen.MetaValues = screenSource.MetaValues;
+					if (screenSource.Objects != null) screen.Objects = screenSource.Objects;
 					row.Add(screen);
 				}
 			}
@@ -269,6 +290,8 @@ namespace Brewmaster.EditorWindows.TileMaps
 	{
 		public int[] Tiles;
 		public int[] ColorAttributes;
+		public int[] MetaValues;
+		public MapObject[] Objects;
 	}
 
 	[Serializable]
