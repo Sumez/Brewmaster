@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.Linq;
 using Brewmaster.Modules.Ppu;
 
@@ -29,7 +30,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 		public PixelPen()
 		{
 			Size = new Size(1, 1);
-			Image = _pixelImage = new Bitmap(1, 1);
+			Image = _pixelImage = new Bitmap(1, 1, PixelFormat.Format32bppPArgb);
 		}
 		public override bool Pixel { get { return true; } }
 		public override void Paint(int x, int y, TileMapScreen screen)
@@ -167,7 +168,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 		public override void SetImage(byte[] chrData, TileMap map)
 		{
 			if (MetaTile.Attributes.Length == 1) MetaTile.Attributes[0] = GetSelectedPalette();
-			var image = new Bitmap(map.BaseTileSize.Width * _metaTileSize, map.BaseTileSize.Height * _metaTileSize);
+			var image = new Bitmap(map.BaseTileSize.Width * _metaTileSize, map.BaseTileSize.Height * _metaTileSize, PixelFormat.Format32bppPArgb);
 			using (var graphics = Graphics.FromImage(image))
 			{
 				for (var i = 0; i < MetaTile.Tiles.Length; i++)

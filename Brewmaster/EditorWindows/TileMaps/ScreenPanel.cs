@@ -72,11 +72,12 @@ namespace Brewmaster.EditorWindows.TileMaps
 				var hotSpot = _panel.PointToClient(Cursor.Position);
 				if (!_panel.DisplayRectangle.Contains(hotSpot)) hotSpot = Point.Empty;
 
+				_grid.GenerateGrid(_map, _state.Zoom);
+
 				var x = ((_offset.X - hotSpot.X) * newZoom) / oldZoom;
 				var y = ((_offset.Y - hotSpot.Y) * newZoom) / oldZoom;
 				Offset = new Point(x + hotSpot.X, y + hotSpot.Y);
 				RefreshView();
-				_grid.GenerateGrid(_map, _state.Zoom);
 			};
 			_grid.GenerateGrid(_map, _state.Zoom);
 		}

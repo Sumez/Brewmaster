@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -80,7 +81,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 			Tiles = new int[map.ScreenSize.Width * map.ScreenSize.Height];
 			ColorAttributes = new int[(map.ScreenSize.Width / map.AttributeSize.Width) * (map.ScreenSize.Height / map.AttributeSize.Height)];
 			MetaValues = new int[(map.ScreenSize.Width / map.MetaValueSize.Width) * (map.ScreenSize.Height / map.MetaValueSize.Height)];
-			Image = new Bitmap(map.ScreenSize.Width * map.BaseTileSize.Width, map.ScreenSize.Height * map.BaseTileSize.Height);
+			Image = new Bitmap(map.ScreenSize.Width * map.BaseTileSize.Width, map.ScreenSize.Height * map.BaseTileSize.Height, PixelFormat.Format32bppPArgb);
 			MetaImage = new FastBitmap(map.ScreenSize.Width / map.MetaValueSize.Width, map.ScreenSize.Height / map.MetaValueSize.Height);
 		}
 

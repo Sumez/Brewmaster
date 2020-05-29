@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Brewmaster.Modules.Ppu;
@@ -55,7 +56,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 			_grid = grid;
 		}
 
-		private Image _image = new Bitmap(128, 128);
+		private Image _image = new Bitmap(128, 128, PixelFormat.Format32bppPArgb);
 		private Pen _solid;
 		private int _zoom = 1;
 		private Bitmap _grid;
@@ -166,7 +167,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 			{
 				lock (_backBufferLock)
 				{
-					var image = new Bitmap(_tileWidth * _metaTileWidth * _rowWidth, _tileHeight * _metaTileWidth * _colHeight);
+					var image = new Bitmap(_tileWidth * _metaTileWidth * _rowWidth, _tileHeight * _metaTileWidth * _colHeight, PixelFormat.Format32bppPArgb);
 					using (var graphics = Graphics.FromImage(image))
 					{
 						graphics.Clear(Palette.Colors[0]);
