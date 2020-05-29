@@ -162,7 +162,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 			screenView.Grid = _grid;
 			_panel.Controls.Add(_singleView = screenView);
-			//_panel.Controls.SetChildIndex(_singleView, 0);
+			RefreshView();
 		}
 
 		public void Pan(int deltaX, int deltaY)

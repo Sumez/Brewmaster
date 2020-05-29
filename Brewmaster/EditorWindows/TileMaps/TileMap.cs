@@ -66,6 +66,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 		public MapObject[] Objects;
 
 		public Bitmap Image;
+		public FastBitmap MetaImage;
 
 		public event Action<int, int> TileChanged;
 		public event Action EditEnd;
@@ -80,6 +81,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 			ColorAttributes = new int[(map.ScreenSize.Width / map.AttributeSize.Width) * (map.ScreenSize.Height / map.AttributeSize.Height)];
 			MetaValues = new int[(map.ScreenSize.Width / map.MetaValueSize.Width) * (map.ScreenSize.Height / map.MetaValueSize.Height)];
 			Image = new Bitmap(map.ScreenSize.Width * map.BaseTileSize.Width, map.ScreenSize.Height * map.BaseTileSize.Height);
+			MetaImage = new FastBitmap(map.ScreenSize.Width / map.MetaValueSize.Width, map.ScreenSize.Height / map.MetaValueSize.Height);
 		}
 
 		public void Unload()
@@ -177,6 +179,11 @@ namespace Brewmaster.EditorWindows.TileMaps
 			{
 				//var timer = new Stopwatch();
 				//timer.Start();
+				for (var mx = 0; mx < _map.ScreenSize.Width / _map.MetaValueSize.Width; mx++)
+				for (var my = 0; my < _map.ScreenSize.Height / _map.MetaValueSize.Height; my++)
+				{
+					RefreshMetaValueTile(mx, my);
+				}
 
 				for (var x = 0; x < _map.ScreenSize.Width; x++)
 				for (var y = 0; y < _map.ScreenSize.Height; y++)
@@ -189,6 +196,13 @@ namespace Brewmaster.EditorWindows.TileMaps
 				//Debug.WriteLine("Full redraw: " + timer.Elapsed.TotalMilliseconds);
 				if (ImageUpdated != null) ImageUpdated();
 			}, token);
+		}
+
+		private static Color[] _metaValueColors = { Color.FromArgb(0, 0, 0, 0), Color.FromArgb(128, 255, 255, 255), Color.FromArgb(128, 255, 0, 0), Color.FromArgb(128, 0, 0, 255) };
+		private void RefreshMetaValueTile(int x, int y)
+		{
+			var value = MetaValues[y * (_map.ScreenSize.Width / _map.MetaValueSize.Width) + x];
+			lock (MetaImage) MetaImage.SetPixel(x, y, _metaValueColors[value]);
 		}
 
 		public void OnEditEnd()

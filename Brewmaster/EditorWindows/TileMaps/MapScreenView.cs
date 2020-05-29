@@ -175,6 +175,8 @@ namespace Brewmaster.EditorWindows.TileMaps
 			}
 
 			e.Graphics.CompositingMode = CompositingMode.SourceOver;
+			lock (_screen.MetaImage) e.Graphics.DrawImage(_screen.MetaImage.Image, new Rectangle(0, 0, _screen.MetaImage.Width * _map.BaseTileSize.Width * _map.MetaValueSize.Width * Zoom, _screen.MetaImage.Height * _map.BaseTileSize.Height * _map.MetaValueSize.Height * Zoom));
+
 			e.Graphics.PixelOffsetMode = PixelOffsetMode.None;
 			if (Grid != null && e.ClipRectangle.Left >= 0)
 			{
