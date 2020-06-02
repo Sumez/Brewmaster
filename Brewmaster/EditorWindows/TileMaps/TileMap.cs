@@ -118,6 +118,18 @@ namespace Brewmaster.EditorWindows.TileMaps
 				TileChanged(x * _map.AttributeSize.Width + i, y * _map.AttributeSize.Height + j);
 			}
 		}
+		public void SetMetaValue(int x, int y, int value)
+		{
+			var index = y * (_map.ScreenSize.Width / _map.MetaValueSize.Width) + x;
+			MetaValues[index] = value;
+			RefreshMetaValueTile(x, y);
+		}
+		public int GetMetaValue(int x, int y)
+		{
+			var index = y * (_map.ScreenSize.Width / _map.MetaValueSize.Width) + x;
+			return MetaValues[index];
+		}
+
 
 		public int GetColorAttribute(int x, int y)
 		{
@@ -199,11 +211,11 @@ namespace Brewmaster.EditorWindows.TileMaps
 			}, token);
 		}
 
-		private static Color[] _metaValueColors = { Color.FromArgb(0, 0, 0, 0), Color.FromArgb(128, 255, 255, 255), Color.FromArgb(128, 255, 0, 0), Color.FromArgb(128, 0, 0, 255) };
+		public static Color[] MetaValueColors = { Color.FromArgb(0, 0, 0, 0), Color.FromArgb(128, 255, 255, 255), Color.FromArgb(128, 255, 0, 0), Color.FromArgb(128, 0, 0, 255) };
 		private void RefreshMetaValueTile(int x, int y)
 		{
 			var value = MetaValues[y * (_map.ScreenSize.Width / _map.MetaValueSize.Width) + x];
-			lock (MetaImage) MetaImage.SetPixel(x, y, _metaValueColors[value]);
+			lock (MetaImage) MetaImage.SetPixel(x, y, MetaValueColors[value]);
 		}
 
 		public void OnEditEnd()
@@ -252,7 +264,6 @@ namespace Brewmaster.EditorWindows.TileMaps
 				SetColorTile(iX, iY, metaTile.Attributes[i]);
 			}
 		}
-
 	}
 
 	[Serializable]

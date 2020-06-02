@@ -23,7 +23,6 @@ namespace Brewmaster.EditorWindows.TileMaps
 		private int _cursorY = -1;
 		private bool _mouseDown;
 		private bool _alteredByTool;
-		private SolidBrush _toolBrush;
 		private MapEditorState _state;
 
 		public MapScreenView(TileMap map, TileMapScreen screen, MapEditorState state)
@@ -44,8 +43,6 @@ namespace Brewmaster.EditorWindows.TileMaps
 			_dashed.DashPattern = new float[] { 2, 2 };
 
 			_solid = new Pen(gridColor, 1);
-
-			_toolBrush = new SolidBrush(Color.FromArgb(128, 255, 255, 255));
 
 			_screen.TileChanged += RefreshTile;
 
@@ -129,6 +126,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 		{
 			Tool.Paint(_cursorX, _cursorY, _screen);
 			_alteredByTool = true;
+			InvalidateToolPosition(_cursorX, _cursorY);
 		}
 
 		
@@ -197,7 +195,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 			if (_cursorX >= 0 && _cursorY >= 0)
 			{
-				if (Tool.Image == null) e.Graphics.FillRectangle(_toolBrush, _cursorX * ToolWidth, _cursorY * ToolHeight, ToolWidth, ToolHeight);
+				if (Tool.Image == null && Tool.Brush != null) e.Graphics.FillRectangle(Tool.Brush, _cursorX * ToolWidth, _cursorY * ToolHeight, ToolWidth, ToolHeight);
 				else if (!Tool.Pixel) e.Graphics.DrawRectangle(Pens.Black, _cursorX * ToolWidth, _cursorY * ToolHeight, ToolWidth, ToolHeight);
 			}
 			//timer.Stop();

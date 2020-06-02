@@ -13,6 +13,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 		public virtual Size Size { get; protected set; }
 		public virtual Image Image { get; protected set; }
 		public virtual bool Pixel { get { return false; } }
+		public virtual Brush Brush { get; protected set; }
 
 		public abstract void Paint(int x, int y, TileMapScreen screen);
 		public abstract void EyeDrop(int x, int y, TileMapScreen screen);
@@ -52,6 +53,38 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 	}
 
+	public class MetaValuePen : MapEditorTool
+	{
+		public MetaValuePen(Size metaValueSize)
+		{
+			Size = metaValueSize;
+			SelectedValue = 0;
+		}
+
+		private int _selectedValue;
+
+		public int SelectedValue
+		{
+			get { return _selectedValue; }
+			set
+			{
+				if (_selectedValue == value) return;
+				_selectedValue = value;
+				if (Brush != null) Brush.Dispose();
+				Brush = new SolidBrush(TileMapScreen.MetaValueColors[_selectedValue]);
+			}
+		}
+
+		public override void Paint(int x, int y, TileMapScreen screen)
+		{
+			screen.SetMetaValue(x, y, SelectedValue);
+		}
+
+		public override void EyeDrop(int x, int y, TileMapScreen screen)
+		{
+			SelectedValue = screen.GetMetaValue(x, y);
+		}
+	}
 	public class TilePen : MapEditorTool, IPaletteTool
 	{
 		public event Action SelectedTileChanged;

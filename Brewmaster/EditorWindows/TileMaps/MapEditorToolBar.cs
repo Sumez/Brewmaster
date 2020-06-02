@@ -15,6 +15,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 		public Action TileTool { get; set; }
 		public Action ColorTool { get; set; }
 		public Action PixelTool { get; set; }
+		public Action MetaTool { get; set; }
 
 		public MapEditorToolBar()
 		{
@@ -29,6 +30,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 			Items.AddRange(new[] { new ToolStripButton("Tile", Resources.image, (s, a) => TileTool()) });
 			Items.AddRange(new[] { new ToolStripButton("Color", Resources.data, (s, a) => ColorTool()) });
 			Items.AddRange(new[] { new ToolStripButton("Pen", Resources.data, (s, a) => PixelTool()) });
+			Items.AddRange(new[] { new ToolStripButton("Collisions", Resources.chip, (s, a) => MetaTool()) });
 
 		}
 	}

@@ -133,6 +133,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 			MapEditorToolBar.TileTool = () => SelectTilePen(0);
 			MapEditorToolBar.ColorTool = SelectPalettePen;
 			MapEditorToolBar.PixelTool = SelectPixelPen;
+			MapEditorToolBar.MetaTool = SelectMetaPen;
 		}
 
 		protected override void OnControlRemoved(ControlEventArgs e)
@@ -220,6 +221,11 @@ namespace Brewmaster.EditorWindows.TileMaps
 			var tool = new PixelPen();
 			State.Tool = tool;
 			tool.SelectedColor = 3;
+		}
+		private void SelectMetaPen()
+		{
+			var tool = new MetaValuePen(Map.MetaValueSize);
+			State.Tool = tool;
 		}
 
 		private void InitPaletteTool(IPaletteTool tool)
