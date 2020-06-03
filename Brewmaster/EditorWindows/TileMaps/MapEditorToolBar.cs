@@ -17,21 +17,31 @@ namespace Brewmaster.EditorWindows.TileMaps
 		public Action PixelTool { get; set; }
 		public Action MetaTool { get; set; }
 
+		public Action ToggleGrid { get; set; }
+		public Action ToggleMetaValues { get; set; }
+
 		public MapEditorToolBar()
 		{
 			GripStyle = ToolStripGripStyle.Hidden;
 
-			Items.AddRange(new[] { new ToolStripButton("import image", Resources.image, (s, a) => ImportImage()) });
-			Items.AddRange(new[] { new ToolStripButton("import CHR", Resources.image, (s, a) => ImportChr()) });
-			Items.AddRange(new[] { new ToolStripButton("import map", Resources.macro, (s, a) => ImportMap()) });
-			Items.AddRange(new[] { new ToolStripButton("import Palette", Resources.image, (s, a) => ImportPalette()) });
-			Items.AddRange(new[] { new ToolStripButton("import JSON", Resources.macro, (s, a) => ImportJsonSession()) });
+			Items.AddRange(new[] {
+				new ToolStripButton("import image", Resources.image, (s, a) => ImportImage()),
+				new ToolStripButton("import CHR", Resources.image, (s, a) => ImportChr()),
+				new ToolStripButton("import map", Resources.macro, (s, a) => ImportMap()),
+				new ToolStripButton("import Palette", Resources.image, (s, a) => ImportPalette()),
+				new ToolStripButton("import JSON", Resources.macro, (s, a) => ImportJsonSession()),
 
-			Items.AddRange(new[] { new ToolStripButton("Tile", Resources.image, (s, a) => TileTool()) });
-			Items.AddRange(new[] { new ToolStripButton("Color", Resources.data, (s, a) => ColorTool()) });
-			Items.AddRange(new[] { new ToolStripButton("Pen", Resources.data, (s, a) => PixelTool()) });
-			Items.AddRange(new[] { new ToolStripButton("Collisions", Resources.chip, (s, a) => MetaTool()) });
+				new ToolStripButton("Tile", Resources.image, (s, a) => TileTool()),
+				new ToolStripButton("Color", Resources.data, (s, a) => ColorTool()),
+				new ToolStripButton("Pen", Resources.data, (s, a) => PixelTool()),
+				new ToolStripButton("Collisions", Resources.chip, (s, a) => MetaTool()),
 
+				GridButton = new ToolStripButton("Show grid", Resources.chip, (s, a) => ToggleGrid()) { CheckOnClick = true },
+				CollisionButton = new ToolStripButton("Show Collisions", Resources.chip, (s, a) => ToggleMetaValues()) { CheckOnClick = true }	
+			});
 		}
+
+		public ToolStripButton CollisionButton { get; set; }
+		public ToolStripButton GridButton { get; set; }
 	}
 }

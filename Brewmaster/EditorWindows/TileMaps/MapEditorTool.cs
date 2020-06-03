@@ -24,27 +24,46 @@ namespace Brewmaster.EditorWindows.TileMaps
 		}
 
 		public virtual void RefreshImage(Palette attribute) { }
+
+		public virtual void AfterPaint() { }
 	}
 
 	public class PixelPen : MapEditorTool
 	{
-		public PixelPen()
+		private readonly TileMap _map;
+		private readonly MapEditorState _state;
+
+		public PixelPen(MapEditorState state, TileMap map)
 		{
+			_state = state;
+			_map = map;
 			Size = new Size(1, 1);
 			Image = _pixelImage = new Bitmap(1, 1, PixelFormat.Format32bppPArgb);
 		}
 		public override bool Pixel { get { return true; } }
 		public override void Paint(int x, int y, TileMapScreen screen)
 		{
+			var tile = screen.GetTile(x / _map.BaseTileSize.Width, y / _map.BaseTileSize.Height);
+			var palette = screen.GetColorTile(x / _map.BaseTileSize.Width, y / _map.BaseTileSize.Height);
+			
+			screen.Image.SetPixel(x, y, _map.Palettes[palette].Colors[SelectedColor]);
+			_state.SetPixel(tile, x % _map.BaseTileSize.Width, y % _map.BaseTileSize.Height, SelectedColor);
 		}
 
 		public override void EyeDrop(int x, int y, TileMapScreen screen)
 		{
+			var tile = screen.GetTile(x / _map.BaseTileSize.Width, y / _map.BaseTileSize.Height);
+			SelectedColor = _state.GetPixel(tile, x % _map.BaseTileSize.Width, y % _map.BaseTileSize.Height);
 		}
 
 		public override void RefreshImage(Palette palette)
 		{
 			_pixelImage.SetPixel(0, 0, palette.Colors[SelectedColor]);
+		}
+
+		public override void AfterPaint()
+		{
+			_state.OnChrDataChanged();
 		}
 
 		public int SelectedColor { get; set; }
@@ -55,12 +74,15 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 	public class MetaValuePen : MapEditorTool
 	{
-		public MetaValuePen(Size metaValueSize)
+		public MetaValuePen(Size metaValueSize, Func<int, Color> getColor)
 		{
+			_getColor = getColor;
 			Size = metaValueSize;
 			SelectedValue = 0;
 		}
 
+		public event Action SelectedValueChanged;
+		private readonly Func<int, Color> _getColor;
 		private int _selectedValue;
 
 		public int SelectedValue
@@ -71,7 +93,8 @@ namespace Brewmaster.EditorWindows.TileMaps
 				if (_selectedValue == value) return;
 				_selectedValue = value;
 				if (Brush != null) Brush.Dispose();
-				Brush = new SolidBrush(TileMapScreen.MetaValueColors[_selectedValue]);
+				Brush = new SolidBrush(_getColor(_selectedValue));
+				if (SelectedValueChanged != null) SelectedValueChanged();
 			}
 		}
 

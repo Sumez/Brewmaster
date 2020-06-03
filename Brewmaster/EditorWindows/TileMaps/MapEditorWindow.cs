@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Xml.Serialization;
 using Brewmaster.Layout;
 using Brewmaster.Modules;
 using Brewmaster.Modules.Ppu;
@@ -25,6 +24,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 		private ColorPaletteView _colorPalette;
 		private Dictionary<int, MetaTilePalette> _metaTilePalettes;
 		private ScreenPanel _screenPanel;
+		private MetaValuePalette _metaValuePalette;
 		public override ToolStrip ToolBar { get { return MapEditorToolBar; } }
 		public override LayoutMode LayoutMode { get { return LayoutMode.MapEditor; } }
 
@@ -75,7 +75,6 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 			_tilePalette = new ChrTilePalette(State) { Width = 256, Height = 256, Top = 0, Left = Width - 256 };
 			_tilePalette.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-			//Controls.Add(_tilePalette);
 			_tilePalette.UserSelectedTile += () => SelectTilePen(_tilePalette.SelectedTile);
 
 			_screenPanel = new ScreenPanel(State, Map) { Dock = DockStyle.Fill };
@@ -83,7 +82,6 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 			_colorPalette = new ColorPaletteView(Map.Palettes) { Width = 256, Height = 40 };
 			_colorPalette.Dock = DockStyle.Bottom;
-			Controls.Add(_colorPalette);
 			_colorPalette.SelectedPaletteChanged += (paletteIndex) =>
 			{
 				State.Palette = Map.Palettes[paletteIndex];
@@ -97,6 +95,15 @@ namespace Brewmaster.EditorWindows.TileMaps
 				SetToolImage(_screenView.Tool as TilePen);
 				Pristine = false;
 			};
+
+			_metaValuePalette = new MetaValuePalette(Map) { Dock = DockStyle.Right };
+			_metaValuePalette.UserSelectedValue += SelectMetaPen;
+
+			var bottomPanel = new Panel { AutoSize = true, Dock = DockStyle.Bottom };
+			bottomPanel.Controls.Add(_colorPalette);
+			bottomPanel.Controls.Add(_metaValuePalette);
+			//bottomPanel.Controls.Add(new HorizontalLine { Dock = DockStyle.Top });
+			Controls.Add(bottomPanel);
 
 			_metaTilePalettes = new Dictionary<int, MetaTilePalette>();
 			foreach (var metaTileSize in Map.MetaTileResolutions)
@@ -134,6 +141,12 @@ namespace Brewmaster.EditorWindows.TileMaps
 			MapEditorToolBar.ColorTool = SelectPalettePen;
 			MapEditorToolBar.PixelTool = SelectPixelPen;
 			MapEditorToolBar.MetaTool = SelectMetaPen;
+
+			MapEditorToolBar.GridButton.Checked = State.DisplayGrid;
+			MapEditorToolBar.CollisionButton.Checked = State.DisplayMetaValues;
+
+			MapEditorToolBar.ToggleGrid = () => { State.DisplayGrid = MapEditorToolBar.GridButton.Checked; };
+			MapEditorToolBar.ToggleMetaValues = () => { State.DisplayMetaValues = MapEditorToolBar.CollisionButton.Checked; };
 		}
 
 		protected override void OnControlRemoved(ControlEventArgs e)
@@ -218,14 +231,20 @@ namespace Brewmaster.EditorWindows.TileMaps
 		}
 		private void SelectPixelPen()
 		{
-			var tool = new PixelPen();
+			var tool = new PixelPen(State, Map);
 			State.Tool = tool;
-			tool.SelectedColor = 3;
+			tool.SelectedColor = 0;
 		}
 		private void SelectMetaPen()
 		{
-			var tool = new MetaValuePen(Map.MetaValueSize);
+			MapEditorToolBar.CollisionButton.Checked = State.DisplayMetaValues = true;
+			var tool = new MetaValuePen(Map.MetaValueSize, Map.GetMetaValueColor);
 			State.Tool = tool;
+			tool.SelectedValue = _metaValuePalette.SelectedValue;
+			tool.SelectedValueChanged += () =>
+			{
+				_metaValuePalette.SelectedValue = tool.SelectedValue;
+			};
 		}
 
 		private void InitPaletteTool(IPaletteTool tool)
@@ -403,7 +422,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 				if (e.Delta > 0) zoom++;
 				else zoom--;
 				if (zoom < 1) zoom = 1;
-				if (zoom > 20) zoom = 20;
+				if (zoom > 40) zoom = 40;
 				State.Zoom = zoom;
 
 				return;
@@ -480,10 +499,15 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 	public class MapEditorState
 	{
+		private Dictionary<int, Dictionary<Palette, TileImage>> _cachedTiles = new Dictionary<int, Dictionary<Palette, TileImage>>();
+
 		private MapEditorTool _tool;
 		private byte[] _chrData = new byte[0x1000];
 		private Palette _palette;
 		private int _zoom = 2;
+		private bool _displayGrid = true;
+		private bool _displayMetaValues = false;
+
 
 		public MapEditorTool Tool
 		{
@@ -524,11 +548,32 @@ namespace Brewmaster.EditorWindows.TileMaps
 				var oldValue = _zoom; _zoom = value; OnZoomChanged(oldValue, _zoom); }
 		}
 
+		public bool DisplayMetaValues
+		{
+			get { return _displayMetaValues; }
+			set
+			{
+				_displayMetaValues = value;
+				OnDisplayMetaValuesChanged();
+			}
+		}
+
+		public bool DisplayGrid
+		{
+			get { return _displayGrid; }
+			set
+			{
+				_displayGrid = value;
+				OnDisplayGridChanged();
+			}
+		}
 
 		public event Action PaletteChanged;
 		public event Action ChrDataChanged;
 		public event Action ToolChanged;
 		public event Action<int, int> ZoomChanged;
+		public event Action DisplayMetaValuesChanged;
+		public event Action DisplayGridChanged;
 		public void OnPaletteChanged()
 		{
 			if (PaletteChanged != null) PaletteChanged();
@@ -545,8 +590,16 @@ namespace Brewmaster.EditorWindows.TileMaps
 		{
 			if (ZoomChanged != null) ZoomChanged(oldValue, newValue);
 		}
+		private void OnDisplayMetaValuesChanged()
+		{
+			if (DisplayMetaValuesChanged != null) DisplayMetaValuesChanged();
+		}
+		private void OnDisplayGridChanged()
+		{
+			if (DisplayGridChanged != null) DisplayGridChanged();
+		}
 
-		private Dictionary<int, Dictionary<Palette, TileImage>> _cachedTiles = new Dictionary<int, Dictionary<Palette, TileImage>>();
+
 		public TileImage GetTileImage(int index, Palette palette)
 		{
 			lock (_cachedTiles)
@@ -565,6 +618,17 @@ namespace Brewmaster.EditorWindows.TileMaps
 				_cachedTiles = new Dictionary<int, Dictionary<Palette, TileImage>>();
 			}
 			Task.Run(() => { foreach (var image in oldImages.Where(i => i != null)) image.Dispose(); });
+		}
+
+		public int GetPixel(int tileIndex, int x, int y)
+		{
+			return TileImage.GetTilePixel(ChrData, tileIndex, x, y);
+		}
+
+		public void SetPixel(int tileIndex, int x, int y, int colorIndex)
+		{
+			TileImage.SetTilePixel(ChrData, tileIndex, x, y, colorIndex);
+			lock (_cachedTiles) _cachedTiles.Remove(tileIndex);
 		}
 	}
 

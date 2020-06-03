@@ -25,6 +25,8 @@ namespace Brewmaster.EditorWindows.TileMaps
 		public int BitsPerPixel = 2;
 		public int ColorCount { get { return (int)Math.Pow(2, BitsPerPixel); } }
 		public List<List<TileMapScreen>> Screens = new List<List<TileMapScreen>>();
+		public Color[] MetaValueColors = { Color.FromArgb(0, 0, 0, 0), Color.FromArgb(128, 255, 255, 255), Color.FromArgb(128, 255, 0, 0), Color.FromArgb(128, 0, 0, 255) };
+
 
 		public SerializableTileMap GetSerializable()
 		{
@@ -57,6 +59,11 @@ namespace Brewmaster.EditorWindows.TileMaps
 				};
 			}
 			return screens;
+		}
+
+		public Color GetMetaValueColor(int value)
+		{
+			return MetaValueColors.Length <= value ? MetaValueColors[1] : MetaValueColors[value];
 		}
 	}
 	public class TileMapScreen
@@ -211,11 +218,10 @@ namespace Brewmaster.EditorWindows.TileMaps
 			}, token);
 		}
 
-		public static Color[] MetaValueColors = { Color.FromArgb(0, 0, 0, 0), Color.FromArgb(128, 255, 255, 255), Color.FromArgb(128, 255, 0, 0), Color.FromArgb(128, 0, 0, 255) };
 		private void RefreshMetaValueTile(int x, int y)
 		{
 			var value = MetaValues[y * (_map.ScreenSize.Width / _map.MetaValueSize.Width) + x];
-			lock (MetaImage) MetaImage.SetPixel(x, y, MetaValueColors[value]);
+			lock (MetaImage) MetaImage.SetPixel(x, y, _map.GetMetaValueColor(value));
 		}
 
 		public void OnEditEnd()

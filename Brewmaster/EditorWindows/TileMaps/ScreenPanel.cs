@@ -79,6 +79,10 @@ namespace Brewmaster.EditorWindows.TileMaps
 				Offset = new Point(x + hotSpot.X, y + hotSpot.Y);
 				RefreshView();
 			};
+			_state.DisplayGridChanged += InvalidateVisibleViews;
+			_state.DisplayMetaValuesChanged += InvalidateVisibleViews;
+			_state.ChrDataChanged += RefreshView;
+
 			_grid.GenerateGrid(_map, _state.Zoom);
 		}
 
@@ -91,6 +95,11 @@ namespace Brewmaster.EditorWindows.TileMaps
 				_hScrollBar.Maximum = Math.Max(_singleView.RenderSize.Width - _panel.Width + _hScrollBar.LargeChange, -_offset.X);
 				_vScrollBar.Maximum = Math.Max(_singleView.RenderSize.Height - _panel.Height + _vScrollBar.LargeChange, -_offset.Y);
 			}
+		}
+
+		private void InvalidateVisibleViews()
+		{
+			if (_singleView != null) _singleView.Invalidate();
 		}
 
 		protected override void OnLayout(LayoutEventArgs levent)

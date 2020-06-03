@@ -24,6 +24,8 @@ namespace Brewmaster.EditorWindows.TileMaps
 		private bool _mouseDown;
 		private bool _alteredByTool;
 		private MapEditorState _state;
+		private bool _displayMetaValues;
+		private bool _displayGrid;
 
 		public MapScreenView(TileMap map, TileMapScreen screen, MapEditorState state)
 		{
@@ -93,7 +95,11 @@ namespace Brewmaster.EditorWindows.TileMaps
 				case MouseButtons.Left:
 					_mouseDown = true;
 					_alteredByTool = false;
-					if (Tool != null) PaintTool();
+					if (Tool != null)
+					{
+						PaintTool();
+						Tool.AfterPaint();
+					}
 					break;
 				case MouseButtons.Right:
 					if (Tool != null) Tool.EyeDrop(_cursorX, _cursorY, _screen);
@@ -112,16 +118,71 @@ namespace Brewmaster.EditorWindows.TileMaps
 			if (_cursorX == x && _cursorY == y) return;
 			var oldX = _cursorX;
 			var oldY = _cursorY;
-			_cursorX = x;
-			_cursorY = y;
-			InvalidateToolPosition(oldX, oldY);
-			InvalidateToolPosition(_cursorX, _cursorY);
 
-			if (_mouseDown && _cursorX >= 0 && _cursorY >= 0) PaintTool();
+			if (_mouseDown && x >= 0 && y >= 0)
+			{
+				InvalidateToolPosition(oldX, oldY);
+				if (oldX >= 0 && oldY >= 0) PaintLine(oldX, oldY, x, y);
+				else PaintTool(x, y);
+				Tool.AfterPaint();
+			}
+			else
+			{
+				_cursorX = x;
+				_cursorY = y;
+				InvalidateToolPosition(oldX, oldY);
+				InvalidateToolPosition(_cursorX, _cursorY);
+			}
 
 			base.OnMouseMove(e);
 		}
 
+		/// <summary>
+		/// Bresenham's line algorithm
+		/// </summary>
+		public void PaintLine(int x, int y, int x2, int y2)
+		{
+			var w = x2 - x;
+			var h = y2 - y;
+			int dx1 = 0, dy1 = 0, dx2 = 0, dy2 = 0;
+			if (w < 0) dx1 = -1; else if (w > 0) dx1 = 1;
+			if (h < 0) dy1 = -1; else if (h > 0) dy1 = 1;
+			if (w < 0) dx2 = -1; else if (w > 0) dx2 = 1;
+			var longest = Math.Abs(w);
+			var shortest = Math.Abs(h);
+			if (!(longest > shortest))
+			{
+				longest = Math.Abs(h);
+				shortest = Math.Abs(w);
+				if (h < 0) dy2 = -1; else if (h > 0) dy2 = 1;
+				dx2 = 0;
+			}
+			var numerator = longest >> 1;
+
+			for (var i = 0; i < longest; i++)
+			{
+				numerator += shortest;
+				if (!(numerator < longest))
+				{
+					numerator -= longest;
+					x += dx1;
+					y += dy1;
+				}
+				else
+				{
+					x += dx2;
+					y += dy2;
+				}
+				PaintTool(x, y);
+			}
+		}
+
+		private void PaintTool(int x, int y)
+		{
+			_cursorX = x;
+			_cursorY = y;
+			PaintTool();
+		}
 		private void PaintTool()
 		{
 			Tool.Paint(_cursorX, _cursorY, _screen);
@@ -151,6 +212,17 @@ namespace Brewmaster.EditorWindows.TileMaps
 		}
 		public Size RenderSize { get; set; }
 		public Point Offset { get; set; }
+
+		public bool DisplayGrid
+		{
+			get { return _state.DisplayGrid; }
+		}
+
+		public bool DisplayMetaValues
+		{
+			get { return _state.DisplayMetaValues; }
+		}
+
 		protected override void OnPaint(PaintEventArgs e)
 		{
 			base.OnPaint(e);
@@ -173,20 +245,22 @@ namespace Brewmaster.EditorWindows.TileMaps
 			}
 
 			e.Graphics.CompositingMode = CompositingMode.SourceOver;
-			lock (_screen.MetaImage) e.Graphics.DrawImage(_screen.MetaImage.Image, new Rectangle(0, 0, _screen.MetaImage.Width * _map.BaseTileSize.Width * _map.MetaValueSize.Width * Zoom, _screen.MetaImage.Height * _map.BaseTileSize.Height * _map.MetaValueSize.Height * Zoom));
+			if (DisplayMetaValues)
+				lock (_screen.MetaImage)
+					e.Graphics.DrawImage(_screen.MetaImage.Image, new Rectangle(0, 0, _screen.MetaImage.Width * _map.BaseTileSize.Width * _map.MetaValueSize.Width * Zoom, _screen.MetaImage.Height * _map.BaseTileSize.Height * _map.MetaValueSize.Height * Zoom));
 
 			e.Graphics.PixelOffsetMode = PixelOffsetMode.None;
-			if (Grid != null && e.ClipRectangle.Left >= 0)
+			if (DisplayGrid && Grid != null && e.ClipRectangle.Left >= 0)
 			{
 				var tileWidth = _map.BaseTileSize.Width * Zoom;
 				var tileHeight = _map.BaseTileSize.Height * Zoom;
-				var minX = Math.Max(0, (int) ((e.ClipRectangle.Left - Offset.X) / tileWidth) / MapGrid.Factor * MapGrid.Factor);
-				var minY = Math.Max(0, (int) ((e.ClipRectangle.Top - Offset.Y) / tileHeight) / MapGrid.Factor * MapGrid.Factor);
-				var maxX = Math.Min(_map.ScreenSize.Width, (int)((e.ClipRectangle.Right - Offset.X) / tileWidth) + MapGrid.Factor);
-				var maxY = Math.Min(_map.ScreenSize.Height, (int)((e.ClipRectangle.Bottom - Offset.Y) / tileHeight) + MapGrid.Factor);
-				for (var x = minX; x < maxX; x += MapGrid.Factor)
+				var minX = Math.Max(0, (int) ((e.ClipRectangle.Left - Offset.X) / tileWidth) / Grid.Factor * Grid.Factor);
+				var minY = Math.Max(0, (int) ((e.ClipRectangle.Top - Offset.Y) / tileHeight) / Grid.Factor * Grid.Factor);
+				var maxX = Math.Min(_map.ScreenSize.Width, (int)((e.ClipRectangle.Right - Offset.X) / tileWidth) + Grid.Factor);
+				var maxY = Math.Min(_map.ScreenSize.Height, (int)((e.ClipRectangle.Bottom - Offset.Y) / tileHeight) + Grid.Factor);
+				for (var x = minX; x < maxX; x += Grid.Factor)
 				{
-					for (var y = minY; y < maxY; y += MapGrid.Factor)
+					for (var y = minY; y < maxY; y += Grid.Factor)
 					{
 						Grid.Draw(e.Graphics, x * tileWidth, y * tileHeight);
 					}

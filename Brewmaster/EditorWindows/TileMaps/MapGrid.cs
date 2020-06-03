@@ -7,26 +7,27 @@ namespace Brewmaster.EditorWindows.TileMaps
 {
 	public class MapGrid
 	{
-		private Pen _dotted;
-		private Pen _dashed;
-		private Pen _solid;
+		private Pen[][] _pens;
 		private Bitmap _grid;
 
 		public MapGrid()
 		{
-			var gridColor = Color.FromArgb(128, 255, 255, 255);
-			_dotted = new Pen(gridColor, 1);
-			_dotted.DashStyle = DashStyle.Custom;
-			_dotted.DashPattern = new float[] { 1, 3 };
-
-			_dashed = new Pen(gridColor, 1);
-			_dashed.DashStyle = DashStyle.Custom;
-			_dashed.DashPattern = new float[] { 2, 2 };
-
-			_solid = new Pen(gridColor, 1);
+			var vagueColor = Color.FromArgb(128, 255, 255, 255);
+			var midColor = Color.FromArgb(160, 255, 255, 255);
+			var solidColor = Color.FromArgb(255, 255, 255, 255);
+			_pens = new []
+			{
+				new [] {new Pen(vagueColor, 1), new Pen(vagueColor, 1), new Pen(vagueColor, 1)},
+				new [] {new Pen(midColor, 1), new Pen(solidColor, 1), new Pen(solidColor, 1)}
+			};
+			_pens[0][0].DashStyle = _pens[0][1].DashStyle = DashStyle.Custom;
+			_pens[0][0].DashPattern = new float[] { 1, 3 };
+			_pens[0][1].DashPattern = new float[] { 2, 2 };
 		}
 
-		public static int Factor = 32;
+		public int Factor = 32;
+		public static int PixelStep = 14;
+
 		public void GenerateGrid(TileMap map, int zoom)
 		{
 			var width = map.ScreenSize.Width * map.BaseTileSize.Width * zoom;
@@ -39,23 +40,38 @@ namespace Brewmaster.EditorWindows.TileMaps
 			{
 			*/
 				//using (var gridTile = new Bitmap(tileWidth * Factor, tileHeight * Factor))
+			Factor = zoom > PixelStep ? 4 : 32;
 			var gridTile = new Bitmap(tileWidth * Factor, tileHeight * Factor, PixelFormat.Format32bppPArgb);
 			{
 				using (var tileGraphics = Graphics.FromImage(gridTile))
 				{
 					tileGraphics.CompositingMode = CompositingMode.SourceCopy;
 					tileGraphics.CompositingQuality = CompositingQuality.HighSpeed;
-					for (var i = 0; i < Factor; i++)
-					{
-						if (zoom == 1 && i % 2 == 1) continue;
-						var pen = i % 4 == 0 ? _solid : i % 2 == 0 ? _dashed : _dotted;
-						tileGraphics.DrawLine(pen, i * tileWidth, 0, i * tileWidth, tileHeight * Factor);
-					}
+
+					if (zoom > PixelStep)
+						for (var i = 0; i < Factor; i++)
+						{
+							for (var j = 1; j < map.BaseTileSize.Width; j++)
+							{
+								tileGraphics.DrawLine(_pens[0][1], i * tileWidth + j * zoom, 0, i * tileWidth + j * zoom, tileHeight * Factor);
+							}
+							for (var j = 1; j < map.BaseTileSize.Height; j++)
+							{
+								tileGraphics.DrawLine(_pens[0][1], 0, i * tileHeight + j * zoom, tileWidth * Factor, i * tileHeight + j * zoom);
+							}
+						}
 
 					for (var i = 0; i < Factor; i++)
 					{
 						if (zoom == 1 && i % 2 == 1) continue;
-						var pen = i % 4 == 0 ? _solid : i % 2 == 0 ? _dashed : _dotted;
+
+						var pen = _pens[zoom > PixelStep ? 1 : 0][i % 4 == 0 ? 2 : i % 2 == 0 ? 1 : 0];
+						if (zoom <= PixelStep)
+						{
+							tileGraphics.DrawLine(Pens.Transparent, i * tileWidth, 0, i * tileWidth, tileHeight * Factor);
+							tileGraphics.DrawLine(Pens.Transparent, 0, i * tileHeight, tileWidth * Factor, i * tileHeight);
+						}
+						tileGraphics.DrawLine(pen, i * tileWidth, 0, i * tileWidth, tileHeight * Factor);
 						tileGraphics.DrawLine(pen, 0, i * tileHeight, tileWidth * Factor, i * tileHeight);
 					}
 				}

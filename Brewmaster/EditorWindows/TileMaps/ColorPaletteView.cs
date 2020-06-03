@@ -47,7 +47,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 				if (layoutPanel.Height != Height)
 				{
 					Height = layoutPanel.Height;
-					if (Parent != null) Parent.ResumeLayout(true);
+					if (Parent != null && Parent.Parent != null) Parent.Parent.ResumeLayout(true);
 				}
 			};
 		}

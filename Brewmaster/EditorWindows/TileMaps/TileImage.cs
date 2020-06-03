@@ -44,7 +44,58 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 			return tile;
 		}
+
+		public static int GetTilePixel(byte[] data, int index, int x, int y, int bitDepth = 2, ProjectType projectType = ProjectType.Nes)
+		{
+			var tileSize = 8 * bitDepth;
+			var offset = index * tileSize;
+			if (data.Length < offset + tileSize || index < 0) return 0;
+
+			var colorIndex = 0;
+			for (var j = 0; j <= (bitDepth / 2); j += 2)
+			{
+				var byte0Index = (8 * j) + (projectType == ProjectType.Snes ? y * 2 : y);
+				var byte1Index = (8 * j) + (projectType == ProjectType.Snes ? y * 2 + 1 : y + 8);
+
+				var byte0 = data[offset + byte0Index];
+				var byte1 = data[offset + byte1Index];
+
+				var bit0 = (byte0 >> (7 - x)) & 1;
+				var bit1 = (byte1 >> (7 - x)) & 1;
+
+				colorIndex |= bit0 << j;
+				colorIndex |= bit1 << (j + 1);
+			}
+
+			return colorIndex;
+		}
+
+		public static void SetTilePixel(byte[] data, int index, int x, int y, int colorIndex, int bitDepth = 2, ProjectType projectType = ProjectType.Nes)
+		{
+			// TODO: Mostly redundant compared to chrpipeline
+			var tileSize = 8 * bitDepth;
+			var offset = index * tileSize;
+			if (data.Length < offset + tileSize || index < 0) return;
+
+			for (var j = 0; j <= (bitDepth / 2); j += 2)
+			{
+				var byte0 = (colorIndex & (1 << j)) == 0 ? 0 : 1;
+				var byte1 = (colorIndex & (1 << (j + 1))) == 0 ? 0 : 1;
+
+				var val0 = (byte)(byte0 << (7 - x));
+				var val1 = (byte)(byte1 << (7 - x));
+
+				var mask = (byte)((1 << (7 - x)) ^ 0xff);
+
+				var byte0Index = (8 * j) + (projectType == ProjectType.Snes ? y * 2 : y);
+				var byte1Index = (8 * j) + (projectType == ProjectType.Snes ? y * 2 + 1 : y + 8);
+
+				data[offset + byte0Index] = (byte)((data[offset + byte0Index] & mask) | val0);
+				data[offset + byte1Index] = (byte)((data[offset + byte1Index] & mask) | val1);
+			}
+		}
 	}
+
 	public class FastBitmap : IDisposable
 	{
 		private readonly int[] _data;
