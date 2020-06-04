@@ -24,7 +24,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 		private ColorPaletteView _colorPalette;
 		private Dictionary<int, MetaTilePalette> _metaTilePalettes;
 		private ScreenPanel _screenPanel;
-		private MetaValuePalette _metaValuePalette;
+		private ToolSettings _metaValuePalette;
 		public override ToolStrip ToolBar { get { return MapEditorToolBar; } }
 		public override LayoutMode LayoutMode { get { return LayoutMode.MapEditor; } }
 
@@ -96,7 +96,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 				Pristine = false;
 			};
 
-			_metaValuePalette = new MetaValuePalette(Map) { Dock = DockStyle.Right };
+			_metaValuePalette = new ToolSettings(Map) { Dock = DockStyle.Right };
 			_metaValuePalette.UserSelectedValue += SelectMetaPen;
 
 			var bottomPanel = new Panel { AutoSize = true, Dock = DockStyle.Bottom };

@@ -6,13 +6,13 @@ using Brewmaster.Modules.Watch;
 
 namespace Brewmaster.EditorWindows.TileMaps
 {
-	public class MetaValuePalette : Control
+	public class ToolSettings : Control
 	{
 		private TileMap _map;
 		private int _selectedValue;
 		private SolidBrush _selectedBrush;
 
-		public MetaValuePalette(TileMap map)
+		public ToolSettings(TileMap map)
 		{
 			_map = map;
 			Width = 140;

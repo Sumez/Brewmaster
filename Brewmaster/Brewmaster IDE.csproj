@@ -192,7 +192,7 @@
     <Compile Include="EditorWindows\TileMaps\MetaTilePalette.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="EditorWindows\TileMaps\MetaValuePalette.cs">
+    <Compile Include="EditorWindows\TileMaps\ToolSettings.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="EditorWindows\TileMaps\MiniMap.cs">
