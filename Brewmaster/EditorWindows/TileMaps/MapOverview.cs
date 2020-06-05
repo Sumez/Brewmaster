@@ -194,12 +194,12 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 		}
 
-		public void UpdateScreenImage(TileMapScreen screen)
+		public void InvalidateScreenImage(TileMapScreen screen)
 		{
 			for (var y = 0; y < _map.Screens.Count; y++)
 			{
 				var x = _map.Screens[y].IndexOf(screen);
-				if (x >= 0) _miniMap.UpdateScreenImage(x, y);
+				if (x >= 0) _miniMap.InvalidateScreenImage(x, y);
 			}
 		}
 	}

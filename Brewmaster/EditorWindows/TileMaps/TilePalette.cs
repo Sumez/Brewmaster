@@ -63,7 +63,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 		private int _hoverTile = -1;
 		private Palette _palette;
 		private SolidBrush _solidBrush;
-		private List<MetaTile> _tiles;
+		private List<MetaTile> _tiles = new List<MetaTile>();
 
 		private int _tileWidth = 8;
 		private int _tileHeight = 8;

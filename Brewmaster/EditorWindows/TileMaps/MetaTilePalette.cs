@@ -140,7 +140,6 @@ namespace Brewmaster.EditorWindows.TileMaps
 			this._tilePalette.Size = new System.Drawing.Size(339, 317);
 			this._tilePalette.TabIndex = 0;
 			this._tilePalette.Text = "tilePalette1";
-			this._tilePalette.Tiles = null;
 			this._tilePalette.Zoom = 1;
 			// 
 			// MetaTilePalette

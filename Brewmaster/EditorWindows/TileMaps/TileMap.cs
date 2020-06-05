@@ -101,9 +101,11 @@ namespace Brewmaster.EditorWindows.TileMaps
 		}
 
 
-		public void PrintTile(int x, int y, int index)
+		public void PrintTile(int x, int y, int tileIndex)
 		{
-			Tiles[y * _map.ScreenSize.Width + x] = index;
+			var index = y * _map.ScreenSize.Width + x;
+			if (index >= Tiles.Length || tileIndex < 0) return;
+			Tiles[index] = tileIndex;
 			if (TileChanged != null) TileChanged(x, y);
 		}
 
@@ -116,6 +118,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 		public void SetColorAttribute(int x, int y, int paletteIndex)
 		{
 			var attributeIndex = y * (_map.ScreenSize.Width / _map.AttributeSize.Width) + x;
+			if (attributeIndex >= ColorAttributes.Length) return;
 			ColorAttributes[attributeIndex] = (ColorAttributes[attributeIndex] & 0xF8) | paletteIndex;
 			
 			if (TileChanged == null) return;
@@ -137,10 +140,11 @@ namespace Brewmaster.EditorWindows.TileMaps
 			return MetaValues[index];
 		}
 
-
 		public int GetColorAttribute(int x, int y)
 		{
-			return ColorAttributes[y * (_map.ScreenSize.Width / _map.AttributeSize.Width) + x] & 0x07;
+			var attributeIndex = y * (_map.ScreenSize.Width / _map.AttributeSize.Width) + x;
+			//return attributeIndex >= ColorAttributes.Length ? 0xff : ColorAttributes[y * (_map.ScreenSize.Width / _map.AttributeSize.Width) + x] & 0x07;
+			return attributeIndex >= ColorAttributes.Length ? 0 : ColorAttributes[y * (_map.ScreenSize.Width / _map.AttributeSize.Width) + x] & 0x07;
 		}
 
 		public void SetColorTile(int x, int y, int paletteIndex)
@@ -153,12 +157,13 @@ namespace Brewmaster.EditorWindows.TileMaps
 		}
 
 		public readonly object TileDrawLock = new Object();
-		public void RefreshTile(int x, int y, MapEditorState state, bool force = false)
+		public void RefreshTile(int x, int y, MapEditorState state, bool force = false, bool pushChange = false)
 		{
 			var index = y * _map.ScreenSize.Width + x;
 			if (_updatedTiles == null || !force && _updatedTiles.ContainsKey(index)) return;
 
 			var attributeIndex = (y / _map.AttributeSize.Height) * (_map.ScreenSize.Width / _map.AttributeSize.Width) + (x / _map.AttributeSize.Width);
+			if (attributeIndex >= ColorAttributes.Length) return;
 			var paletteIndex = ColorAttributes[attributeIndex];
 			var tile = state.GetTileImage(Tiles[index], _map.Palettes[paletteIndex]);
 			if (tile == null) return;
@@ -167,6 +172,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 			
 			lock (_updatedTiles)
 			if (!_updatedTiles.ContainsKey(index)) _updatedTiles.Add(index, true);
+			if (pushChange && ImageUpdated != null) ImageUpdated();
 		}
 
 		private Task _fullRefreshTask;

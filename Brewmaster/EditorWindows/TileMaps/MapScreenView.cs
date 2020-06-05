@@ -110,10 +110,10 @@ namespace Brewmaster.EditorWindows.TileMaps
 		protected override void OnMouseMove(MouseEventArgs e)
 		{
 			var x = (e.Location.X - Offset.X) / ToolWidth;
-			if (x < 0 || x >= (_map.ScreenSize.Width * _map.BaseTileSize.Width) / (Tool.Size.Width * (Tool.Pixel ? 1 : _map.BaseTileSize.Width))) x = -1;
+			if (x < 0 || x * (Tool.Size.Width * (Tool.Pixel ? 1 : _map.BaseTileSize.Width)) >= (_map.ScreenSize.Width * _map.BaseTileSize.Width)) x = -1;
 
 			var y = (e.Location.Y - Offset.Y) / ToolHeight;
-			if (y < 0 || y >= (_map.ScreenSize.Height * _map.BaseTileSize.Height) / (Tool.Size.Height * (Tool.Pixel ? 1 : _map.BaseTileSize.Height))) y = -1;
+			if (y < 0 || y * (Tool.Size.Height * (Tool.Pixel ? 1 : _map.BaseTileSize.Height)) >= _map.ScreenSize.Height * _map.BaseTileSize.Height) y = -1;
 
 			if (_cursorX == x && _cursorY == y) return;
 			var oldX = _cursorX;
@@ -282,7 +282,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 		public void RefreshTile(int x, int y)
 		{
-			_screen.RefreshTile(x, y, _state, true);
+			_screen.RefreshTile(x, y, _state, true, true);
 			Invalidate(new Rectangle(x * _map.BaseTileSize.Width * Zoom + Offset.X, y * _map.BaseTileSize.Width * Zoom + Offset.Y, _map.BaseTileSize.Width * Zoom, _map.BaseTileSize.Height * Zoom));
 		}
 

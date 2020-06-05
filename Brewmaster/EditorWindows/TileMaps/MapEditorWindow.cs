@@ -189,7 +189,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 			screen.ImageUpdated += () =>
 			{
 				if (Parent == null) return;
-				BeginInvoke(new Action(() => _mapOverview.UpdateScreenImage(screen)));
+				BeginInvoke(new Action(() => _mapOverview.InvalidateScreenImage(screen)));
 			};
 			screen.RefreshAllTiles(State);
 		}
@@ -401,7 +401,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 				for (var y = 0; y < height; y += 2)
 					for (var x = 0; x < width; x += 2)
 					{
-						var i = x / 4 + (y / 4) * (Map.ScreenSize.Width / 4);
+						var i = x / 4 + (y / 4) * ((Map.ScreenSize.Width + 3) / 4);
 						var attribute = attributeBytes[i];
 						if (x % 4 == 2) attribute >>= 2;
 						if (y % 4 == 2) attribute >>= 4;

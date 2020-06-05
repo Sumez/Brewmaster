@@ -103,7 +103,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 			}
 		}
 
-		public void UpdateScreenImage(int x, int y)
+		public void InvalidateScreenImage(int x, int y)
 		{
 			var screenWidth = Map.BaseTileSize.Width * Map.ScreenSize.Width * Scale;
 			var screenHeight = Map.BaseTileSize.Height * Map.ScreenSize.Height * Scale;
