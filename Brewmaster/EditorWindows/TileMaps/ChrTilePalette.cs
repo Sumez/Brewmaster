@@ -24,7 +24,6 @@ namespace Brewmaster.EditorWindows.TileMaps
 			state.ChrDataChanged += () =>
 			{
 				RefreshTileCount();
-				_tilePalette.RefreshImage();
 			};
 			state.PaletteChanged += _tilePalette.RefreshImage;
 
@@ -42,8 +41,16 @@ namespace Brewmaster.EditorWindows.TileMaps
 		{
 			var tiles = _tilePalette.Tiles;
 			var targetTiles = _state.ChrData.Length / TileImage.GetTileDataLength();
+			if (targetTiles == tiles.Count)
+			{
+				_tilePalette.RefreshImage();
+				return;
+			}
+
 			for (var i = tiles.Count; i < targetTiles; ++i) tiles.Add(new MetaTile { Tiles = new[] { i }, Attributes = new[] { -1 } });
 			while (tiles.Count > targetTiles) tiles.RemoveAt(tiles.Count - 1);
+
+			_tilePalette.Tiles = tiles;
 		}
 
 		private void InitializeComponent()

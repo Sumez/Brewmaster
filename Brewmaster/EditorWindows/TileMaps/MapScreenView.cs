@@ -280,7 +280,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 		public int ToolHeight { get { return (Tool.Pixel ? 1 : _map.BaseTileSize.Height) * Tool.Size.Height * Zoom; } }
 		public MapGrid Grid { get; set; }
 
-		public void RefreshTile(int x, int y)
+		public void RefreshTile(int x, int y, int oldtile, int newTile)
 		{
 			_screen.RefreshTile(x, y, _state, true, true);
 			Invalidate(new Rectangle(x * _map.BaseTileSize.Width * Zoom + Offset.X, y * _map.BaseTileSize.Width * Zoom + Offset.Y, _map.BaseTileSize.Width * Zoom, _map.BaseTileSize.Height * Zoom));

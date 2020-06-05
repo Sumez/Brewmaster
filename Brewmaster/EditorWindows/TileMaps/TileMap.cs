@@ -76,9 +76,11 @@ namespace Brewmaster.EditorWindows.TileMaps
 		public FastBitmap Image;
 		public FastBitmap MetaImage;
 
-		public event Action<int, int> TileChanged;
+		public event TileChange TileChanged;
 		public event Action EditEnd;
 		public event Action ImageUpdated;
+
+		public delegate void TileChange(int x, int y, int oldTile, int newTile);
 
 		private readonly TileMap _map;
 
@@ -105,8 +107,9 @@ namespace Brewmaster.EditorWindows.TileMaps
 		{
 			var index = y * _map.ScreenSize.Width + x;
 			if (index >= Tiles.Length || tileIndex < 0) return;
+			var oldTile = Tiles[index];
 			Tiles[index] = tileIndex;
-			if (TileChanged != null) TileChanged(x, y);
+			if (TileChanged != null) TileChanged(x, y, oldTile, tileIndex);
 		}
 
 		public int GetTile(int x, int y)
@@ -125,7 +128,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 			for (var i = 0; i < _map.AttributeSize.Width; i++)
 			for (var j = 0; j < _map.AttributeSize.Height; j++)
 			{
-				TileChanged(x * _map.AttributeSize.Width + i, y * _map.AttributeSize.Height + j);
+				TileChanged(x * _map.AttributeSize.Width + i, y * _map.AttributeSize.Height + j, -1, -1);
 			}
 		}
 		public void SetMetaValue(int x, int y, int value)
@@ -172,12 +175,14 @@ namespace Brewmaster.EditorWindows.TileMaps
 			
 			lock (_updatedTiles)
 			if (!_updatedTiles.ContainsKey(index)) _updatedTiles.Add(index, true);
-			if (pushChange && ImageUpdated != null) ImageUpdated();
+			if (pushChange) _pendingTileImageChange = true;
 		}
 
 		private Task _fullRefreshTask;
 		private Dictionary<int, bool> _updatedTiles;
 		private Action _cancelRefresh;
+		private bool _pendingTileImageChange;
+
 		public void RefreshAllTiles(MapEditorState state)
 		{
 			_updatedTiles = new Dictionary<int, bool>();
@@ -229,6 +234,8 @@ namespace Brewmaster.EditorWindows.TileMaps
 		public void OnEditEnd()
 		{
 			if (EditEnd != null) EditEnd();
+			if (_pendingTileImageChange && ImageUpdated != null) ImageUpdated();
+			_pendingTileImageChange = false;
 		}
 
 		public MetaTile GetMetaTile(int x, int y, int size)

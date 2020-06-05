@@ -34,7 +34,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 			var tileWidth = _tileWidth * _metaTileWidth * Zoom;
 			var tileHeight = _tileHeight * _metaTileWidth * Zoom;
 			var width = tileWidth * _rowWidth;
-			var height = tileHeight * _colHeight;
+			var height = tileHeight * ColHeight;
 
 			var grid = new Bitmap(width, height);
 			using (var graphics = Graphics.FromImage(grid))
@@ -45,7 +45,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 				{
 					graphics.DrawLine(_solid, i * tileWidth, 0, i * tileWidth, height);
 				}
-				for (var i = 1; i < _colHeight; i++)
+				for (var i = 1; i < ColHeight; i++)
 				{
 					graphics.DrawLine(_solid, 0, i * tileHeight, width, i * tileHeight);
 				}
@@ -78,13 +78,15 @@ namespace Brewmaster.EditorWindows.TileMaps
 			{
 				if (_metaTileWidth == value) return;
 				_metaTileWidth = value;
-				var image = new FastBitmap(_tileWidth * _metaTileWidth * _rowWidth, _tileHeight * _metaTileWidth * _colHeight);
+				var image = new FastBitmap(_tileWidth * _metaTileWidth * _rowWidth, _tileHeight * _metaTileWidth * ColHeight);
 				_image.Dispose();
 				_image = image;
 				GenerateGrid();
 				RefreshImage();
 			}
 		}
+
+		public int ColHeight { get; private set; }
 
 		private byte[] ChrData
 		{
@@ -117,6 +119,13 @@ namespace Brewmaster.EditorWindows.TileMaps
 			set
 			{
 				_tiles = value;
+				var colHeight = Math.Max((_tiles.Count + _rowWidth - 1) / _rowWidth, _colHeight);
+				if (colHeight > ColHeight)
+				{
+					ColHeight = colHeight;
+					GenerateGrid();
+				}
+				ColHeight = colHeight;
 				RefreshImage();
 			}
 		}
@@ -127,7 +136,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 			var y = e.Location.Y / (_tileHeight * _metaTileWidth * Zoom);
 
 			var tile = y * _rowWidth + x;
-			if (x < 0 || x >= _rowWidth || y < 0 || y >= _colHeight || tile >= Tiles.Count) HoverTile = -1;
+			if (x < 0 || x >= _rowWidth || y < 0 || tile >= Tiles.Count) HoverTile = -1;
 			else HoverTile = tile;
 			base.OnMouseMove(e);
 		}
@@ -147,6 +156,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 		public TilePalette()
 		{
 			DoubleBuffered = true;
+			ColHeight = _colHeight;
 			var gridColor = Color.FromArgb(128, 255, 255, 255);
 			_solid = new Pen(gridColor, 1);
 			_solidBrush = new SolidBrush(gridColor);
@@ -160,7 +170,6 @@ namespace Brewmaster.EditorWindows.TileMaps
 		public void RefreshImage()
 		{
 			if (Tiles == null) return;
-			// TODO: Just cancel task if not finished
 
 			if (_backBufferTask != null && !_backBufferTask.IsCompleted)
 			{
@@ -174,27 +183,27 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 			_backBufferTask = Task.Run(() =>
 			{
-				lock (_backBufferLock)
+				var image = new FastBitmap(_tileWidth * _metaTileWidth * _rowWidth, _tileHeight * _metaTileWidth * ColHeight);
+				image.Clear(Palette.Colors[0]);
+				if (ChrData != null)
 				{
-					var image = new FastBitmap(_tileWidth * _metaTileWidth * _rowWidth, _tileHeight * _metaTileWidth * Math.Max((Tiles.Count + _rowWidth - 1) / _rowWidth, _colHeight));
-					image.Clear(Palette.Colors[0]);
-					if (ChrData != null)
+					for (var i = 0; i < Tiles.Count; i++)
 					{
-						for (var i = 0; i < Tiles.Count; i++)
+						if (token.IsCancellationRequested) return;
+						var metaTile = Tiles[i];
+						for (var j = 0; j < metaTile.Tiles.Length; j++)
 						{
-							if (token.IsCancellationRequested) return;
-							var metaTile = Tiles[i];
-							for (var j = 0; j < metaTile.Tiles.Length; j++)
-							{
-								var tile = State.GetTileImage(metaTile.Tiles[j], GetTileColors(metaTile, j));
-								if (tile == null) continue;
-								tile.CopyTile(image,
-									(i % _rowWidth) * _metaTileWidth + (j % _metaTileWidth),
-									(i / _rowWidth) * _metaTileWidth + (j / _metaTileWidth));
-							}
+							var tile = State.GetTileImage(metaTile.Tiles[j], GetTileColors(metaTile, j));
+							if (tile == null) continue;
+							tile.CopyTile(image,
+								(i % _rowWidth) * _metaTileWidth + (j % _metaTileWidth),
+								(i / _rowWidth) * _metaTileWidth + (j / _metaTileWidth));
 						}
 					}
+				}
 
+				lock (_backBufferLock)
+				{
 					var oldImage = _image;
 					_image = image;
 					oldImage.Dispose();
@@ -212,7 +221,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 			e.Graphics.CompositingQuality = CompositingQuality.HighSpeed;
 			e.Graphics.PixelOffsetMode = PixelOffsetMode.Half;
 			e.Graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
-			e.Graphics.DrawImage(_image.Image, new Rectangle(0, 0, _image.Width * Zoom, _image.Height * Zoom));
+			lock (_backBufferLock) e.Graphics.DrawImage(_image.Image, new Rectangle(0, 0, _image.Width * Zoom, _image.Height * Zoom));
 
 			e.Graphics.CompositingMode = CompositingMode.SourceOver;
 			e.Graphics.PixelOffsetMode = PixelOffsetMode.None;

@@ -126,6 +126,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 			SelectTilePen(0);
 
 			foreach (var screen in Map.Screens.SelectMany(l => l).Where(s => s != null)) InitScreen(screen);
+			State.RefreshTileUsage(Map);
 			ActivateScreen(0, 0);
 		}
 
@@ -191,6 +192,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 				if (Parent == null) return;
 				BeginInvoke(new Action(() => _mapOverview.InvalidateScreenImage(screen)));
 			};
+			screen.TileChanged += (x, y, oldTile, newTile) => { State.RefreshTileUsage(screen, oldTile, newTile); };
 			screen.RefreshAllTiles(State);
 		}
 
@@ -634,6 +636,52 @@ namespace Brewmaster.EditorWindows.TileMaps
 				// It's a little cheaper to just modify the cached image than to clear the cache entirely
 				tileCache.Value.SetPixel(x, y, tileCache.Key.Colors[colorIndex]);
 			}
+		}
+
+		private Dictionary<TileMapScreen, Dictionary<int, int>> _screenTileUsage = new Dictionary<TileMapScreen, Dictionary<int, int>>();
+		private Dictionary<int, int> _tileUsage = new Dictionary<int, int>();
+		public void RefreshTileUsage(TileMapScreen screen, int oldTile, int newTile)
+		{
+			if (oldTile >= 0)
+			{
+				_screenTileUsage[screen][oldTile]--;
+				_tileUsage[oldTile]--;
+			}
+
+			if (newTile < 0) return;
+
+			if (_screenTileUsage[screen].ContainsKey(newTile)) _screenTileUsage[screen][newTile]++;
+			else _screenTileUsage[screen][newTile] = 1;
+
+			if (_tileUsage.ContainsKey(newTile)) _tileUsage[newTile]++;
+			else _tileUsage[newTile] = 1;
+			
+		}
+
+		public void RefreshTileUsage(TileMap map)
+		{
+			// TODO: Remove screens from list if removed from full map
+			_screenTileUsage.Clear();
+			foreach (var screen in map.Screens.SelectMany(s => s).Where(s => s != null))
+			{
+				_screenTileUsage[screen] = screen.Tiles.GroupBy(tile => tile).ToDictionary(g => g.Key, g => g.ToArray().Length);
+			}
+			_tileUsage = _screenTileUsage.SelectMany(kvp => kvp.Value).GroupBy(kvp => kvp.Key, kvp => kvp.Value).ToDictionary(g => g.Key, g => g.Sum());
+		}
+
+		public int GetTileUsage(int tile)
+		{
+			return _tileUsage.ContainsKey(tile) ? _tileUsage[tile] : 0;
+		}
+
+		public int CopyTile(int tile)
+		{
+			var tileSize = TileImage.GetTileDataLength();
+			var newData = new byte[_chrData.Length + tileSize];
+			Buffer.BlockCopy(_chrData, 0, newData, 0, _chrData.Length);
+			Buffer.BlockCopy(_chrData, tileSize * tile, newData, _chrData.Length, tileSize);
+			_chrData = newData;
+			return (newData.Length / tileSize) - 1;
 		}
 	}
 
