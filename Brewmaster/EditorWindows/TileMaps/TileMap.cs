@@ -89,7 +89,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 			ColorAttributes = new int[(map.ScreenSize.Width / map.AttributeSize.Width) * (map.ScreenSize.Height / map.AttributeSize.Height)];
 			MetaValues = new int[(map.ScreenSize.Width / map.MetaValueSize.Width) * (map.ScreenSize.Height / map.MetaValueSize.Height)];
 			Image = new Bitmap(map.ScreenSize.Width * map.BaseTileSize.Width, map.ScreenSize.Height * map.BaseTileSize.Height, PixelFormat.Format32bppPArgb);
-			MetaImage = new FastBitmap(map.ScreenSize.Width / map.MetaValueSize.Width, map.ScreenSize.Height / map.MetaValueSize.Height);
+			MetaImage = new FastBitmap(map.ScreenSize.Width / map.MetaValueSize.Width, map.ScreenSize.Height / map.MetaValueSize.Height, PixelFormat.Format32bppArgb);
 		}
 
 		public void Unload()

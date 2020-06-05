@@ -106,7 +106,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 		protected GCHandle BitsHandle { get; private set; }
 
-		public FastBitmap(int width, int height, PixelFormat pixelFormat = PixelFormat.Format32bppArgb)
+		public FastBitmap(int width, int height, PixelFormat pixelFormat = PixelFormat.Format32bppPArgb)
 		{
 			Width = width;
 			Height = height;
