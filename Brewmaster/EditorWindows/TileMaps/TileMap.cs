@@ -73,7 +73,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 		public int[] MetaValues;
 		public MapObject[] Objects;
 
-		public Bitmap Image;
+		public FastBitmap Image;
 		public FastBitmap MetaImage;
 
 		public event Action<int, int> TileChanged;
@@ -88,7 +88,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 			Tiles = new int[map.ScreenSize.Width * map.ScreenSize.Height];
 			ColorAttributes = new int[(map.ScreenSize.Width / map.AttributeSize.Width) * (map.ScreenSize.Height / map.AttributeSize.Height)];
 			MetaValues = new int[(map.ScreenSize.Width / map.MetaValueSize.Width) * (map.ScreenSize.Height / map.MetaValueSize.Height)];
-			Image = new Bitmap(map.ScreenSize.Width * map.BaseTileSize.Width, map.ScreenSize.Height * map.BaseTileSize.Height, PixelFormat.Format32bppPArgb);
+			Image = new FastBitmap(map.ScreenSize.Width * map.BaseTileSize.Width, map.ScreenSize.Height * map.BaseTileSize.Height, PixelFormat.Format32bppPArgb);
 			MetaImage = new FastBitmap(map.ScreenSize.Width / map.MetaValueSize.Width, map.ScreenSize.Height / map.MetaValueSize.Height, PixelFormat.Format32bppArgb);
 		}
 
@@ -162,12 +162,8 @@ namespace Brewmaster.EditorWindows.TileMaps
 			var paletteIndex = ColorAttributes[attributeIndex];
 			var tile = state.GetTileImage(Tiles[index], _map.Palettes[paletteIndex]);
 			if (tile == null) return;
-			lock (TileDrawLock)
-			using (var graphics = Graphics.FromImage(Image))
-			{
-				graphics.CompositingMode = CompositingMode.SourceCopy;
-				lock (tile) graphics.DrawImageUnscaled(tile.Image, x * _map.BaseTileSize.Width, y * _map.BaseTileSize.Height);
-			}
+
+			lock (TileDrawLock) tile.CopyTile(Image, x, y);
 			
 			lock (_updatedTiles)
 			if (!_updatedTiles.ContainsKey(index)) _updatedTiles.Add(index, true);

@@ -54,7 +54,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 				var x = (i % metaTileSize) / map.AttributeSize.Width;
 				var y = (i / metaTileSize) / map.AttributeSize.Height;
 				i = y * (metaTileSize / map.AttributeSize.Width) + x;
-				return (tile.Attributes[i] & 0xff) == 0xff ? state.Palette.Colors : map.Palettes[tile.Attributes[i] & 0xff].Colors;
+				return (tile.Attributes[i] & 0xff) == 0xff ? state.Palette : map.Palettes[tile.Attributes[i] & 0xff];
 			};
 			RefreshMetaTiles();
 			_tilePalette.TileClick += (index) =>

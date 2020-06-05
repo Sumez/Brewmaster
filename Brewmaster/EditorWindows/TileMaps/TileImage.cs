@@ -94,6 +94,21 @@ namespace Brewmaster.EditorWindows.TileMaps
 				data[offset + byte1Index] = (byte)((data[offset + byte1Index] & mask) | val1);
 			}
 		}
+
+		public void CopyTile(FastBitmap target, int tileX, int tileY)
+		{
+			var x = tileX * Width;
+			var y = tileY * Height;
+			for (var yOffset = 0; yOffset < Height; yOffset++)
+			{
+				CopySlice(target, yOffset * Width, Width, x, y + yOffset);
+			}
+		}
+
+		public static int GetTileDataLength(int bitDepth = 2)
+		{
+			return 8 * bitDepth;
+		}
 	}
 
 	public class FastBitmap : IDisposable
@@ -131,6 +146,17 @@ namespace Brewmaster.EditorWindows.TileMaps
 			Disposed = true;
 			Image.Dispose();
 			BitsHandle.Free();
+		}
+
+		public void CopySlice(FastBitmap target, int offset, int length, int targetX, int targetY)
+		{
+			Buffer.BlockCopy(_data, offset * 4, target._data, 4 * (targetY * target.Width + targetX), length * 4);
+		}
+
+		public void Clear(Color color)
+		{
+			var value = color.ToArgb();
+			for (var i = 0; i < _data.Length; ++i) _data[i] = value;
 		}
 	}
 }

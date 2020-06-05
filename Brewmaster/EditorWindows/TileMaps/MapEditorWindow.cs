@@ -446,7 +446,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 			using (var sourceImage = new Bitmap(fileName))
 			{
-				using (var graphics = Graphics.FromImage(FocusedScreen.Image))
+				using (var graphics = Graphics.FromImage(FocusedScreen.Image.Image))
 				{
 					graphics.DrawImageUnscaled(sourceImage, 0, 0);
 				}
@@ -628,7 +628,12 @@ namespace Brewmaster.EditorWindows.TileMaps
 		public void SetPixel(int tileIndex, int x, int y, int colorIndex)
 		{
 			TileImage.SetTilePixel(ChrData, tileIndex, x, y, colorIndex);
-			lock (_cachedTiles) _cachedTiles.Remove(tileIndex);
+			lock (_cachedTiles)
+			foreach (var tileCache in _cachedTiles[tileIndex])
+			{
+				// It's a little cheaper to just modify the cached image than to clear the cache entirely
+				tileCache.Value.SetPixel(x, y, tileCache.Key.Colors[colorIndex]);
+			}
 		}
 	}
 

@@ -92,7 +92,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 					if (screen == null || screen.Image == null) continue;
 
 					// TODO: Draw grid of scaled screen images to a backbuffer
-					lock (screen.TileDrawLock) e.Graphics.DrawImage(screen.Image, x * screenWidth, y * screenHeight, screenWidth, screenHeight);
+					lock (screen.TileDrawLock) e.Graphics.DrawImage(screen.Image.Image, x * screenWidth, y * screenHeight, screenWidth, screenHeight);
 				}
 			}
 

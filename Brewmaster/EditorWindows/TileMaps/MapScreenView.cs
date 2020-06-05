@@ -74,7 +74,6 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 			if (Width != width || Height != height) Size = new Size(width, height);
 			RefreshVisibleTiles();
-			Invalidate();
 		}
 
 		private bool MouseButtonUp(Point location)
@@ -236,7 +235,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 			e.Graphics.CompositingQuality = CompositingQuality.HighSpeed;
 			e.Graphics.PixelOffsetMode = PixelOffsetMode.Half;
 			e.Graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
-			lock (_screen.TileDrawLock) e.Graphics.DrawImage(_screen.Image, new Rectangle(0, 0, _screen.Image.Width * Zoom, _screen.Image.Height * Zoom));
+			lock (_screen.TileDrawLock) e.Graphics.DrawImage(_screen.Image.Image, new Rectangle(0, 0, _screen.Image.Width * Zoom, _screen.Image.Height * Zoom));
 
 			if (_cursorX >= 0 && _cursorY >= 0 && Tool.Image != null)
 			{
