@@ -11,7 +11,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 {
 	public class MapScreenView : Control
 	{
-		public MapEditorTool Tool { get { return _state.Tool; } }
+		private MapEditorTool Tool { get { return _state.Tool; } }
 
 		private readonly TileMap _map;
 		private TileMapScreen _screen;
@@ -34,7 +34,8 @@ namespace Brewmaster.EditorWindows.TileMaps
 			_state = state;
 
 			DoubleBuffered = true;
-
+			ContextMenu = new ContextMenu();
+			
 			var gridColor = Color.FromArgb(128, 255, 255, 255);
 			_dotted = new Pen(gridColor, 1);
 			_dotted.DashStyle = DashStyle.Custom;

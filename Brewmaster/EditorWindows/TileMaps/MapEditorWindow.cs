@@ -18,13 +18,12 @@ namespace Brewmaster.EditorWindows.TileMaps
 	public class MapEditorWindow : SaveableEditorWindow
 	{
 		protected static MapEditorToolBar MapEditorToolBar = new MapEditorToolBar();
-		private MapScreenView _screenView;
 		private ChrTilePalette _tilePalette;
 		private MapOverview _mapOverview;
 		private ColorPaletteView _colorPalette;
 		private Dictionary<int, MetaTilePalette> _metaTilePalettes;
 		private ScreenPanel _screenPanel;
-		private ToolSettings _metaValuePalette;
+		private ToolSettings _toolSettings;
 		public override ToolStrip ToolBar { get { return MapEditorToolBar; } }
 		public override LayoutMode LayoutMode { get { return LayoutMode.MapEditor; } }
 
@@ -85,23 +84,31 @@ namespace Brewmaster.EditorWindows.TileMaps
 			_colorPalette.SelectedPaletteChanged += (paletteIndex) =>
 			{
 				State.Palette = Map.Palettes[paletteIndex];
-				SetToolImage(_screenView.Tool as TilePen);
+				SetToolImage(State.Tool as TilePen);
 			};
-			_colorPalette.PalettesChanged += () =>
+			_colorPalette.PalettesModified += () =>
 			{
 				State.ClearTileCache();
 				State.OnPaletteChanged();
-				_screenView.RefreshAllTiles();
-				SetToolImage(_screenView.Tool as TilePen);
+				_screenPanel.RefreshAllTiles();
+				SetToolImage(State.Tool as TilePen);
 				Pristine = false;
 			};
+			_colorPalette.SelectedColorIndexChanged += (colorIndex, paletteIndex) =>
+			{
+				if (State.Tool is PixelPen pixelPen)
+				{
+					pixelPen.SelectedColor = colorIndex;
+					pixelPen.PreviewSource = Map.Palettes[paletteIndex];
+				}
+			};
 
-			_metaValuePalette = new ToolSettings(Map) { Dock = DockStyle.Right };
-			_metaValuePalette.UserSelectedValue += SelectMetaPen;
+			_toolSettings = new ToolSettings(Map, State) { Dock = DockStyle.Right };
+			_toolSettings.MetaValues.UserSelectedValue += SelectMetaPen;
 
 			var bottomPanel = new Panel { AutoSize = true, Dock = DockStyle.Bottom };
 			bottomPanel.Controls.Add(_colorPalette);
-			bottomPanel.Controls.Add(_metaValuePalette);
+			bottomPanel.Controls.Add(_toolSettings);
 			//bottomPanel.Controls.Add(new HorizontalLine { Dock = DockStyle.Top });
 			Controls.Add(bottomPanel);
 
@@ -166,10 +173,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 				InitScreen(Map.Screens[y][x]);
 			}
 			FocusedScreen = Map.Screens[y][x];
-			_screenView = new MapScreenView(Map, FocusedScreen, State);
-			_screenView.ContextMenu = new ContextMenu();
-			_screenPanel.Add(_screenView);
-			_screenView.RefreshAllTiles();
+			_screenPanel.Add(FocusedScreen);
 		}
 
 		private void InitScreen(TileMapScreen screen)
@@ -240,11 +244,6 @@ namespace Brewmaster.EditorWindows.TileMaps
 			MapEditorToolBar.CollisionButton.Checked = State.DisplayMetaValues = true;
 			var tool = new MetaValuePen(Map.MetaValueSize, Map.GetMetaValueColor);
 			State.Tool = tool;
-			tool.SelectedValue = _metaValuePalette.SelectedValue;
-			tool.SelectedValueChanged += () =>
-			{
-				_metaValuePalette.SelectedValue = tool.SelectedValue;
-			};
 		}
 
 		private void InitPaletteTool(IPaletteTool tool)
@@ -262,7 +261,8 @@ namespace Brewmaster.EditorWindows.TileMaps
 				stream.Read(data, 0, data.Length);
 				State.ChrData = data;
 			}
-			if (_screenView != null) _screenView.RefreshAllTiles();
+
+			_screenPanel.RefreshAllTiles(); // TODO: Should probably react to ChrDataChanged event, but unsure how much overhead that creates while drawing tiles
 		}
 
 		public TileMapScreen FocusedScreen { get; set; }
@@ -451,7 +451,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 					graphics.DrawImageUnscaled(sourceImage, 0, 0);
 				}
 			}
-			_screenView.Invalidate();
+			_screenPanel.InvalidateVisibleViews();
 		}
 		private void ImportChr()
 		{

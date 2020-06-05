@@ -91,13 +91,12 @@ namespace Brewmaster.EditorWindows.TileMaps
 			if (_singleView != null)
 			{
 				_singleView.RefreshView();
-				_singleView.RefreshVisibleTiles();
 				_hScrollBar.Maximum = Math.Max(_singleView.RenderSize.Width - _panel.Width + _hScrollBar.LargeChange, -_offset.X);
 				_vScrollBar.Maximum = Math.Max(_singleView.RenderSize.Height - _panel.Height + _vScrollBar.LargeChange, -_offset.Y);
 			}
 		}
 
-		private void InvalidateVisibleViews()
+		public void InvalidateVisibleViews()
 		{
 			if (_singleView != null) _singleView.Invalidate();
 		}
@@ -161,8 +160,10 @@ namespace Brewmaster.EditorWindows.TileMaps
 			return false;
 		}
 
-		public void Add(MapScreenView screenView)
+		public void Add(TileMapScreen screen)
 		{
+			var screenView = new MapScreenView(_map, screen, _state);
+
 			Offset = Point.Empty;
 			if (_singleView != null)
 			{
@@ -173,6 +174,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 			screenView.Grid = _grid;
 			_panel.Controls.Add(_singleView = screenView);
 			RefreshView();
+			screenView.RefreshAllTiles();
 		}
 
 		public void Pan(int deltaX, int deltaY)
@@ -181,6 +183,11 @@ namespace Brewmaster.EditorWindows.TileMaps
 				Math.Max(- (_hScrollBar.Maximum), Math.Min(- _hScrollBar.Minimum, Offset.X - deltaX)),
 				Math.Max(- (_vScrollBar.Maximum), Math.Min(- _vScrollBar.Minimum, Offset.Y - deltaY))
 			);
+		}
+
+		public void RefreshAllTiles()
+		{
+			if (_singleView != null) _singleView.RefreshAllTiles();
 		}
 	}
 }

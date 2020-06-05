@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
+using System.Windows.Forms;
 using Brewmaster.Modules.Ppu;
 
 namespace Brewmaster.EditorWindows.TileMaps
@@ -30,8 +30,14 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 	public class PixelPen : MapEditorTool
 	{
+		private Bitmap _pixelImage;
+		private Palette _previewSource;
+		private int _selectedColor;
+
 		private readonly TileMap _map;
 		private readonly MapEditorState _state;
+		public event Action PreviewSourceChanged;
+		public event Action SelectedColorChanged;
 
 		public PixelPen(MapEditorState state, TileMap map)
 		{
@@ -39,10 +45,13 @@ namespace Brewmaster.EditorWindows.TileMaps
 			_map = map;
 			Size = new Size(1, 1);
 			Image = _pixelImage = new Bitmap(1, 1, PixelFormat.Format32bppPArgb);
+			PreviewSource = map.Palettes[0];
 		}
 		public override bool Pixel { get { return true; } }
+		public bool CreateNewTile { get; set; }
 		public override void Paint(int x, int y, TileMapScreen screen)
 		{
+			var createNewTile = CreateNewTile || Control.ModifierKeys.HasFlag(Keys.Control);
 			var tile = screen.GetTile(x / _map.BaseTileSize.Width, y / _map.BaseTileSize.Height);
 			var palette = screen.GetColorTile(x / _map.BaseTileSize.Width, y / _map.BaseTileSize.Height);
 			
@@ -66,10 +75,25 @@ namespace Brewmaster.EditorWindows.TileMaps
 			_state.OnChrDataChanged();
 		}
 
-		public int SelectedColor { get; set; }
+		public int SelectedColor
+		{
+			get { return _selectedColor; }
+			set
+			{
+				_selectedColor = value;
+				if (SelectedColorChanged != null) SelectedColorChanged();
+			}
+		}
 
-		private Bitmap _pixelImage;
-
+		public Palette PreviewSource
+		{
+			get { return _previewSource; }
+			set
+			{
+				_previewSource = value;
+				if (PreviewSourceChanged != null) PreviewSourceChanged();
+			}
+		}
 	}
 
 	public class MetaValuePen : MapEditorTool

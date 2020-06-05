@@ -11,7 +11,8 @@ namespace Brewmaster.EditorWindows.TileMaps
 	public class ColorPaletteView : Control
 	{
 		public event Action<int> SelectedPaletteChanged;
-		public event Action PalettesChanged;
+		public event Action PalettesModified;
+		public event Action<int, int> SelectedColorIndexChanged;
 
 		public ColorPaletteView(List<Palette> palettes)
 		{
@@ -33,7 +34,12 @@ namespace Brewmaster.EditorWindows.TileMaps
 						p.Invalidate();
 					}
 
-					if (PalettesChanged != null) PalettesChanged();
+					if (PalettesModified != null) PalettesModified();
+				};
+				paletteControl.SelectedColorIndexChanged += () =>
+				{
+					if (SelectedColorIndexChanged != null)
+						SelectedColorIndexChanged(paletteControl.SelectedColorIndex, SelectedPaletteIndex);
 				};
 			}
 
@@ -84,13 +90,15 @@ namespace Brewmaster.EditorWindows.TileMaps
 				}
 				paletteControl.Invalidate();
 			}
-			if (PalettesChanged != null) PalettesChanged();
+			if (PalettesModified != null) PalettesModified();
 		}
 	}
 
 	public class ColorPalette : Control
 	{
 		public event Action<Palette> PaletteChanged;
+		public event Action SelectedColorIndexChanged;
+		public int SelectedColorIndex { get; set; }
 		private bool _selected;
 		public bool Selected
 		{
@@ -122,26 +130,46 @@ namespace Brewmaster.EditorWindows.TileMaps
 			Height = 18;
 
 			_paletteViewer.Click += (s, a) => OnClick(a);
+			_paletteViewer.DoubleClick += (s, a) => OnDoubleClick(a);
 		}
 
 		protected override void OnClick(EventArgs e)
 		{
-			if (Selected && _paletteViewer.HoverIndex >= 0)
+			if (_paletteViewer.HoverIndex < 0)
 			{
-				var paletteIndex = _paletteViewer.HoverIndex;
-				var colorPicker = new NesColorPicker();
-				colorPicker.Color = Palette.Colors[paletteIndex];
-				colorPicker.StartPosition = FormStartPosition.Manual;
-				colorPicker.Location = PointToScreen(new Point(0, -colorPicker.Height));
-				colorPicker.Show(this);
-				colorPicker.FormClosing += (s, a) =>
-				{
-					Palette.Colors[paletteIndex] = colorPicker.Color;
-					_paletteViewer.Invalidate();
-					if (PaletteChanged != null) PaletteChanged(Palette);
-				};
+				base.OnClick(e);
+				return;
 			}
+			
+			if (Selected && _paletteViewer.HoverIndex == SelectedColorIndex)
+			{
+				PickNewColor();
+			}
+			SelectedColorIndex = _paletteViewer.HoverIndex;
+			if (SelectedColorIndexChanged != null) SelectedColorIndexChanged();
 			base.OnClick(e);
+		}
+
+		protected override void OnDoubleClick(EventArgs e)
+		{
+			PickNewColor();
+			base.OnDoubleClick(e);
+		}
+
+		private void PickNewColor()
+		{
+			var paletteIndex = _paletteViewer.HoverIndex;
+			var colorPicker = new NesColorPicker();
+			colorPicker.Color = Palette.Colors[paletteIndex];
+			colorPicker.StartPosition = FormStartPosition.Manual;
+			colorPicker.Location = PointToScreen(new Point(0, -colorPicker.Height));
+			colorPicker.Show();
+			colorPicker.FormClosing += (s, a) =>
+			{
+				Palette.Colors[paletteIndex] = colorPicker.Color;
+				_paletteViewer.Invalidate();
+				if (PaletteChanged != null) PaletteChanged(Palette);
+			};
 		}
 
 		public Palette Palette
