@@ -127,7 +127,9 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 			foreach (var screen in Map.Screens.SelectMany(l => l).Where(s => s != null)) InitScreen(screen);
 			State.RefreshTileUsage(Map);
-			ActivateScreen(0, 0);
+
+			_screenPanel.AddFullMap();
+			//ActivateScreen(0, 0);
 		}
 
 		public override void TabActivated()
@@ -174,7 +176,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 				InitScreen(Map.Screens[y][x]);
 			}
 			FocusedScreen = Map.Screens[y][x];
-			_screenPanel.Add(FocusedScreen);
+			_screenPanel.AddSingleScreen(FocusedScreen);
 		}
 
 		private void InitScreen(TileMapScreen screen)

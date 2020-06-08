@@ -165,23 +165,6 @@ namespace Brewmaster.EditorWindows.TileMaps
 			return false;
 		}
 
-		public void Add(TileMapScreen screen)
-		{
-			var screenView = new MapScreenView(_map, screen, _state);
-
-			Offset = Point.Empty;
-			if (_singleView != null)
-			{
-				_panel.Controls.Remove(_singleView);
-				_singleView.Dispose();
-			}
-
-			screenView.Grid = _grid;
-			_panel.Controls.Add(_singleView = screenView);
-			RefreshView();
-			screenView.RefreshAllTiles();
-		}
-
 		public void Pan(int deltaX, int deltaY)
 		{
 			Offset = new Point(
@@ -193,6 +176,34 @@ namespace Brewmaster.EditorWindows.TileMaps
 		public void RefreshAllTiles()
 		{
 			if (_singleView != null) _singleView.RefreshAllTiles();
+		}
+
+		public void AddSingleScreen(TileMapScreen screen)
+		{
+			Add(new MapScreenView(_map, screen, _state));
+		}
+
+		public void AddFullMap()
+		{
+			var screenView = new MapScreenView(_map, _state);
+			screenView.LoadFullMap();
+
+			Add(screenView);
+		}
+
+		private void Add(MapScreenView screenView)
+		{
+			Offset = Point.Empty;
+			if (_singleView != null)
+			{
+				_panel.Controls.Remove(_singleView);
+				_singleView.Dispose();
+			}
+
+			screenView.Grid = _grid;
+			_panel.Controls.Add(_singleView = screenView);
+			RefreshView();
+			RefreshAllTiles();
 		}
 	}
 }
