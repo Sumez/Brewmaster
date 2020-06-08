@@ -114,7 +114,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 				if (SelectedTile >= 0) selectedMetaTile = GetMetaTile(SelectedTile);
 				var distinctMetaTiles = _screenCollections.Values.SelectMany(mt => mt).Distinct().TakeWhile((tile, i) => !token.IsCancellationRequested).ToList();
 				if (token.IsCancellationRequested) return;
-				
+			
 				_metaTiles = distinctMetaTiles;
 				_tilePalette.Tiles = _metaTiles;
 				if (selectedMetaTile != null) SelectMetaTile(selectedMetaTile);
@@ -122,6 +122,8 @@ namespace Brewmaster.EditorWindows.TileMaps
 			}, token);
 			if (screen == null) _refreshAllTask = task;
 		}
+
+		private object _allMetaTilesLock = new object();
 
 		private void InitializeComponent()
 		{

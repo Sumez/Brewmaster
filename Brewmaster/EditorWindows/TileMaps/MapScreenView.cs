@@ -17,7 +17,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 		private readonly TileMap _map;
 		private readonly List<TileMapScreen> _screens;
-		private List<int> _visibleScreens = new List<int>();
+		private readonly List<int> _visibleScreens = new List<int>();
 		private Pen _dotted;
 		private Pen _solid;
 		private Pen _dashed;
@@ -25,7 +25,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 		private int _cursorX = -1;
 		private int _cursorY = -1;
 		private bool _mouseDown;
-		private bool _alteredByTool;
+		private readonly List<int> _screensAlteredByTool = new List<int>();
 		private MapEditorState _state;
 		private bool _displayMetaValues;
 		private bool _displayGrid;
@@ -99,10 +99,13 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 		private bool MouseButtonUp(Point location)
 		{
-			if (_mouseDown && _alteredByTool) _screens[_cursorScreen].OnEditEnd();
+			if (_mouseDown)
+			{
+				foreach (var index in _screensAlteredByTool) _screens[index].OnEditEnd();
+			}
 
 			_mouseDown = false;
-			_alteredByTool = false;
+			_screensAlteredByTool.Clear();
 			return false;
 		}
 
@@ -115,7 +118,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 			{
 				case MouseButtons.Left:
 					_mouseDown = true;
-					_alteredByTool = false;
+					_screensAlteredByTool.Clear();
 					if (Tool != null)
 					{
 						PaintTool();
@@ -227,7 +230,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 		private void PaintTool()
 		{
 			Tool.Paint(_cursorX, _cursorY, _screens[_cursorScreen]);
-			_alteredByTool = true; // TODO: List of altered screens
+			if (!_screensAlteredByTool.Contains(_cursorScreen)) _screensAlteredByTool.Add(_cursorScreen);
 			InvalidateToolPosition(_cursorScreen, _cursorX, _cursorY);
 		}
 
