@@ -29,7 +29,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 		private MapEditorState _state;
 		private bool _displayMetaValues;
 		private bool _displayGrid;
-		private TileMapScreen _cursorScreen;
+		private int _cursorScreen;
 
 		public MapScreenView(TileMap map, MapEditorState state)
 		{
@@ -97,10 +97,9 @@ namespace Brewmaster.EditorWindows.TileMaps
 			RefreshVisibleTiles();
 		}
 
-		private TileMapScreen _screen { get { return _screens[0]; } }
 		private bool MouseButtonUp(Point location)
 		{
-			if (_mouseDown && _alteredByTool) _screen.OnEditEnd();
+			if (_mouseDown && _alteredByTool) _screens[_cursorScreen].OnEditEnd();
 
 			_mouseDown = false;
 			_alteredByTool = false;
@@ -110,7 +109,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 		protected override void OnMouseDown(MouseEventArgs e)
 		{
 			base.OnMouseDown(e);
-			if (_cursorX < 0 || _cursorY < 0) return;
+			if (_cursorX < 0 || _cursorY < 0 || _cursorScreen < 0) return;
 
 			switch (e.Button)
 			{
@@ -124,36 +123,54 @@ namespace Brewmaster.EditorWindows.TileMaps
 					}
 					break;
 				case MouseButtons.Right:
-					if (Tool != null) Tool.EyeDrop(_cursorX, _cursorY, _screen);
+					if (Tool != null) Tool.EyeDrop(_cursorX, _cursorY, _screens[_cursorScreen]);
 					break;
 			}
 		}
 
 		protected override void OnMouseMove(MouseEventArgs e)
 		{
-			var x = (e.Location.X - Offset.X) / ToolWidth;
-			if (x < 0 || x * (Tool.Size.Width * (Tool.Pixel ? 1 : _map.BaseTileSize.Width)) >= (_map.ScreenSize.Width * _map.BaseTileSize.Width)) x = -1;
+			// TODO: Make a struct to hold all 3 values in cursor's position
+			var newX = -1;
+			var newY = -1;
+			var newScreen = -1;
+			foreach (var index in _visibleScreens)
+			{
+				var offset = GetOffset(index);
+				var x = (e.Location.X - offset.X) / ToolWidth;
+				if (x < 0 || x * (Tool.Size.Width * (Tool.Pixel ? 1 : _map.BaseTileSize.Width)) >= (_map.ScreenSize.Width * _map.BaseTileSize.Width)) x = -1;
 
-			var y = (e.Location.Y - Offset.Y) / ToolHeight;
-			if (y < 0 || y * (Tool.Size.Height * (Tool.Pixel ? 1 : _map.BaseTileSize.Height)) >= _map.ScreenSize.Height * _map.BaseTileSize.Height) y = -1;
+				var y = (e.Location.Y - offset.Y) / ToolHeight;
+				if (y < 0 || y * (Tool.Size.Height * (Tool.Pixel ? 1 : _map.BaseTileSize.Height)) >= _map.ScreenSize.Height * _map.BaseTileSize.Height) y = -1;
 
-			if (_cursorX == x && _cursorY == y) return;
+				if (x < 0 || y < 0) continue;
+				
+				newX = x;
+				newY = y;
+				newScreen = index;
+				break;
+			}
+			if (_cursorScreen == newScreen && _cursorX == newX && _cursorY == newY) return;
+
+
 			var oldX = _cursorX;
 			var oldY = _cursorY;
+			var oldScreen = _cursorScreen;
 
-			if (_mouseDown && x >= 0 && y >= 0)
+			if (_mouseDown && newScreen >= 0)
 			{
-				InvalidateToolPosition(oldX, oldY);
-				if (oldX >= 0 && oldY >= 0) PaintLine(oldX, oldY, x, y);
-				else PaintTool(x, y);
+				InvalidateToolPosition(oldScreen, oldX, oldY);
+				if (oldX >= 0 && oldY >= 0 && oldScreen == newScreen) PaintLine(oldX, oldY, newX, newY);
+				else PaintTool(newScreen, newX, newY);
 				Tool.AfterPaint();
 			}
 			else
 			{
-				_cursorX = x;
-				_cursorY = y;
-				InvalidateToolPosition(oldX, oldY);
-				InvalidateToolPosition(_cursorX, _cursorY);
+				_cursorX = newX;
+				_cursorY = newY;
+				_cursorScreen = newScreen;
+				InvalidateToolPosition(oldScreen, oldX, oldY);
+				InvalidateToolPosition(_cursorScreen, _cursorX, _cursorY);
 			}
 
 			base.OnMouseMove(e);
@@ -195,21 +212,23 @@ namespace Brewmaster.EditorWindows.TileMaps
 					x += dx2;
 					y += dy2;
 				}
-				PaintTool(x, y);
+				PaintTool(_cursorScreen, x, y);
 			}
 		}
 
-		private void PaintTool(int x, int y)
+		private void PaintTool(int screenIndex, int x, int y)
 		{
 			_cursorX = x;
 			_cursorY = y;
+			_cursorScreen = screenIndex;
+
 			PaintTool();
 		}
 		private void PaintTool()
 		{
-			Tool.Paint(_cursorX, _cursorY, _screen);
-			_alteredByTool = true;
-			InvalidateToolPosition(_cursorX, _cursorY);
+			Tool.Paint(_cursorX, _cursorY, _screens[_cursorScreen]);
+			_alteredByTool = true; // TODO: List of altered screens
+			InvalidateToolPosition(_cursorScreen, _cursorX, _cursorY);
 		}
 
 		
@@ -217,15 +236,17 @@ namespace Brewmaster.EditorWindows.TileMaps
 		{
 			var oldX = _cursorX;
 			var oldY = _cursorY;
-			_cursorX = _cursorY = -1;
+			var oldScreen = _cursorScreen;
+			_cursorX = _cursorY = _cursorScreen = -1;
 			base.OnMouseLeave(e);
-			InvalidateToolPosition(oldX, oldY);
+			InvalidateToolPosition(oldScreen, oldX, oldY);
 		}
 
-		private void InvalidateToolPosition(int x, int y)
+		private void InvalidateToolPosition(int screenIndex, int x, int y)
 		{
-			if (x < 0 || y < 0) return;
-			Invalidate(new Rectangle(x * ToolWidth + Offset.X, y * ToolHeight + Offset.Y, ToolWidth + 1, ToolHeight + 1));
+			if (x < 0 || y < 0 || screenIndex < 0) return;
+			var offset = GetOffset(screenIndex);
+			Invalidate(new Rectangle(x * ToolWidth + offset.X, y * ToolHeight + offset.Y, ToolWidth + 1, ToolHeight + 1));
 		}
 
 		public int Zoom
@@ -253,15 +274,16 @@ namespace Brewmaster.EditorWindows.TileMaps
 			//timer.Start();
 			foreach (var index in _visibleScreens)
 			{
-				PaintScreen(_screens[index], GetOffset(index), e);
+				PaintScreen(index, e);
 			}
 
-			e.Graphics.Transform = new Matrix();
-			e.Graphics.SetClip(e.ClipRectangle);
-			e.Graphics.TranslateTransform(Offset.X, Offset.Y);
-
-			if (_cursorX >= 0 && _cursorY >= 0)
+			if (_cursorScreen >= 0 && _cursorX >= 0 && _cursorY >= 0)
 			{
+				var offset = GetOffset(_cursorScreen);
+				e.Graphics.Transform = new Matrix();
+				e.Graphics.SetClip(e.ClipRectangle);
+				e.Graphics.TranslateTransform(offset.X, offset.Y);
+
 				if (Tool.Image == null && Tool.Brush != null) e.Graphics.FillRectangle(Tool.Brush, _cursorX * ToolWidth, _cursorY * ToolHeight, ToolWidth, ToolHeight);
 				else if (!Tool.Pixel) e.Graphics.DrawRectangle(Pens.Black, _cursorX * ToolWidth, _cursorY * ToolHeight, ToolWidth, ToolHeight);
 			}
@@ -278,10 +300,12 @@ namespace Brewmaster.EditorWindows.TileMaps
 				Offset.Y + y * MapSize.Height);
 		}
 
-		private void PaintScreen(TileMapScreen screen, Point offset, PaintEventArgs e)
+		private void PaintScreen(int index, PaintEventArgs e)
 		{
+			var offset = GetOffset(index);
 			var clipRectangle = Rectangle.Intersect(e.ClipRectangle, new Rectangle(offset.X, offset.Y, MapSize.Width, MapSize.Height));
 			if (clipRectangle.IsEmpty) return;
+			var screen = _screens[index];
 
 			e.Graphics.Transform = new Matrix();
 			e.Graphics.SetClip(clipRectangle);
@@ -293,7 +317,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 			e.Graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
 			lock (screen.TileDrawLock) e.Graphics.DrawImage(screen.Image.Image, new Rectangle(0, 0, screen.Image.Width * Zoom, screen.Image.Height * Zoom));
 
-			if (_cursorScreen == screen && Tool.Image != null)
+			if (_cursorScreen == index && Tool.Image != null)
 			{
 				var attributeIndex = (_cursorY / (_map.BaseTileSize.Height * _map.AttributeSize.Height)) * (_map.ScreenSize.Width / _map.AttributeSize.Width) + (_cursorX / (_map.BaseTileSize.Width * _map.AttributeSize.Width));
 				Tool.RefreshImage(_map.Palettes[screen.ColorAttributes[attributeIndex] & 0xff]);
