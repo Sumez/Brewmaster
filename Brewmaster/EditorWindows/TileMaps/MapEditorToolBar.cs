@@ -6,10 +6,12 @@ namespace Brewmaster.EditorWindows.TileMaps
 {
 	public class MapEditorToolBar : ToolStrip
 	{
+		private ToolStripMenuItem _importMenu;
 		public Action ImportImage { get; set; }
 		public Action ImportChr { get; set; }
 		public Action ImportMap { get; set; }
 		public Action ImportPalette { get; set; }
+		public Action ImportPyxelMap { get; set; }
 		public Action ImportJsonSession { get; set; }
 
 		public Action TileTool { get; set; }
@@ -24,20 +26,30 @@ namespace Brewmaster.EditorWindows.TileMaps
 		{
 			GripStyle = ToolStripGripStyle.Hidden;
 
-			Items.AddRange(new[] {
-				new ToolStripButton("import image", Resources.image, (s, a) => ImportImage()),
+			Items.AddRange(new ToolStripItem[] {
+				_importMenu = new ToolStripMenuItem(Resources.config) { Height = 10 }, 
 				new ToolStripButton("import CHR", Resources.image, (s, a) => ImportChr()),
-				new ToolStripButton("import map", Resources.macro, (s, a) => ImportMap()),
-				new ToolStripButton("import Palette", Resources.image, (s, a) => ImportPalette()),
-				new ToolStripButton("import JSON", Resources.macro, (s, a) => ImportJsonSession()),
+
+				new ToolStripSeparator(),
+
+				GridButton = new ToolStripButton("Show grid", Resources.chip, (s, a) => ToggleGrid()) { CheckOnClick = true },
+				CollisionButton = new ToolStripButton("Show Collisions", Resources.chip, (s, a) => ToggleMetaValues()) { CheckOnClick = true },
+
+				new ToolStripSeparator(),
 
 				new ToolStripButton("Tile", Resources.image, (s, a) => TileTool()),
 				new ToolStripButton("Color", Resources.data, (s, a) => ColorTool()),
 				new ToolStripButton("Pen", Resources.data, (s, a) => PixelTool()),
 				new ToolStripButton("Collisions", Resources.chip, (s, a) => MetaTool()),
+			});
 
-				GridButton = new ToolStripButton("Show grid", Resources.chip, (s, a) => ToggleGrid()) { CheckOnClick = true },
-				CollisionButton = new ToolStripButton("Show Collisions", Resources.chip, (s, a) => ToggleMetaValues()) { CheckOnClick = true }	
+			_importMenu.DropDownItems.AddRange(new []
+			{
+				new ToolStripMenuItem("Import NESST Map...", null, (s, a) => ImportMap()),
+				new ToolStripMenuItem("Import NES Palette...", null, (s, a) => ImportPalette()),
+				new ToolStripMenuItem("Import PyxelEdit Map...", null, (s, a) => ImportPyxelMap()),
+				new ToolStripMenuItem("Import Image...", null, (s, a) => ImportImage()),
+				new ToolStripMenuItem("Import JSON session...", null, (s, a) => ImportJsonSession()),
 			});
 		}
 
