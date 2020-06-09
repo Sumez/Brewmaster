@@ -80,7 +80,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 			}
 			var distinctMetaTiles = metaTiles.Distinct().TakeWhile((tile, i) => !token.IsCancellationRequested).ToList();
 			if (token.IsCancellationRequested) return;
-			_screenCollections[screen] = distinctMetaTiles;
+			lock (_allMetaTilesLock) _screenCollections[screen] = distinctMetaTiles;
 		}
 
 		private Task _refreshAllTask;
@@ -112,12 +112,16 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 				MetaTile selectedMetaTile = null;
 				if (SelectedTile >= 0) selectedMetaTile = GetMetaTile(SelectedTile);
-				var distinctMetaTiles = _screenCollections.Values.SelectMany(mt => mt).Distinct().TakeWhile((tile, i) => !token.IsCancellationRequested).ToList();
-				if (token.IsCancellationRequested) return;
-			
-				_metaTiles = distinctMetaTiles;
-				_tilePalette.Tiles = _metaTiles;
-				if (selectedMetaTile != null) SelectMetaTile(selectedMetaTile);
+				lock (_allMetaTilesLock)
+				{
+					var distinctMetaTiles = _screenCollections.Values.SelectMany(mt => mt).Distinct()
+						.TakeWhile((tile, i) => !token.IsCancellationRequested).ToList();
+					if (token.IsCancellationRequested) return;
+
+					_metaTiles = distinctMetaTiles;
+					_tilePalette.Tiles = _metaTiles;
+					if (selectedMetaTile != null) SelectMetaTile(selectedMetaTile);
+				}
 
 			}, token);
 			if (screen == null) _refreshAllTask = task;
