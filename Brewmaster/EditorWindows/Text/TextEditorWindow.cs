@@ -11,7 +11,7 @@ using Brewmaster.ProjectModel;
 
 namespace Brewmaster.EditorWindows.Text
 {
-	public class TextEditorWindow : SaveableEditorWindow
+	public class TextEditorWindow : SaveableEditorWindow, IUndoable
 	{
 		private FileSystemWatcher _fileSystemWatcher;
 		public bool RefreshWarningVisible { get; private set; }
@@ -241,6 +241,16 @@ namespace Brewmaster.EditorWindows.Text
 			this.Controls.Add(this.SourceNavigator);
 			this.Controls.Add(this.TextEditor);
 			this.ResumeLayout(false);
+		}
+
+		public void Undo()
+		{
+			TextEditor.Undo();
+		}
+
+		public void Redo()
+		{
+			TextEditor.Redo();
 		}
 	}
 }

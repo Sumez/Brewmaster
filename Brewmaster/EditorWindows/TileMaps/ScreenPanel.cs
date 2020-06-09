@@ -82,6 +82,11 @@ namespace Brewmaster.EditorWindows.TileMaps
 			_state.DisplayGridChanged += InvalidateVisibleViews;
 			_state.DisplayMetaValuesChanged += InvalidateVisibleViews;
 			_state.ChrDataChanged += RefreshVisibleTiles;
+			_state.AfterUndo += (step) =>
+			{
+				foreach (var screen in step.States.Keys) screen.RefreshAllTiles(_state);
+				RefreshVisibleTiles();
+			};
 
 			_grid.GenerateGrid(_map, _state.Zoom);
 		}

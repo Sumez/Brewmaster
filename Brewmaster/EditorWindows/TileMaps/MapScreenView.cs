@@ -58,8 +58,14 @@ namespace Brewmaster.EditorWindows.TileMaps
 			{
 				mouseHandler.MouseUp -= MouseButtonUp;
 				Application.RemoveMessageFilter(mouseHandler);
+				state.ToolChanged -= ToolChanged;
 			};
-			state.ToolChanged += () => { Cursor = state.Tool.Pixel ? new Cursor(new MemoryStream(Resources.pen)) : Cursors.Default; };
+			state.ToolChanged += ToolChanged;
+		}
+
+		private void ToolChanged()
+		{
+			Cursor = _state.Tool.Pixel ? new Cursor(new MemoryStream(Resources.pen)) : Cursors.Default;
 		}
 
 		public void LoadFullMap()
@@ -99,9 +105,16 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 		private bool MouseButtonUp(Point location)
 		{
-			if (_mouseDown)
+			if (_mouseDown && _screensAlteredByTool.Count > 0)
 			{
-				foreach (var index in _screensAlteredByTool) _screens[index].OnEditEnd();
+				var undoStep = new UndoStep();
+				if (Tool.EditsChr) undoStep.AddChr(_state);
+				foreach (var index in _screensAlteredByTool)
+				{
+					_screens[index].OnEditEnd();
+					undoStep.AddScreen(_screens[index]);
+				}
+				_state.AddUndoStep(undoStep);
 			}
 
 			_mouseDown = false;

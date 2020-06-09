@@ -15,7 +15,7 @@ using Newtonsoft.Json.Serialization;
 
 namespace Brewmaster.EditorWindows.TileMaps
 {
-	public class MapEditorWindow : SaveableEditorWindow
+	public class MapEditorWindow : SaveableEditorWindow, IUndoable
 	{
 		protected static MapEditorToolBar MapEditorToolBar = new MapEditorToolBar();
 		private ChrTilePalette _tilePalette;
@@ -266,6 +266,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 				State.ChrData = data;
 			}
 
+			State.ClearUndoStack();
 			_screenPanel.RefreshAllTiles(); // TODO: Should probably react to ChrDataChanged event, but unsure how much overhead that creates while drawing tiles
 		}
 
@@ -358,7 +359,8 @@ namespace Brewmaster.EditorWindows.TileMaps
 			ActivateScreen(0, 0);
 			_colorPalette.Invalidate();
 
-		   Pristine = false;
+			State.ClearUndoStack();
+			Pristine = false;
 		}
 		private void ImportMap()
 		{
@@ -414,7 +416,8 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 				ActivateScreen(0, 0);
 			}
-
+			
+			State.ClearUndoStack();
 			Pristine = false;
 		}
 
@@ -481,6 +484,16 @@ namespace Brewmaster.EditorWindows.TileMaps
 			File.WriteAllText(ProjectFile.File.FullName, json);
 			Pristine = true;
 		}
+
+		public void Undo()
+		{
+			State.Undo();
+		}
+
+		public void Redo()
+		{
+			State.Redo();
+		}
 	}
 
 	public class CondensedArrayConverter : JsonConverter
@@ -529,6 +542,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 			set
 			{
 				_chrData = value;
+				RefreshPreviousState();
 				ClearTileCache();
 				OnChrDataChanged();
 			}
@@ -572,12 +586,16 @@ namespace Brewmaster.EditorWindows.TileMaps
 			}
 		}
 
+		public byte[] PreviousChrData { get; private set; }
+
 		public event Action PaletteChanged;
 		public event Action ChrDataChanged;
 		public event Action ToolChanged;
 		public event Action<int, int> ZoomChanged;
 		public event Action DisplayMetaValuesChanged;
 		public event Action DisplayGridChanged;
+		public event Action<UndoStep> AfterUndo;
+
 		public void OnPaletteChanged()
 		{
 			if (PaletteChanged != null) PaletteChanged();
@@ -684,6 +702,58 @@ namespace Brewmaster.EditorWindows.TileMaps
 			Buffer.BlockCopy(_chrData, tileSize * tile, newData, _chrData.Length, tileSize);
 			_chrData = newData;
 			return (newData.Length / tileSize) - 1;
+		}
+
+		private readonly LinkedList<UndoStep> _undoStack = new LinkedList<UndoStep>();
+		private readonly LinkedList<UndoStep> _redoStack = new LinkedList<UndoStep>();
+		
+		public void AddUndoStep(UndoStep undoStep)
+		{
+			_redoStack.Clear();
+			_undoStack.AddLast(undoStep);
+			if (_undoStack.Count > 100) _undoStack.RemoveFirst();
+		}
+
+		public void ClearUndoStack()
+		{
+			_undoStack.Clear();
+			_redoStack.Clear();
+		}
+		public void Undo()
+		{
+			if (_undoStack.Count == 0) return;
+
+			var step = _undoStack.Last.Value;
+			_undoStack.RemoveLast();
+			var redoStep = step.Revert(this);
+			_redoStack.AddLast(redoStep);
+
+			if (AfterUndo != null) AfterUndo(step);
+		}
+
+		public void Redo()
+		{
+			if (_redoStack.Count == 0) return;
+
+			var step = _redoStack.Last.Value;
+			_redoStack.RemoveLast();
+			var undoStep = step.Revert(this);
+			_undoStack.AddLast(undoStep);
+
+			if (AfterUndo != null) AfterUndo(step);
+		}
+
+		public void RefreshPreviousState()
+		{
+			PreviousChrData = new byte[ChrData.Length];
+			Buffer.BlockCopy(ChrData, 0, PreviousChrData, 0, Buffer.ByteLength(ChrData));
+		}
+
+		public void RevertChr(byte[] chr)
+		{
+			var chrData = new byte[chr.Length];
+			Buffer.BlockCopy(chr, 0, chrData, 0, Buffer.ByteLength(chr));
+			ChrData = chrData;
 		}
 	}
 

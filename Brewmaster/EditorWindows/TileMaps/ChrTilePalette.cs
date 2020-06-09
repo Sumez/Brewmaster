@@ -30,11 +30,13 @@ namespace Brewmaster.EditorWindows.TileMaps
 			_tilePalette.Tiles = new List<MetaTile>();
 			_tilePalette.State = state;
 			RefreshTileCount();
-			_tilePalette.TileClick += (index) =>
-			{
-				_tilePalette.SelectedTile = index;
-				if (UserSelectedTile != null) UserSelectedTile();
-			};
+			_tilePalette.TileClick += SelectTile;
+		}
+
+		private void SelectTile(int index)
+		{
+			_tilePalette.SelectedTile = index;
+			if (UserSelectedTile != null) UserSelectedTile();
 		}
 
 		private void RefreshTileCount()
@@ -51,6 +53,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 			while (tiles.Count > targetTiles) tiles.RemoveAt(tiles.Count - 1);
 
 			_tilePalette.Tiles = tiles;
+			if (_tilePalette.SelectedTile >= targetTiles) SelectTile(targetTiles - 1);
 		}
 
 		private void InitializeComponent()

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Linq;
 using System.Threading;
@@ -92,6 +91,9 @@ namespace Brewmaster.EditorWindows.TileMaps
 			MetaValues = new int[(map.ScreenSize.Width / map.MetaValueSize.Width) * (map.ScreenSize.Height / map.MetaValueSize.Height)];
 			Image = new FastBitmap(map.ScreenSize.Width * map.BaseTileSize.Width, map.ScreenSize.Height * map.BaseTileSize.Height, PixelFormat.Format32bppPArgb);
 			MetaImage = new FastBitmap(map.ScreenSize.Width / map.MetaValueSize.Width, map.ScreenSize.Height / map.MetaValueSize.Height, PixelFormat.Format32bppArgb);
+			Objects = new MapObject[0];
+
+			RefreshPreviousState();
 		}
 
 		public void Unload()
@@ -279,6 +281,43 @@ namespace Brewmaster.EditorWindows.TileMaps
 				SetColorTile(iX, iY, metaTile.Attributes[i]);
 			}
 		}
+
+		public void RefreshPreviousState()
+		{
+			PreviousState = new UndoState
+			{
+				Attributes = new int[ColorAttributes.Length],
+				Tiles = new int[Tiles.Length],
+				MetaValues = new int[MetaValues.Length],
+				Objects = new MapObject[Objects.Length]
+			};
+			//var timer = new Stopwatch();
+			//timer.Start();
+			Buffer.BlockCopy(ColorAttributes, 0, PreviousState.Attributes, 0, Buffer.ByteLength(ColorAttributes));
+			Buffer.BlockCopy(Tiles, 0, PreviousState.Tiles, 0, Buffer.ByteLength(Tiles));
+			Buffer.BlockCopy(MetaValues, 0, PreviousState.MetaValues, 0, Buffer.ByteLength(MetaValues));
+			if (Objects.Length > 0) Buffer.BlockCopy(Objects, 0, PreviousState.Objects, 0, Buffer.ByteLength(Objects));
+			//timer.Stop();
+			//Debug.WriteLine("Copy state: " + timer.Elapsed.TotalMilliseconds);
+		}
+
+		public UndoState PreviousState { get; private set; }
+
+		public void RevertToState(UndoState state)
+		{
+			if (ColorAttributes.Length != state.Attributes.Length || Tiles.Length != state.Tiles.Length ||
+			    MetaValues.Length != state.MetaValues.Length) return;
+
+			Buffer.BlockCopy(state.Attributes, 0, ColorAttributes, 0, Buffer.ByteLength(ColorAttributes));
+			Buffer.BlockCopy(state.Tiles, 0, Tiles, 0, Buffer.ByteLength(Tiles));
+			Buffer.BlockCopy(state.MetaValues, 0, MetaValues, 0, Buffer.ByteLength(MetaValues));
+
+			if (Objects.Length != state.Objects.Length) Objects = new MapObject[state.Objects.Length];
+			if (Objects.Length > 0) Buffer.BlockCopy(state.Objects, 0, Objects, 0, Buffer.ByteLength(Objects));
+
+			PreviousState = state;
+			OnEditEnd();
+		}
 	}
 
 	[Serializable]
@@ -332,6 +371,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 					if (screenSource.ColorAttributes != null) screen.ColorAttributes = screenSource.ColorAttributes;
 					if (screenSource.MetaValues != null) screen.MetaValues = screenSource.MetaValues;
 					if (screenSource.Objects != null) screen.Objects = screenSource.Objects;
+					screen.RefreshPreviousState();
 					row.Add(screen);
 				}
 			}

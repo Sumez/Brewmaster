@@ -14,6 +14,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 		public virtual Image Image { get; protected set; }
 		public virtual bool Pixel { get { return false; } }
 		public virtual Brush Brush { get; protected set; }
+		public virtual bool EditsChr { get {return false;} }
 
 		public abstract void Paint(int x, int y, TileMapScreen screen);
 		public abstract void EyeDrop(int x, int y, TileMapScreen screen);
@@ -48,6 +49,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 			PreviewSource = map.Palettes[0];
 		}
 		public override bool Pixel { get { return true; } }
+		public override bool EditsChr { get { return true; } }
 		public bool CreateNewTile { get; set; }
 		public override void Paint(int x, int y, TileMapScreen screen)
 		{

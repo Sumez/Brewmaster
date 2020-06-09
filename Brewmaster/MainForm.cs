@@ -145,6 +145,9 @@ namespace Brewmaster
 			File_PrintMenuItem.Enabled = File_PrintPreviewMenuItem.Enabled = currentTab is TextEditorWindow;
 			File_CloseMenuItem.Enabled = File_CloseAllMenuItem.Enabled = closeAllWindowsMenuItem.Enabled = editorTabs.TabCount > 0;
 
+			Edit_UndoMenuItem.Enabled = Edit_RedoMenuItem.Enabled =
+				undoToolStripButton.Enabled = redoToolStripButton.Enabled = currentTab is IUndoable;
+
 			if (editorTab == null) filenameLabel.Text = ProgramTitle;
 			else filenameLabel.Text = editorTab.ProjectFile.File.FullName;
 
@@ -374,8 +377,8 @@ namespace Brewmaster
 			Program.BindKey(Feature.Print, File_PrintMenuItem);
 			Program.BindKey(Feature.Exit, File_ExitMenuItem);
 
-			Program.BindKey(Feature.Undo, (keys) => Edit_UndoMenuItem.ShortcutKeyDisplayString = keys == Keys.None ? "" : ButtonAssignment.GetString(keys));
-			Program.BindKey(Feature.Redo, (keys) => Edit_RedoMenuItem.ShortcutKeyDisplayString = keys == Keys.None ? "" : ButtonAssignment.GetString(keys));
+			Program.BindKey(Feature.Undo, Edit_UndoMenuItem);
+			Program.BindKey(Feature.Redo, Edit_RedoMenuItem);
 			Program.BindKey(Feature.Cut, (keys) => Edit_CutMenuItem.ShortcutKeyDisplayString = keys == Keys.None ? "" : ButtonAssignment.GetString(keys));
 			Program.BindKey(Feature.Copy, (keys) => Edit_CopyMenuItem.ShortcutKeyDisplayString = keys == Keys.None ? "" : ButtonAssignment.GetString(keys));
 			Program.BindKey(Feature.Paste, (keys) => Edit_PasteMenuItem.ShortcutKeyDisplayString = keys == Keys.None ? "" : ButtonAssignment.GetString(keys));
@@ -1298,14 +1301,14 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 
 	    private void Edit_UndoMenuItem_Click(object sender, EventArgs e)
         {
-			if (!(editorTabs.SelectedTab is TextEditorWindow textEditorWindow)) return;
-	        textEditorWindow.TextEditor.Undo();
+			if (!(editorTabs.SelectedTab is IUndoable undoable)) return;
+	        undoable.Undo();
         }
 
 	    private void Edit_RedoMenuItem_Click(object sender, EventArgs e)
         {
-	        if (!(editorTabs.SelectedTab is TextEditorWindow textEditorWindow)) return;
-	        textEditorWindow.TextEditor.Redo();
+	        if (!(editorTabs.SelectedTab is IUndoable undoable)) return;
+	        undoable.Redo();
         }
 
 		private void Edit_FindMenuItem_Click(object sender, EventArgs e)
