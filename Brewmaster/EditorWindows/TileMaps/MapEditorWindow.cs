@@ -17,7 +17,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 {
 	public class MapEditorWindow : SaveableEditorWindow, IUndoable
 	{
-		protected static MapEditorToolBar MapEditorToolBar = new MapEditorToolBar();
+		public static MapEditorToolBar MapEditorToolBar = new MapEditorToolBar();
 		private ChrTilePalette _tilePalette;
 		private MapOverview _mapOverview;
 		private ColorPaletteView _colorPalette;

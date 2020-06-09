@@ -356,4 +356,68 @@
     <MenuItem>emulatorSettingsMenuItem</MenuItem>
     <HelpText>Change various settings for the emulator</HelpText>
   </MenuHelp>
+  <MenuHelp>
+    <MenuItem>findInFilesMenuItem</MenuItem>
+    <HelpText />
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>File_SaveMenuItem</MenuItem>
+    <HelpText />
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>resetLayoutToolStripMenuItem</MenuItem>
+    <HelpText>Resets the layout to the default for the current mode</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>ColorAttributeTool</MenuItem>
+    <HelpText>Assign palettes to the tiles in your map</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>TileTool</MenuItem>
+    <HelpText>Place tiles from CHR data in the tilemap</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>MetaTileTool</MenuItem>
+    <HelpText>Place identical groups of tiles in the tile map</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>PixelPenTool</MenuItem>
+    <HelpText>Edit CHR data by drawing directly on the tiles in the map</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>CollisionTool</MenuItem>
+    <HelpText>Edit custom data overlay on the tile map, useful for collision maps, etc.</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>DisplayTileMapOverlay</MenuItem>
+    <HelpText>Display/hide metadata overlay, such as collisions, etc.</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>DisplayGrid</MenuItem>
+    <HelpText>Display/hide the tile grid.</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>ImportTileMap</MenuItem>
+    <HelpText>Import a file with tilemap data</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>ImportNesstMap</MenuItem>
+    <HelpText>Import a NES Screen Tool map format</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>ImportNesPalette</MenuItem>
+    <HelpText>Import a file with four backgroud palettes referencing the full NES palette</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>ImportPyxelMap</MenuItem>
+    <HelpText>Import a tile map in XML format exported from PyxelEdit</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>ImportImage</MenuItem>
+    <HelpText>Import a full image, and try to generate a tile map based on it</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>ImportJsonSession</MenuItem>
+    <HelpText>Import a JSON session file saved from Sumez's online NES map editor</HelpText>
+  </MenuHelp>
 </MenuHelpCollection>

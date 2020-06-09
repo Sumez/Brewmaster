@@ -37,7 +37,7 @@ namespace Brewmaster.Modules
 			foreach (ToolStripItem item in toolStripItems)
 			{
 				if (item is ToolStripSeparator) continue;
-				if (item is ToolStripMenuItem menuItem) Prepare(menuItem.DropDownItems);
+				if (item is ToolStripDropDownItem menuItem) Prepare(menuItem.DropDownItems);
 				item.MouseEnter += (s, a) =>
 				{
 					if (_writeHelp != null && !string.IsNullOrWhiteSpace(item.Name)) _writeHelp(_helpItems.Get(item.Name));

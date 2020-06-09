@@ -768,6 +768,14 @@
     <None Include="Resources\Toolbar\build2.png" />
     <None Include="Resources\Toolbar\build3.png" />
     <Content Include="Resources\pen.cur" />
+    <None Include="Resources\Toolbar\pen tool.png" />
+    <None Include="Resources\Toolbar\tile tool.png" />
+    <None Include="Resources\Toolbar\metatile tool.png" />
+    <None Include="Resources\Toolbar\palette tool.png" />
+    <None Include="Resources\Toolbar\import tilemap.png" />
+    <None Include="Resources\Toolbar\grid.png" />
+    <None Include="Resources\Toolbar\overlay.png" />
+    <None Include="Resources\Toolbar\overlay tool.png" />
     <Content Include="Templates\ftm">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
