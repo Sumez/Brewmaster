@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 using Brewmaster.Properties;
@@ -16,7 +17,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 		public Action ImportJsonSession { get; set; }
 
 		public Action TileTool { get; set; }
-		public Action MetaTileTool { get; set; }
+		public Action<int?> MetaTileTool { get; set; }
 		public Action ColorTool { get; set; }
 		public Action PixelTool { get; set; }
 		public Action MetaTool { get; set; }
@@ -32,19 +33,21 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 				new ToolStripLabel("Map Editor"),
 				new ToolStripSeparator(),
-				_importMenu = new ToolStripDropDownButton("Import File", Resources.import_tilemap) { DisplayStyle = ToolStripItemDisplayStyle.Image, Name = "ImportTileMap" }, 
+				_importMenu = new ToolStripDropDownButton("Import File", Resources.import_tilemap) { Name = "ImportTileMap" }, 
 				new ToolStripSeparator(),
 				GridButton = new ToolStripButton("Display Grid", Resources.grid, (s, a) => ToggleGrid(), "DisplayGrid") { CheckOnClick = true },
 				CollisionButton = new ToolStripButton("Display Tile Overlay", Resources.overlay, (s, a) => ToggleMetaValues(), "DisplayTileMapOverlay") { CheckOnClick = true },
 				new ToolStripSeparator(),
 				new ToolStripButton("Draw Tiles", Resources.tile_tool, (s, a) => TileTool(), "TileTool"),
-				new ToolStripButton("Draw MetaTiles", Resources.metatile_tool, (s, a) => MetaTileTool(), "MetaTileTool"),
+				MetaTileButton = new ToolStripSplitButton("Draw MetaTiles", Resources.metatile_tool, (s, a) => MetaTileTool(null), "MetaTileTool"),
 				new ToolStripButton("Set Color Attribute", Resources.palette_tool, (s, a) => ColorTool(), "ColorAttributeTool"),
 				new ToolStripButton("Pixel Pen", Resources.pen_tool, (s, a) => PixelTool(), "PixelPenTool"),
 				new ToolStripButton("Edit Tile/Collision Map", Resources.overlay_tool, (s, a) => MetaTool(), "CollisionTool"),
+				new ToolStripSeparator(),
 			});
 			foreach (var item in Items.OfType<ToolStripButton>()) item.DisplayStyle = ToolStripItemDisplayStyle.Image;
-
+			foreach (var item in Items.OfType<ToolStripDropDownItem>()) item.DisplayStyle = ToolStripItemDisplayStyle.Image;
+			
 			_importMenu.DropDownItems.AddRange(new ToolStripItem[]
 			{
 				new ToolStripMenuItem("Import NESST Map...", null, (s, a) => ImportMap(), "ImportNesstMap"),
@@ -56,7 +59,27 @@ namespace Brewmaster.EditorWindows.TileMaps
 			});
 		}
 
-		public ToolStripButton CollisionButton { get; set; }
-		public ToolStripButton GridButton { get; set; }
+		public ToolStripSplitButton MetaTileButton { get; private set; }
+
+		public void SetToolSettings(ToolSettings settingsControl)
+		{
+			if (SettingsControl != null) SettingsControl.Host.Visible = false;
+			Items.Add(settingsControl.Host);
+			SettingsControl = settingsControl;
+			settingsControl.Host.Visible = true;
+		}
+
+		public void SetMetaTileSizes(IEnumerable<int> sizes)
+		{
+			MetaTileButton.DropDownItems.Clear();
+			foreach (var size in sizes)
+			{
+				MetaTileButton.DropDownItems.Add(new ToolStripMenuItem(string.Format("{0}x{0} Tiles", size), null, (s, a) => MetaTileTool(size)));
+			}
+		}
+
+		public ToolStripButton CollisionButton { get; private set; }
+		public ToolStripButton GridButton { get; private set; }
+		public ToolSettings SettingsControl { get; private set; }
 	}
 }

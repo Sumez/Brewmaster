@@ -14,7 +14,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 			Controls.Add(MetaValues = new MetaValueSettings(map) {Visible = false, Dock = DockStyle.Right});
 			Controls.Add(PixelSettings = new PixelPenSettings() { Visible = false, Dock = DockStyle.Right });
-
+			Host = new ToolStripControlHost(this);
 
 			state.ToolChanged += () =>
 			{
@@ -38,6 +38,8 @@ namespace Brewmaster.EditorWindows.TileMaps
 				if (ActiveControl != null) Width = ActiveControl.Width;
 			};
 		}
+
+		public ToolStripControlHost Host { get; private set; }
 
 		public PixelPenSettings PixelSettings { get; set; }
 		public Control ActiveControl { get; set; }

@@ -108,7 +108,6 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 			var bottomPanel = new Panel { AutoSize = true, Dock = DockStyle.Bottom };
 			bottomPanel.Controls.Add(_colorPalette);
-			bottomPanel.Controls.Add(_toolSettings);
 			//bottomPanel.Controls.Add(new HorizontalLine { Dock = DockStyle.Top });
 			Controls.Add(bottomPanel);
 
@@ -118,7 +117,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 				var includeMetaValues = metaTileSize >= 2;
 				var includeAttributes = metaTileSize >= 4;
 				_metaTilePalettes[metaTileSize] = new MetaTilePalette(Map, metaTileSize, State, includeMetaValues, includeAttributes) { Width = 256, Height = 256 };
-				_metaTilePalettes[metaTileSize].UserSelectedTile += () => SelectMetaTilePen(metaTileSize, _metaTilePalettes[metaTileSize], _metaTilePalettes[metaTileSize].SelectedTile);
+				_metaTilePalettes[metaTileSize].UserSelectedTile += () => SelectMetaTilePen(metaTileSize, _metaTilePalettes[metaTileSize].SelectedTile);
 			}
 			//form.LayoutHandler.ShowPanel(new IdePanel(_colorPalette) { Label = "Tile Map Palettes" });
 
@@ -141,6 +140,9 @@ namespace Brewmaster.EditorWindows.TileMaps
 				MainWindow.LoadModule(metaTile.Value, string.Format("{0}x{0} Metatiles", metaTile.Key));
 			}
 
+			MapEditorToolBar.SetToolSettings(_toolSettings);
+			MapEditorToolBar.SetMetaTileSizes(Map.MetaTileResolutions);
+
 			MapEditorToolBar.ImportImage = ImportImage;
 			MapEditorToolBar.ImportChr = ImportChr;
 			MapEditorToolBar.ImportMap = ImportMap;
@@ -151,6 +153,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 			MapEditorToolBar.ColorTool = SelectPalettePen;
 			MapEditorToolBar.PixelTool = SelectPixelPen;
 			MapEditorToolBar.MetaTool = SelectMetaPen;
+			MapEditorToolBar.MetaTileTool = (size) => SelectMetaTilePen(size, 0);
 
 			MapEditorToolBar.GridButton.Checked = State.DisplayGrid;
 			MapEditorToolBar.CollisionButton.Checked = State.DisplayMetaValues;
@@ -211,9 +214,18 @@ namespace Brewmaster.EditorWindows.TileMaps
 			InitPaletteTool(tool);
 			tool.SelectedTile = selectTile >= 0 ? selectTile : 0;
 		}
-		private void SelectMetaTilePen(int metaTileSize, MetaTilePalette tileSelector, int selectTile)
+
+		private int? _lastSelectedMetaTileSize;
+		private void SelectMetaTilePen(int? metaTileSize, int selectTile)
 		{
-			var tool = new MetaTilePen(metaTileSize);
+			if (metaTileSize == null)
+			{
+				metaTileSize = _lastSelectedMetaTileSize ?? Map.MetaTileResolutions[0];
+			}
+
+			_lastSelectedMetaTileSize = metaTileSize;
+			var tool = new MetaTilePen(metaTileSize.Value);
+			var tileSelector = _metaTilePalettes[metaTileSize.Value];
 			State.Tool = tool;
 			tool.MetaTileChanged += () =>
 			{
@@ -224,7 +236,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 			InitPaletteTool(tool);
 			tool.MetaTile = tileSelector.GetMetaTile(selectTile);
 		}
-
+		
 		private void SetToolImage(TilePen tool)
 		{
 			if (tool == null) return;
