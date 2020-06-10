@@ -67,6 +67,7 @@ namespace Brewmaster
 		private readonly Action<EmulationState> _debugStateHandler;
 		private Events _moduleEvents = new Events();
 		private MemoryState _memoryState;
+		private ToolStrip _editorToolStrip;
 
 
 		private void RefreshView()
@@ -157,10 +158,15 @@ namespace Brewmaster
 			if (editorTab != null && editorTab.ToolBar != null)
 			{
 				_buildToolStrip.Visible = false;
+				if (_editorToolStrip != null && _editorToolStrip != editorTab.ToolBar) _editorToolStrip.Visible = false;
 				editorTab.ToolBar.Visible = true;
-				toolstrippanel.Controls.Add(editorTab.ToolBar);
+				toolstrippanel.Controls.Add(_editorToolStrip = editorTab.ToolBar);
 			}
-			else _buildToolStrip.Visible = true;
+			else
+			{
+				if (_editorToolStrip != null) _editorToolStrip.Visible = false;
+				_buildToolStrip.Visible = true;
+			}
 
 				// TODO: Do this dynamically when switching active editor tab
 			if (editorTab != null) StoredLayoutHandler.LoadEditorLayout(_modules, editorTab.LayoutMode);
@@ -1141,7 +1147,8 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 	    }
 
 		private List<Breakpoint> allBreakpoints = new List<Breakpoint>();
-	    private void SetBreakpoints(IEnumerable<Breakpoint> breakpoints)
+
+		private void SetBreakpoints(IEnumerable<Breakpoint> breakpoints)
 	    {
 			allBreakpoints = breakpoints.ToList();
 
