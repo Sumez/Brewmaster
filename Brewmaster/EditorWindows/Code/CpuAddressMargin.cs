@@ -53,7 +53,7 @@ namespace Brewmaster.EditorWindows.Code
 				{
 					var debugLine = _getDebugLine(currentLine);
 					if (debugLine == null || !debugLine.CpuAddress.HasValue) continue;
-					graphics.DrawString(WatchValue.FormatHexAddress(debugLine.CpuAddress.Value, _addressWidth), font, brush, backgroundRectangle);
+					graphics.DrawString(WatchValue.FormatHexAddress(debugLine.CpuAddress.Value, _addressWidth, 4), font, brush, backgroundRectangle);
 				}
 			}
 		}
