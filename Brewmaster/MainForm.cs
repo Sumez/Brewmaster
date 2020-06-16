@@ -170,7 +170,7 @@ namespace Brewmaster
 
 				// TODO: Do this dynamically when switching active editor tab
 			if (editorTab != null) StoredLayoutHandler.LoadEditorLayout(_modules, editorTab.LayoutMode);
-			else StoredLayoutHandler.LoadEditorLayout(_modules, LayoutMode.Default); // TODO: Default mode per project type
+			else StoredLayoutHandler.LoadEditorLayout(_modules, LayoutMode.Default); // TODO: Default mode per project type (asset / tilemap projects)
 
 			UpdateTabListInWindowMenu();
 		}

@@ -96,10 +96,10 @@ namespace Brewmaster.EditorWindows.TileMaps
 			};
 			_colorPalette.SelectedColorIndexChanged += (colorIndex, paletteIndex) =>
 			{
-				if (State.Tool is PixelPen pixelPen)
+				if (State.Tool is PixelTool pixelTool)
 				{
-					pixelPen.SelectedColor = colorIndex;
-					pixelPen.PreviewSource = Map.Palettes[paletteIndex];
+					pixelTool.SelectedColor = colorIndex;
+					pixelTool.PreviewSource = Map.Palettes[paletteIndex];
 				}
 			};
 
@@ -152,6 +152,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 			MapEditorToolBar.TileTool = () => SelectTilePen(0);
 			MapEditorToolBar.ColorTool = SelectPalettePen;
 			MapEditorToolBar.PixelTool = SelectPixelPen;
+			MapEditorToolBar.FloodFillTool = SelectFloodFill;
 			MapEditorToolBar.MetaTool = SelectMetaPen;
 			MapEditorToolBar.MetaTileTool = (size) => SelectMetaTilePen(size, 0);
 
@@ -255,6 +256,13 @@ namespace Brewmaster.EditorWindows.TileMaps
 			State.Tool = tool;
 			tool.SelectedColor = 0;
 		}
+
+		private void SelectFloodFill()
+		{
+			var tool = new FloodFill(State, Map);
+			State.Tool = tool;
+			tool.SelectedColor = 0;
+		}
 		private void SelectMetaPen()
 		{
 			MapEditorToolBar.CollisionButton.Checked = State.DisplayMetaValues = true;
@@ -278,8 +286,45 @@ namespace Brewmaster.EditorWindows.TileMaps
 				State.ChrData = data;
 			}
 
+			State.ChrWasChanged = false;
 			State.ClearUndoStack();
 			_screenPanel.RefreshAllTiles(); // TODO: Should probably react to ChrDataChanged event, but unsure how much overhead that creates while drawing tiles
+		}
+
+		private void TrySaveChrData()
+		{
+			if (ChrSource != null)
+			{
+				if (MessageBox.Show(string.Format("Overwrite the file '{0}'?", ProjectFile.Project.GetRelativePath(ChrSource)), "CHR data was changed", MessageBoxButtons.YesNo) == DialogResult.No)
+				{
+					var newChrFile = GetChrFileName();
+					if (newChrFile == null) return;
+					ChrSource = newChrFile;
+				}
+			}
+			else
+			{
+				if (MessageBox.Show("Save CHR data?", "CHR data was changed", MessageBoxButtons.YesNo) == DialogResult.No) return;
+				var newChrFile = GetChrFileName();
+				if (newChrFile == null) return;
+				ChrSource = newChrFile;
+			}
+			using (var stream = File.Open(ChrSource, FileMode.Create))
+			{
+				stream.Write(State.ChrData, 0, State.ChrData.Length);
+			}
+			State.ChrWasChanged = false;
+		}
+
+		public string GetChrFileName()
+		{
+			using (var chrFileDialog = new SaveFileDialog())
+			{
+				chrFileDialog.DefaultExt = "*.chr";
+				chrFileDialog.Filter = "CHR data|*.chr";
+				chrFileDialog.InitialDirectory = ProjectFile.File.DirectoryName;
+				return chrFileDialog.ShowDialog(this) == DialogResult.OK ? chrFileDialog.FileName : null;
+			}
 		}
 
 		public TileMapScreen FocusedScreen { get; set; }
@@ -488,12 +533,28 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 		public override void Save(Func<FileInfo, string> getNewFileName = null)
 		{
+			string filename;
+			if (getNewFileName != null)
+			{
+				// TODO: Redundant across editor windows
+				filename = getNewFileName(ProjectFile.File);
+				if (filename == null) return;
+				ProjectFile.File = new FileInfo(filename);
+				ProjectFile.Project.Pristine = false;
+				ModuleEvents.OnFilenameChanged(ProjectFile);
+			}
+			else
+			{
+				filename = ProjectFile.File.FullName;
+			}
+
 			var map = Map.GetSerializable();
-			map.ChrSource = ProjectFile.Project.GetRelativePath(ChrSource);
+			if (State.ChrWasChanged) TrySaveChrData();
+			if (ChrSource != null) map.ChrSource = ProjectFile.Project.GetRelativePath(ChrSource);
 			var jsonSettings = new JsonSerializerSettings { Formatting = Formatting.Indented, ContractResolver = new CamelCasePropertyNamesContractResolver() };
 			jsonSettings.Converters.Add(new CondensedArrayConverter());
 			var json = JsonConvert.SerializeObject(map, jsonSettings);
-			File.WriteAllText(ProjectFile.File.FullName, json);
+			File.WriteAllText(filename, json);
 			Pristine = true;
 		}
 
@@ -531,7 +592,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 		private Dictionary<int, Dictionary<Palette, TileImage>> _cachedTiles = new Dictionary<int, Dictionary<Palette, TileImage>>();
 
 		private MapEditorTool _tool;
-		private byte[] _chrData = new byte[0x1000];
+		private byte[] _chrData = new byte[16]; // TODO: Set to size of single tile when opening a "clean" map with no CHR reference
 		private Palette _palette;
 		private int _zoom = 2;
 		private bool _displayGrid = true;
@@ -599,6 +660,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 		}
 
 		public byte[] PreviousChrData { get; private set; }
+		public bool ChrWasChanged { get; set; }
 
 		public event Action PaletteChanged;
 		public event Action ChrDataChanged;
@@ -614,6 +676,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 		}
 		public void OnChrDataChanged()
 		{
+			ChrWasChanged = true;
 			if (ChrDataChanged != null) ChrDataChanged();
 		}
 		public void OnToolChanged()

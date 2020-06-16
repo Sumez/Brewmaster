@@ -20,6 +20,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 		public Action<int?> MetaTileTool { get; set; }
 		public Action ColorTool { get; set; }
 		public Action PixelTool { get; set; }
+		public Action FloodFillTool { get; set; }
 		public Action MetaTool { get; set; }
 
 		public Action ToggleGrid { get; set; }
@@ -41,8 +42,10 @@ namespace Brewmaster.EditorWindows.TileMaps
 				new ToolStripButton("Draw Tiles", Resources.tile_tool, (s, a) => TileTool(), "TileTool"),
 				MetaTileButton = new ToolStripSplitButton("Draw MetaTiles", Resources.metatile_tool, (s, a) => MetaTileTool(null), "MetaTileTool"),
 				new ToolStripButton("Set Color Attribute", Resources.palette_tool, (s, a) => ColorTool(), "ColorAttributeTool"),
-				new ToolStripButton("Pixel Pen", Resources.pen_tool, (s, a) => PixelTool(), "PixelPenTool"),
 				new ToolStripButton("Edit Tile/Collision Map", Resources.overlay_tool, (s, a) => MetaTool(), "CollisionTool"),
+				new ToolStripSeparator(),
+				new ToolStripButton("Pixel Pen", Resources.pen_tool, (s, a) => PixelTool(), "PixelPenTool"),
+				new ToolStripButton("Flood Fill", Resources.pen_tool, (s, a) => FloodFillTool(), "FloodFillTool"),
 				new ToolStripSeparator(),
 			});
 			foreach (var item in Items.OfType<ToolStripButton>()) item.DisplayStyle = ToolStripItemDisplayStyle.Image;

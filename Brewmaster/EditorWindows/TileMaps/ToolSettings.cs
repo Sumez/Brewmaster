@@ -13,7 +13,9 @@ namespace Brewmaster.EditorWindows.TileMaps
 			AutoSize = true;
 
 			Controls.Add(MetaValues = new MetaValueSettings(map) {Visible = false, Dock = DockStyle.Right});
-			Controls.Add(PixelSettings = new PixelPenSettings() { Visible = false, Dock = DockStyle.Right });
+			Controls.Add(PixelSettings = new PixelPenSettings { Visible = false, Dock = DockStyle.Right });
+			Controls.Add(FloodFillSettings = new FloodFillSettings { Visible = false, Dock = DockStyle.Right });
+			
 			Host = new ToolStripControlHost(this);
 
 			state.ToolChanged += () =>
@@ -34,6 +36,11 @@ namespace Brewmaster.EditorWindows.TileMaps
 					PixelSettings.SetCurrentTool(pixelPen);
 					(ActiveControl = PixelSettings).Visible = true;
 				}
+				if (state.Tool is FloodFill floodFill)
+				{
+					FloodFillSettings.SetCurrentTool(floodFill);
+					(ActiveControl = FloodFillSettings).Visible = true;
+				}
 
 				if (ActiveControl != null) Width = ActiveControl.Width;
 			};
@@ -42,14 +49,15 @@ namespace Brewmaster.EditorWindows.TileMaps
 		public ToolStripControlHost Host { get; private set; }
 
 		public PixelPenSettings PixelSettings { get; set; }
+		public FloodFillSettings FloodFillSettings { get; set; }
 		public Control ActiveControl { get; set; }
 		public MetaValueSettings MetaValues { get; set; }
 	}
 
-	public class PixelPenSettings : Control
+	public abstract class PixelToolSettings : Control
 	{
 		private Color _color = Color.Black;
-		private PixelPen _tool;
+		protected PixelTool _tool;
 
 		public Color Color
 		{
@@ -61,6 +69,36 @@ namespace Brewmaster.EditorWindows.TileMaps
 			}
 		}
 
+		public PixelToolSettings()
+		{
+			Width = 140;
+		}
+
+		protected override void OnPaint(PaintEventArgs e)
+		{
+			base.OnPaint(e);
+
+			using (var brush = new SolidBrush(Color)) e.Graphics.FillRectangle(brush, Width - 20, 3, 16, 16);
+			e.Graphics.DrawRectangle(Pens.Black, Width - 20, 3, 16, 16);
+		}
+
+		public virtual void SetCurrentTool(PixelTool pixelTool)
+		{
+			_tool = pixelTool;
+			pixelTool.PreviewSourceChanged += UpdatePixelColor;
+			pixelTool.SelectedColorChanged += UpdatePixelColor;
+			UpdatePixelColor();
+		}
+
+		private void UpdatePixelColor()
+		{
+			Color = _tool.PreviewSource.Colors[_tool.SelectedColor];
+		}
+
+	}
+
+	public class PixelPenSettings : PixelToolSettings
+	{
 		public PixelPenSettings()
 		{
 			Width = 140;
@@ -72,29 +110,19 @@ namespace Brewmaster.EditorWindows.TileMaps
 			};
 		}
 
+		public override void SetCurrentTool(PixelTool pixelTool)
+		{
+			base.SetCurrentTool(pixelTool);
+			pixelTool.CreateNewTile = CreateNewTileOption.Checked;
+		}
+
 		public CheckBox CreateNewTileOption { get; private set; }
 
-		protected override void OnPaint(PaintEventArgs e)
-		{
-			base.OnPaint(e);
+	}
 
-			using (var brush = new SolidBrush(Color)) e.Graphics.FillRectangle(brush, Width - 20, 3, 16, 16);
-			e.Graphics.DrawRectangle(Pens.Black, Width - 20, 3, 16, 16);
-		}
-
-		public void SetCurrentTool(PixelPen pixelPen)
-		{
-			_tool = pixelPen;
-			pixelPen.PreviewSourceChanged += UpdatePixelColor;
-			pixelPen.SelectedColorChanged += UpdatePixelColor;
-			UpdatePixelColor();
-			pixelPen.CreateNewTile = CreateNewTileOption.Checked;
-		}
-
-		private void UpdatePixelColor()
-		{
-			Color = _tool.PreviewSource.Colors[_tool.SelectedColor];
-		}
+	public class FloodFillSettings : PixelToolSettings
+	{
+		
 	}
 	public class MetaValueSettings : Control
 	{

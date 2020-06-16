@@ -135,6 +135,46 @@ namespace Brewmaster.EditorWindows.TileMaps
 			_data[y * Width + x] = color.ToArgb();
 		}
 
+		public HashSet<int> GetFillRegion(int x, int y)
+		{
+			var index = y * Width + x;
+			var matchColor = _data[index];
+			var foundValues = new HashSet<int>();
+			TraverseFill(index, matchColor, foundValues);
+			return foundValues;
+		}
+
+		public void FillRegion(IEnumerable<int> indexes, Color color)
+		{
+			var value = color.ToArgb();
+			foreach (var index in indexes) _data[index] = value;
+		}
+
+		private void TraverseFill(int firstIndex, int matchColor, ISet<int> foundValues)
+		{
+			var stack = new Stack<int>();
+			stack.Push(firstIndex);
+			while (stack.Count > 0)
+			{
+				var index = stack.Pop();
+				if (index < 0 || index >= _data.Length || _data[index] != matchColor || foundValues.Contains(index)) continue;
+				foundValues.Add(index);
+
+				stack.Push(index - Width);
+				stack.Push(index + Width);
+				stack.Push(index - 1);
+				stack.Push(index + 1);
+
+				// Diagonal:
+				/*
+				stack.Push(index - Width - 1);
+				stack.Push(index - Width + 1);
+				stack.Push(index + Width - 1);
+				stack.Push(index + Width + 1);
+				*/
+			}
+		}
+
 		public Color GetPixel(int x, int y)
 		{
 			return Color.FromArgb(_data[y * Width + x]);

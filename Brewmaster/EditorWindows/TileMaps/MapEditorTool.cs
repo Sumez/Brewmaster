@@ -29,18 +29,18 @@ namespace Brewmaster.EditorWindows.TileMaps
 		public virtual void AfterPaint() { }
 	}
 
-	public class PixelPen : MapEditorTool
+	public abstract class PixelTool : MapEditorTool
 	{
 		private Bitmap _pixelImage;
 		private Palette _previewSource;
 		private int _selectedColor;
 
-		private readonly TileMap _map;
-		private readonly MapEditorState _state;
+		protected readonly TileMap _map;
+		protected readonly MapEditorState _state;
 		public event Action PreviewSourceChanged;
 		public event Action SelectedColorChanged;
 
-		public PixelPen(MapEditorState state, TileMap map)
+		public PixelTool(MapEditorState state, TileMap map)
 		{
 			_state = state;
 			_map = map;
@@ -51,24 +51,6 @@ namespace Brewmaster.EditorWindows.TileMaps
 		public override bool Pixel { get { return true; } }
 		public override bool EditsChr { get { return true; } }
 		public bool CreateNewTile { get; set; }
-		public override void Paint(int x, int y, TileMapScreen screen)
-		{
-			var createNewTile = CreateNewTile || Control.ModifierKeys.HasFlag(Keys.Control);
-			var tileX = x / _map.BaseTileSize.Width;
-			var tileY = y / _map.BaseTileSize.Height;
-
-			var tile = screen.GetTile(tileX, tileY);
-			var palette = screen.GetColorTile(tileX, tileY);
-			
-			screen.Image.SetPixel(x, y, _map.Palettes[palette].Colors[SelectedColor]);
-
-			if (createNewTile && _state.GetTileUsage(tile) > 1)
-			{
-				tile = _state.CopyTile(tile);
-				screen.PrintTile(tileX, tileY, tile);
-			}
-			_state.SetPixel(tile, x % _map.BaseTileSize.Width, y % _map.BaseTileSize.Height, SelectedColor);
-		}
 
 		public override void EyeDrop(int x, int y, TileMapScreen screen)
 		{
@@ -105,8 +87,63 @@ namespace Brewmaster.EditorWindows.TileMaps
 				if (PreviewSourceChanged != null) PreviewSourceChanged();
 			}
 		}
+
 	}
 
+	public class PixelPen : PixelTool
+	{
+		public PixelPen(MapEditorState state, TileMap map) : base(state, map)
+		{
+		}
+
+		public override void Paint(int x, int y, TileMapScreen screen)
+		{
+			var createNewTile = CreateNewTile || Control.ModifierKeys.HasFlag(Keys.Control);
+			var tileX = x / _map.BaseTileSize.Width;
+			var tileY = y / _map.BaseTileSize.Height;
+
+			var tile = screen.GetTile(tileX, tileY);
+			var palette = screen.GetColorTile(tileX, tileY);
+
+			screen.Image.SetPixel(x, y, _map.Palettes[palette].Colors[SelectedColor]);
+
+			if (createNewTile && _state.GetTileUsage(tile) > 1)
+			{
+				tile = _state.CopyTile(tile);
+				screen.PrintTile(tileX, tileY, tile);
+			}
+			_state.SetPixel(tile, x % _map.BaseTileSize.Width, y % _map.BaseTileSize.Height, SelectedColor);
+		}
+	}
+
+	public class FloodFill : PixelTool
+	{
+		public FloodFill(MapEditorState state, TileMap map) : base(state, map)
+		{
+		}
+
+		public override void Paint(int x, int y, TileMapScreen screen)
+		{
+			var tileX = x / _map.BaseTileSize.Width;
+			var tileY = y / _map.BaseTileSize.Height;
+
+			var tile = screen.GetTile(tileX, tileY);
+			var palette = screen.GetColorTile(tileX, tileY);
+
+			//screen.Image.FillRegion(screen.Image.GetFillRegion(x, y), _map.Palettes[palette].Colors[SelectedColor]);
+
+			var fillRegion = screen.Image.GetFillRegion(x, y);
+			foreach (var index in fillRegion)
+			{
+				var pixelX = index % screen.Image.Width;
+				var pixelY = index / screen.Image.Width;
+				var pixelTile = screen.GetTile(pixelX / _map.BaseTileSize.Width, pixelY / _map.BaseTileSize.Height);
+
+				_state.SetPixel(pixelTile, pixelX % _map.BaseTileSize.Width, pixelY % _map.BaseTileSize.Height, SelectedColor);
+			}
+			//_state.SetPixel(tile, x % _map.BaseTileSize.Width, y % _map.BaseTileSize.Height, SelectedColor);
+		}
+	}
 	public class MetaValuePen : MapEditorTool
 	{
 		public MetaValuePen(Size metaValueSize, Func<int, Color> getColor)

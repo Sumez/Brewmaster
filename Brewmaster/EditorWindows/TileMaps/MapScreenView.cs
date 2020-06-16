@@ -65,7 +65,9 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 		private void ToolChanged()
 		{
-			Cursor = _state.Tool.Pixel ? new Cursor(new MemoryStream(Resources.pen)) : Cursors.Default;
+			// TODO: Get from tool generically
+			Cursor = _state.Tool is PixelPen ? new Cursor(new MemoryStream(Resources.pen)) :
+				_state.Tool is FloodFill ? new Cursor(new MemoryStream(Resources.bucket)) : Cursors.Default;
 		}
 
 		public void LoadFullMap()
