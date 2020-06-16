@@ -26,7 +26,20 @@ namespace Brewmaster.Layout
 			_closeButton.Width = 15;
 			_closeButton.Height = 15;
 			_closeButton.Location = new Point(Width - 17, 2);
-			_closeButton.Click += (s, a) => HidePanel();
+	        var suppressCloseButton = false;
+			_closeButton.Click += (s, a) =>
+			{
+				if (suppressCloseButton)
+				{
+					suppressCloseButton = false;
+					return;
+				}
+				HidePanel();
+			};
+			_closeButton.PreviewKeyDown += (s, a) =>
+			{
+				if (a.KeyCode == Keys.Space || a.KeyCode == Keys.Enter) suppressCloseButton = true;
+			};
 			Controls.Add(_closeButton);
 
 			_tabPanel = new FlowLayoutPanel();
