@@ -319,8 +319,9 @@ namespace Brewmaster.Emulation
 			InteropEmu.SetFlag(EmulationFlags.DisablePaletteRead, false);
 			InteropEmu.SetFlag(EmulationFlags.DisableOamAddrBug, false);
 			InteropEmu.SetFlag(EmulationFlags.DisablePpuReset, false);
-			InteropEmu.SetFlag(EmulationFlags.EnableOamDecay, false);
+			InteropEmu.SetFlag(EmulationFlags.EnableOamDecay, true);
 			InteropEmu.SetFlag(EmulationFlags.UseNes101Hvc101Behavior, false);
+			InteropEmu.SetFlag(EmulationFlags.EnablePpuOamRowCorruption, true);
 			InteropEmu.SetFlag(EmulationFlags.RandomizeMapperPowerOnState, false);
 
 			InteropEmu.SetPpuNmiConfig(0, 0);
@@ -331,6 +332,7 @@ namespace Brewmaster.Emulation
 		{
 			InteropEmu.SetRamPowerOnState(settings.RandomPowerOnState ? RamPowerOnState.Random : RamPowerOnState.AllZeros);
 			InteropEmu.SetFlag(EmulationFlags.RandomizeMapperPowerOnState, settings.RandomPowerOnState);
+			InteropEmu.SetFlag(EmulationFlags.RandomizeCpuPpuAlignment, settings.RandomPowerOnState);
 
 			InteropEmu.SetMasterVolume(settings.PlayAudio ? 25 / 10d : 0, 75 / 100d);
 			InteropEmu.SetChannelVolume(AudioChannel.Square1, ConvertVolume(settings.PlaySquare1 ? 100 : 0));

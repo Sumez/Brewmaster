@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
 using System.Windows.Forms;
 
 namespace Brewmaster.Modules.Ppu
@@ -12,7 +13,7 @@ namespace Brewmaster.Modules.Ppu
 		protected Object BackBufferLock = new Object();
 
 		private bool _fitImage;
-		private Bitmap _backBuffer = new Bitmap(512, 480);
+		private Bitmap _backBuffer = new Bitmap(512, 480, PixelFormat.Format32bppPArgb);
 		private readonly PictureBox _pictureBox;
 		private float _scale = 1;
 		private int _offsetX = 0;
@@ -21,7 +22,7 @@ namespace Brewmaster.Modules.Ppu
 		protected ScaledImageRenderer()
 		{
 			_pictureBox = new PictureBox();
-			_pictureBox.Image = new Bitmap(512, 480);
+			_pictureBox.Image = new Bitmap(512, 480, PixelFormat.Format32bppPArgb);
 			_pictureBox.Width = 512;
 			_pictureBox.Height = 480;
 			Controls.Add(_pictureBox);
@@ -41,7 +42,7 @@ namespace Brewmaster.Modules.Ppu
 			if (_backBuffer == null) return;
 
 			BackColor = SystemColors.ControlDarkDark;
-			var image = new Bitmap(ImageWidth, ImageHeight); // Create new temporary image to prevent errors when drawing a new image while the old is being drawn to screen
+			var image = new Bitmap(ImageWidth, ImageHeight, PixelFormat.Format32bppPArgb); // Create new temporary image to prevent errors when drawing a new image while the old is being drawn to screen
 			lock (BackBufferLock)
 			using (var g = Graphics.FromImage(image))
 			{
@@ -110,7 +111,7 @@ namespace Brewmaster.Modules.Ppu
 			_backBuffer.Dispose();
 			ImageWidth = width;
 			ImageHeight = height;
-			_backBuffer = new Bitmap(ImageWidth, ImageHeight);
+			_backBuffer = new Bitmap(ImageWidth, ImageHeight, PixelFormat.Format32bppPArgb);
 			if (InvokeRequired) BeginInvoke(new Action(RepositionImage));
 			else RepositionImage();
 		}

@@ -107,7 +107,7 @@ namespace Brewmaster.Pipeline
 		}
 		public Bitmap GetReducedImage(Bitmap image)
 		{
-			var bitmap = new Bitmap(image.Width, image.Height);
+			var bitmap = new Bitmap(image.Width, image.Height, PixelFormat.Format32bppPArgb);
 			var tileCount = (image.Width / 8) * (image.Height / 8);
 
 			var basePalette = TilePalettes.OrderByDescending(p => p.Count).First().ToDictionary(k => k.Value, k => k.Key);

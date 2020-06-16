@@ -453,11 +453,11 @@ namespace Brewmaster.Modules.Watch
 		{
 			return string.Format("${0}", Convert.ToString(value, 16).ToUpper().PadLeft(width, '0'));
 		}
-		public static string FormatHexAddress(int value, int addressWidth = 4)
+		public static string FormatHexAddress(int value, int addressWidth = 4, int minAddressWidth = 2)
 		{
 			return value > 0xffff || addressWidth > 4
 				? string.Format("${0}:{1}", Convert.ToString(value >> 16, 16).ToUpper().PadLeft(2, '0'), Convert.ToString(value & 0xffff, 16).ToUpper().PadLeft(4, '0'))
-				: string.Format("${0}", Convert.ToString(value, 16).ToUpper().PadLeft(value > 0xff ? 4 : 2, '0'));
+				: string.Format("${0}", Convert.ToString(value, 16).ToUpper().PadLeft(Math.Max(minAddressWidth, value > 0xff ? 4 : 2), '0'));
 		}
 	}
 
