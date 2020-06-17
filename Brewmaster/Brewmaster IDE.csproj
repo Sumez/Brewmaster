@@ -777,6 +777,7 @@
     <None Include="Resources\Toolbar\grid.png" />
     <None Include="Resources\Toolbar\overlay.png" />
     <None Include="Resources\Toolbar\overlay tool.png" />
+    <Content Include="Resources\Toolbar\bucket tool.png" />
     <Content Include="Templates\ftm">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

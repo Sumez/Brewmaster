@@ -45,7 +45,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 				new ToolStripButton("Edit Tile/Collision Map", Resources.overlay_tool, (s, a) => MetaTool(), "CollisionTool"),
 				new ToolStripSeparator(),
 				new ToolStripButton("Pixel Pen", Resources.pen_tool, (s, a) => PixelTool(), "PixelPenTool"),
-				new ToolStripButton("Flood Fill", Resources.pen_tool, (s, a) => FloodFillTool(), "FloodFillTool"),
+				new ToolStripButton("Flood Fill", Resources.bucket_tool, (s, a) => FloodFillTool(), "FloodFillTool"),
 				new ToolStripSeparator(),
 			});
 			foreach (var item in Items.OfType<ToolStripButton>()) item.DisplayStyle = ToolStripItemDisplayStyle.Image;
