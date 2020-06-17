@@ -1,4 +1,6 @@
-﻿namespace Brewmaster.EditorWindows.TileMaps.Tools
+﻿using System.Collections.Generic;
+
+namespace Brewmaster.EditorWindows.TileMaps.Tools
 {
 	public class FloodFill : PixelTool
 	{
@@ -8,24 +10,28 @@
 
 		public override void Paint(int x, int y, TileMapScreen screen)
 		{
-			var tileX = x / _map.BaseTileSize.Width;
-			var tileY = y / _map.BaseTileSize.Height;
-
-			var tile = screen.GetTile(tileX, tileY);
-			var palette = screen.GetColorTile(tileX, tileY);
-
-			//screen.Image.FillRegion(screen.Image.GetFillRegion(x, y), _map.Palettes[palette].Colors[SelectedColor]);
-
+			screen.EnsureRefreshedImage(); // Makes sure screen.Image is reliable
 			var fillRegion = screen.Image.GetFillRegion(x, y);
+
+			var changedPixels = new HashSet<int>();
+			var tileWidth = _map.BaseTileSize.Width;
+			var tileHeight = _map.BaseTileSize.Height;
+			var tileSize = _map.BaseTileSize.Width * _map.BaseTileSize.Height;
 			foreach (var index in fillRegion)
 			{
 				var pixelX = index % screen.Image.Width;
 				var pixelY = index / screen.Image.Width;
-				var pixelTile = screen.GetTile(pixelX / _map.BaseTileSize.Width, pixelY / _map.BaseTileSize.Height);
+				var tilePixelX = pixelX % tileWidth;
+				var tilePixelY = pixelY % tileHeight;
+				var pixelTile = screen.GetTile(pixelX / tileWidth, pixelY / tileHeight);
 
-				_state.SetPixel(pixelTile, pixelX % _map.BaseTileSize.Width, pixelY % _map.BaseTileSize.Height, SelectedColor);
+				// Prevent updating the same CHR address more than once, by generating a unique hash for each tile+coordinate combination
+				var pixelId = pixelTile * tileSize + tilePixelY * tileWidth + tilePixelX;
+				if (changedPixels.Contains(pixelId)) continue;
+				changedPixels.Add(pixelId);
+
+				_state.SetPixel(pixelTile, tilePixelX, tilePixelY, SelectedColor);
 			}
-			//_state.SetPixel(tile, x % _map.BaseTileSize.Width, y % _map.BaseTileSize.Height, SelectedColor);
 		}
 	}
 }
