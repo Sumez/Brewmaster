@@ -62,6 +62,11 @@ namespace Brewmaster.Emulation
 				InteropEmu.Stop();
 			}
 
+			var testRom = InteropEmu.GetRomInfo(cartridgeFile);
+			if (testRom.Crc32 == 0)
+			{
+				throw new Exception("Invalid NES ROM");
+			}
 			InteropEmu.LoadROM(cartridgeFile, string.Empty);
 			InitDebugger();
 			EnableDebugger();
@@ -78,23 +83,23 @@ namespace Brewmaster.Emulation
 		public void InitDebugger()
 		{
             var debuggerAlreadyRunning = InteropEmu.DebugIsDebuggerRunning();
-            InteropEmu.DebugInitialize();
+			InteropEmu.DebugInitialize();
 
-            //_previousCycle = state.CPU.CycleCount;
-            /*
-            //Pause a few frames later to give the debugger a chance to disassemble some code
-           // _firstBreak = true;
-            if (!debuggerAlreadyRunning)
-            {
-                InteropEmu.SetFlag(EmulationFlags.ForceMaxSpeed, true);
-                InteropEmu.DebugStep((uint)1);
-            }
-            else
-            {
-                //Break once to show code and then resume execution
-                InteropEmu.DebugStep(1);
-            }
-            InteropEmu.Resume();*/
+			//_previousCycle = state.CPU.CycleCount;
+			/*
+			//Pause a few frames later to give the debugger a chance to disassemble some code
+		 // _firstBreak = true;
+			if (!debuggerAlreadyRunning)
+			{
+			    InteropEmu.SetFlag(EmulationFlags.ForceMaxSpeed, true);
+			    InteropEmu.DebugStep((uint)1);
+			}
+			else
+			{
+			    //Break once to show code and then resume execution
+			    InteropEmu.DebugStep(1);
+			}
+			InteropEmu.Resume();*/
 
 		}
 		public void EnableDebugger()

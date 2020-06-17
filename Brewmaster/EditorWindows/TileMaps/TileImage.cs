@@ -135,12 +135,13 @@ namespace Brewmaster.EditorWindows.TileMaps
 			_data[y * Width + x] = color.ToArgb();
 		}
 
-		public HashSet<int> GetFillRegion(int x, int y)
+		public HashSet<int> GetFillRegion(int startX, int startY, bool connectDiagonally = false)
 		{
-			var index = y * Width + x;
+			var index = startY * Width + startX;
 			var matchColor = _data[index];
 			var foundValues = new HashSet<int>();
-			TraverseFill(index, matchColor, foundValues);
+			if (connectDiagonally) TraverseFillDiagonal(index, matchColor, foundValues);
+			else TraverseFill(index, matchColor, foundValues);
 			return foundValues;
 		}
 
@@ -164,16 +165,29 @@ namespace Brewmaster.EditorWindows.TileMaps
 				stack.Push(index + Width);
 				stack.Push(index - 1);
 				stack.Push(index + 1);
+			}
+		}
+		private void TraverseFillDiagonal(int firstIndex, int matchColor, ISet<int> foundValues)
+		{
+			var stack = new Stack<int>();
+			stack.Push(firstIndex);
+			while (stack.Count > 0)
+			{
+				var index = stack.Pop();
+				if (index < 0 || index >= _data.Length || _data[index] != matchColor || foundValues.Contains(index)) continue;
+				foundValues.Add(index);
 
-				// Diagonal:
-				/*
+				stack.Push(index - Width);
+				stack.Push(index + Width);
+				stack.Push(index - 1);
+				stack.Push(index + 1);
 				stack.Push(index - Width - 1);
 				stack.Push(index - Width + 1);
 				stack.Push(index + Width - 1);
 				stack.Push(index + Width + 1);
-				*/
 			}
 		}
+
 
 		public Color GetPixel(int x, int y)
 		{

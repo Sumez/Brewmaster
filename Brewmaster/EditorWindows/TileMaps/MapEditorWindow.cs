@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Brewmaster.EditorWindows.TileMaps.Tools;
 using Brewmaster.Layout;
 using Brewmaster.Modules;
 using Brewmaster.Modules.Ppu;

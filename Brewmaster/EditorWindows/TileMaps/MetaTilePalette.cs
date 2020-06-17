@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Brewmaster.EditorWindows.TileMaps.Tools;
 
 namespace Brewmaster.EditorWindows.TileMaps
 {

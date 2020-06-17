@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
+using Brewmaster.EditorWindows.TileMaps.Tools;
 using Brewmaster.Modules.Ppu;
 
 namespace Brewmaster.EditorWindows.TileMaps
@@ -226,6 +227,11 @@ namespace Brewmaster.EditorWindows.TileMaps
 				if (ImageUpdated != null) ImageUpdated();
 			}, token);
 		}
+		public void EnsureRefreshedImage()
+		{
+			if (_fullRefreshTask != null && !_fullRefreshTask.IsCompleted) _fullRefreshTask.Wait();
+		}
+
 
 		private void RefreshMetaValueTile(int x, int y)
 		{

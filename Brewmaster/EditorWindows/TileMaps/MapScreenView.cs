@@ -6,6 +6,7 @@ using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using Brewmaster.EditorWindows.TileMaps.Tools;
 using Brewmaster.ProjectExplorer;
 using Brewmaster.Properties;
 
