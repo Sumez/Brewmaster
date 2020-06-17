@@ -115,6 +115,22 @@ namespace Brewmaster.EditorWindows.TileMaps
 			if (TileChanged != null) TileChanged(x, y, oldTile, tileIndex);
 		}
 
+		public bool ReplaceTiles(Dictionary<int, int> changes)
+		{
+			var changed = false;
+			for (var i = 0; i < Tiles.Length; i++)
+			{
+				var oldTile = Tiles[i];
+				if (!changes.ContainsKey(oldTile)) continue;
+
+				changed = true;
+				Tiles[i] = changes[oldTile];
+				if (TileChanged != null) TileChanged(i % _map.ScreenSize.Width, i / _map.ScreenSize.Width, oldTile, Tiles[i]);
+			}
+			return changed;
+		}
+
+
 		public int GetTile(int x, int y)
 		{
 			var index = y * _map.ScreenSize.Width + x;

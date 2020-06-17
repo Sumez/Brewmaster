@@ -69,6 +69,15 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 			State.Palette = Map.Palettes[0];
 
+			State.TilesMoved += (changes, undoStep) =>
+			{
+				foreach (var screen in Map.Screens.SelectMany(s => s))
+				{
+					if (!screen.ReplaceTiles(changes)) continue;
+					undoStep.AddScreen(screen);
+				}
+			};
+
 			_mapOverview = new MapOverview(Map);
 			_mapOverview.MapSizeChanged += () => { Pristine = false; };
 			_mapOverview.ActivateScreen = ActivateScreen;
@@ -670,6 +679,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 		public event Action DisplayMetaValuesChanged;
 		public event Action DisplayGridChanged;
 		public event Action<UndoStep> AfterUndo;
+		public event Action<Dictionary<int, int>, UndoStep> TilesMoved;
 
 		public void OnPaletteChanged()
 		{
@@ -778,6 +788,36 @@ namespace Brewmaster.EditorWindows.TileMaps
 			Buffer.BlockCopy(_chrData, tileSize * tile, newData, _chrData.Length, tileSize);
 			_chrData = newData;
 			return (newData.Length / tileSize) - 1;
+		}
+		public void MoveChrTile(int fromTile, int toTile)
+		{
+			var tileSize = TileImage.GetTileDataLength();
+			var length = Math.Abs(fromTile - toTile);
+			var sourceOffset = fromTile > toTile ? toTile : (fromTile + 1);
+			var destinationOffset = fromTile > toTile ? (toTile + 1) : fromTile;
+
+			var buffer = new byte[tileSize];
+
+			//Below code copies inbetween tiles to a temporary buffer. But it seems .NET's blockcopy works fine without it
+			//Buffer.BlockCopy(_chrData, sourceOffset * tileSize, buffer, 0, length * tileSize);
+			//Buffer.BlockCopy(buffer, 0, _chrData, destinationOffset * tileSize, length * tileSize);
+
+			Buffer.BlockCopy(_chrData, fromTile * tileSize, buffer, 0, tileSize); // Backup moved tile
+			Buffer.BlockCopy(_chrData, sourceOffset * tileSize, _chrData, destinationOffset * tileSize, length * tileSize); // Shift inbetween tiles
+			Buffer.BlockCopy(buffer, 0, _chrData, toTile * tileSize, tileSize); // Restore moved tile at new location
+
+			var changedTiles = new Dictionary<int, int>();
+			changedTiles.Add(fromTile, toTile);
+			for (var i = fromTile; i < toTile; i++) changedTiles.Add(i + 1, i);
+			for (var i = fromTile; i > toTile; i--) changedTiles.Add(i - 1, i);
+
+			var undoStep = new UndoStep();
+			undoStep.AddChr(this);
+			foreach (var tile in changedTiles.Keys) _cachedTiles.Remove(tile);
+			if (TilesMoved != null) TilesMoved(changedTiles, undoStep);
+			AddUndoStep(undoStep);
+
+			OnChrDataChanged();
 		}
 
 		private readonly LinkedList<UndoStep> _undoStack = new LinkedList<UndoStep>();

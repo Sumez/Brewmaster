@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Brewmaster.EditorWindows.TileMaps.Tools;
 using Brewmaster.Modules.Ppu;
+using Brewmaster.ProjectExplorer;
 
 namespace Brewmaster.EditorWindows.TileMaps
 {
@@ -14,6 +15,8 @@ namespace Brewmaster.EditorWindows.TileMaps
 	{
 		public MapEditorState State;
 		public event Action<int> TileClick;
+		public event Action<int, int> TileDrag;
+		public bool AllowTileDrag { get; set; }
 		private Palette Palette
 		{
 			get { return State.Palette; }
@@ -65,6 +68,9 @@ namespace Brewmaster.EditorWindows.TileMaps
 		private Palette _palette;
 		private SolidBrush _solidBrush;
 		private List<MetaTile> _tiles = new List<MetaTile>();
+
+		private int _dragTile = -1;
+		private Point _dragOrigin;
 
 		private int _tileWidth = 8;
 		private int _tileHeight = 8;
@@ -151,7 +157,55 @@ namespace Brewmaster.EditorWindows.TileMaps
 		protected override void OnMouseDown(MouseEventArgs e)
 		{
 			if (HoverTile >= 0 && TileClick != null) TileClick(HoverTile);
+			if (HoverTile >= 0 && AllowTileDrag && e.Button == MouseButtons.Left)
+			{
+				_dragTile = HoverTile;
+				_dragOrigin = e.Location;
+			}
+
 			base.OnMouseDown(e);
+		}
+		private bool GlobalMouseUp(Point location)
+		{
+			if (AllowTileDrag && _dragTile >= 0)
+			{
+				if (_hoverTile >= 0 && _dragTile != _hoverTile && TileDrag != null)
+				{
+					TileDrag(_dragTile, _hoverTile);
+				}
+				if (TileClick != null) TileClick(_hoverTile);
+				Invalidate();
+			}
+			_dragTile = -1;
+			_dragLocation = null;
+			return false;
+		}
+
+		private bool GlobalMouseMoved(Point location)
+		{
+			if (_dragTile < 0) return false;
+			location = PointToClient(location);
+			if (_dragLocation != null)
+			{
+				_dragLocation = location;
+				Invalidate();
+				return false;
+			}
+			if (Math.Abs(location.X - _dragOrigin.X) + Math.Abs(location.Y - _dragOrigin.Y) < 5) return false;
+
+			_dragLocation = location;
+			var dragImage = new FastBitmap(_tileWidth * MetaTileWidth, _tileWidth * MetaTileWidth);
+			var metaTile = Tiles[_dragTile];
+			for (var j = 0; j < metaTile.Tiles.Length; j++)
+			{
+				var tile = State.GetTileImage(metaTile.Tiles[j], GetTileColors(metaTile, j));
+				if (tile == null) continue;
+				tile.CopyTile(dragImage, (j % _metaTileWidth), (j / _metaTileWidth));
+			}
+			if (_dragImage != null) _dragImage.Dispose();
+			_dragImage = dragImage;
+			Invalidate();
+			return false;
 		}
 
 		public TilePalette()
@@ -163,6 +217,12 @@ namespace Brewmaster.EditorWindows.TileMaps
 			_solidBrush = new SolidBrush(gridColor);
 
 			GetTileColors = (tile, i) => Palette;
+
+			var mouseHandler = new OsFeatures.GlobalMouseHandler();
+			mouseHandler.MouseMoved += GlobalMouseMoved;
+			mouseHandler.MouseUp += GlobalMouseUp;
+			Application.AddMessageFilter(mouseHandler);
+			Disposed += (s, a) => { Application.RemoveMessageFilter(mouseHandler); };	
 		}
 
 		private readonly object _backBufferLock = new object();
@@ -214,22 +274,33 @@ namespace Brewmaster.EditorWindows.TileMaps
 		}
 
 		public Func<MetaTile, int, Palette> GetTileColors;
+		private Point? _dragLocation;
+		private FastBitmap _dragImage;
 
 		protected override void OnPaint(PaintEventArgs e)
 		{
 			base.OnPaint(e);
+
+			var tileWidth = _tileWidth * _metaTileWidth * Zoom;
+			var tileHeight = _tileHeight * _metaTileWidth * Zoom;
+
 			e.Graphics.CompositingMode = CompositingMode.SourceCopy;
 			e.Graphics.CompositingQuality = CompositingQuality.HighSpeed;
 			e.Graphics.PixelOffsetMode = PixelOffsetMode.Half;
 			e.Graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
 			lock (_backBufferLock) e.Graphics.DrawImage(_image.Image, new Rectangle(0, 0, _image.Width * Zoom, _image.Height * Zoom));
 
+			if (_dragTile >= 0 && _dragLocation != null)
+			{
+				var x = _dragTile % _rowWidth;
+				var y = _dragTile / _rowWidth;
+				e.Graphics.FillRectangle(Brushes.Black, x * tileWidth, y * tileHeight, tileWidth, tileHeight);
+			}
+
 			e.Graphics.CompositingMode = CompositingMode.SourceOver;
 			e.Graphics.PixelOffsetMode = PixelOffsetMode.None;
 			e.Graphics.DrawImageUnscaled(_grid, 0, 0);
 
-			var tileWidth = _tileWidth * _metaTileWidth * Zoom;
-			var tileHeight = _tileHeight * _metaTileWidth * Zoom;
 			if (_hoverTile >= 0)
 			{
 				var x = _hoverTile % _rowWidth;
@@ -238,12 +309,19 @@ namespace Brewmaster.EditorWindows.TileMaps
 			}
 			
 			e.Graphics.CompositingMode = CompositingMode.SourceCopy;
-			if (_selectedTile >= 0)
+			if (_selectedTile >= 0 && _dragLocation == null)
 			{
 				var x = _selectedTile % _rowWidth;
 				var y = _selectedTile / _rowWidth;
 				e.Graphics.DrawRectangle(Pens.White, x * tileWidth, y * tileHeight, tileWidth, tileHeight);
 				e.Graphics.DrawRectangle(Pens.Black, x * tileWidth + 1, y * tileHeight + 1, tileWidth - 2, tileHeight - 2);
+			}
+			if (_dragTile >= 0 && _dragLocation != null && _dragImage != null)
+			{
+				var dragOffset = new Point(_dragOrigin.X % tileWidth, _dragOrigin.Y % tileHeight);
+				var dragTileLocation = new Rectangle(_dragLocation.Value.X - dragOffset.X, _dragLocation.Value.Y - dragOffset.Y, tileWidth, tileHeight);
+				e.Graphics.DrawImage(_dragImage.Image, dragTileLocation);
+				e.Graphics.DrawRectangle(Pens.White, dragTileLocation);
 			}
 		}
 	}

@@ -19,6 +19,8 @@ namespace Brewmaster.EditorWindows.TileMaps
 			{
 				redoStep.States.Add(screenState.Key, screenState.Key.PreviousState);
 				screenState.Key.RevertToState(screenState.Value);
+
+				// TODO: Restore tile usages!!!
 			}
 
 			if (Chr != null)

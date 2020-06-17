@@ -21,6 +21,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 		{
 			_state = state;
 			InitializeComponent();
+			_tilePalette.AllowTileDrag = true;
 
 			state.ChrDataChanged += () =>
 			{
@@ -32,6 +33,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 			_tilePalette.State = state;
 			RefreshTileCount();
 			_tilePalette.TileClick += SelectTile;
+			_tilePalette.TileDrag += state.MoveChrTile;
 		}
 
 		private void SelectTile(int index)
