@@ -1421,7 +1421,7 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 		        if (currentFocusLine == null) return;
 		        Mesen.LoadCartridgeAtSameState(CurrentProject.Directory.FullName, CurrentProject.Directory.FullName + @"\" + CurrentProject.CurrentConfiguration.Filename,
 			        i => currentFocusLine.CpuAddress ?? i);
-	        }, null);
+	        }, null).ContinueWith(HandleEmulatorThreadException);
 		}
 
 		private void Run_RunApplicationMenuItem_Click(object sender, EventArgs e)
@@ -1457,7 +1457,12 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 					return;
 				}
 				Mesen.LoadCartridge(CurrentProject.Directory.FullName, romFile);
-			}, null);
+			}, null).ContinueWith(HandleEmulatorThreadException);
+		}
+
+		private void HandleEmulatorThreadException(Task task)
+		{
+			if (task.IsFaulted && task.Exception != null) Error("Error executing emulator:\n\n" + task.Exception.InnerException.Message);
 		}
 
 
@@ -1467,7 +1472,7 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 			{
 				if (t.Status != TaskStatus.RanToCompletion || !t.Result) return;
 				Mesen.LoadCartridge(CurrentProject.Directory.FullName, CurrentProject.Directory.FullName + @"\" + CurrentProject.CurrentConfiguration.Filename);
-			}, null);
+			}, null).ContinueWith(HandleEmulatorThreadException);
 		}
 	    private void continueWithNewBuildToolStripMenuItem_Click(object sender, EventArgs e)
 	    {
@@ -1479,8 +1484,8 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 			    if (currentFocusLine == null) return;
 				Mesen.LoadCartridgeAtSameState(CurrentProject.Directory.FullName, CurrentProject.Directory.FullName + @"\" + CurrentProject.CurrentConfiguration.Filename, 
 				    i => currentFocusLine.CpuAddress ?? i);
-		    }, null);
-	    }
+		    }, null).ContinueWith(HandleEmulatorThreadException);
+		}
 
 		private void Run_RunAppletMenuItem_Click(object sender, EventArgs e)
         {
