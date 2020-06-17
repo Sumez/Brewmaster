@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
+using Brewmaster.EditorWindows.TileMaps.Tools;
 using Brewmaster.Modules.Watch;
 
 namespace Brewmaster.EditorWindows.TileMaps

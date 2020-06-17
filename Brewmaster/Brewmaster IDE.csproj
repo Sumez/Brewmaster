@@ -173,7 +173,8 @@
     <Compile Include="EditorWindows\TileMaps\ChrTilePalette.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="EditorWindows\TileMaps\MapEditorTool.cs" />
+    <Compile Include="EditorWindows\TileMaps\Tools\FloodFill.cs" />
+    <Compile Include="EditorWindows\TileMaps\Tools\MapEditorTool.cs" />
     <Compile Include="EditorWindows\TileMaps\MapEditorToolBar.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -210,6 +211,12 @@
     <Compile Include="EditorWindows\TileMaps\TilePalette.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="EditorWindows\TileMaps\Tools\MetaTilePen.cs" />
+    <Compile Include="EditorWindows\TileMaps\Tools\MetaValuePen.cs" />
+    <Compile Include="EditorWindows\TileMaps\Tools\PalettePen.cs" />
+    <Compile Include="EditorWindows\TileMaps\Tools\PixelPen.cs" />
+    <Compile Include="EditorWindows\TileMaps\Tools\PixelTool.cs" />
+    <Compile Include="EditorWindows\TileMaps\Tools\TilePen.cs" />
     <Compile Include="EditorWindows\TileMaps\UndoStep.cs" />
     <Compile Include="Emulation\EmulatorHandler.cs" />
     <Compile Include="Layout\StoredLayoutHandler.cs" />
