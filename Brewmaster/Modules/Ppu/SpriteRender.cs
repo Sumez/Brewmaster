@@ -11,7 +11,7 @@ namespace Brewmaster.Modules.Ppu
 	public class SpriteRender : ScaledImageRenderer
 	{
 		private SpriteData _data;
-		private ProjectType _type;
+		private TargetPlatform _type;
 
 		public SpriteRender()
 		{
@@ -30,7 +30,7 @@ namespace Brewmaster.Modules.Ppu
 			}
 		}
 
-		public void UpdateSpriteData(SpriteData data, ProjectType type)
+		public void UpdateSpriteData(SpriteData data, TargetPlatform type)
 		{
 			_data = data;
 			_type = type;
@@ -62,7 +62,7 @@ namespace Brewmaster.Modules.Ppu
 			{
 				graphics.Clear(Color.Transparent);
 				var handle = GCHandle.Alloc(_data.PixelData, GCHandleType.Pinned);
-				if (_type == ProjectType.Nes)
+				if (_type == TargetPlatform.Nes)
 				{
 					using (var source = new Bitmap(64, 128, 4 * 64, PixelFormat.Format32bppPArgb, handle.AddrOfPinnedObject()))
 					{

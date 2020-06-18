@@ -17,7 +17,7 @@ using Brewmaster.ProjectModel.Compatibility;
 
 namespace Brewmaster.ProjectModel
 {
-	public enum ProjectType
+	public enum TargetPlatform
 	{
 		Nes = 0,
 		Snes = 1
@@ -68,7 +68,7 @@ namespace Brewmaster.ProjectModel
 		}
 
 		public List<KeyValuePair<string, Symbol>> Symbols { get; set; }
-		public ProjectType Type { get; set; }
+		public TargetPlatform Platform { get; set; }
 		public Dictionary<string, DebugSymbol> DebugSymbols { get; private set; }
 		public List<DirectoryInfo> Directories { get; internal set; }
 		public bool UpdatedSinceLastBuild { get; set; }
@@ -82,7 +82,7 @@ namespace Brewmaster.ProjectModel
 
 		private AsmProject()
 		{
-			Type = ProjectType.Nes;
+			Platform = TargetPlatform.Nes;
 			Files = new ObservableCollection<AsmProjectFile>();
 			Files.CollectionChanged += (s, e) => { if (ContentsChanged != null) ContentsChanged(); };
 			Pristine = true;
@@ -129,7 +129,7 @@ namespace Brewmaster.ProjectModel
 
 		public void ParseDebugData(string debugFile)
 		{
-			var headerLength = Type == ProjectType.Nes ? 16 : 0; // TODO: Base extra offset on info in the debug file
+			var headerLength = Platform == TargetPlatform.Nes ? 16 : 0; // TODO: Base extra offset on info in the debug file
 			var debugInfo = new DebugInfo();
 			var debugFileInfo = new FileInfo(debugFile);
 			if (!debugFileInfo.Exists) return;
@@ -404,7 +404,7 @@ namespace Brewmaster.ProjectModel
 			};
 			if (buildConfiguration.Filename.EndsWith(".sfc"))
 			{
-				project.Type = ProjectType.Snes;
+				project.Platform = TargetPlatform.Snes;
 				buildConfiguration.Name = "SNES";
 			}
 			project.BuildConfigurations.Add(buildConfiguration);
@@ -531,7 +531,7 @@ namespace Brewmaster.ProjectModel
 
 		public string GetTargetCpu()
 		{
-			return Type == ProjectType.Snes ? "65816" : "6502";
+			return Platform == TargetPlatform.Snes ? "65816" : "6502";
 		}
 		public static string GetRelativePath(AsmProject project, string filePath)
 		{

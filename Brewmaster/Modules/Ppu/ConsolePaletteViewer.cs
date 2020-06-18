@@ -20,10 +20,10 @@ namespace Brewmaster.Modules.Ppu
 				}
 				Invalidate();
 			};*/
-			events.ProjectTypeChanged += type =>
+			events.PlatformChanged += type =>
 			{
-				Columns = type == ProjectModel.ProjectType.Snes ? (0x20 * 8) : 16;
-				CellWidth = CellHeight = type == ProjectModel.ProjectType.Snes ? 3 : 20;
+				Columns = type == ProjectModel.TargetPlatform.Snes ? (0x20 * 8) : 16;
+				CellWidth = CellHeight = type == ProjectModel.TargetPlatform.Snes ? 3 : 20;
 
 				Invalidate();
 				FitSize();

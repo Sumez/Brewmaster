@@ -19,7 +19,7 @@ namespace Brewmaster.ProjectWizard
 			{
 				_project = value;
 				if (_project == null) return;
-				CalculateSnesChecksum.Visible = ChecksumLabel.Visible = _project.Type == ProjectType.Snes;
+				CalculateSnesChecksum.Visible = ChecksumLabel.Visible = _project.Platform == TargetPlatform.Snes;
 			}
 		}
 
@@ -199,11 +199,11 @@ namespace Brewmaster.ProjectWizard
 
 		public void SetDefaults()
 		{
-			ConfigurationName.Text = Project.Type == ProjectType.Snes ? "SNES" : "NES";
+			ConfigurationName.Text = Project.Platform == TargetPlatform.Snes ? "SNES" : "NES";
 			UseIntegrated.Checked = true;
 			var defaultConfigFile = Project.Files.FirstOrDefault(f => f.Mode == CompileMode.LinkerConfig);
 			if (defaultConfigFile != null) ConfigurationFile.Text = defaultConfigFile.GetRelativePath();
-			OutputFile.Text = Project.Type == ProjectType.Snes ? "bin/game.sfc" : "bin/game.nes";
+			OutputFile.Text = Project.Platform == TargetPlatform.Snes ? "bin/game.sfc" : "bin/game.nes";
 		}
 	}
 }

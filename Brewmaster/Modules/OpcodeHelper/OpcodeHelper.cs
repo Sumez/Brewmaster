@@ -28,7 +28,7 @@ namespace Brewmaster.Modules.OpcodeHelper
 		private Label subDescription;
 		private readonly Dictionary<Opcode, OpcodeButton> _buttons = new Dictionary<Opcode, OpcodeButton>();
 
-		private void LoadOpcodes(ProjectType type)
+		private void LoadOpcodes(TargetPlatform type)
 		{
 
 			_opcodes = OpcodeParser.GetOpcodes(type).Values.ToList();
@@ -58,9 +58,9 @@ namespace Brewmaster.Modules.OpcodeHelper
 
 			_events = events;
 			_events.HighlightedOpcode += SelectOpcode;
-			_events.ProjectTypeChanged += LoadOpcodes;
+			_events.PlatformChanged += LoadOpcodes;
 
-			LoadOpcodes(_events.ProjectType);
+			LoadOpcodes(_events.Platform);
 		}
 
 		protected override bool ProcessCmdKey(ref Message msg, Keys keyData)

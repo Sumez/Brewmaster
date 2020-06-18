@@ -13,14 +13,14 @@ namespace Brewmaster.Modules.Ppu
 		{
 			InitializeComponent();
 			events.EmulationStateUpdate += (state) => UpdateChrData(state.CharacterData, state.Type);
-			events.ProjectTypeChanged += (type) =>
+			events.PlatformChanged += (type) =>
 			{
-				var showOptionPanel = type == ProjectType.Snes;
+				var showOptionPanel = type == TargetPlatform.Snes;
 				if (_snesOptionPanel.Visible != showOptionPanel) _snesOptionPanel.Visible = showOptionPanel;
 			};
 		}
 
-		private void UpdateChrData(CharacterData characterData, ProjectType type)
+		private void UpdateChrData(CharacterData characterData, TargetPlatform type)
 		{
 			_data = characterData;
 			_chrDisplay.UpdateChrData(characterData, type);

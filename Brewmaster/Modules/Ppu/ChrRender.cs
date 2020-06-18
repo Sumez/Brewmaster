@@ -10,14 +10,14 @@ namespace Brewmaster.Modules.Ppu
 	public class ChrRender : ScaledImageRenderer
 	{
 		private CharacterData _data;
-		private ProjectType _type;
+		private TargetPlatform _type;
 
 		public ChrRender()
 		{
 			SetImageSize(128, 256);
 		}
 
-		public void UpdateChrData(CharacterData data, ProjectType type)
+		public void UpdateChrData(CharacterData data, TargetPlatform type)
 		{
 			_data = data;
 			_type = type;

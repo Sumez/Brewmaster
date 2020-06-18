@@ -49,13 +49,13 @@ namespace Brewmaster.Emulation
 
 	public class EmulationState
 	{
-		public EmulationState(ProjectType type)
+		public EmulationState(TargetPlatform type)
 		{
 			Type = type;
 		}
 		public DebugState NesState;
 		public Mesen.GUI.DebugState SnesState;
-		public ProjectType Type { get; }
+		public TargetPlatform Type { get; }
 
 		public SpriteData Sprites = new SpriteData();
 		public CharacterData CharacterData = new CharacterData();

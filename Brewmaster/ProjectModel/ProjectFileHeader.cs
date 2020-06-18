@@ -11,7 +11,7 @@ namespace Brewmaster.ProjectModel
 	[XmlRoot("BrewmasterProject")]
 	public class ProjectFileHeader
 	{
-		public ProjectType Type;
+		public TargetPlatform Type;
 		public string Name;
 		public BuildConfigurationHeader Cartridge;
 		[XmlElement(ElementName = "BuildConfiguration")]
@@ -27,7 +27,7 @@ namespace Brewmaster.ProjectModel
 			var header = new ProjectFileHeader();
 			var fileReferences = new Dictionary<AsmProjectFile, int>();
 
-			header.Type = project.Type;
+			header.Type = project.Platform;
 			header.Name = project.Name;
 			header.ExtraDirectories = project.Directories.Select(d => project.GetRelativePath(d.FullName)).ToArray();
 
@@ -81,7 +81,7 @@ namespace Brewmaster.ProjectModel
 			var errors = new List<string>();
 			var fileReferences = new Dictionary<int, AsmProjectFile>();
 
-			project.Type = Type;
+			project.Platform = Type;
 			project.Name = Name;
 			if (ExtraDirectories != null) project.Directories = ExtraDirectories
 					.Select(d => new DirectoryInfo(Path.Combine(project.Directory.FullName, d)))

@@ -30,7 +30,7 @@ namespace Brewmaster.Settings
 			Settings = settings;
 			InitializeComponent();
 
-			Highlighting = new Ca65Highlighting(ProjectType.Nes);
+			Highlighting = new Ca65Highlighting(TargetPlatform.Nes);
 			editorPreview.IsReadOnly = true;
 			editorPreview.Text = @".include ""nes.inc""
 

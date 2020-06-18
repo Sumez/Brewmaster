@@ -170,7 +170,7 @@ namespace Brewmaster.Pipeline
 
 		public override void Process()
 		{
-			var projectType = File.Project.Type;
+			var platform = File.Project.Platform;
 			var bitDepth = BitDepth;
 
 			var tileSize = 8 * bitDepth;
@@ -253,8 +253,8 @@ namespace Brewmaster.Pipeline
 							var mask0 = (byte)(byte0 << (7 - x));
 							var mask1 = (byte)(byte1 << (7 - x));
 
-							var byte0Index = (8 * j) + (projectType == ProjectType.Snes ? y * 2 : y);
-							var byte1Index = (8 * j) + (projectType == ProjectType.Snes ? y * 2 + 1 : y + 8);
+							var byte0Index = (8 * j) + (platform == TargetPlatform.Snes ? y * 2 : y);
+							var byte1Index = (8 * j) + (platform == TargetPlatform.Snes ? y * 2 + 1 : y + 8);
 
 							tileData[byte0Index] |= mask0;
 							tileData[byte1Index] |= mask1;

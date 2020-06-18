@@ -26,10 +26,10 @@ namespace Brewmaster.Modules
 
 		public event Action<EmulationState> EmulationStateUpdate;
 		public int SelectedSprite { get; private set; } = -1;
-		public ProjectType ProjectType { get; private set; } = ProjectType.Nes;
+		public TargetPlatform Platform { get; private set; } = TargetPlatform.Nes;
 
 		public event Action<int> SelectedSpriteChanged;
-		public event Action<ProjectType> ProjectTypeChanged;
+		public event Action<TargetPlatform> PlatformChanged;
 		public event Action<Opcode> HighlightedOpcode;
 		public event Action<Ca65Command> HighlightedCommand;
 		public event Action<AsmProjectFile> FilenameChanged;
@@ -56,12 +56,12 @@ namespace Brewmaster.Modules
 		}
 
 		private bool _projectTypeInitialized = false;
-		public void SetProjectType(ProjectType projectType)
+		public void SetCurrentPlatform(TargetPlatform platform)
 		{
-			if (projectType == ProjectType && _projectTypeInitialized) return;
-			ProjectType = projectType;
+			if (platform == Platform && _projectTypeInitialized) return;
+			Platform = platform;
 			_projectTypeInitialized = true;
-			if (ProjectTypeChanged != null) ProjectTypeChanged(projectType);
+			if (PlatformChanged != null) PlatformChanged(platform);
 		}
 
 		public void OpenFile(AsmProjectFile file, int? line = null, int? column = null, int? length = null)

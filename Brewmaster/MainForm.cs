@@ -100,10 +100,10 @@ namespace Brewmaster
 
 			nesGraphicsMenuItem.Visible =
 			nesAudioMenuItem.Visible =
-				CurrentProject == null || CurrentProject.Type == ProjectType.Nes;
+				CurrentProject == null || CurrentProject.Platform == TargetPlatform.Nes;
 			snesGraphicsMenuItem.Visible =
 			snesAudioMenuItem.Visible =
-				CurrentProject != null && CurrentProject.Type == ProjectType.Snes;
+				CurrentProject != null && CurrentProject.Platform == TargetPlatform.Snes;
 
 			saveToolStripButton.Enabled =
 				editorTabs.SelectedTab is EditorWindow;
@@ -469,20 +469,20 @@ namespace Brewmaster
 			WatchValues.GetSymbol = (exp) => CurrentProject == null || !CurrentProject.DebugSymbols.ContainsKey(exp) ? null : CurrentProject.DebugSymbols[exp];
 		    WatchValues.AddBreakpoint = AddBreakpoint;
 
-		    OpcodeParser.GetOpcodes(ProjectType.Nes);
-		    OpcodeParser.GetOpcodes(ProjectType.Snes);
+		    OpcodeParser.GetOpcodes(TargetPlatform.Nes);
+		    OpcodeParser.GetOpcodes(TargetPlatform.Snes);
 		    Ca65Parser.GetCommands();
 
 			AddRecentProjects();
 			RefreshView();
 
-		    LoadEmulator(ProjectType.Nes); // Load NES emulator so it can be used in the button configuration (TODO: use only emulator for current project to detect buttons?)
+		    LoadEmulator(TargetPlatform.Nes); // Load NES emulator so it can be used in the button configuration (TODO: use only emulator for current project to detect buttons?)
 
 			if (RequestFile != null) LoadProject(RequestFile);
 			else if (Settings.ReOpenLastProject && Settings.CurrentProject != null)
 				LoadProject(Settings.CurrentProject);
 			else
-				_moduleEvents.SetProjectType(ProjectType.Nes);
+				_moduleEvents.SetCurrentPlatform(TargetPlatform.Nes);
 		}
 
 	    private void RemoveBreakpoints(IEnumerable<Breakpoint> breakpoints)
@@ -510,20 +510,20 @@ namespace Brewmaster
 		    CurrentProject.AddBreakpoint(breakpoint);
 	    }
 
-		private void LoadEmulator(ProjectType projectType)
+		private void LoadEmulator(TargetPlatform platform)
 	    {
-		    Mesen.SwitchSystem(projectType, (e) => InitializeEmulator(e, projectType), this);
-		    if (projectType == ProjectType.Nes) GamePaletteViewer.SourcePalette = ConsolePaletteViewer.Palette = Mesen.EmulatorSettings.NesPalette;
-		    if (projectType == ProjectType.Snes) GamePaletteViewer.SourcePalette = ConsolePaletteViewer.Palette = Mesen.EmulatorSettings.SnesPalette;
+		    Mesen.SwitchSystem(platform, (e) => InitializeEmulator(e, platform), this);
+		    if (platform == TargetPlatform.Nes) GamePaletteViewer.SourcePalette = ConsolePaletteViewer.Palette = Mesen.EmulatorSettings.NesPalette;
+		    if (platform == TargetPlatform.Snes) GamePaletteViewer.SourcePalette = ConsolePaletteViewer.Palette = Mesen.EmulatorSettings.SnesPalette;
 			// TODO: Use events object and/or go through mesen control
 		    MemoryTabs.Cpu.DataChanged = Mesen.Emulator.SetCpuMemory;
 		    MemoryTabs.Ppu.DataChanged = Mesen.Emulator.SetPpuMemory;
 		    MemoryTabs.Oam.DataChanged = Mesen.Emulator.SetOamMemory;
 	    }
 
-	    private void InitializeEmulator(IEmulatorHandler emulator, ProjectType projectType)
+	    private void InitializeEmulator(IEmulatorHandler emulator, TargetPlatform platform)
 	    {
-		    emulator.InitializeEmulator(Program.EmulatorDirectory, ThreadSafeLogOutput, Mesen.GetRenderSurface(projectType));
+		    emulator.InitializeEmulator(Program.EmulatorDirectory, ThreadSafeLogOutput, Mesen.GetRenderSurface(platform));
 		    emulator.OnBreak += ThreadSafeBreakHandler;
 		    emulator.OnRun += ActivateBreakPointsForCurrentProject;
 		    emulator.OnStatusChange += ThreadSafeStatusHandler;
@@ -824,17 +824,17 @@ namespace Brewmaster
 
         private void newNesProjectMenuItem_Click(object sender, EventArgs e)
         {
-	        CreateNewProject(ProjectType.Nes);
+	        CreateNewProject(TargetPlatform.Nes);
         }
 	    private void newSnesProjectMenuItem_Click(object sender, EventArgs e)
 	    {
-		    CreateNewProject(ProjectType.Snes);
+		    CreateNewProject(TargetPlatform.Snes);
 	    }
 
 
-		private void CreateNewProject(ProjectType projectType)
+		private void CreateNewProject(TargetPlatform targetPlatform)
 		{
-		    using (var newProjectDialog = new NewProject(Settings, projectType))
+		    using (var newProjectDialog = new NewProject(Settings, targetPlatform))
 		    {
 			    newProjectDialog.StartPosition = FormStartPosition.CenterParent;
 			    newProjectDialog.ShowDialog();
@@ -1050,8 +1050,8 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 			}
 			SuspendLayout();
 
-			_moduleEvents.SetProjectType(project.Type);
-			LoadEmulator(project.Type);
+			_moduleEvents.SetCurrentPlatform(project.Platform);
+			LoadEmulator(project.Platform);
 			project.GoTo = (file, length, ch) => GoTo(file, length, ch);
 			project.BreakpointsChanged += ThreadSafeBreakpointHandler;
 
@@ -1717,18 +1717,18 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 		    if (CurrentProject == null) return;
 		    using (var keyBindings = new KeyBindingWindow())
 		    {
-			    var mappings = CurrentProject.Type == ProjectType.Snes ? Settings.SnesMappings : Settings.NesMappings;
+			    var mappings = CurrentProject.Platform == TargetPlatform.Snes ? Settings.SnesMappings : Settings.NesMappings;
 			    keyBindings.StartPosition = FormStartPosition.CenterParent;
 			    keyBindings.KeyBindingSettings.SetMappings(mappings.Select(m => m.Clone()).ToList());
 			    if (keyBindings.ShowDialog(this) != DialogResult.OK) return;
 
 			    var newMappings = keyBindings.KeyBindingSettings.Mappings.Select(m => m.Clone()).ToList();
-			    switch (CurrentProject.Type)
+			    switch (CurrentProject.Platform)
 			    {
-					case ProjectType.Nes:
+					case TargetPlatform.Nes:
 						Settings.NesMappings = newMappings;
 						break;
-					case ProjectType.Snes:
+					case TargetPlatform.Snes:
 					    Settings.SnesMappings = newMappings;
 					    break;
 			    }

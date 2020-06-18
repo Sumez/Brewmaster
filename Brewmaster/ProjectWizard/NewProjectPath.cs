@@ -12,13 +12,13 @@ namespace Brewmaster.ProjectWizard
 	{
 		private bool _folderNameChanged;
 
-		public ProjectType ProjectType
+		public TargetPlatform Platform
 		{
-			get { return _snesProjectOption.Checked ? ProjectType.Nes : ProjectType.Snes; }
+			get { return _snesProjectOption.Checked ? TargetPlatform.Nes : TargetPlatform.Snes; }
 			set
 			{
-				_nesProjectOption.Checked = value == ProjectType.Nes;
-				_snesProjectOption.Checked = value == ProjectType.Snes;
+				_nesProjectOption.Checked = value == TargetPlatform.Nes;
+				_snesProjectOption.Checked = value == TargetPlatform.Snes;
 			}
 		}
 

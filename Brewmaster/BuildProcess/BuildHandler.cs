@@ -429,7 +429,7 @@ namespace Brewmaster.BuildProcess
 				if (linkerProcess.ExitCode != 0) return false;
 			}
 
-			if (project.Type == ProjectType.Snes && config.CalculateChecksum)
+			if (project.Platform == TargetPlatform.Snes && config.CalculateChecksum)
 				using (var stream = File.Open(outputFile, FileMode.Open, FileAccess.ReadWrite))
 				{
 					Log(new LogData("Calculating SNES checksum", LogType.Headline));
@@ -462,7 +462,7 @@ namespace Brewmaster.BuildProcess
 
 			if (prgFolder != null)
 			{
-				if (project.Type == ProjectType.Nes) Log(new LogData("Merging into iNES file", LogType.Headline));
+				if (project.Platform == TargetPlatform.Nes) Log(new LogData("Merging into iNES file", LogType.Headline));
 				using (var write = File.OpenWrite(targetFile))
 				{
 					using (var read = File.OpenRead(string.Format(@"{0}\{1}", prgFolder, config.PrgFile)))

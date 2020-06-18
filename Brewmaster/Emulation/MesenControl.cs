@@ -249,7 +249,7 @@ namespace Brewmaster.Emulation
 		public Color EmulatorBackgroundColor { set { _renderer.BackColor = value; Invalidate(); } }
 
 
-		private ProjectType _currentProjectType = ProjectType.Nes;
+		private TargetPlatform _currentPlatform = TargetPlatform.Nes;
 		public IEmulatorHandler Emulator { get; private set; }
 		private int _updateRate = 1;
 		public int UpdateRate
@@ -269,18 +269,18 @@ namespace Brewmaster.Emulation
 		private SmallTrackBar _speedSlider;
 		private IEmulatorHandler _nesEmulator;
 
-		public void SwitchSystem(ProjectType projectType, Action<IEmulatorHandler> initMethod, Form mainForm)
+		public void SwitchSystem(TargetPlatform platform, Action<IEmulatorHandler> initMethod, Form mainForm)
 		{
-			switch (projectType)
+			switch (platform)
 			{
-				case ProjectType.Snes when _snesEmulator == null:
+				case TargetPlatform.Snes when _snesEmulator == null:
 					_snesEmulator = new SnesEmulatorHandler(mainForm);
 					_snesEmulator.UpdateRate = _updateRate;
 					_snesEmulator.OnStatusChange += ThreadSafeEmulationStatusChanged;
 					initMethod(_snesEmulator);
 					break;
 				
-				case ProjectType.Nes when _nesEmulator == null:
+				case TargetPlatform.Nes when _nesEmulator == null:
 					_nesEmulator = new NesEmulatorHandler(mainForm);
 					_nesEmulator.UpdateRate = _updateRate;
 					_nesEmulator.OnStatusChange += ThreadSafeEmulationStatusChanged;
@@ -288,16 +288,16 @@ namespace Brewmaster.Emulation
 					break;
 			}
 
-			_renderer.SwitchRenderSurface(projectType);
+			_renderer.SwitchRenderSurface(platform);
 
-			Emulator = projectType == ProjectType.Snes
+			Emulator = platform == TargetPlatform.Snes
 				? _snesEmulator
 				: _nesEmulator;
 
 			Emulator.UpdateSettings(EmulatorSettings);
-			currentMapping = mappings[projectType];
+			currentMapping = mappings[platform];
 			Emulator.UpdateControllerMappings(currentMapping);
-			_currentProjectType = projectType;
+			_currentPlatform = platform;
 		}
 
 		private void ThreadSafeEmulationStatusChanged(EmulatorStatus status)
@@ -353,7 +353,7 @@ namespace Brewmaster.Emulation
 			return false;
 		}
 
-		private Dictionary<ProjectType, Dictionary<ControllerButtons, int>> mappings = new Dictionary<ProjectType, Dictionary<ControllerButtons, int>>();
+		private Dictionary<TargetPlatform, Dictionary<ControllerButtons, int>> mappings = new Dictionary<TargetPlatform, Dictionary<ControllerButtons, int>>();
 		private Dictionary<ControllerButtons, int> currentMapping = new Dictionary<ControllerButtons, int>();
 
 		public void SetButtonMappings(List<KeyboardMapping> nes, List<KeyboardMapping> snes)
@@ -363,10 +363,10 @@ namespace Brewmaster.Emulation
 			foreach (var mapping in nes) nesMappings[(ControllerButtons)mapping.TargetKey] = mapping.MappedTo;
 			foreach (var mapping in snes) snesMappings[(ControllerButtons)mapping.TargetKey] = mapping.MappedTo;
 
-			mappings[ProjectType.Nes] = nesMappings;
-			mappings[ProjectType.Snes] = snesMappings;
+			mappings[TargetPlatform.Nes] = nesMappings;
+			mappings[TargetPlatform.Snes] = snesMappings;
 
-			currentMapping = mappings[_currentProjectType];
+			currentMapping = mappings[_currentPlatform];
 			if (Emulator != null) Emulator.UpdateControllerMappings(currentMapping);
 		}
 
@@ -375,9 +375,9 @@ namespace Brewmaster.Emulation
 			Emulator = null;
 		}
 
-		public Control GetRenderSurface(ProjectType projectType)
+		public Control GetRenderSurface(TargetPlatform platform)
 		{
-			return _renderer.GetRenderSurface(projectType);
+			return _renderer.GetRenderSurface(platform);
 		}
 
 		private void _saveButton_Click(object sender, EventArgs e)
