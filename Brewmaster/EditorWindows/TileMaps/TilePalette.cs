@@ -15,6 +15,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 	{
 		public MapEditorState State;
 		public event Action<int> TileClick;
+		public event Action<int> TileHover;
 		public event Action<int, int> TileDrag;
 		public bool AllowTileDrag { get; set; }
 		private Palette Palette
@@ -116,6 +117,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 			{
 				if (_hoverTile == value) return;
 				_hoverTile = value;
+				if (TileHover != null) TileHover(_hoverTile);
 				Invalidate();
 			}
 		}

@@ -9,6 +9,7 @@ using Brewmaster.EditorWindows.TileMaps.Tools;
 using Brewmaster.Layout;
 using Brewmaster.Modules;
 using Brewmaster.Modules.Ppu;
+using Brewmaster.Modules.Watch;
 using Brewmaster.ProjectModel;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -85,6 +86,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 			_tilePalette = new ChrTilePalette(State) { Width = 256, Height = 256, Top = 0, Left = Width - 256 };
 			_tilePalette.Anchor = AnchorStyles.Top | AnchorStyles.Right;
 			_tilePalette.UserSelectedTile += () => SelectTilePen(_tilePalette.SelectedTile);
+			_tilePalette.HoverTile += (index) => MainWindow.WriteStatus(State.GetTileInfo(index));
 
 			_screenPanel = new ScreenPanel(State, Map) { Dock = DockStyle.Fill };
 			Controls.Add(_screenPanel);
@@ -136,6 +138,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 			foreach (var screen in Map.Screens.SelectMany(l => l).Where(s => s != null)) InitScreen(screen);
 			State.RefreshTileUsage(Map);
+			State.AfterUndo += (step) => State.RefreshTileUsage(Map);
 
 			_screenPanel.AddFullMap();
 			//ActivateScreen(0, 0);
@@ -625,7 +628,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 			set
 			{
 				_chrData = value;
-				RefreshPreviousState();
+				RefreshPreviousChrState();
 				ClearTileCache();
 				OnChrDataChanged();
 			}
@@ -744,7 +747,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 			}
 		}
 
-		private Dictionary<TileMapScreen, Dictionary<int, int>> _screenTileUsage = new Dictionary<TileMapScreen, Dictionary<int, int>>();
+		private readonly Dictionary<TileMapScreen, Dictionary<int, int>> _screenTileUsage = new Dictionary<TileMapScreen, Dictionary<int, int>>();
 		private Dictionary<int, int> _tileUsage = new Dictionary<int, int>();
 		public void RefreshTileUsage(TileMapScreen screen, int oldTile, int newTile)
 		{
@@ -819,6 +822,13 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 			OnChrDataChanged();
 		}
+		public string GetTileInfo(int tileIndex)
+		{
+			if (tileIndex < 0) return null;
+			return string.Format("CHR tile: {0}. Usages in map: {1}",
+				WatchValue.FormatHex(tileIndex, 2), GetTileUsage(tileIndex));
+		}
+
 
 		private readonly LinkedList<UndoStep> _undoStack = new LinkedList<UndoStep>();
 		private readonly LinkedList<UndoStep> _redoStack = new LinkedList<UndoStep>();
@@ -859,7 +869,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 			if (AfterUndo != null) AfterUndo(step);
 		}
 
-		public void RefreshPreviousState()
+		public void RefreshPreviousChrState()
 		{
 			PreviousChrData = new byte[ChrData.Length];
 			Buffer.BlockCopy(ChrData, 0, PreviousChrData, 0, Buffer.ByteLength(ChrData));

@@ -9,6 +9,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 	{
 		private MapEditorState _state;
 		private TilePalette _tilePalette;
+		public event Action<int> HoverTile;
 		public event Action UserSelectedTile;
 		public int SelectedTile
 		{
@@ -34,6 +35,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 			RefreshTileCount();
 			_tilePalette.TileClick += SelectTile;
 			_tilePalette.TileDrag += state.MoveChrTile;
+			_tilePalette.TileHover += (index) => { if (HoverTile != null) HoverTile(index); };
 		}
 
 		private void SelectTile(int index)

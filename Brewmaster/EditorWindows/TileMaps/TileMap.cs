@@ -306,7 +306,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 		public void RefreshPreviousState()
 		{
-			PreviousState = new UndoState
+			PreviousState = new ScreenUndoState
 			{
 				Attributes = new int[ColorAttributes.Length],
 				Tiles = new int[Tiles.Length],
@@ -323,9 +323,9 @@ namespace Brewmaster.EditorWindows.TileMaps
 			//Debug.WriteLine("Copy state: " + timer.Elapsed.TotalMilliseconds);
 		}
 
-		public UndoState PreviousState { get; private set; }
+		public ScreenUndoState PreviousState { get; private set; }
 
-		public void RevertToState(UndoState state)
+		public void RevertToState(ScreenUndoState state)
 		{
 			if (ColorAttributes.Length != state.Attributes.Length || Tiles.Length != state.Tiles.Length ||
 			    MetaValues.Length != state.MetaValues.Length) return;

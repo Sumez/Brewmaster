@@ -5,7 +5,8 @@ namespace Brewmaster.EditorWindows.TileMaps
 	public class UndoStep
 	{
 		public byte[] Chr;
-		public Dictionary<TileMapScreen, UndoState> States = new Dictionary<TileMapScreen, UndoState>();
+		public Dictionary<TileMapScreen, ScreenUndoState> States = new Dictionary<TileMapScreen, ScreenUndoState>();
+
 		public void AddScreen(TileMapScreen screen)
 		{
 			States.Add(screen, screen.PreviousState);
@@ -19,8 +20,6 @@ namespace Brewmaster.EditorWindows.TileMaps
 			{
 				redoStep.States.Add(screenState.Key, screenState.Key.PreviousState);
 				screenState.Key.RevertToState(screenState.Value);
-
-				// TODO: Restore tile usages!!!
 			}
 
 			if (Chr != null)
@@ -35,11 +34,11 @@ namespace Brewmaster.EditorWindows.TileMaps
 		public void AddChr(MapEditorState state)
 		{
 			Chr = state.PreviousChrData;
-			state.RefreshPreviousState();
+			state.RefreshPreviousChrState();
 		}
 	}
 
-	public struct UndoState
+	public struct ScreenUndoState
 	{
 		public int[] Tiles;
 		public int[] Attributes;

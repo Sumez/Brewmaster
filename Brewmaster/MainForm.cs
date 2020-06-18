@@ -591,7 +591,7 @@ namespace Brewmaster
 		    _currentStatus = status;
 		    WriteStatus();
 	    }
-	    private void WriteStatus(string message = null)
+	    public void WriteStatus(string message = null)
 	    {
 		    BeginInvoke(new Action(() =>
 		    {
