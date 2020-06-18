@@ -36,7 +36,7 @@ namespace Brewmaster.Emulation
 		{
 			InitializeComponent();
 
-			_renderSurfaces = new Dictionary<ProjectType, UserControl>();
+			_renderSurfaces = new Dictionary<TargetPlatform, UserControl>();
 
 			SizeChanged += (obj, args) =>
 			{
@@ -67,7 +67,7 @@ namespace Brewmaster.Emulation
 		public bool IntegerScaling { get; set; }
 
 		private UserControl _currentRenderSurface;
-		private readonly Dictionary<ProjectType, UserControl> _renderSurfaces;
+		private readonly Dictionary<TargetPlatform, UserControl> _renderSurfaces;
 
 		public void ResizeSurface()
 		{
@@ -83,23 +83,23 @@ namespace Brewmaster.Emulation
 
 		}
 
-		public Control GetRenderSurface(ProjectType projectType)
+		public Control GetRenderSurface(TargetPlatform platform)
 		{
-			if (!_renderSurfaces.ContainsKey(projectType))
+			if (!_renderSurfaces.ContainsKey(platform))
 			{
 				var renderSurface = new UserControl();
 				renderSurface.Dock = DockStyle.None;
 				renderSurface.Location = new Point(0, 0);
 				renderSurface.TabIndex = 1;
-				_renderSurfaces.Add(projectType, renderSurface);
+				_renderSurfaces.Add(platform, renderSurface);
 			}
-			return _renderSurfaces[projectType];
+			return _renderSurfaces[platform];
 		}
 
-		public void SwitchRenderSurface(ProjectType projectType)
+		public void SwitchRenderSurface(TargetPlatform platform)
 		{
 			if (_currentRenderSurface != null) Controls.Remove(_currentRenderSurface);
-			_currentRenderSurface = _renderSurfaces[projectType];
+			_currentRenderSurface = _renderSurfaces[platform];
 			Controls.Add(_currentRenderSurface);
 			ResizeSurface();
 		}

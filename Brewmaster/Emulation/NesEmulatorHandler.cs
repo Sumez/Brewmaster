@@ -235,7 +235,7 @@ namespace Brewmaster.Emulation
 			_logHandler(new LogData(status, LogType.Normal));
 		}
 
-		private readonly EmulationState _debugState = new EmulationState(ProjectType.Nes);
+		private readonly EmulationState _debugState = new EmulationState(TargetPlatform.Nes);
 		private uint[] _dummyPaletteData;
 		protected override void EmitDebugData()
 		{

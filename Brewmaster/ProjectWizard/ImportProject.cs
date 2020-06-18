@@ -69,7 +69,7 @@ namespace Brewmaster.ProjectWizard
 					{
 						var defaultConfigFile = Project.Files.FirstOrDefault(f => f.Mode == CompileMode.LinkerConfig);
 						if (defaultConfigFile != null) configuration.LinkerConfigFile = defaultConfigFile.GetRelativePath();
-						configuration.Filename = string.Format("bin/{0}.{1}", _importProjectPath.BaseFilename, Project.Type == ProjectType.Snes ? "sfc" : "nes");
+						configuration.Filename = string.Format("bin/{0}.{1}", _importProjectPath.BaseFilename, Project.Platform == TargetPlatform.Snes ? "sfc" : "nes");
 					}
 					Project.BuildConfigurations.Add(configuration);
 					_buildConfiguration.Project = Project;

@@ -64,7 +64,7 @@ namespace Brewmaster.EditorWindows.Code
 			ActiveTextAreaControl.TextArea.InsertLeftMargin(1, 
 				new CpuAddressMargin(ActiveTextAreaControl.TextArea,
 					GetDebugLine,
-					file.Project.Type == ProjectType.Snes ? 6 : 4));
+					file.Project.Platform == TargetPlatform.Snes ? 6 : 4));
 
 			Menu = new CodeMenu(events);
 			Menu.Enabled = true;
@@ -115,7 +115,7 @@ namespace Brewmaster.EditorWindows.Code
 			Menu.ToggleBreakpoint = ToggleBreakpointAtCaret;
 
 
-			Document.HighlightingStrategy = new Ca65Highlighting(File.Project.Type);
+			Document.HighlightingStrategy = new Ca65Highlighting(File.Project.Platform);
 			var testMarker = new TextMarker(0, 0, TextMarkerType.SolidBlock, Document.HighlightingStrategy.GetColorFor("Highlighted word").BackgroundColor);
 			Document.MarkerStrategy.AddMarker(testMarker);
 			/*ActiveTextAreaControl.TextArea.MouseMove += (sender, e) =>
@@ -192,7 +192,7 @@ namespace Brewmaster.EditorWindows.Code
 						if (command != null) e.ShowToolTip(command.ToString());
 						break;
 					case AsmWord.AsmWordType.Opcode:
-						var opcode = OpcodeParser.GetOpcodeFromWord(word.Word, File.Project.Type);
+						var opcode = OpcodeParser.GetOpcodeFromWord(word.Word, File.Project.Platform);
 						if (opcode != null) e.ShowToolTip(opcode.ToString());
 						break;
 					default:
@@ -290,7 +290,7 @@ namespace Brewmaster.EditorWindows.Code
 			var word = lineSegment.Words.OfType<AsmWord>().FirstOrDefault(w => w.WordType == AsmWord.AsmWordType.Opcode);
 
 			if (word == null) return;
-			var opcode = OpcodeParser.GetOpcodeFromWord(word.Word, File.Project.Type);
+			var opcode = OpcodeParser.GetOpcodeFromWord(word.Word, File.Project.Platform);
 			if (opcode != null) ModuleEvents.HighlightOpcode(opcode);
 		}
 

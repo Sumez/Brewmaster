@@ -8,18 +8,18 @@ namespace Brewmaster.ProjectWizard
 		private NewProjectPath _newProjectPath;
 		private ProjectTemplates _projectTemplates;
 		public AsmProject Project { get; set; }
-		public ProjectType ProjectType
+		public TargetPlatform Platform
 		{
-			get { return _newProjectPath.ProjectType; }
-			private set { _newProjectPath.ProjectType = value; }
+			get { return _newProjectPath.Platform; }
+			private set { _newProjectPath.Platform = value; }
 		}
 
-		public NewProject(Settings.Settings settings, ProjectType projectType) : base(settings)
+		public NewProject(Settings.Settings settings, TargetPlatform projectType) : base(settings)
 		{
 			_newProjectPath = new NewProjectPath();
 			_projectTemplates = new ProjectTemplates();
 
-			ProjectType = projectType;
+			Platform = projectType;
 			_newProjectPath.Directory =
 				string.IsNullOrWhiteSpace(Settings.DefaultProjectDirectory)
 					? Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)

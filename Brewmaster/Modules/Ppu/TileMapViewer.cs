@@ -15,7 +15,7 @@ namespace Brewmaster.Modules.Ppu
 			InitializeComponent();
 
 			events.EmulationStateUpdate += state => UpdateNametableData(state.TileMaps);
-			events.ProjectTypeChanged += type => this.UpdateLabel(type == ProjectType.Nes ? "Nametables" : "Tilemaps");
+			events.PlatformChanged += type => this.UpdateLabel(type == TargetPlatform.Nes ? "Nametables" : "Tilemaps");
 		}
 
 		protected override void OnLayout(LayoutEventArgs e)

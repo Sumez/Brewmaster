@@ -63,7 +63,7 @@ namespace Brewmaster.Modules.SpriteList
 		{
 			_spriteInfo = state.Sprites;
 			_listView.BeginUpdate();
-			_listView.VirtualListSize = state.Type == ProjectType.Snes ? 128 : 64;
+			_listView.VirtualListSize = state.Type == TargetPlatform.Snes ? 128 : 64;
 			_listView.EndUpdate();
 		}
 

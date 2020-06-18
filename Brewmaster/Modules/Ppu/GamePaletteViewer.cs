@@ -10,7 +10,7 @@ namespace Brewmaster.Modules.Ppu
 	public class GamePaletteViewer : PaletteViewer
 	{
 		private List<int> _paletteIndexes;
-		private ProjectType _type;
+		private TargetPlatform _type;
 		private int _bytesPerColor = 1;
 		private ToolTip _toolTip;
 
@@ -28,9 +28,9 @@ namespace Brewmaster.Modules.Ppu
 				if (_type != state.Type)
 				{
 					_type = state.Type;
-					_bytesPerColor = _type == ProjectType.Snes ? 2 : 1;
-					CellWidth = CellHeight = _type == ProjectType.Snes ? 20 : 40;
-					Columns = _type == ProjectType.Nes ? 4 : 16;
+					_bytesPerColor = _type == TargetPlatform.Snes ? 2 : 1;
+					CellWidth = CellHeight = _type == TargetPlatform.Snes ? 20 : 40;
+					Columns = _type == TargetPlatform.Nes ? 4 : 16;
 				}
 				var paletteSource = state.Memory.CgRam;
 				Palette.Colors = new List<Color>(paletteSource.Length / _bytesPerColor);
@@ -74,7 +74,7 @@ namespace Brewmaster.Modules.Ppu
 				return;
 			}
 			var indexHex = Convert.ToString(HoverIndex, 16).PadLeft(2, '0').ToUpper();
-			var colorHex = Convert.ToString(_paletteIndexes[HoverIndex], 16).PadLeft(_type == ProjectType.Snes ? 4 : 2, '0').ToUpper();
+			var colorHex = Convert.ToString(_paletteIndexes[HoverIndex], 16).PadLeft(_type == TargetPlatform.Snes ? 4 : 2, '0').ToUpper();
 			_toolTip.Active = true;
 			_toolTip.Show(string.Format("${0}: ${1}", indexHex, colorHex), this, e.Location.X + 20, e.Location.Y + 2);
 		}

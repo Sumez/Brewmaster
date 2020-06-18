@@ -54,20 +54,20 @@ namespace Brewmaster.Modules.OpcodeHelper
 	}
 	public class OpcodeParser
 	{
-		private static Dictionary<ProjectType, Dictionary<string, Opcode>> _list = new Dictionary<ProjectType, Dictionary<string, Opcode>>();
+		private static Dictionary<TargetPlatform, Dictionary<string, Opcode>> _list = new Dictionary<TargetPlatform, Dictionary<string, Opcode>>();
 
 		private static Regex _cleanText = new Regex(@"\s+");
 		private static Regex _filterOpcode = new Regex(@"^[A-Z]{3}");
-		public static Dictionary<string, Opcode> GetOpcodes(ProjectType type)
+		public static Dictionary<string, Opcode> GetOpcodes(TargetPlatform type)
 		{
 			if (_list.ContainsKey(type)) return _list[type];
 
 			switch (type)
 			{
-				case ProjectType.Nes:
+				case TargetPlatform.Nes:
 					_list[type] = Parse6502Reference();
 					break;
-				case ProjectType.Snes:
+				case TargetPlatform.Snes:
 					_list[type] = Parse65826Reference();
 					break;
 				default:
@@ -227,7 +227,7 @@ namespace Brewmaster.Modules.OpcodeHelper
 
 		}
 
-		public static Opcode GetOpcodeFromWord(string word, ProjectType type)
+		public static Opcode GetOpcodeFromWord(string word, TargetPlatform type)
 		{
 			var allOpcodes = OpcodeParser.GetOpcodes(type);
 			if (allOpcodes.ContainsKey(word.ToUpper())) return allOpcodes[word.ToUpper()];

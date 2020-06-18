@@ -15,11 +15,11 @@ namespace Brewmaster.StatusView
 		{
 			InitializeComponent();
 			InitializeFlagEvents();
-			SetMode(ProjectType.Nes);
+			SetMode(TargetPlatform.Nes);
 
 			_moduleEvents = moduleEvents;
 			_moduleEvents.EmulationStateUpdate += UpdateStates;
-			_moduleEvents.ProjectTypeChanged += SetMode;
+			_moduleEvents.PlatformChanged += SetMode;
 		}
 
 		private void InitializeFlagEvents()
@@ -76,13 +76,13 @@ namespace Brewmaster.StatusView
 			return Convert.ToString(number, 16).ToUpper().PadLeft(bytes*2, '0');
 		}
 
-		public void SetMode(ProjectType type)
+		public void SetMode(TargetPlatform type)
 		{
 			flagPanel.SuspendLayout();
 			registerPanel.SuspendLayout();
 			switch (type)
 			{
-				case ProjectType.Nes:
+				case TargetPlatform.Nes:
 					RegisterA.RegisterSize =
 					RegisterX.RegisterSize =
 					RegisterY.RegisterSize = RegisterSize.EightBit;
@@ -91,7 +91,7 @@ namespace Brewmaster.StatusView
 
 					snesFlags.Visible = panelDB.Visible = panelDP.Visible = false;
 					break;
-				case ProjectType.Snes:
+				case TargetPlatform.Snes:
 					RegisterA.RegisterSize =
 					RegisterX.RegisterSize =
 					RegisterY.RegisterSize = RegisterSize.SixteenBit;
@@ -112,8 +112,8 @@ namespace Brewmaster.StatusView
 			if (state == null) return;
 			_loading = true;
 			_lastState = state;
-			if (state.Type == ProjectType.Nes) UpdateNesState(state.NesState);
-			if (state.Type == ProjectType.Snes) UpdateSnesState(state.SnesState);
+			if (state.Type == TargetPlatform.Nes) UpdateNesState(state.NesState);
+			if (state.Type == TargetPlatform.Snes) UpdateSnesState(state.SnesState);
 			_cpuMemory = state.Memory.CpuData;
 			RefreshStack();
 			_loading = false;
@@ -255,22 +255,22 @@ namespace Brewmaster.StatusView
 		private void UpdateStateValue(RegisterValue textBox, ref byte nesRegister, ref byte snesRegister)
 		{
 			if (_loading || _lastState == null) return;
-			if (_lastState.Type == ProjectType.Nes) nesRegister = (byte)textBox.Value;
-			if (_lastState.Type == ProjectType.Snes) snesRegister = (byte)textBox.Value;
+			if (_lastState.Type == TargetPlatform.Nes) nesRegister = (byte)textBox.Value;
+			if (_lastState.Type == TargetPlatform.Snes) snesRegister = (byte)textBox.Value;
 			PushStateChanges();
 		}
 		private void UpdateStateValue(RegisterValue textBox, ref byte nesRegister, ref ushort snesRegister)
 		{
 			if (_loading || _lastState == null) return;
-			if (_lastState.Type == ProjectType.Nes) nesRegister = (byte)textBox.Value;
-			if (_lastState.Type == ProjectType.Snes) snesRegister = (ushort)textBox.Value;
+			if (_lastState.Type == TargetPlatform.Nes) nesRegister = (byte)textBox.Value;
+			if (_lastState.Type == TargetPlatform.Snes) snesRegister = (ushort)textBox.Value;
 			PushStateChanges();
 		}
 		private void UpdateStateValue(RegisterValue textBox, ref ushort nesRegister, ref ushort snesRegister)
 		{
 			if (_loading || _lastState == null) return;
-			if (_lastState.Type == ProjectType.Nes) nesRegister = (ushort)textBox.Value;
-			if (_lastState.Type == ProjectType.Snes) snesRegister = (ushort)textBox.Value;
+			if (_lastState.Type == TargetPlatform.Nes) nesRegister = (ushort)textBox.Value;
+			if (_lastState.Type == TargetPlatform.Snes) snesRegister = (ushort)textBox.Value;
 			PushStateChanges();
 		}
 		private void EditA_ValueChanged(object sender, EventArgs e)
@@ -313,8 +313,8 @@ namespace Brewmaster.StatusView
 		private void EditP_ValueChanged(object sender, EventArgs e)
 		{
 			if (_loading || _lastState == null) return;
-			if (_lastState.Type == ProjectType.Nes) _lastState.NesState.CPU.PS = (byte)RegisterP.Value;
-			if (_lastState.Type == ProjectType.Snes) _lastState.SnesState.Cpu.PS = (ProcFlags)RegisterP.Value;
+			if (_lastState.Type == TargetPlatform.Nes) _lastState.NesState.CPU.PS = (byte)RegisterP.Value;
+			if (_lastState.Type == TargetPlatform.Snes) _lastState.SnesState.Cpu.PS = (ProcFlags)RegisterP.Value;
 
 			UpdateStates(_lastState);
 			PushStateChanges();
@@ -322,7 +322,7 @@ namespace Brewmaster.StatusView
 		private void FlagChanged(object sender, EventArgs e)
 		{
 			if (_loading || _lastState == null) return;
-			if (_lastState.Type == ProjectType.Nes)
+			if (_lastState.Type == TargetPlatform.Nes)
 			{
 				_lastState.NesState.CPU.PS = (byte) (
 					(_lastState.NesState.CPU.PS & 0b00110000) // ignored flags
@@ -334,7 +334,7 @@ namespace Brewmaster.StatusView
 					| (CheckN.Checked ? 0b10000000 : 0)
 				);
 			}
-			if (_lastState.Type == ProjectType.Snes)
+			if (_lastState.Type == TargetPlatform.Snes)
 			{
 				_lastState.SnesState.Cpu.PS = (
 					(CheckM.Checked ? ProcFlags.MemoryMode8 : 0)

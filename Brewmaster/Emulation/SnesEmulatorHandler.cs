@@ -247,7 +247,7 @@ namespace Brewmaster.Emulation
 			_logHandler(new LogData(status, LogType.Normal));
 		}
 
-		private readonly EmulationState _state = new EmulationState(ProjectType.Snes)
+		private readonly EmulationState _state = new EmulationState(TargetPlatform.Snes)
 		{
 			TileMaps = new TileMapData { NumberOfMaps = 1, DataWidth = 1024 * 4, NumberOfPages = 4 },
 			CharacterData = new CharacterData { PixelData = new [] { new byte[0x400000] } }

@@ -118,11 +118,11 @@ namespace Brewmaster.EditorWindows.Code
 		const string StringMatch = @"^('|"").*?\1";
 		const string NumberMatch = @"^(\$[0-9a-fA-F]+|[0-9]+|%[01]+|[0-9][0-9a-fA-F]*h)(?=\b)";
 		const string AddressMatch = @"^(\(?)(#?(\$|%)?[0-9A-F]+|[@a-zA-Z_][0-9a-zA-Z_]*)(\s*\)?\s*,\s*(x|y|X|Y))\)?";
-		public Ca65Highlighting(ProjectType projectType)
+		public Ca65Highlighting(TargetPlatform platform)
 		{
 			Extensions = new[] {"s", "h"};
 			opcodes = new HashSet<string>(nesOpcodes);
-			if (projectType == ProjectType.Snes)opcodes.UnionWith(snesOpcodes);
+			if (platform == TargetPlatform.Snes)opcodes.UnionWith(snesOpcodes);
 			Properties = new Dictionary<string, string>();
 			Properties.Add("LineComment", ";");
 			Rule = new HighlightRuleSet();

@@ -264,7 +264,7 @@ namespace Brewmaster.ProjectExplorer
 			projectNode.Name = "project";
 			projectNode.Edited += (e) => _project.Name = e.Label; // TODO: Update window title
 			projectNode.Text = _project.Name;
-			var projectImage = _project.Type == ProjectType.Snes ? 1 : 0;
+			var projectImage = _project.Platform == TargetPlatform.Snes ? 1 : 0;
 			projectNode.ImageIndex = projectImage;
 			projectNode.SelectedImageIndex = projectImage;
 
