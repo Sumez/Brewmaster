@@ -24,10 +24,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 			InitializeComponent();
 			_tilePalette.AllowTileDrag = true;
 
-			state.ChrDataChanged += () =>
-			{
-				RefreshTileCount();
-			};
+			state.ChrDataChanged += RefreshTileCount;
 			state.PaletteChanged += _tilePalette.RefreshImage;
 
 			_tilePalette.Tiles = new List<MetaTile>();
@@ -36,6 +33,16 @@ namespace Brewmaster.EditorWindows.TileMaps
 			_tilePalette.TileClick += SelectTile;
 			_tilePalette.TileDrag += state.MoveChrTile;
 			_tilePalette.TileHover += (index) => { if (HoverTile != null) HoverTile(index); };
+			_tilePalette.RemoveTile = (index) =>
+			{
+				var usages = state.GetTileUsage(index);
+				if (usages > 0)
+				{
+					MessageBox.Show(string.Format("Cannot delete tile used in {0} locations", usages), "Delete CHR tile", MessageBoxButtons.OK);
+					return;
+				}
+				state.RemoveChrTile(index);
+			};
 		}
 
 		private void SelectTile(int index)

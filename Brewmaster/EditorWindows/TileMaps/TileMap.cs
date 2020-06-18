@@ -80,7 +80,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 		public event Action EditEnd;
 		public event Action ImageUpdated;
 
-		public delegate void TileChange(int x, int y, int oldTile, int newTile);
+		public delegate void TileChange(int x, int y, int oldTile, int newTile, bool changedGraphics);
 
 		private readonly TileMap _map;
 
@@ -112,7 +112,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 			if (index >= Tiles.Length || tileIndex < 0) return;
 			var oldTile = Tiles[index];
 			Tiles[index] = tileIndex;
-			if (TileChanged != null) TileChanged(x, y, oldTile, tileIndex);
+			if (TileChanged != null) TileChanged(x, y, oldTile, tileIndex, true);
 		}
 
 		public bool ReplaceTiles(Dictionary<int, int> changes)
@@ -125,7 +125,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 				changed = true;
 				Tiles[i] = changes[oldTile];
-				if (TileChanged != null) TileChanged(i % _map.ScreenSize.Width, i / _map.ScreenSize.Width, oldTile, Tiles[i]);
+				if (TileChanged != null) TileChanged(i % _map.ScreenSize.Width, i / _map.ScreenSize.Width, oldTile, Tiles[i], false);
 			}
 			return changed;
 		}
@@ -147,7 +147,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 			for (var i = 0; i < _map.AttributeSize.Width; i++)
 			for (var j = 0; j < _map.AttributeSize.Height; j++)
 			{
-				TileChanged(x * _map.AttributeSize.Width + i, y * _map.AttributeSize.Height + j, -1, -1);
+				TileChanged(x * _map.AttributeSize.Width + i, y * _map.AttributeSize.Height + j, -1, -1, true);
 			}
 		}
 		public void SetMetaValue(int x, int y, int value)

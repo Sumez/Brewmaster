@@ -8,6 +8,7 @@ using System.Windows.Forms;
 using Brewmaster.EditorWindows.TileMaps.Tools;
 using Brewmaster.Modules.Ppu;
 using Brewmaster.ProjectExplorer;
+using Brewmaster.Settings;
 
 namespace Brewmaster.EditorWindows.TileMaps
 {
@@ -17,6 +18,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 		public event Action<int> TileClick;
 		public event Action<int> TileHover;
 		public event Action<int, int> TileDrag;
+		public Action<int> RemoveTile;
 		public bool AllowTileDrag { get; set; }
 		private Palette Palette
 		{
@@ -58,6 +60,14 @@ namespace Brewmaster.EditorWindows.TileMaps
 			
 			if (_grid != null) _grid.Dispose();
 			_grid = grid;
+		}
+
+		
+		protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+		{
+			if (keyData != Program.Keys[Feature.RemoveFromList] || RemoveTile == null) return base.ProcessCmdKey(ref msg, keyData);
+			if (SelectedTile >= 0) RemoveTile(SelectedTile);
+			return true;
 		}
 
 		private FastBitmap _image = new FastBitmap(128, 128);
@@ -158,6 +168,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 		protected override void OnMouseDown(MouseEventArgs e)
 		{
+			Focus();
 			if (HoverTile >= 0 && TileClick != null) TileClick(HoverTile);
 			if (HoverTile >= 0 && AllowTileDrag && e.Button == MouseButtons.Left)
 			{
@@ -213,6 +224,8 @@ namespace Brewmaster.EditorWindows.TileMaps
 		public TilePalette()
 		{
 			DoubleBuffered = true;
+			SetStyle(ControlStyles.Selectable, true);
+
 			ColHeight = _colHeight;
 			var gridColor = Color.FromArgb(128, 255, 255, 255);
 			_solid = new Pen(gridColor, 1);

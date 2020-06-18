@@ -40,6 +40,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 			DoubleBuffered = true;
 			ContextMenu = new ContextMenu();
+			SetStyle(ControlStyles.Selectable, true);
 
 			var gridColor = Color.FromArgb(128, 255, 255, 255);
 			_dotted = new Pen(gridColor, 1);
@@ -81,7 +82,10 @@ namespace Brewmaster.EditorWindows.TileMaps
 			_screens.AddRange(screens);
 			foreach (var screen in _screens.Where(s => s != null))
 			{
-				screen.TileChanged += (x, y, oldTile, newTile) => RefreshTile(screen, x, y, oldTile, newTile);
+				screen.TileChanged += (x, y, oldTile, newTile, changedGraphics) =>
+				{
+					if (changedGraphics) RefreshTile(screen, x, y, oldTile, newTile);
+				};
 			}
 		}
 
@@ -128,6 +132,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 		protected override void OnMouseDown(MouseEventArgs e)
 		{
 			base.OnMouseDown(e);
+			Focus();
 			if (_cursorX < 0 || _cursorY < 0 || _cursorScreen < 0) return;
 
 			switch (e.Button)
@@ -371,7 +376,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 		public int ToolHeight { get { return (Tool.Pixel ? 1 : _map.BaseTileSize.Height) * Tool.Size.Height * Zoom; } }
 		public MapGrid Grid { get; set; }
 
-		public void RefreshTile(TileMapScreen screen, int x, int y, int oldtile, int newTile)
+		public void RefreshTile(TileMapScreen screen, int x, int y, int oldTile, int newTile)
 		{
 			screen.RefreshTile(x, y, _state, true, true);
 			Invalidate(new Rectangle(x * _map.BaseTileSize.Width * Zoom + Offset.X, y * _map.BaseTileSize.Width * Zoom + Offset.Y, _map.BaseTileSize.Width * Zoom, _map.BaseTileSize.Height * Zoom));

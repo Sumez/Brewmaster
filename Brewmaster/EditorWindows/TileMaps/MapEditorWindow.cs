@@ -211,7 +211,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 				if (Parent == null) return;
 				BeginInvoke(new Action(() => _mapOverview.InvalidateScreenImage(screen)));
 			};
-			screen.TileChanged += (x, y, oldTile, newTile) => { State.RefreshTileUsage(screen, oldTile, newTile); };
+			screen.TileChanged += (x, y, oldTile, newTile, changedGraphics) => { State.RefreshTileUsage(screen, oldTile, newTile); };
 			screen.RefreshAllTiles(State);
 		}
 
@@ -814,14 +814,42 @@ namespace Brewmaster.EditorWindows.TileMaps
 			for (var i = fromTile; i < toTile; i++) changedTiles.Add(i + 1, i);
 			for (var i = fromTile; i > toTile; i--) changedTiles.Add(i - 1, i);
 
+			AdjustForMovedTiles(changedTiles);
+		}
+		public void RemoveChrTile(int tile)
+		{
+			if (GetTileUsage(tile) > 0) return;
+
+			var tileSize = TileImage.GetTileDataLength();
+			var tileCount = _chrData.Length / tileSize;
+			if (tileCount == 1) return;
+
+			var chrData = new byte[_chrData.Length - tileSize];
+			var moveTiles = tileCount - tile - 1;
+
+			Buffer.BlockCopy(_chrData, 0, chrData, 0, tile * tileSize);
+			if (moveTiles > 0) Buffer.BlockCopy(_chrData, (tile + 1) * tileSize, chrData, tile * tileSize, moveTiles * tileSize);
+			_chrData = chrData; // Don't use ChrData setter, as this method manually controls when events are fired and previous chr buffer is updated
+
+			var changedTiles = new Dictionary<int, int>();
+			for (var i = tile + 1; i < tileCount; i++) changedTiles.Add(i, i - 1);
+
+			lock (_cachedTiles) _cachedTiles.Remove(tile);
+			AdjustForMovedTiles(changedTiles);
+		}
+
+		private void AdjustForMovedTiles(Dictionary<int, int> changedTiles)
+		{
 			var undoStep = new UndoStep();
 			undoStep.AddChr(this);
-			foreach (var tile in changedTiles.Keys) _cachedTiles.Remove(tile);
+			lock (_cachedTiles)
+				foreach (var changedTile in changedTiles.Keys) _cachedTiles.Remove(changedTile);
 			if (TilesMoved != null) TilesMoved(changedTiles, undoStep);
 			AddUndoStep(undoStep);
 
 			OnChrDataChanged();
 		}
+
 		public string GetTileInfo(int tileIndex)
 		{
 			if (tileIndex < 0) return null;
