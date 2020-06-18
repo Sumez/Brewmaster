@@ -1837,6 +1837,12 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 			CreateNewFile(CurrentProject.ProjectFile.DirectoryName, FileTemplate.AssemblyInclude, ".inc", CompileMode.Ignore);
 		}
 
+		private void tileMapMenuItem_Click(object sender, EventArgs e)
+		{
+			if (CurrentProject == null) return;
+			CreateNewFile(CurrentProject.ProjectFile.DirectoryName, FileTemplate.TileMap, ".bwmap", CompileMode.ContentPipeline);
+		}
+
 		private void importProjectMenuItem_Click(object sender, EventArgs e)
 		{
 			ImportExistingProject();
