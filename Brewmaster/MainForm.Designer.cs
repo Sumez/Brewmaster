@@ -53,6 +53,7 @@ namespace Brewmaster
 			this.File_NewMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.nesProjectMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.snesProjectMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.assetOnlyProjectMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
 			this.sourceFileMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.includeFileMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -161,7 +162,12 @@ namespace Brewmaster
 			this.aboutMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.toolstrippanel = new System.Windows.Forms.FlowLayoutPanel();
 			this.MainToolStrip = new System.Windows.Forms.ToolStrip();
-			this.newProjectToolStripButton = new System.Windows.Forms.ToolStripButton();
+			this.toolStripDropDownButton1 = new System.Windows.Forms.ToolStripDropDownButton();
+			this.nesProjectToolBarMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.snesProjectToolBarMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.assetOnlyProjectToolBarMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.toolStripSeparator28 = new System.Windows.Forms.ToolStripSeparator();
+			this.newTileMapToolBarMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.openProjectToolStripButton = new System.Windows.Forms.ToolStripButton();
 			this.saveToolStripButton = new System.Windows.Forms.ToolStripButton();
 			this.saveAllToolStripButton = new System.Windows.Forms.ToolStripButton();
@@ -220,13 +226,6 @@ namespace Brewmaster
 			this.CreateNewFileDialog = new System.Windows.Forms.SaveFileDialog();
 			this.MainEastContainer2 = new Brewmaster.Layout.MultiSplitContainer();
 			this._menuHelper = new Brewmaster.Modules.MenuHelper(this.components);
-			this.assetOnlyProjectMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.toolStripDropDownButton1 = new System.Windows.Forms.ToolStripDropDownButton();
-			this.nesProjectToolBarMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.snesProjectToolBarMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.assetOnlyProjectToolBarMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.toolStripSeparator28 = new System.Windows.Forms.ToolStripSeparator();
-			this.newTileMapToolBarMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			availableIdePanels = new System.Windows.Forms.Panel();
 			toolStripSeparator14 = new System.Windows.Forms.ToolStripSeparator();
 			toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
@@ -406,6 +405,13 @@ namespace Brewmaster
 			this.snesProjectMenuItem.Text = "SNES Project...";
 			this.snesProjectMenuItem.Click += new System.EventHandler(this.newSnesProjectMenuItem_Click);
 			// 
+			// assetOnlyProjectMenuItem
+			// 
+			this.assetOnlyProjectMenuItem.Name = "assetOnlyProjectMenuItem";
+			this.assetOnlyProjectMenuItem.Size = new System.Drawing.Size(187, 22);
+			this.assetOnlyProjectMenuItem.Text = "Asset-Only Project...";
+			this.assetOnlyProjectMenuItem.Click += new System.EventHandler(this.assetOnlyProjectMenuItem_Click);
+			// 
 			// toolStripSeparator1
 			// 
 			this.toolStripSeparator1.Name = "toolStripSeparator1";
@@ -435,7 +441,6 @@ namespace Brewmaster
 			this.tileMapMenuItem.Name = "tileMapMenuItem";
 			this.tileMapMenuItem.Size = new System.Drawing.Size(187, 22);
 			this.tileMapMenuItem.Text = "Tile Map...";
-			this.tileMapMenuItem.Visible = false;
 			this.tileMapMenuItem.Click += new System.EventHandler(this.tileMapMenuItem_Click);
 			// 
 			// graphicsDataMenuItem
@@ -1304,7 +1309,6 @@ namespace Brewmaster
 			this.MainToolStrip.CanOverflow = false;
 			this.MainToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripDropDownButton1,
-            this.newProjectToolStripButton,
             this.openProjectToolStripButton,
             this.saveToolStripButton,
             this.saveAllToolStripButton,
@@ -1318,19 +1322,55 @@ namespace Brewmaster
 			this.MainToolStrip.Location = new System.Drawing.Point(0, 0);
 			this.MainToolStrip.Name = "MainToolStrip";
 			this.MainToolStrip.RenderMode = System.Windows.Forms.ToolStripRenderMode.Professional;
-			this.MainToolStrip.Size = new System.Drawing.Size(260, 25);
+			this.MainToolStrip.Size = new System.Drawing.Size(268, 25);
 			this.MainToolStrip.TabIndex = 0;
 			// 
-			// newProjectToolStripButton
+			// toolStripDropDownButton1
 			// 
-			this.newProjectToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.newProjectToolStripButton.Image = global::Brewmaster.Properties.Resources.newfile;
-			this.newProjectToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.newProjectToolStripButton.Name = "newProjectToolStripButton";
-			this.newProjectToolStripButton.Size = new System.Drawing.Size(23, 22);
-			this.newProjectToolStripButton.Text = "New Project";
-			this.newProjectToolStripButton.ToolTipText = "New Project";
-			this.newProjectToolStripButton.Click += new System.EventHandler(this.newProjectToolStripButton_Click);
+			this.toolStripDropDownButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.toolStripDropDownButton1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.nesProjectToolBarMenuItem,
+            this.snesProjectToolBarMenuItem,
+            this.assetOnlyProjectToolBarMenuItem,
+            this.toolStripSeparator28,
+            this.newTileMapToolBarMenuItem});
+			this.toolStripDropDownButton1.Image = global::Brewmaster.Properties.Resources.newfile;
+			this.toolStripDropDownButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.toolStripDropDownButton1.Name = "toolStripDropDownButton1";
+			this.toolStripDropDownButton1.Size = new System.Drawing.Size(29, 22);
+			this.toolStripDropDownButton1.Text = "newItemButton";
+			// 
+			// nesProjectToolBarMenuItem
+			// 
+			this.nesProjectToolBarMenuItem.Enabled = false;
+			this.nesProjectToolBarMenuItem.Name = "nesProjectToolBarMenuItem";
+			this.nesProjectToolBarMenuItem.Size = new System.Drawing.Size(181, 22);
+			this.nesProjectToolBarMenuItem.Text = "NES Project...";
+			// 
+			// snesProjectToolBarMenuItem
+			// 
+			this.snesProjectToolBarMenuItem.Enabled = false;
+			this.snesProjectToolBarMenuItem.Name = "snesProjectToolBarMenuItem";
+			this.snesProjectToolBarMenuItem.Size = new System.Drawing.Size(181, 22);
+			this.snesProjectToolBarMenuItem.Text = "SNES Project...";
+			// 
+			// assetOnlyProjectToolBarMenuItem
+			// 
+			this.assetOnlyProjectToolBarMenuItem.Name = "assetOnlyProjectToolBarMenuItem";
+			this.assetOnlyProjectToolBarMenuItem.Size = new System.Drawing.Size(181, 22);
+			this.assetOnlyProjectToolBarMenuItem.Text = "Asset-Only Project...";
+			this.assetOnlyProjectToolBarMenuItem.Click += new System.EventHandler(this.assetOnlyProjectToolBarMenuItem_Click);
+			// 
+			// toolStripSeparator28
+			// 
+			this.toolStripSeparator28.Name = "toolStripSeparator28";
+			this.toolStripSeparator28.Size = new System.Drawing.Size(178, 6);
+			// 
+			// newTileMapToolBarMenuItem
+			// 
+			this.newTileMapToolBarMenuItem.Name = "newTileMapToolBarMenuItem";
+			this.newTileMapToolBarMenuItem.Size = new System.Drawing.Size(181, 22);
+			this.newTileMapToolBarMenuItem.Text = "Tile Map...";
 			// 
 			// openProjectToolStripButton
 			// 
@@ -1433,7 +1473,7 @@ namespace Brewmaster
             this.stepInto,
             this.stepOut,
             this.stepBack});
-			this._buildToolStrip.Location = new System.Drawing.Point(260, 0);
+			this._buildToolStrip.Location = new System.Drawing.Point(268, 0);
 			this._buildToolStrip.Name = "_buildToolStrip";
 			this._buildToolStrip.Size = new System.Drawing.Size(420, 25);
 			this._buildToolStrip.TabIndex = 1;
@@ -1791,58 +1831,6 @@ namespace Brewmaster
 			this.MainEastContainer2.TabIndex = 1;
 			this.MainEastContainer2.Text = "multiSplitContainer2";
 			// 
-			// assetOnlyProjectMenuItem
-			// 
-			this.assetOnlyProjectMenuItem.Name = "assetOnlyProjectMenuItem";
-			this.assetOnlyProjectMenuItem.Size = new System.Drawing.Size(187, 22);
-			this.assetOnlyProjectMenuItem.Text = "Asset-Only Project...";
-			// 
-			// toolStripDropDownButton1
-			// 
-			this.toolStripDropDownButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.toolStripDropDownButton1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.nesProjectToolBarMenuItem,
-            this.snesProjectToolBarMenuItem,
-            this.assetOnlyProjectToolBarMenuItem,
-            this.toolStripSeparator28,
-            this.newTileMapToolBarMenuItem});
-			this.toolStripDropDownButton1.Image = global::Brewmaster.Properties.Resources.newfile;
-			this.toolStripDropDownButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.toolStripDropDownButton1.Name = "toolStripDropDownButton1";
-			this.toolStripDropDownButton1.Size = new System.Drawing.Size(29, 22);
-			this.toolStripDropDownButton1.Text = "toolStripDropDownButton1";
-			// 
-			// nesProjectToolBarMenuItem
-			// 
-			this.nesProjectToolBarMenuItem.Enabled = false;
-			this.nesProjectToolBarMenuItem.Name = "nesProjectToolBarMenuItem";
-			this.nesProjectToolBarMenuItem.Size = new System.Drawing.Size(181, 22);
-			this.nesProjectToolBarMenuItem.Text = "NES Project...";
-			// 
-			// snesProjectToolBarMenuItem
-			// 
-			this.snesProjectToolBarMenuItem.Enabled = false;
-			this.snesProjectToolBarMenuItem.Name = "snesProjectToolBarMenuItem";
-			this.snesProjectToolBarMenuItem.Size = new System.Drawing.Size(181, 22);
-			this.snesProjectToolBarMenuItem.Text = "SNES Project...";
-			// 
-			// assetOnlyProjectToolBarMenuItem
-			// 
-			this.assetOnlyProjectToolBarMenuItem.Name = "assetOnlyProjectToolBarMenuItem";
-			this.assetOnlyProjectToolBarMenuItem.Size = new System.Drawing.Size(181, 22);
-			this.assetOnlyProjectToolBarMenuItem.Text = "Asset-Only Project...";
-			// 
-			// toolStripSeparator28
-			// 
-			this.toolStripSeparator28.Name = "toolStripSeparator28";
-			this.toolStripSeparator28.Size = new System.Drawing.Size(178, 6);
-			// 
-			// newTileMapToolBarMenuItem
-			// 
-			this.newTileMapToolBarMenuItem.Name = "newTileMapToolBarMenuItem";
-			this.newTileMapToolBarMenuItem.Size = new System.Drawing.Size(181, 22);
-			this.newTileMapToolBarMenuItem.Text = "Tile Map...";
-			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1990,7 +1978,6 @@ namespace Brewmaster
 		private System.Windows.Forms.ToolStripButton pause;
 		private System.Windows.Forms.ToolStripButton stop;
 		private System.Windows.Forms.ToolStripButton restart;
-		private System.Windows.Forms.ToolStripButton newProjectToolStripButton;
 		private System.Windows.Forms.ToolStripMenuItem EmulatorMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem updateEveryFrameMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem findNextMenuItem;

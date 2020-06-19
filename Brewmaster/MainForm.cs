@@ -1953,11 +1953,6 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 			Mesen.LoadState();
 		}
 
-		private void newProjectToolStripButton_Click(object sender, EventArgs e)
-		{
-			nesProjectMenuItem.PerformClick();
-		}
-
 		private void goToAllMenuItem_Click(object sender, EventArgs e)
 		{
 			if (CurrentProject == null) return;
@@ -1971,6 +1966,16 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 			StoredLayoutHandler.LoadPanelLayout(_modules);
 			StoredLayoutHandler.RefreshLayout(_modules);
 			ResumeLayout(true);
+		}
+
+		private void assetOnlyProjectMenuItem_Click(object sender, EventArgs e)
+		{
+
+		}
+
+		private void assetOnlyProjectToolBarMenuItem_Click(object sender, EventArgs e)
+		{
+			assetOnlyProjectMenuItem.PerformClick();
 		}
 	}
 
