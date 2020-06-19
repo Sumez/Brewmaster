@@ -21,6 +21,11 @@ namespace Brewmaster.ProjectModel
 		Nes = 0,
 		Snes = 1
 	}
+
+	public enum ProjectType
+	{
+		Game = 0, AssetOnly = 1
+	}
 	public enum FileTemplate
 	{
 		None, Famitracker, Chr, AssemblyCode, AssemblyInclude,
@@ -70,6 +75,8 @@ namespace Brewmaster.ProjectModel
 
 		public List<KeyValuePair<string, Symbol>> Symbols { get; set; }
 		public TargetPlatform Platform { get; set; }
+		public ProjectType Type { get; set; }
+
 		public Dictionary<string, DebugSymbol> DebugSymbols { get; private set; }
 		public List<DirectoryInfo> Directories { get; internal set; }
 		public bool UpdatedSinceLastBuild { get; set; }

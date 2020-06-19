@@ -11,8 +11,12 @@ namespace Brewmaster.ProjectModel
 	[XmlRoot("BrewmasterProject")]
 	public class ProjectFileHeader
 	{
-		public TargetPlatform Type;
 		public string Name;
+		[XmlElement(ElementName = "ProjectType")]
+		public ProjectType ProjectType;
+		[XmlElement(ElementName = "Platform")]
+		public TargetPlatform Platform;
+
 		public BuildConfigurationHeader Cartridge;
 		[XmlElement(ElementName = "BuildConfiguration")]
 		public BuildConfigurationHeader[] BuildConfigurations;
@@ -21,13 +25,19 @@ namespace Brewmaster.ProjectModel
 		[XmlElement(ElementName = "Directory")]
 		public string[] ExtraDirectories;
 
+
+		[XmlElement(ElementName = "Type")]
+		public TargetPlatform? PlatformType;
+		public bool ShouldSerializePlatformType() { return false; }
+
 		// EXPORT
 		public static ProjectFileHeader GetFileHeader(AsmProject project)
 		{
 			var header = new ProjectFileHeader();
 			var fileReferences = new Dictionary<AsmProjectFile, int>();
 
-			header.Type = project.Platform;
+			header.Platform = project.Platform;
+			header.ProjectType = project.Type;
 			header.Name = project.Name;
 			header.ExtraDirectories = project.Directories.Select(d => project.GetRelativePath(d.FullName)).ToArray();
 
@@ -81,7 +91,8 @@ namespace Brewmaster.ProjectModel
 			var errors = new List<string>();
 			var fileReferences = new Dictionary<int, AsmProjectFile>();
 
-			project.Platform = Type;
+			project.Platform = PlatformType.HasValue ? PlatformType.Value : Platform;
+			project.Type = ProjectType;
 			project.Name = Name;
 			if (ExtraDirectories != null) project.Directories = ExtraDirectories
 					.Select(d => new DirectoryInfo(Path.Combine(project.Directory.FullName, d)))
