@@ -47,7 +47,6 @@ namespace Brewmaster
 			System.Windows.Forms.ToolStripSeparator toolStripSeparator13;
 			System.Windows.Forms.ToolStripSeparator toolStripSeparator27;
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
-			this.editorTabs = new Brewmaster.EditorWindows.EditorTabs();
 			this.MainWindowMenu = new System.Windows.Forms.MenuStrip();
 			this.FileMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.File_NewMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -224,6 +223,7 @@ namespace Brewmaster
 			this.OpenProjectFileDialog = new System.Windows.Forms.OpenFileDialog();
 			this.OpenFilesFileDialog = new System.Windows.Forms.OpenFileDialog();
 			this.CreateNewFileDialog = new System.Windows.Forms.SaveFileDialog();
+			this.editorTabs = new Brewmaster.EditorWindows.EditorTabs();
 			this.MainEastContainer2 = new Brewmaster.Layout.MultiSplitContainer();
 			this._menuHelper = new Brewmaster.Modules.MenuHelper(this.components);
 			availableIdePanels = new System.Windows.Forms.Panel();
@@ -254,21 +254,6 @@ namespace Brewmaster
 			availableIdePanels.Size = new System.Drawing.Size(856, 450);
 			availableIdePanels.TabIndex = 3;
 			availableIdePanels.Visible = false;
-			// 
-			// editorTabs
-			// 
-			this.editorTabs.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.editorTabs.DrawMode = System.Windows.Forms.TabDrawMode.OwnerDrawFixed;
-			this.editorTabs.HotTrack = true;
-			this.editorTabs.Location = new System.Drawing.Point(0, 0);
-			this.editorTabs.Name = "editorTabs";
-			this.editorTabs.Padding = new System.Drawing.Point(30, 4);
-			this.editorTabs.SelectedIndex = 0;
-			this.editorTabs.ShowToolTips = true;
-			this.editorTabs.Size = new System.Drawing.Size(856, 450);
-			this.editorTabs.TabIndex = 0;
-			this.editorTabs.TextColor = System.Drawing.Color.Navy;
-			this.editorTabs.TextColorInactive = System.Drawing.Color.Navy;
 			// 
 			// toolStripSeparator14
 			// 
@@ -1371,6 +1356,7 @@ namespace Brewmaster
 			this.newTileMapToolBarMenuItem.Name = "newTileMapToolBarMenuItem";
 			this.newTileMapToolBarMenuItem.Size = new System.Drawing.Size(181, 22);
 			this.newTileMapToolBarMenuItem.Text = "Tile Map...";
+			this.newTileMapToolBarMenuItem.Click += new System.EventHandler(this.newTileMapToolBarMenuItem_Click);
 			// 
 			// openProjectToolStripButton
 			// 
@@ -1820,6 +1806,21 @@ namespace Brewmaster
 			this.CreateNewFileDialog.Filter = "All files|*.*";
 			this.CreateNewFileDialog.OverwritePrompt = false;
 			this.CreateNewFileDialog.Title = "Save File";
+			// 
+			// editorTabs
+			// 
+			this.editorTabs.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.editorTabs.DrawMode = System.Windows.Forms.TabDrawMode.OwnerDrawFixed;
+			this.editorTabs.HotTrack = true;
+			this.editorTabs.Location = new System.Drawing.Point(0, 0);
+			this.editorTabs.Name = "editorTabs";
+			this.editorTabs.Padding = new System.Drawing.Point(30, 4);
+			this.editorTabs.SelectedIndex = 0;
+			this.editorTabs.ShowToolTips = true;
+			this.editorTabs.Size = new System.Drawing.Size(856, 450);
+			this.editorTabs.TabIndex = 0;
+			this.editorTabs.TextColor = System.Drawing.Color.Navy;
+			this.editorTabs.TextColorInactive = System.Drawing.Color.Navy;
 			// 
 			// MainEastContainer2
 			// 

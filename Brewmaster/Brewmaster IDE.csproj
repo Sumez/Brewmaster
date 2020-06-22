@@ -464,6 +464,9 @@
     <Compile Include="ProjectWizard\ImportProjectFiles.Designer.cs">
       <DependentUpon>ImportProjectFiles.cs</DependentUpon>
     </Compile>
+    <Compile Include="ProjectWizard\NewAssetProject.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="ProjectWizard\NewProject.cs">
       <SubType>Form</SubType>
     </Compile>

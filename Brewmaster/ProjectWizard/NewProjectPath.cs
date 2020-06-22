@@ -12,9 +12,12 @@ namespace Brewmaster.ProjectWizard
 	{
 		private bool _folderNameChanged;
 
+		public string ProjectPath { get { return Valid ? _projectPathPreview.Text : null; } }
+		public string ProjectName { get { return Valid ? _projectName.Text : null; } }
+
 		public TargetPlatform Platform
 		{
-			get { return _snesProjectOption.Checked ? TargetPlatform.Nes : TargetPlatform.Snes; }
+			get { return _snesProjectOption.Checked ? TargetPlatform.Snes : TargetPlatform.Nes; }
 			set
 			{
 				_nesProjectOption.Checked = value == TargetPlatform.Nes;
@@ -28,9 +31,12 @@ namespace Brewmaster.ProjectWizard
 			set { _projectDirectory.Text = value; }
 		}
 
-		public NewProjectPath()
+		public NewProjectPath(ProjectType projectType)
 		{
+			_projectType = projectType;
 			InitializeComponent();
+
+			_platformSelection.Visible = _projectType == ProjectType.Game;
 		}
 
 		private void _nesImage_Click(object sender, MouseEventArgs e)
@@ -60,6 +66,7 @@ namespace Brewmaster.ProjectWizard
 
 		public static readonly IEnumerable<char> InvalidPathChars = Path.GetInvalidPathChars().Union(Path.GetInvalidFileNameChars()).Except(new [] {'\\', '/' });
 		public static readonly IEnumerable<char> InvalidFileChars = Path.GetInvalidFileNameChars();
+		private ProjectType _projectType;
 
 		private void RefreshPreviewText()
 		{

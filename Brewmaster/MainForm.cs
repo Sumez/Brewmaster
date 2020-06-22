@@ -168,8 +168,9 @@ namespace Brewmaster
 				_buildToolStrip.Visible = true;
 			}
 
-				// TODO: Do this dynamically when switching active editor tab
-			if (editorTab != null) StoredLayoutHandler.LoadEditorLayout(_modules, editorTab.LayoutMode);
+			// TODO: Do this dynamically when switching active editor tab
+			if (CurrentProject != null && CurrentProject.Type == ProjectType.AssetOnly) StoredLayoutHandler.LoadEditorLayout(_modules, LayoutMode.MapEditor);
+			else if (editorTab != null) StoredLayoutHandler.LoadEditorLayout(_modules, editorTab.LayoutMode);
 			else StoredLayoutHandler.LoadEditorLayout(_modules, LayoutMode.Default); // TODO: Default mode per project type (asset / tilemap projects)
 
 			UpdateTabListInWindowMenu();
@@ -859,7 +860,17 @@ namespace Brewmaster
 	    {
 		    CreateNewProject(TargetPlatform.Snes);
 	    }
+		private void assetOnlyProjectMenuItem_Click(object sender, EventArgs e)
+		{
+			using (var newProjectDialog = new NewAssetProject(Settings, TargetPlatform.Nes))
+			{
+				newProjectDialog.StartPosition = FormStartPosition.CenterParent;
+				newProjectDialog.ShowDialog();
+				if (newProjectDialog.DialogResult != DialogResult.OK) return;
 
+				LoadProject(newProjectDialog.Project.ProjectFile.FullName);
+			}
+		}
 
 		private void CreateNewProject(TargetPlatform targetPlatform)
 		{
@@ -867,7 +878,9 @@ namespace Brewmaster
 		    {
 			    newProjectDialog.StartPosition = FormStartPosition.CenterParent;
 			    newProjectDialog.ShowDialog();
-			    //if (!CloseCurrentProject()) return;
+			    if (newProjectDialog.DialogResult != DialogResult.OK) return;
+
+			    //LoadProject(newProjectDialog.Project.ProjectFile.FullName);
 		    }
 		}
 		private void ImportExistingProject()
@@ -1968,14 +1981,14 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 			ResumeLayout(true);
 		}
 
-		private void assetOnlyProjectMenuItem_Click(object sender, EventArgs e)
-		{
-
-		}
-
 		private void assetOnlyProjectToolBarMenuItem_Click(object sender, EventArgs e)
 		{
 			assetOnlyProjectMenuItem.PerformClick();
+		}
+
+		private void newTileMapToolBarMenuItem_Click(object sender, EventArgs e)
+		{
+			tileMapMenuItem.PerformClick();
 		}
 	}
 

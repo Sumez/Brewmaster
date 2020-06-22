@@ -356,6 +356,20 @@ namespace Brewmaster.ProjectModel
 			return project;
 		}
 
+		public static AsmProject Create(string projectPath, string projectName, ProjectType type, TargetPlatform platform)
+		{
+			var file = new FileInfo(projectPath);
+			var project = new AsmProject
+			{
+				Directory = file.Directory,
+				ProjectFile = file,
+				Name = projectName,
+				Type = type,
+				Platform = platform
+			};
+			return project;
+		}
+
 		public static AsmProject ImportFromDirectory(DirectoryInfo parentDirectory)
 		{
 			var project = new AsmProject { Directory = parentDirectory };

@@ -14,12 +14,12 @@ namespace Brewmaster.ProjectWizard
 			private set { _newProjectPath.Platform = value; }
 		}
 
-		public NewProject(Settings.Settings settings, TargetPlatform projectType) : base(settings)
+		public NewProject(Settings.Settings settings, TargetPlatform targetPlatform) : base(settings)
 		{
-			_newProjectPath = new NewProjectPath();
+			_newProjectPath = new NewProjectPath(ProjectType.Game);
 			_projectTemplates = new ProjectTemplates();
 
-			Platform = projectType;
+			Platform = targetPlatform;
 			_newProjectPath.Directory =
 				string.IsNullOrWhiteSpace(Settings.DefaultProjectDirectory)
 					? Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)

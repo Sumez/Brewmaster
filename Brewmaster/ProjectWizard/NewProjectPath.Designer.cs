@@ -44,6 +44,7 @@ namespace Brewmaster.ProjectWizard
 			this._nesProjectOption = new System.Windows.Forms.RadioButton();
 			this._snesProjectOption = new System.Windows.Forms.RadioButton();
 			this._snesImage = new System.Windows.Forms.PictureBox();
+			this._platformSelection = new System.Windows.Forms.Panel();
 			label1 = new System.Windows.Forms.Label();
 			label2 = new System.Windows.Forms.Label();
 			label3 = new System.Windows.Forms.Label();
@@ -51,6 +52,7 @@ namespace Brewmaster.ProjectWizard
 			label5 = new System.Windows.Forms.Label();
 			((System.ComponentModel.ISupportInitialize)(this._nesImage)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this._snesImage)).BeginInit();
+			this._platformSelection.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// label1
@@ -145,7 +147,7 @@ namespace Brewmaster.ProjectWizard
 			// 
 			// _nesImage
 			// 
-			this._nesImage.Location = new System.Drawing.Point(167, 55);
+			this._nesImage.Location = new System.Drawing.Point(167, 15);
 			this._nesImage.Name = "_nesImage";
 			this._nesImage.Size = new System.Drawing.Size(64, 64);
 			this._nesImage.TabIndex = 8;
@@ -155,7 +157,7 @@ namespace Brewmaster.ProjectWizard
 			// _nesProjectOption
 			// 
 			this._nesProjectOption.AutoSize = true;
-			this._nesProjectOption.Location = new System.Drawing.Point(148, 127);
+			this._nesProjectOption.Location = new System.Drawing.Point(148, 87);
 			this._nesProjectOption.Name = "_nesProjectOption";
 			this._nesProjectOption.Size = new System.Drawing.Size(83, 17);
 			this._nesProjectOption.TabIndex = 10;
@@ -166,7 +168,7 @@ namespace Brewmaster.ProjectWizard
 			// _snesProjectOption
 			// 
 			this._snesProjectOption.AutoSize = true;
-			this._snesProjectOption.Location = new System.Drawing.Point(319, 127);
+			this._snesProjectOption.Location = new System.Drawing.Point(319, 87);
 			this._snesProjectOption.Name = "_snesProjectOption";
 			this._snesProjectOption.Size = new System.Drawing.Size(90, 17);
 			this._snesProjectOption.TabIndex = 11;
@@ -176,23 +178,33 @@ namespace Brewmaster.ProjectWizard
 			// 
 			// _snesImage
 			// 
-			this._snesImage.Location = new System.Drawing.Point(337, 57);
+			this._snesImage.Location = new System.Drawing.Point(337, 17);
 			this._snesImage.Name = "_snesImage";
 			this._snesImage.Size = new System.Drawing.Size(64, 64);
 			this._snesImage.TabIndex = 12;
 			this._snesImage.TabStop = false;
 			this._snesImage.MouseDown += new System.Windows.Forms.MouseEventHandler(this._snesImage_Click);
 			// 
+			// _platformSelection
+			// 
+			this._platformSelection.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this._platformSelection.Controls.Add(this._snesImage);
+			this._platformSelection.Controls.Add(this._snesProjectOption);
+			this._platformSelection.Controls.Add(this._nesProjectOption);
+			this._platformSelection.Controls.Add(this._nesImage);
+			this._platformSelection.Location = new System.Drawing.Point(0, 40);
+			this._platformSelection.Name = "_platformSelection";
+			this._platformSelection.Size = new System.Drawing.Size(592, 119);
+			this._platformSelection.TabIndex = 15;
+			// 
 			// NewProjectPath
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+			this.Controls.Add(this._platformSelection);
 			this.Controls.Add(label5);
 			this.Controls.Add(label4);
-			this.Controls.Add(this._snesImage);
-			this.Controls.Add(this._snesProjectOption);
-			this.Controls.Add(this._nesProjectOption);
-			this.Controls.Add(this._nesImage);
 			this.Controls.Add(label3);
 			this.Controls.Add(label2);
 			this.Controls.Add(label1);
@@ -205,6 +217,8 @@ namespace Brewmaster.ProjectWizard
 			this.Size = new System.Drawing.Size(592, 309);
 			((System.ComponentModel.ISupportInitialize)(this._nesImage)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this._snesImage)).EndInit();
+			this._platformSelection.ResumeLayout(false);
+			this._platformSelection.PerformLayout();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -221,5 +235,6 @@ namespace Brewmaster.ProjectWizard
 		private System.Windows.Forms.RadioButton _nesProjectOption;
 		private System.Windows.Forms.RadioButton _snesProjectOption;
 		private System.Windows.Forms.PictureBox _snesImage;
+		private Panel _platformSelection;
 	}
 }

@@ -260,33 +260,37 @@ namespace Brewmaster.ProjectExplorer
 		}
 		public void RefreshTree()
 		{
-			var projectNode = CreateNodeFromDirectory(_project.Directory, false, _project.Directories);
-			projectNode.Name = "project";
-			projectNode.Edited += (e) => _project.Name = e.Label; // TODO: Update window title
-			projectNode.Text = _project.Name;
 			var projectImage = _project.Platform == TargetPlatform.Snes ? 1 : 0;
-			projectNode.ImageIndex = projectImage;
-			projectNode.SelectedImageIndex = projectImage;
+			EditableNode sourceNode = null;
+			if (_project.Type != ProjectType.AssetOnly)
+			{
+				sourceNode = CreateNodeFromDirectory(_project.Directory, false, _project.Directories);
+				sourceNode.Name = "project";
+				sourceNode.Edited += (e) => _project.Name = e.Label; // TODO: Update window title
+				sourceNode.Text = _project.Name;
+				sourceNode.ImageIndex = projectImage;
+				sourceNode.SelectedImageIndex = projectImage;
+			}
 
 			var dataNode = CreateNodeFromDirectory(_project.Directory, true, new List<DirectoryInfo>());
 			dataNode.Name = "data";
 			dataNode.Editable = false;
-			dataNode.Text = "Data pipeline";
-			dataNode.ImageIndex = 2;
-			dataNode.SelectedImageIndex = 2;
+			dataNode.Text = _project.Type == ProjectType.AssetOnly ? _project.Name : "Data pipeline";
+			dataNode.ImageIndex = _project.Type == ProjectType.AssetOnly ? projectImage : 2;
+			dataNode.SelectedImageIndex = _project.Type == ProjectType.AssetOnly ? projectImage : 2;
 
 			if (Nodes.Count == 0)
 			{
-				projectNode.Expand();
+				if (sourceNode != null) sourceNode.Expand();
 				dataNode.Expand();
 			}
 			GetExpandedState();
 			Nodes.Clear();
-			Nodes.Add(projectNode);
+			if (sourceNode != null) Nodes.Add(sourceNode);
 			Nodes.Add(dataNode);
 			_menu.SetNode(null);
 
-			_projectRootNode = projectNode;
+			_projectRootNode = sourceNode ?? dataNode;
 			_dataRootNode = dataNode;
 			SetExpandedState();
 		}

@@ -420,4 +420,20 @@
     <MenuItem>ImportJsonSession</MenuItem>
     <HelpText>Import a JSON session file saved from Sumez's online NES map editor</HelpText>
   </MenuHelp>
+  <MenuHelp>
+    <MenuItem>assetOnlyProjectMenuItem</MenuItem>
+    <HelpText>Create a new project just for asset files, without code or emulation features</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>Create a new project just for asset files, without code or emulation features</MenuItem>
+    <HelpText> </HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>Create a new tile map, for editing stages, screens or character graphics</MenuItem>
+    <HelpText> </HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>Create a new tile map, for editing stages, screens or character graphics</MenuItem>
+    <HelpText> </HelpText>
+  </MenuHelp>
 </MenuHelpCollection>

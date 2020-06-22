@@ -97,35 +97,37 @@ namespace Brewmaster.ProjectModel
 			if (ExtraDirectories != null) project.Directories = ExtraDirectories
 					.Select(d => new DirectoryInfo(Path.Combine(project.Directory.FullName, d)))
 					.Where(d => d.Exists).ToList();
-			foreach (var fileHeader in Files)
-			{
-				var fileInfo = new FileInfo(Path.Combine(project.Directory.FullName, fileHeader.RelativePath));
-				var file = new AsmProjectFile { Project = project };
 
-				file.File = fileInfo;
-				if (!fileInfo.Exists) file.Missing = true;
-				
-				file.Mode = fileHeader.Mode;
-
-				if (fileHeader.Pipeline != null)
+			if (Files != null)
+				foreach (var fileHeader in Files)
 				{
-					switch (fileHeader.Pipeline.Type)
+					var fileInfo = new FileInfo(Path.Combine(project.Directory.FullName, fileHeader.RelativePath));
+					var file = new AsmProjectFile { Project = project };
+
+					file.File = fileInfo;
+					if (!fileInfo.Exists) file.Missing = true;
+					
+					file.Mode = fileHeader.Mode;
+
+					if (fileHeader.Pipeline != null)
 					{
-						case "chr":
-							// TODO: Deserialization method on the pipeline itself
-							var chrOutput = Path.Combine(project.Directory.FullName, fileHeader.Pipeline.Output[0]);
-							var paletteOutput = fileHeader.Pipeline.Output.Length < 2 || fileHeader.Pipeline.Output[1] == null ? null : Path.Combine(project.Directory.FullName, fileHeader.Pipeline.Output[1]);
+						switch (fileHeader.Pipeline.Type)
+						{
+							case "chr":
+								// TODO: Deserialization method on the pipeline itself
+								var chrOutput = Path.Combine(project.Directory.FullName, fileHeader.Pipeline.Output[0]);
+								var paletteOutput = fileHeader.Pipeline.Output.Length < 2 || fileHeader.Pipeline.Output[1] == null ? null : Path.Combine(project.Directory.FullName, fileHeader.Pipeline.Output[1]);
 
-							var pipeline = new ChrPipeline(file, chrOutput, paletteOutput, fileHeader.Pipeline.LastProcessed);
-							pipeline.SetSettings(fileHeader.Pipeline.Settings);
-							file.Pipeline = pipeline;
-							break;
+								var pipeline = new ChrPipeline(file, chrOutput, paletteOutput, fileHeader.Pipeline.LastProcessed);
+								pipeline.SetSettings(fileHeader.Pipeline.Settings);
+								file.Pipeline = pipeline;
+								break;
+						}
 					}
-				}
 
-				fileReferences.Add(fileHeader.Id, file);
-				project.Files.Add(file);
-			}
+					fileReferences.Add(fileHeader.Id, file);
+					project.Files.Add(file);
+				}
 
 			var buildConfigurations = new List<BuildConfigurationHeader>();
 			if (Cartridge != null) buildConfigurations.Add(Cartridge);
