@@ -425,15 +425,15 @@
     <HelpText>Create a new project just for asset files, without code or emulation features</HelpText>
   </MenuHelp>
   <MenuHelp>
-    <MenuItem>Create a new project just for asset files, without code or emulation features</MenuItem>
-    <HelpText> </HelpText>
+    <MenuItem>tileMapMenuItem</MenuItem>
+    <HelpText>Create a new tile map, for editing stages, screens or character graphics</HelpText>
   </MenuHelp>
   <MenuHelp>
-    <MenuItem>Create a new tile map, for editing stages, screens or character graphics</MenuItem>
-    <HelpText> </HelpText>
+    <MenuItem>assetOnlyProjectToolBarMenuItem</MenuItem>
+    <HelpText>Create a new project just for asset files, without code or emulation features</HelpText>
   </MenuHelp>
   <MenuHelp>
-    <MenuItem>Create a new tile map, for editing stages, screens or character graphics</MenuItem>
-    <HelpText> </HelpText>
+    <MenuItem>newTileMapToolBarMenuItem</MenuItem>
+    <HelpText>Create a new tile map, for editing stages, screens or character graphics</HelpText>
   </MenuHelp>
 </MenuHelpCollection>
