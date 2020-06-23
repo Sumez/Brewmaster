@@ -171,7 +171,7 @@ namespace Brewmaster
 			// TODO: Do this dynamically when switching active editor tab
 			if (CurrentProject != null && CurrentProject.Type == ProjectType.AssetOnly) StoredLayoutHandler.LoadEditorLayout(_modules, LayoutMode.MapEditor);
 			else if (editorTab != null) StoredLayoutHandler.LoadEditorLayout(_modules, editorTab.LayoutMode);
-			else StoredLayoutHandler.LoadEditorLayout(_modules, LayoutMode.Default); // TODO: Default mode per project type (asset / tilemap projects)
+			//else StoredLayoutHandler.LoadEditorLayout(_modules, LayoutMode.Default); // TODO: Default mode per project type (asset / tilemap projects)
 
 			UpdateTabListInWindowMenu();
 		}
@@ -273,6 +273,10 @@ namespace Brewmaster
 				LoadModule(Ca65Helper = new Ca65CommandDocumentation(_moduleEvents), "Commands");
 				LoadModule(NumberHelper = new NumberHelper(), "Number Formats");
 
+				LoadModule("Map Overview");
+				LoadModule("Chr Tiles");
+				LoadModule("2x2 Metatiles");
+				LoadModule("4x4 Metatiles");
 
 				MainEastContainer2.AddPanel(mainSouthContainer);
 				MainEastContainer2.AddPanel(eastContainer);
@@ -373,6 +377,10 @@ namespace Brewmaster
 			}
 			new IdePanel(control) { Label = label };
 			_modules.Add(label, control);
+		}
+		private void LoadModule(string label)
+		{
+			LoadModule(new Control(), label);
 		}
 
 		private void BindShortcutKeys()
@@ -511,7 +519,10 @@ namespace Brewmaster
 			else if (Settings.ReOpenLastProject && Settings.CurrentProject != null)
 				LoadProject(Settings.CurrentProject);
 			else
+			{
 				_moduleEvents.SetCurrentPlatform(TargetPlatform.Nes);
+				StoredLayoutHandler.ClearLayout(_modules);
+			}
 		}
 
 	    private void RemoveBreakpoints(IEnumerable<Breakpoint> breakpoints)

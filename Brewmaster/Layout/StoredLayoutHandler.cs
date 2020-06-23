@@ -149,6 +149,9 @@ namespace Brewmaster.Layout
 					case LayoutMode.MapEditor:
 						_layouts[mode] = GetMapEditorLayout();
 						break;
+					default:
+						_layouts[mode] = GetNoLayout();
+						break;
 				}
 				return;
 			}
@@ -175,6 +178,12 @@ namespace Brewmaster.Layout
 			RememberPanelLayout(modules);
 			_mode = mode;
 			if (!_layouts.ContainsKey(_mode)) LoadPanelLayout(modules, _mode);
+			RefreshLayout(modules);
+		}
+		public void ClearLayout(Dictionary<string, Control> modules)
+		{
+			_mode = LayoutMode.None;
+			LoadPanelLayout(modules, LayoutMode.None);
 			RefreshLayout(modules);
 		}
 
@@ -237,6 +246,33 @@ namespace Brewmaster.Layout
 			return layout;
 		}
 
+		private PanelLayout GetNoLayout()
+		{
+			var layout = new PanelLayout();
+			layout.SplitPanels.AddRange(new[]
+			{
+				new StoredSplitPanelLayout
+				{
+					Name = "west",
+					Size = 1,
+					PanelGroups = new List<PanelGroup>()
+				},
+				new StoredSplitPanelLayout
+				{
+					Name = "south",
+					Size = 1,
+					PanelGroups = new List<PanelGroup>()
+				},
+				new StoredSplitPanelLayout
+				{
+					Name = "east",
+					Size = 1,
+					PanelGroups = new List<PanelGroup>()
+				}
+			});
+			return layout;
+
+		}
 		private PanelLayout GetMapEditorLayout()
 		{
 			var layout = new PanelLayout();
