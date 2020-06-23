@@ -173,6 +173,9 @@
     <Compile Include="EditorWindows\TileMaps\ChrTilePalette.cs">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="EditorWindows\TileMaps\ResizeWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="EditorWindows\TileMaps\Tools\FloodFill.cs" />
     <Compile Include="EditorWindows\TileMaps\Tools\MapEditorTool.cs" />
     <Compile Include="EditorWindows\TileMaps\MapEditorToolBar.cs">
@@ -581,6 +584,9 @@
     <EmbeddedResource Include="EditorWindows\TileMaps\MetaTilePalette.resx">
       <DependentUpon>MetaTilePalette.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="EditorWindows\TileMaps\ResizeWindow.resx">
+      <DependentUpon>ResizeWindow.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Emulation\MesenControl.resx">
       <DependentUpon>MesenControl.cs</DependentUpon>
     </EmbeddedResource>
@@ -760,6 +766,11 @@
     <None Include="Resources\Files\snesproject.png" />
     <None Include="Resources\Files\file_missing.png" />
     <None Include="Resources\bucket.cur" />
+    <None Include="Resources\Other\alignment center.png" />
+    <None Include="Resources\Other\arrow down.png" />
+    <None Include="Resources\Other\arrow left.png" />
+    <None Include="Resources\Other\arrow right.png" />
+    <None Include="Resources\Other\arrow up.png" />
     <Content Include="Resources\Other\error.png" />
     <None Include="Resources\Other\smallload.png" />
     <None Include="Resources\Other\smallsave.png" />

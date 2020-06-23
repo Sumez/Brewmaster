@@ -104,10 +104,18 @@ namespace Brewmaster.EditorWindows.TileMaps
 			{
 				if (screen == null)
 				{
-					foreach (var s in _map.Screens.SelectMany(s => s).Where(s => s != null))
+					var screens = _map.Screens.SelectMany(s => s).Where(s => s != null).ToArray();
+					lock (_allMetaTilesLock)
+						foreach (var removedScreen in _screenCollections.Keys.Where(s => !screens.Contains(s)).ToArray())
+						{
+							_screenCollections.Remove(removedScreen);
+						}
+
+					foreach (var s in screens)
 					{
 						GetMetaTilesFromScreen(s, token);
 					}
+
 				}
 				else GetMetaTilesFromScreen(screen, token);
 

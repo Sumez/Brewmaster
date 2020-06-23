@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 using Brewmaster.ProjectExplorer;
 
@@ -127,6 +128,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 		private VScrollBar _vScrollBar;
 		private HScrollBar _hScrollBar;
 		private Panel _panel;
+		private TileMapScreen _loadedScreen;
 
 		private Point Offset
 		{
@@ -185,15 +187,23 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 		public void AddSingleScreen(TileMapScreen screen)
 		{
+			_loadedScreen = screen;
 			Add(new MapScreenView(_map, screen, _state));
 		}
 
-		public void AddFullMap()
+		public void AddFullMap(Point? focus = null)
 		{
-			var screenView = new MapScreenView(_map, _state);
-			screenView.LoadFullMap();
-
-			Add(screenView);
+			//if (_singleView == null || _loadedScreen != null)
+			{
+				_loadedScreen = null;
+				var screenView = new MapScreenView(_map, _state);
+				screenView.LoadFullMap();
+				Add(screenView);
+			}
+			if (focus.HasValue)
+			{
+				Offset = new Point(- focus.Value.X * _singleView.MapSize.Width, - focus.Value.Y * _singleView.MapSize.Height);
+			}
 		}
 
 		private void Add(MapScreenView screenView)
@@ -209,6 +219,23 @@ namespace Brewmaster.EditorWindows.TileMaps
 			_panel.Controls.Add(_singleView = screenView);
 			RefreshView();
 			RefreshAllTiles();
+		}
+
+		public void RefreshMapScreens()
+		{
+			if (_loadedScreen == null)
+			{
+				var offset = Offset;
+				AddFullMap();
+				if ((-offset.X) >= _singleView.RenderSize.Width) offset.X = 0;
+				if ((-offset.Y) >= _singleView.RenderSize.Height) offset.Y = 0;
+				Offset = offset;
+				return;
+			}
+
+			var remainingScreens = _map.Screens.SelectMany(s => s).Where(s => s != null).ToArray();
+			if (remainingScreens.Contains(_loadedScreen)) return;
+			AddSingleScreen(remainingScreens[0]);
 		}
 	}
 }

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace Brewmaster.EditorWindows.TileMaps
@@ -15,11 +17,76 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 			UpdateDataView();
 
-			_decWidth.Click += (s, a) => EditDimensions(-1, 0);
-			_incWidth.Click += (s, a) => EditDimensions(1, 0);
-			_decHeight.Click += (s, a) => EditDimensions(0, -1);
-			_incHeight.Click += (s, a) => EditDimensions(0, 1);
+			_mapSizeButton.LinkClicked += (s, a) => { ChangeMapSize(); };
+			_screenSizeButton.LinkClicked += (s, a) => { ChangeScreenSize(); };
 		}
+
+		private void ChangeMapSize()
+		{
+			using (var window = new ResizeWindow(_map.Width, _map.Height, "Screens will be deleted when shrinking the global map size.\nThese cannot be recovered!"))
+			{
+				if (window.ShowDialog(this) != DialogResult.OK) return;
+				var newWidth = window.SetWidth;
+				var newHeight = window.SetHeight;
+				if (window.ResizeAnchor == TileMaps.Anchor.Ne || window.ResizeAnchor == TileMaps.Anchor.Se)
+				{
+					foreach (var screenRow in _map.Screens)
+					{
+						for (var i = _map.Width; i < newWidth; i++) screenRow.Insert(0, null);
+						for (var i = _map.Width; i > newWidth; i--)
+						{
+							if (screenRow[0] != null) screenRow[0].Unload();
+							screenRow.RemoveAt(0);
+						}
+					}
+				}
+				else
+				{
+					foreach (var screenRow in _map.Screens)
+					{
+						while (screenRow.Count > newWidth)
+						{
+							if (screenRow[screenRow.Count - 1] != null) screenRow[screenRow.Count - 1].Unload();
+							screenRow.RemoveAt(screenRow.Count - 1);
+						}
+					}
+				}
+
+				if (window.ResizeAnchor == TileMaps.Anchor.Se || window.ResizeAnchor == TileMaps.Anchor.Sw)
+				{
+					for (var i = _map.Height ; i < newHeight; i++) _map.Screens.Insert(0, new List<TileMapScreen>());
+					for (var i = _map.Height; i > newHeight; i--)
+					{
+						foreach (var screen in _map.Screens[0].Where(s => s != null)) screen.Unload();
+						_map.Screens.RemoveAt(0);
+					}
+				}
+				else
+				{
+					while (_map.Screens.Count > newHeight)
+					{
+						foreach (var screen in _map.Screens[_map.Screens.Count - 1].Where(s => s != null)) screen.Unload();
+						_map.Screens.RemoveAt(_map.Screens.Count - 1);
+					}
+				}
+				_map.Width = newWidth;
+				_map.Height = newHeight;
+
+				if (MapSizeChanged != null) MapSizeChanged();
+				UpdateDataView();
+				_miniMap.PerformLayout();
+				_miniMap.Invalidate();
+			}
+		}
+		private void ChangeScreenSize()
+		{
+			using (var window = new ResizeWindow(_map.ScreenSize.Width, _map.ScreenSize.Height, "Tiles outside the new screen size will be deleted.\nThese cannot be recovered!"))
+			{
+				if (window.ShowDialog(this) != DialogResult.OK) return;
+				UpdateDataView();
+			}
+		}
+
 
 		public Action<int, int> ActivateScreen
 		{
@@ -27,133 +94,40 @@ namespace Brewmaster.EditorWindows.TileMaps
 			set { _miniMap.ActivateScreen = value; }
 		}
 
-		private void EditDimensions(int deltaX, int deltaY)
-		{
-			var width = Math.Max(1, _map.Width + deltaX);
-			var height = Math.Max(1, _map.Height + deltaY);
-			if (_map.Width == width && _map.Height == height) return;
-			_map.Width = width;
-			_map.Height = height;
-			if (MapSizeChanged != null) MapSizeChanged();
-			UpdateDataView();
-			_miniMap.PerformLayout();
-			_miniMap.Invalidate();
-		}
-
 		private void UpdateDataView()
 		{
-			_width.Text = _map.Width.ToString();
-			_height.Text = _map.Height.ToString();
+			_mapSizeButton.Text = string.Format("{0}x{1}", _map.Width, _map.Height);
+			_screenSizeButton.Text = string.Format("{0}x{1}", _map.ScreenSize.Width, _map.ScreenSize.Height);
 		}
-
-		private Label _label1;
-		private Label _label2;
-		private Button _incWidth;
-		private Button _decWidth;
-		private Button _decHeight;
-		private Button _incHeight;
-		private Label _height;
 		private Panel _mapPanel;
 		private MiniMap _miniMap;
-		private Label _width;
-		private TileMap _map;
+		private LinkLabel _mapSizeButton;
+		private LinkLabel _screenSizeButton;
+		private readonly TileMap _map;
 
 		private void InitializeComponent()
 		{
-			this._label1 = new System.Windows.Forms.Label();
-			this._label2 = new System.Windows.Forms.Label();
-			this._width = new System.Windows.Forms.Label();
-			this._incWidth = new System.Windows.Forms.Button();
-			this._decWidth = new System.Windows.Forms.Button();
-			this._decHeight = new System.Windows.Forms.Button();
-			this._incHeight = new System.Windows.Forms.Button();
-			this._height = new System.Windows.Forms.Label();
+			System.Windows.Forms.Label label1;
+			System.Windows.Forms.Label label2;
 			this._mapPanel = new System.Windows.Forms.Panel();
 			this._miniMap = new Brewmaster.EditorWindows.TileMaps.MiniMap();
+			this._mapSizeButton = new System.Windows.Forms.LinkLabel();
+			this._screenSizeButton = new System.Windows.Forms.LinkLabel();
+			label1 = new System.Windows.Forms.Label();
+			label2 = new System.Windows.Forms.Label();
 			this._mapPanel.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// label1
 			// 
-			this._label1.AutoSize = true;
-			this._label1.Location = new System.Drawing.Point(3, 0);
-			this._label1.Name = "_label1";
-			this._label1.Size = new System.Drawing.Size(35, 13);
-			this._label1.TabIndex = 0;
-			this._label1.Text = "Width";
+			label1.AutoSize = true;
+			label1.Location = new System.Drawing.Point(3, 0);
+			label1.Name = "label1";
+			label1.Size = new System.Drawing.Size(52, 13);
+			label1.TabIndex = 0;
+			label1.Text = "Map size:";
 			// 
-			// label2
-			// 
-			this._label2.AutoSize = true;
-			this._label2.Location = new System.Drawing.Point(91, 0);
-			this._label2.Name = "_label2";
-			this._label2.Size = new System.Drawing.Size(38, 13);
-			this._label2.TabIndex = 1;
-			this._label2.Text = "Height";
-			// 
-			// _width
-			// 
-			this._width.AutoSize = true;
-			this._width.Location = new System.Drawing.Point(47, 0);
-			this._width.Name = "_width";
-			this._width.Size = new System.Drawing.Size(19, 13);
-			this._width.TabIndex = 2;
-			this._width.Text = "20";
-			// 
-			// _incWidth
-			// 
-			this._incWidth.FlatAppearance.BorderSize = 0;
-			this._incWidth.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this._incWidth.Image = global::Brewmaster.Properties.Resources.collapsed;
-			this._incWidth.Location = new System.Drawing.Point(63, 0);
-			this._incWidth.Name = "_incWidth";
-			this._incWidth.Size = new System.Drawing.Size(12, 13);
-			this._incWidth.TabIndex = 3;
-			this._incWidth.UseVisualStyleBackColor = true;
-			// 
-			// _decWidth
-			// 
-			this._decWidth.FlatAppearance.BorderSize = 0;
-			this._decWidth.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this._decWidth.Image = global::Brewmaster.Properties.Resources.left_arrow;
-			this._decWidth.Location = new System.Drawing.Point(36, 0);
-			this._decWidth.Name = "_decWidth";
-			this._decWidth.Size = new System.Drawing.Size(12, 13);
-			this._decWidth.TabIndex = 4;
-			this._decWidth.UseVisualStyleBackColor = true;
-			// 
-			// _decHeight
-			// 
-			this._decHeight.FlatAppearance.BorderSize = 0;
-			this._decHeight.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this._decHeight.Image = global::Brewmaster.Properties.Resources.left_arrow;
-			this._decHeight.Location = new System.Drawing.Point(127, 0);
-			this._decHeight.Name = "_decHeight";
-			this._decHeight.Size = new System.Drawing.Size(12, 13);
-			this._decHeight.TabIndex = 7;
-			this._decHeight.UseVisualStyleBackColor = true;
-			// 
-			// _incHeight
-			// 
-			this._incHeight.FlatAppearance.BorderSize = 0;
-			this._incHeight.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this._incHeight.Image = global::Brewmaster.Properties.Resources.collapsed;
-			this._incHeight.Location = new System.Drawing.Point(154, 0);
-			this._incHeight.Name = "_incHeight";
-			this._incHeight.Size = new System.Drawing.Size(12, 13);
-			this._incHeight.TabIndex = 6;
-			this._incHeight.UseVisualStyleBackColor = true;
-			// 
-			// _height
-			// 
-			this._height.AutoSize = true;
-			this._height.Location = new System.Drawing.Point(138, 0);
-			this._height.Name = "_height";
-			this._height.Size = new System.Drawing.Size(19, 13);
-			this._height.TabIndex = 5;
-			this._height.Text = "20";
-			// 
-			// panel1
+			// _mapPanel
 			// 
 			this._mapPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
@@ -166,7 +140,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 			this._mapPanel.Size = new System.Drawing.Size(428, 285);
 			this._mapPanel.TabIndex = 8;
 			// 
-			// miniMap1
+			// _miniMap
 			// 
 			this._miniMap.Location = new System.Drawing.Point(0, 0);
 			this._miniMap.Map = null;
@@ -175,17 +149,44 @@ namespace Brewmaster.EditorWindows.TileMaps
 			this._miniMap.TabIndex = 0;
 			this._miniMap.Text = "miniMap1";
 			// 
+			// _mapSizeButton
+			// 
+			this._mapSizeButton.AutoSize = true;
+			this._mapSizeButton.LinkBehavior = System.Windows.Forms.LinkBehavior.HoverUnderline;
+			this._mapSizeButton.Location = new System.Drawing.Point(53, 1);
+			this._mapSizeButton.Name = "_mapSizeButton";
+			this._mapSizeButton.Size = new System.Drawing.Size(36, 13);
+			this._mapSizeButton.TabIndex = 9;
+			this._mapSizeButton.TabStop = true;
+			this._mapSizeButton.Text = "20x20";
+			// 
+			// _screenSizeButton
+			// 
+			this._screenSizeButton.AutoSize = true;
+			this._screenSizeButton.LinkBehavior = System.Windows.Forms.LinkBehavior.HoverUnderline;
+			this._screenSizeButton.Location = new System.Drawing.Point(158, 1);
+			this._screenSizeButton.Name = "_screenSizeButton";
+			this._screenSizeButton.Size = new System.Drawing.Size(36, 13);
+			this._screenSizeButton.TabIndex = 11;
+			this._screenSizeButton.TabStop = true;
+			this._screenSizeButton.Text = "32x30";
+			// 
+			// label2
+			// 
+			label2.AutoSize = true;
+			label2.Location = new System.Drawing.Point(95, 0);
+			label2.Name = "label2";
+			label2.Size = new System.Drawing.Size(65, 13);
+			label2.TabIndex = 10;
+			label2.Text = "Screen size:";
+			// 
 			// MapOverview
 			// 
+			this.Controls.Add(this._screenSizeButton);
+			this.Controls.Add(label2);
+			this.Controls.Add(this._mapSizeButton);
 			this.Controls.Add(this._mapPanel);
-			this.Controls.Add(this._decHeight);
-			this.Controls.Add(this._incHeight);
-			this.Controls.Add(this._height);
-			this.Controls.Add(this._decWidth);
-			this.Controls.Add(this._incWidth);
-			this.Controls.Add(this._width);
-			this.Controls.Add(this._label2);
-			this.Controls.Add(this._label1);
+			this.Controls.Add(label1);
 			this.Name = "MapOverview";
 			this.Size = new System.Drawing.Size(437, 304);
 			this._mapPanel.ResumeLayout(false);

@@ -72,7 +72,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 			State.TilesMoved += (changes, undoStep) =>
 			{
-				foreach (var screen in Map.Screens.SelectMany(s => s))
+				foreach (var screen in Map.Screens.SelectMany(s => s).Where(s => s != null))
 				{
 					if (!screen.ReplaceTiles(changes)) continue;
 					undoStep.AddScreen(screen);
@@ -80,7 +80,21 @@ namespace Brewmaster.EditorWindows.TileMaps
 			};
 
 			_mapOverview = new MapOverview(Map);
-			_mapOverview.MapSizeChanged += () => { Pristine = false; };
+			_mapOverview.MapSizeChanged += () =>
+			{
+				Pristine = false;
+				State.ClearUndoStack();
+				State.RefreshTileUsage(Map);
+				foreach (var metaTilePalette in _metaTilePalettes.Values)
+				{
+					metaTilePalette.RefreshMetaTiles();
+				}
+				for (var x = 0; x < Map.Width; x++)
+				for (var y = 0; y < Map.Height; y++)
+					EnsureScreen(x, y);
+
+				_screenPanel.RefreshMapScreens();
+			};
 			_mapOverview.ActivateScreen = ActivateScreen;
 
 			_tilePalette = new ChrTilePalette(State) { Width = 256, Height = 256, Top = 0, Left = Width - 256 };
@@ -179,10 +193,17 @@ namespace Brewmaster.EditorWindows.TileMaps
 		protected override void OnControlRemoved(ControlEventArgs e)
 		{
 			base.OnControlRemoved(e);
-			foreach (var screen in Map.Screens.SelectMany(s => s)) screen.Unload();
+			foreach (var screen in Map.Screens.SelectMany(s => s).Where(s => s != null)) screen.Unload();
 		}
 
 		private void ActivateScreen(int x, int y)
+		{
+			EnsureScreen(x, y);
+			//_screenPanel.AddSingleScreen(Map.Screens[y][x]);
+			_screenPanel.AddFullMap(new Point(x, y));
+		}
+
+		private void EnsureScreen(int x, int y)
 		{
 			while (y >= Map.Screens.Count) Map.Screens.Add(new List<TileMapScreen>());
 			while (x >= Map.Screens[y].Count) Map.Screens[y].Add(null);
@@ -191,9 +212,8 @@ namespace Brewmaster.EditorWindows.TileMaps
 			{
 				Map.Screens[y][x] = new TileMapScreen(Map);
 				InitScreen(Map.Screens[y][x]);
+				State.RefreshTileUsage(Map.Screens[y][x]);
 			}
-			FocusedScreen = Map.Screens[y][x];
-			_screenPanel.AddSingleScreen(FocusedScreen);
 		}
 
 		private void InitScreen(TileMapScreen screen)
@@ -340,8 +360,6 @@ namespace Brewmaster.EditorWindows.TileMaps
 			}
 		}
 
-		public TileMapScreen FocusedScreen { get; set; }
-
 		public TileMap Map { get; set; }
 
 		private void ImportPalette()
@@ -430,6 +448,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 			_colorPalette.Invalidate();
 
 			State.ClearUndoStack();
+			State.RefreshTileUsage(Map);
 			Pristine = false;
 		}
 		private void ImportMap()
@@ -521,13 +540,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 				fileName = dialog.FileName;
 			}
 
-			using (var sourceImage = new Bitmap(fileName))
-			{
-				using (var graphics = Graphics.FromImage(FocusedScreen.Image.Image))
-				{
-					graphics.DrawImageUnscaled(sourceImage, 0, 0);
-				}
-			}
+			throw new NotImplementedException();
 			_screenPanel.InvalidateVisibleViews();
 		}
 		private void ImportChr()
@@ -763,8 +776,12 @@ namespace Brewmaster.EditorWindows.TileMaps
 			else _screenTileUsage[screen][newTile] = 1;
 
 			if (_tileUsage.ContainsKey(newTile)) _tileUsage[newTile]++;
-			else _tileUsage[newTile] = 1;
-			
+			else _tileUsage[newTile] = 1;	
+		}
+		public void RefreshTileUsage(TileMapScreen screen)
+		{
+			_screenTileUsage[screen] = screen.Tiles.GroupBy(tile => tile).ToDictionary(g => g.Key, g => g.ToArray().Length);
+			_tileUsage = _screenTileUsage.SelectMany(kvp => kvp.Value).GroupBy(kvp => kvp.Key, kvp => kvp.Value).ToDictionary(g => g.Key, g => g.Sum());
 		}
 
 		public void RefreshTileUsage(TileMap map)
