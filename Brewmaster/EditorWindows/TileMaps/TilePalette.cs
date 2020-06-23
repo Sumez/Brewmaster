@@ -65,9 +65,30 @@ namespace Brewmaster.EditorWindows.TileMaps
 		
 		protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
 		{
+			switch (keyData)
+			{
+				case Keys.Right:
+					MoveSelection(1);
+					return true;
+				case Keys.Left:
+					MoveSelection(- 1);
+					return true;
+				case Keys.Up:
+					MoveSelection(- _rowWidth);
+					return true;
+				case Keys.Down:
+					MoveSelection(_rowWidth);
+					return true;
+			}
 			if (keyData != Program.Keys[Feature.RemoveFromList] || RemoveTile == null) return base.ProcessCmdKey(ref msg, keyData);
 			if (SelectedTile >= 0) RemoveTile(SelectedTile);
 			return true;
+		}
+
+		private void MoveSelection(int delta)
+		{
+			var selectTile = SelectedTile + delta;
+			if (selectTile >=  0 && selectTile < Tiles.Count && TileClick != null) TileClick(selectTile);
 		}
 
 		private FastBitmap _image = new FastBitmap(128, 128);
