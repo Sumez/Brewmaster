@@ -9,7 +9,7 @@ namespace Brewmaster.ProjectWizard
 {
 	public partial class ImportProjectFiles : WizardStep
 	{
-		public ProjectExplorer.ProjectExplorer ProjectExplorer { get; }
+		public ProjectExplorer.ProjectExplorerTree ProjectExplorer { get; }
 		private AsmProject _project;
 		private readonly List<ImportFile> _fileControls = new List<ImportFile>();
 		private int _focusControl = -1;
@@ -20,7 +20,7 @@ namespace Brewmaster.ProjectWizard
 		{
 			InitializeComponent();
 
-			ProjectExplorer = new ProjectExplorer.ProjectExplorer(new Events(), true, false) { Dock = DockStyle.Fill };
+			ProjectExplorer = new ProjectExplorer.ProjectExplorerTree(new Events(), true, false) { Dock = DockStyle.Fill };
 			FilePanel.Controls.Add(ProjectExplorer);
 			return;
 

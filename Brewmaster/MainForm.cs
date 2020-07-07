@@ -56,7 +56,7 @@ namespace Brewmaster
 	    public string RequestFile { get; set; }
 		public OpcodeHelper OpcodeHelper { get; private set; }
 		public Ca65CommandDocumentation Ca65Helper { get; private set; }
-		public ProjectExplorer.ProjectExplorer ProjectExplorer { get; private set; }
+		public ProjectExplorer.ProjectExplorerTree ProjectExplorer { get; private set; }
 
 		private readonly Action<LogData> _logHandler;
 		private readonly Action<int> _breakHandler;
@@ -243,7 +243,7 @@ namespace Brewmaster
 				LoadModule(CpuStatus = new CpuStatus(_moduleEvents), "Console Status");
 				LoadModule(Mesen = new MesenControl(), "Mesen");
 
-				LoadModule(ProjectExplorer = new ProjectExplorer.ProjectExplorer(_moduleEvents), "Project Explorer");
+				LoadModule(ProjectExplorer = new ProjectExplorer.ProjectExplorerTree(_moduleEvents), "Project Explorer");
 
 				LoadModule(OpcodeHelper = new OpcodeHelper(_moduleEvents), "Opcodes");
 				LoadModule(Ca65Helper = new Ca65CommandDocumentation(_moduleEvents), "Commands");

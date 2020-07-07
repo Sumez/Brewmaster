@@ -9,7 +9,7 @@ using Brewmaster.Properties;
 
 namespace Brewmaster.ProjectExplorer
 {
-	public class ProjectExplorer : SortableTreeView
+	public class ProjectExplorerTree : SortableTreeView
 	{
 		private ProjectExplorerMenu _menu;
 		private AsmProject _project;
@@ -49,7 +49,7 @@ namespace Brewmaster.ProjectExplorer
 
 		}
 
-		public ProjectExplorer(Events events, bool showAllFiles = false, bool allowFileEditing = true)
+		public ProjectExplorerTree(Events events, bool showAllFiles = false, bool allowFileEditing = true)
 		{
 			_events = events;
 			_showAllFiles = showAllFiles;

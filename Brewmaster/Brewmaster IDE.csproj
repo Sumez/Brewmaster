@@ -372,7 +372,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="ProjectExplorer\FileNode.cs" />
     <Compile Include="ProjectExplorer\OsFeatures.cs" />
-    <Compile Include="ProjectExplorer\ProjectExplorer.cs">
+    <Compile Include="ProjectExplorer\ProjectExplorerTree.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="ProjectExplorer\SelectableTreeView.cs">
@@ -578,8 +578,8 @@
     <EmbeddedResource Include="Modules\Ppu\TileMapViewer.resx">
       <DependentUpon>TileMapViewer.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="ProjectExplorer\ProjectExplorer.resx">
-      <DependentUpon>ProjectExplorer.cs</DependentUpon>
+    <EmbeddedResource Include="ProjectExplorer\ProjectExplorerTree.resx">
+      <DependentUpon>ProjectExplorerTree.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ProjectWizard\BuildConfigurationStep.resx">
       <DependentUpon>BuildConfigurationStep.cs</DependentUpon>
