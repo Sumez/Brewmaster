@@ -10,7 +10,8 @@ namespace Brewmaster.EditorWindows.TileMaps
 {
 	public class MetaTilePalette : UserControl
 	{
-		private TileMap _map;
+		private readonly TileMap _map;
+		private readonly MapEditorState _state;
 		private readonly int _metaTileSize;
 		private readonly bool _includeMetaValues;
 		private readonly bool _includeAttributes;
@@ -38,6 +39,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 		public MetaTilePalette(TileMap map, int metaTileSize, MapEditorState state, bool includeMetaValues, bool includeAttributes)
 		{
 			_map = map;
+			_state = state;
 			_metaTileSize = metaTileSize;
 			_includeMetaValues = includeMetaValues;
 			_includeAttributes = includeAttributes;
@@ -48,7 +50,6 @@ namespace Brewmaster.EditorWindows.TileMaps
 			state.ChrDataChanged += _tilePalette.RefreshImage;
 			state.PaletteChanged += _tilePalette.RefreshImage;
 
-			_tilePalette.State = state;
 			_tilePalette.MetaTileWidth = metaTileSize;
 			_tilePalette.GetTileColors = (tile, i) =>
 			{
@@ -104,7 +105,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 			{
 				if (screen == null)
 				{
-					var screens = _map.Screens.SelectMany(s => s).Where(s => s != null).ToArray();
+					var screens = _map.GetAllScreens().ToArray();
 					lock (_allMetaTilesLock)
 						foreach (var removedScreen in _screenCollections.Keys.Where(s => !screens.Contains(s)).ToArray())
 						{
@@ -145,6 +146,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 			// 
 			// _tilePalette
 			// 
+			this._tilePalette.State = _state;
 			this._tilePalette.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));

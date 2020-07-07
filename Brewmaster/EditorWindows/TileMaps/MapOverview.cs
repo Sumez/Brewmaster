@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -21,14 +23,45 @@ namespace Brewmaster.EditorWindows.TileMaps
 			_screenSizeButton.LinkClicked += (s, a) => { ChangeScreenSize(); };
 		}
 
+		private bool ValidateMapResize(int width, int height, Anchor anchor)
+		{
+			if (width >= _map.Width && height >= _map.Height) return true;
+			return MessageBox.Show("Screens will be deleted when shrinking the global map size.\nThese cannot be recovered!", "Warning", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning) == DialogResult.OK;
+		}
+		private bool ValidateScreenResize(int width, int height, Anchor anchor)
+		{
+			var deltaW = width - _map.ScreenSize.Width;
+			var deltaH = height - _map.ScreenSize.Height;
+			if (anchor.HasFlag(TileMaps.Anchor.E))
+			{
+				if (deltaW % _map.AttributeSize.Width != 0) return RefuseSizeChange(string.Format("Cropping on the left side must be a multiple of the attribute width ({0})", _map.AttributeSize.Width));
+				if (deltaW % _map.MetaValueSize.Width != 0) return RefuseSizeChange(string.Format("Cropping on the left side must be a multiple of the collision resolution ({0})", _map.MetaValueSize.Width));
+			}
+
+			if (anchor.HasFlag(TileMaps.Anchor.S))
+			{
+				if (deltaH % _map.AttributeSize.Height != 0) return RefuseSizeChange(string.Format("Cropping on the top must be a multiple of the attribute height ({0})", _map.AttributeSize.Height));
+				if (deltaH % _map.MetaValueSize.Height != 0) return RefuseSizeChange(string.Format("Cropping on the top must be a multiple of the collision resolution ({0})", _map.MetaValueSize.Height));
+			}
+
+			if (width >= _map.ScreenSize.Width && height >= _map.ScreenSize.Height) return true;
+			return MessageBox.Show("Tiles outside the new screen size will be deleted.\nThese cannot be recovered!", "Warning", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning) == DialogResult.OK;
+		}
+
+		private bool RefuseSizeChange(string message)
+		{
+			MessageBox.Show(message, "Cannot change size", MessageBoxButtons.OK);
+			return false;
+		}
+
 		private void ChangeMapSize()
 		{
-			using (var window = new ResizeWindow(_map.Width, _map.Height, "Screens will be deleted when shrinking the global map size.\nThese cannot be recovered!"))
+			using (var window = new ResizeWindow(_map.Width, _map.Height, ValidateMapResize))
 			{
 				if (window.ShowDialog(this) != DialogResult.OK) return;
 				var newWidth = window.SetWidth;
 				var newHeight = window.SetHeight;
-				if (window.ResizeAnchor == TileMaps.Anchor.Ne || window.ResizeAnchor == TileMaps.Anchor.Se)
+				if (window.ResizeAnchor.HasFlag(TileMaps.Anchor.E))
 				{
 					foreach (var screenRow in _map.Screens)
 					{
@@ -52,7 +85,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 					}
 				}
 
-				if (window.ResizeAnchor == TileMaps.Anchor.Se || window.ResizeAnchor == TileMaps.Anchor.Sw)
+				if (window.ResizeAnchor.HasFlag(TileMaps.Anchor.S))
 				{
 					for (var i = _map.Height ; i < newHeight; i++) _map.Screens.Insert(0, new List<TileMapScreen>());
 					for (var i = _map.Height; i > newHeight; i--)
@@ -80,11 +113,51 @@ namespace Brewmaster.EditorWindows.TileMaps
 		}
 		private void ChangeScreenSize()
 		{
-			using (var window = new ResizeWindow(_map.ScreenSize.Width, _map.ScreenSize.Height, "Tiles outside the new screen size will be deleted.\nThese cannot be recovered!"))
+			using (var window = new ResizeWindow(_map.ScreenSize.Width, _map.ScreenSize.Height, ValidateScreenResize))
 			{
 				if (window.ShowDialog(this) != DialogResult.OK) return;
+				foreach (var screen in _map.GetAllScreens())
+				{
+					ResizeTileMap(ref screen.Tiles, _map.ScreenSize.Width, _map.ScreenSize.Height, window.SetWidth, window.SetHeight, window.ResizeAnchor);
+					ResizeTileMap(ref screen.ColorAttributes,
+						_map.ScreenSize.Width / _map.AttributeSize.Width, _map.ScreenSize.Height / _map.AttributeSize.Height, 
+						window.SetWidth / _map.AttributeSize.Width, window.SetHeight / _map.AttributeSize.Height, window.ResizeAnchor);
+					ResizeTileMap(ref screen.MetaValues,
+						_map.ScreenSize.Width / _map.MetaValueSize.Width, _map.ScreenSize.Height / _map.MetaValueSize.Height,
+						window.SetWidth / _map.MetaValueSize.Width, window.SetHeight / _map.MetaValueSize.Height, window.ResizeAnchor);
+
+					screen.Image = new FastBitmap(window.SetWidth * _map.BaseTileSize.Width, window.SetHeight * _map.BaseTileSize.Height, PixelFormat.Format32bppPArgb);
+					screen.MetaImage = new FastBitmap(window.SetWidth / _map.MetaValueSize.Width, window.SetHeight / _map.MetaValueSize.Height, PixelFormat.Format32bppArgb);
+				}
+				_map.ScreenSize = new Size(window.SetWidth, window.SetHeight);
+
+				if (MapSizeChanged != null) MapSizeChanged();
 				UpdateDataView();
+				_miniMap.PerformLayout();
+				_miniMap.Invalidate();
 			}
+		}
+
+		private void ResizeTileMap(ref int[] tiles, int oldWidth, int oldHeight, int newWidth, int newHeight, Anchor anchor)
+		{
+			var deltaWidth = newWidth - oldWidth;
+			var deltaHeight = newHeight - oldHeight;
+
+			var newTiles = new int[newWidth * newHeight];
+			var sourceIndex = anchor.HasFlag(TileMaps.Anchor.E) ? Math.Max(0, -deltaWidth) : 0;
+			var targetIndex = anchor.HasFlag(TileMaps.Anchor.E) ? Math.Max(0, deltaWidth) : 0;
+
+			if (anchor.HasFlag(TileMaps.Anchor.S) && deltaHeight > 0) targetIndex += deltaHeight * newWidth;
+			if (anchor.HasFlag(TileMaps.Anchor.S) && deltaHeight < 0) sourceIndex -= deltaHeight * oldWidth;
+
+			while (targetIndex < newTiles.Length && sourceIndex < tiles.Length)
+			{
+				Buffer.BlockCopy(tiles, sourceIndex * 4, newTiles, targetIndex * 4, Math.Min(oldWidth, newWidth) * 4);
+				sourceIndex += oldWidth;
+				targetIndex += newWidth;
+			}
+
+			tiles = newTiles;
 		}
 
 

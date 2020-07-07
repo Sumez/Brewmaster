@@ -65,6 +65,11 @@ namespace Brewmaster.EditorWindows.TileMaps
 		{
 			return MetaValueColors.Length <= value ? MetaValueColors[1] : MetaValueColors[value];
 		}
+
+		public IEnumerable<TileMapScreen> GetAllScreens()
+		{
+			return Screens.SelectMany(s => s).Where(s => s != null);
+		}
 	}
 	public class TileMapScreen
 	{

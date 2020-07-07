@@ -7,7 +7,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 {
 	public class ChrTilePalette : UserControl
 	{
-		private MapEditorState _state;
+		private readonly MapEditorState _state;
 		private TilePalette _tilePalette;
 		public event Action<int> HoverTile;
 		public event Action UserSelectedTile;
@@ -28,7 +28,6 @@ namespace Brewmaster.EditorWindows.TileMaps
 			state.PaletteChanged += _tilePalette.RefreshImage;
 
 			_tilePalette.Tiles = new List<MetaTile>();
-			_tilePalette.State = state;
 			RefreshTileCount();
 			_tilePalette.TileClick += SelectTile;
 			_tilePalette.TileDrag += state.MoveChrTile;
@@ -71,10 +70,12 @@ namespace Brewmaster.EditorWindows.TileMaps
 		private void InitializeComponent()
 		{
 			this._tilePalette = new Brewmaster.EditorWindows.TileMaps.TilePalette();
+
 			this.SuspendLayout();
 			// 
 			// _tilePalette
 			// 
+			this._tilePalette.State = _state;
 			this._tilePalette.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));

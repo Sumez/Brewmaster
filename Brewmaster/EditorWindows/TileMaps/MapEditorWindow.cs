@@ -72,7 +72,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 			State.TilesMoved += (changes, undoStep) =>
 			{
-				foreach (var screen in Map.Screens.SelectMany(s => s).Where(s => s != null))
+				foreach (var screen in Map.GetAllScreens())
 				{
 					if (!screen.ReplaceTiles(changes)) continue;
 					undoStep.AddScreen(screen);
@@ -150,7 +150,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 			LoadChrSource();
 			SelectTilePen(0);
 
-			foreach (var screen in Map.Screens.SelectMany(l => l).Where(s => s != null)) InitScreen(screen);
+			foreach (var screen in Map.GetAllScreens()) InitScreen(screen);
 			State.RefreshTileUsage(Map);
 			State.AfterUndo += (step) => State.RefreshTileUsage(Map);
 
@@ -193,7 +193,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 		protected override void OnControlRemoved(ControlEventArgs e)
 		{
 			base.OnControlRemoved(e);
-			foreach (var screen in Map.Screens.SelectMany(s => s).Where(s => s != null)) screen.Unload();
+			foreach (var screen in Map.GetAllScreens()) screen.Unload();
 		}
 
 		private void ActivateScreen(int x, int y)
@@ -443,7 +443,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 				}
 
 			}
-			foreach (var screen in Map.Screens.SelectMany(s => s)) InitScreen(screen);
+			foreach (var screen in Map.GetAllScreens()) InitScreen(screen);
 			ActivateScreen(0, 0);
 			_colorPalette.Invalidate();
 
@@ -788,7 +788,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 		{
 			// TODO: Remove screens from list if removed from full map
 			_screenTileUsage.Clear();
-			foreach (var screen in map.Screens.SelectMany(s => s).Where(s => s != null))
+			foreach (var screen in map.GetAllScreens())
 			{
 				_screenTileUsage[screen] = screen.Tiles.GroupBy(tile => tile).ToDictionary(g => g.Key, g => g.ToArray().Length);
 			}

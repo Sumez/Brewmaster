@@ -1,4 +1,5 @@
-﻿using System.Windows.Forms;
+﻿using System;
+using System.Windows.Forms;
 using Brewmaster.Properties;
 
 namespace Brewmaster.EditorWindows.TileMaps
@@ -11,11 +12,8 @@ namespace Brewmaster.EditorWindows.TileMaps
 		private Button _swButton;
 		private Button _seButton;
 		private NumericUpDown _widthInput;
-		private int _originalWidth;
 		private Button _cancelButton;
 		private Button _okButton;
-		private int _originalHeight;
-		private readonly string _shrinkWarning;
 
 		public int SetHeight
 		{
@@ -29,13 +27,10 @@ namespace Brewmaster.EditorWindows.TileMaps
 		}
 		public Anchor ResizeAnchor { get; private set; }
 		 
-		public ResizeWindow(int width, int height, string shrinkWarning = null)
+		public ResizeWindow(int width, int height, Func<int, int, Anchor, bool> validate = null)
 		{
 			InitializeComponent();
 
-			_originalWidth = width;
-			_originalHeight = height;
-			_shrinkWarning = shrinkWarning;
 			SetWidth = width;
 			SetHeight = height;
 
@@ -61,9 +56,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 			_okButton.Click += (s, a) =>
 			{
-				if ((SetWidth < _originalWidth || SetHeight < _originalHeight) &&
-				    _shrinkWarning != null && 
-				    MessageBox.Show(_shrinkWarning, "Warning", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning) != DialogResult.OK) return;
+				if (validate != null && !validate(SetWidth, SetHeight, ResizeAnchor)) return;
 				DialogResult = DialogResult.OK;
 				Close();
 			};
@@ -274,6 +267,13 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 	public enum Anchor
 	{
-		Nw, Ne, Sw, Se
+		N = 1,
+		S = 2,
+		W = 4,
+		E = 8,
+		Nw = 5,
+		Ne = 9,
+		Sw = 6,
+		Se = 10
 	}
 }

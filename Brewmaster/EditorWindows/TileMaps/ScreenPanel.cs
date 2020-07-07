@@ -233,7 +233,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 				return;
 			}
 
-			var remainingScreens = _map.Screens.SelectMany(s => s).Where(s => s != null).ToArray();
+			var remainingScreens = _map.GetAllScreens().ToArray();
 			if (remainingScreens.Contains(_loadedScreen)) return;
 			AddSingleScreen(remainingScreens[0]);
 		}
