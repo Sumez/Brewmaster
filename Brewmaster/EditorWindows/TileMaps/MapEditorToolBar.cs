@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
+using Brewmaster.Controls;
 using Brewmaster.Properties;
 
 namespace Brewmaster.EditorWindows.TileMaps
 {
-	public class MapEditorToolBar : ToolStrip
+	public class MapEditorToolBar : AutoFocusToolStrip
 	{
 		private ToolStripDropDownItem _importMenu;
 		public Action ImportImage { get; set; }

@@ -56,7 +56,8 @@ namespace Brewmaster.ProjectModel
 		private static readonly FileType[] ContentFiles = {
 			FileType.Image,
 			FileType.Audio,
-			FileType.FamiTracker
+			FileType.FamiTracker,
+			FileType.TileMap
 		};
 		private static readonly string[] ContentFileExtensions = {".bin", ".json", ".xml"};
 
