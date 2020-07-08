@@ -49,6 +49,7 @@ namespace Brewmaster.Layout
 	[Designer(typeof(MultiSplitDesigner))]
 	public class MultiSplitContainer : ContainerControl
 	{
+		public int BorderWidth { get; set; } = 1;
 		public List<MultiSplitPanel> Panels { get; private set; }
 		public List<int> Splits { get; private set; }
 		public bool Horizontal { get; set; }
@@ -171,9 +172,12 @@ namespace Brewmaster.Layout
 			ResizePanels(-addSize);
 			Splits.Add(FullSize);
 
-			var newPanel = new MultiSplitPanel();
-			newPanel.Height = Height;
-			newPanel.Top = 0;
+			var newPanel = new MultiSplitPanel
+			{
+				Height = Height,
+				Top = 0,
+				Padding = new Padding(BorderWidth, BorderWidth, BorderWidth, BorderWidth)
+			};
 
 			Panels.Insert(index, newPanel);
 			Controls.Add(newPanel);
@@ -188,6 +192,7 @@ namespace Brewmaster.Layout
 			ResumeLayout();
 			return newPanel;
 		}
+
 		public void RemovePanel(MultiSplitPanel panel)
 		{
 			var index = Panels.IndexOf(panel);
@@ -330,6 +335,11 @@ namespace Brewmaster.Layout
 			Splits = newSplits;
 			if (Splits.Count > 0) _oldWidth = _oldHeight = Splits[Splits.Count - 1]; // "Hack" to ensure fitting stored sizes into a new layout.
 			PerformLayout();
+		}
+
+		internal void AddPanel(object p)
+		{
+			throw new NotImplementedException();
 		}
 	}
 

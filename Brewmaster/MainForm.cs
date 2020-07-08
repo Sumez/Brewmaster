@@ -56,7 +56,7 @@ namespace Brewmaster
 	    public string RequestFile { get; set; }
 		public OpcodeHelper OpcodeHelper { get; private set; }
 		public Ca65CommandDocumentation Ca65Helper { get; private set; }
-		public ProjectExplorer.ProjectExplorerTree ProjectExplorer { get; private set; }
+		public ProjectExplorer.ProjectExplorer ProjectExplorer { get; private set; }
 
 		private readonly Action<LogData> _logHandler;
 		private readonly Action<int> _breakHandler;
@@ -67,9 +67,13 @@ namespace Brewmaster
 		private MemoryState _memoryState;
 
 
+		private void RefreshTitle()
+		{
+			Text = CurrentProject == null ? ProgramTitle : string.Format("{0}{1} - {2}", CurrentProject.Name, CurrentProject.Pristine ? "" : "*", ProgramTitle);
+		}
 		private void RefreshView()
-	    {
-		    Text = CurrentProject == null ? ProgramTitle : CurrentProject.Name + " - " + ProgramTitle;
+		{
+			RefreshTitle();
 		    SetStatus();
 
 			build.Enabled =
@@ -243,7 +247,7 @@ namespace Brewmaster
 				LoadModule(CpuStatus = new CpuStatus(_moduleEvents), "Console Status");
 				LoadModule(Mesen = new MesenControl(), "Mesen");
 
-				LoadModule(ProjectExplorer = new ProjectExplorer.ProjectExplorerTree(_moduleEvents), "Project Explorer");
+				LoadModule(ProjectExplorer = new ProjectExplorer.ProjectExplorer(_moduleEvents), "Project Explorer");
 
 				LoadModule(OpcodeHelper = new OpcodeHelper(_moduleEvents), "Opcodes");
 				LoadModule(Ca65Helper = new Ca65CommandDocumentation(_moduleEvents), "Commands");
@@ -455,9 +459,9 @@ namespace Brewmaster
 
 			FormClosed += (sender, args) => UnloadEmulator();
 
-			ProjectExplorer.OpenFile = (file) => OpenFileInTab(file);
-		    ProjectExplorer.CreateNewFile = CreateNewFile;
-		    ProjectExplorer.AddExistingFile = AddExistingFile;
+			ProjectExplorer.Tree.OpenFile = (file) => OpenFileInTab(file);
+		    ProjectExplorer.Tree.CreateNewFile = CreateNewFile;
+		    ProjectExplorer.Tree.AddExistingFile = AddExistingFile;
 
 			BuildHandler.Log = ThreadSafeLogOutput;
 		    BuildHandler.RefreshErrorList = ThreadSafeBuildErrorUpdate;
@@ -615,7 +619,7 @@ namespace Brewmaster
 			    File = file
 			};
 		    CurrentProject.AddNewProjectFile(projectFile);
-			ProjectExplorer.FocusNode(projectFile);
+			ProjectExplorer.Tree.FocusNode(projectFile);
 	    }
 		private void CreateNewFile(string target, FileTemplate template, string extension)
 	    {
@@ -661,7 +665,7 @@ namespace Brewmaster
 
 		    projectFile.File = new FileInfo(filename);
 		    CurrentProject.AddNewProjectFile(projectFile);
-			ProjectExplorer.FocusNode(projectFile);
+			ProjectExplorer.Tree.FocusNode(projectFile);
 
 			OpenFileInTab(projectFile);
 		}
@@ -1063,6 +1067,7 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 			LoadProjectState();
 
 			//loadingForm.Close();
+			project.PristineChanged += RefreshTitle;
 			RefreshView();
 			RefreshConfigurationList();
 			SetStatus("Parsing debug symbols...");
@@ -1154,7 +1159,7 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 		    }
 
 			UnloadEmulator();
-			ProjectExplorer.Nodes.Clear();
+			ProjectExplorer.SetProject(null);
 			//CartridgeExplorer.Nodes.Clear();
 		    editorTabs.TabPages.Clear();
 		    WatchValues.Clear();

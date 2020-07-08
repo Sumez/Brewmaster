@@ -150,6 +150,9 @@
     <Compile Include="CartridgeExplorer\CartridgeExplorer.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Controls\AutoFocusMenuStrip.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="EditorWindows\Code\AllCompletion.cs" />
     <Compile Include="EditorWindows\Code\CodeMarkers.cs" />
     <Compile Include="EditorWindows\Code\GoToAll.cs">
@@ -238,6 +241,12 @@
     </Compile>
     <Compile Include="Modules\Ppu\TileMapViewer.Designer.cs">
       <DependentUpon>TileMapViewer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\NonBuggyComboBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ProjectExplorer\ProjectExplorer.cs">
+      <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="ProjectExplorer\ProjectExplorerMenu.cs">
       <SubType>Component</SubType>
@@ -375,7 +384,13 @@
     <Compile Include="ProjectExplorer\ProjectExplorerTree.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="ProjectExplorer\ProjectFileSettings.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="ProjectExplorer\SelectableTreeView.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ProjectExplorer\SettingControl.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="ProjectExplorer\SortableTreeView.cs">
@@ -578,8 +593,14 @@
     <EmbeddedResource Include="Modules\Ppu\TileMapViewer.resx">
       <DependentUpon>TileMapViewer.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="ProjectExplorer\ProjectExplorer.resx">
+      <DependentUpon>ProjectExplorer.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="ProjectExplorer\ProjectExplorerTree.resx">
       <DependentUpon>ProjectExplorerTree.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ProjectExplorer\ProjectFileSettings.resx">
+      <DependentUpon>ProjectFileSettings.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ProjectWizard\BuildConfigurationStep.resx">
       <DependentUpon>BuildConfigurationStep.cs</DependentUpon>

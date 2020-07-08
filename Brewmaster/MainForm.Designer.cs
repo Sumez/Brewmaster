@@ -49,7 +49,7 @@ namespace Brewmaster
 			System.Windows.Forms.ToolStripSeparator toolStripSeparator27;
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
 			this.editorTabs = new Brewmaster.EditorWindows.EditorTabs();
-			this.MainWindowMenu = new System.Windows.Forms.MenuStrip();
+			this.MainWindowMenu = new Brewmaster.Controls.AutoFocusMenuStrip();
 			this.FileMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.File_NewMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.nesProjectMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -159,7 +159,7 @@ namespace Brewmaster
 			this.viewHelpTopicsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.aboutMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.toolstrippanel = new System.Windows.Forms.FlowLayoutPanel();
-			this.MainToolStrip = new System.Windows.Forms.ToolStrip();
+			this.MainToolStrip = new Brewmaster.Controls.AutoFocusToolStrip();
 			this.newProjectToolStripButton = new System.Windows.Forms.ToolStripButton();
 			this.openProjectToolStripButton = new System.Windows.Forms.ToolStripButton();
 			this.saveToolStripButton = new System.Windows.Forms.ToolStripButton();
