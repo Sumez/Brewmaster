@@ -153,7 +153,7 @@ namespace Brewmaster.ProjectExplorer
 			var dirNode = node is DirectoryNode;
 			var editableNode = node as EditableNode;
 
-			var root = ProjectExplorer.GetRoot(node);
+			var root = ProjectExplorerTree.GetRoot(node);
 			if (root.Name == "data")
 			{
 				// Data pipeline

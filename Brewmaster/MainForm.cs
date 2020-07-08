@@ -70,9 +70,13 @@ namespace Brewmaster
 		private ToolStrip _editorToolStrip;
 
 
+		private void RefreshTitle()
+		{
+			Text = CurrentProject == null ? ProgramTitle : string.Format("{0}{1} - {2}", CurrentProject.Name, CurrentProject.Pristine ? "" : "*", ProgramTitle);
+		}
 		private void RefreshView()
-	    {
-		    Text = CurrentProject == null ? ProgramTitle : CurrentProject.Name + " - " + ProgramTitle;
+		{
+			RefreshTitle();
 		    SetStatus();
 
 			build.Enabled =
@@ -492,9 +496,9 @@ namespace Brewmaster
 
 			FormClosed += (sender, args) => UnloadEmulator();
 
-			ProjectExplorer.OpenFile = (file) => OpenFileInTab(file);
-		    ProjectExplorer.CreateNewFile = CreateNewFile;
-		    ProjectExplorer.AddExistingFile = AddExistingFile;
+			ProjectExplorer.Tree.OpenFile = (file) => OpenFileInTab(file);
+		    ProjectExplorer.Tree.CreateNewFile = CreateNewFile;
+		    ProjectExplorer.Tree.AddExistingFile = AddExistingFile;
 
 			BuildHandler.Log = ThreadSafeLogOutput;
 		    BuildHandler.RefreshErrorList = ThreadSafeBuildErrorUpdate;
@@ -655,7 +659,7 @@ namespace Brewmaster
 			    File = file
 			};
 		    CurrentProject.AddNewProjectFile(projectFile);
-			ProjectExplorer.FocusNode(projectFile);
+			ProjectExplorer.Tree.FocusNode(projectFile);
 	    }
 		private void CreateNewFile(string target, FileTemplate template, string extension, CompileMode mode)
 	    {
@@ -701,7 +705,7 @@ namespace Brewmaster
 
 		    projectFile.File = new FileInfo(filename);
 		    CurrentProject.AddNewProjectFile(projectFile);
-			ProjectExplorer.FocusNode(projectFile);
+			ProjectExplorer.Tree.FocusNode(projectFile);
 
 			OpenFileInTab(projectFile);
 		}
@@ -1116,6 +1120,7 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 			LoadProjectState();
 
 			//loadingForm.Close();
+			project.PristineChanged += RefreshTitle;
 			RefreshView();
 			RefreshConfigurationList();
 			SetStatus("Parsing debug symbols...");
@@ -1208,7 +1213,7 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 		    }
 
 			UnloadEmulator();
-			ProjectExplorer.Nodes.Clear();
+			ProjectExplorer.SetProject(null);
 			//CartridgeExplorer.Nodes.Clear();
 		    editorTabs.TabPages.Clear();
 		    WatchValues.Clear();
