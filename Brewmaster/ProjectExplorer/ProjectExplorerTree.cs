@@ -19,7 +19,7 @@ namespace Brewmaster.ProjectExplorer
 		private bool _showAllFiles;
 
 		public Action<AsmProjectFile> OpenFile;
-		public Action<string, FileTemplate, string> CreateNewFile { set { _menu.CreateNewFile = value; } }
+		public Action<string, FileTemplate, string, CompileMode> CreateNewFile { set { _menu.CreateNewFile = value; } }
 		public Action<string, string, CompileMode> AddExistingFile { set { _menu.AddExistingFile = value; } get { return _menu.AddExistingFile; } }
 		public bool ShowAllFiles
 		{
@@ -260,33 +260,37 @@ namespace Brewmaster.ProjectExplorer
 		}
 		public void RefreshTree()
 		{
-			var projectNode = CreateNodeFromDirectory(_project.Directory, false, _project.Directories);
-			projectNode.Name = "project";
-			projectNode.Edited += (e) => _project.Name = e.Label; // TODO: Update window title
-			projectNode.Text = _project.Name;
 			var projectImage = _project.Platform == TargetPlatform.Snes ? 1 : 0;
-			projectNode.ImageIndex = projectImage;
-			projectNode.SelectedImageIndex = projectImage;
+			EditableNode sourceNode = null;
+			if (_project.Type != ProjectType.AssetOnly)
+			{
+				sourceNode = CreateNodeFromDirectory(_project.Directory, false, _project.Directories);
+				sourceNode.Name = "project";
+				sourceNode.Edited += (e) => _project.Name = e.Label; // TODO: Update window title
+				sourceNode.Text = _project.Name;
+				sourceNode.ImageIndex = projectImage;
+				sourceNode.SelectedImageIndex = projectImage;
+			}
 
 			var dataNode = CreateNodeFromDirectory(_project.Directory, true, new List<DirectoryInfo>());
 			dataNode.Name = "data";
 			dataNode.Editable = false;
-			dataNode.Text = "Data pipeline";
-			dataNode.ImageIndex = 2;
-			dataNode.SelectedImageIndex = 2;
+			dataNode.Text = _project.Type == ProjectType.AssetOnly ? _project.Name : "Data pipeline";
+			dataNode.ImageIndex = _project.Type == ProjectType.AssetOnly ? projectImage : 2;
+			dataNode.SelectedImageIndex = _project.Type == ProjectType.AssetOnly ? projectImage : 2;
 
 			if (Nodes.Count == 0)
 			{
-				projectNode.Expand();
+				if (sourceNode != null) sourceNode.Expand();
 				dataNode.Expand();
 			}
 			GetExpandedState();
 			Nodes.Clear();
-			Nodes.Add(projectNode);
+			if (sourceNode != null) Nodes.Add(sourceNode);
 			Nodes.Add(dataNode);
 			_menu.SetNode(null);
 
-			_projectRootNode = projectNode;
+			_projectRootNode = sourceNode ?? dataNode;
 			_dataRootNode = dataNode;
 			SetExpandedState();
 		}
@@ -298,7 +302,8 @@ namespace Brewmaster.ProjectExplorer
 				if (subDirectory.Name[0] == '.') continue;
 				var subDirNode = CreateNodeFromDirectory(subDirectory, pipeline, extraDirectories);
 				subDirNode.Edited += (e) => RenameDirectory(subDirectory, e);
-				if (subDirNode.Nodes.Count > 0) {
+				if (subDirNode.Nodes.Count > 0)
+				{
 					extraDirectories.RemoveAll(d => d.FullName == subDirectory.FullName);
 				}
 				else if (!extraDirectories.Any(d => d.FullName == subDirectory.FullName)) continue;
@@ -349,12 +354,12 @@ namespace Brewmaster.ProjectExplorer
 				return;
 			}
 			foreach (var character in Path.GetInvalidPathChars().Union(Path.GetInvalidFileNameChars()))
-			if (e.Label.Contains(character))
-			{
-				e.CancelEdit = true;
-				Program.Error(string.Format("Invalid character '{0}'", character));
-				return;
-			}
+				if (e.Label.Contains(character))
+				{
+					e.CancelEdit = true;
+					Program.Error(string.Format("Invalid character '{0}'", character));
+					return;
+				}
 
 			var oldPath = directory.FullName.TrimEnd('\\', '/');
 			var newPath = Path.Combine(directory.Parent.FullName, e.Label);
