@@ -90,12 +90,13 @@ namespace Brewmaster.EditorWindows.Images
 
 		public void RefreshPalette(Bitmap imageSource)
 		{
-			var palette = new List<Color>();
-			palette.AddRange(imageSource.Palette.Entries);
+			var palette = new HashSet<Color>();
+			foreach (var color in imageSource.Palette.Entries.Distinct()) palette.Add(color);
 			for (var y = 0; y < imageSource.Height; y++)
 			{
 				for (var x = 0; x < imageSource.Width; x++)
 				{
+					if (palette.Count >= 256) break;
 					var color = imageSource.GetPixel(x, y);
 					if (!palette.Contains(color)) palette.Add(color);
 				}

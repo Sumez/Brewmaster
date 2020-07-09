@@ -272,7 +272,7 @@ namespace Brewmaster.ProjectExplorer
 				sourceNode.SelectedImageIndex = projectImage;
 			}
 
-			var dataNode = CreateNodeFromDirectory(_project.Directory, true, new List<DirectoryInfo>());
+			var dataNode = CreateNodeFromDirectory(_project.Directory, true, _project.Type == ProjectType.AssetOnly ? _project.Directories : new List<DirectoryInfo>());
 			dataNode.Name = "data";
 			dataNode.Editable = false;
 			dataNode.Text = _project.Type == ProjectType.AssetOnly ? _project.Name : "Data pipeline";

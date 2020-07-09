@@ -152,7 +152,7 @@ namespace Brewmaster.EditorWindows.Images
 			switch (option)
 			{
 				case ImagePipelines.Chr:
-					var baseFile = _file.GetRelativeDirectory() + @"/" + Path.GetFileNameWithoutExtension(_file.File.Name);
+					var baseFile = _file.GetRelativeDirectory(true) + Path.GetFileNameWithoutExtension(_file.File.Name);
 					Pipeline = new ChrPipeline(_file, baseFile + ".chr", baseFile + ".pal");
 					ChrPipelinePanel.Pipeline = Pipeline as ChrPipeline;
 					PaletteReductionPanel.Pipeline = Pipeline as ChrPipeline;

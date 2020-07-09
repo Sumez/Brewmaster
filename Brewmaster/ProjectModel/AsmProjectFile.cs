@@ -195,9 +195,10 @@ namespace Brewmaster.ProjectModel
 			Project.RefreshBreakpoints();
 		}
 
-		public string GetRelativeDirectory()
+		public string GetRelativeDirectory(bool trailingSlash = false)
 		{
-			return Project.GetRelativePath(File.DirectoryName);
+			var directory = Project.GetRelativePath(File.DirectoryName);
+			return directory == "" || !trailingSlash ? directory : (directory + @"/");
 		}
 		public string GetRelativePath()
 		{

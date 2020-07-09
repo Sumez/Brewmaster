@@ -47,6 +47,7 @@ namespace Brewmaster.ProjectExplorer
 			PipelineNewMenu.DropDownItems.Add("New Tile Map ...", null, (s, e) => { NewFile(".bwmap", FileTemplate.TileMap, CompileMode.ContentPipeline); });
 			PipelineNewMenu.DropDownItems.Add("New Famitracker Project...", null, (s, e) => { NewFile(".ftm", FileTemplate.Famitracker, CompileMode.ContentPipeline); });
 			PipelineNewMenu.DropDownItems.Add("New Level Data...", null, (s, e) => { NewFile(".level", FileTemplate.None, CompileMode.ContentPipeline); });
+			PipelineNewMenu.DropDownItems.Add("New Directory", null, (s, e) => { NewDirectory(); });
 
 			AddExistingOption = new ToolStripMenuItem("Add existing File...", null, (s, e) => ExistingFile(CompileMode.IncludeInAssembly));
 			PipelineAddExistingOption = new ToolStripMenuItem("Add existing File...", null, (s, e) => ExistingFile(CompileMode.ContentPipeline));

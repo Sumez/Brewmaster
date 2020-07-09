@@ -315,7 +315,7 @@ namespace Brewmaster.Pipeline
 
 		public override DataPipeline Clone(bool toEditor = false)
 		{
-			Func<string, string> convertFilePath = (s) => Path.Combine(File.Project.Directory.FullName, s);
+			Func<string, string> convertFilePath = (s) => Path.Combine(File.Project.Directory.FullName, s.Trim('/', '\\'));
 			if (toEditor) convertFilePath = (s) => File.Project.GetRelativePath(s);
 
 			var pipeline = new ChrPipeline(File, convertFilePath(ChrOutput), String.IsNullOrWhiteSpace(PaletteOutput) ? null : convertFilePath(PaletteOutput));
