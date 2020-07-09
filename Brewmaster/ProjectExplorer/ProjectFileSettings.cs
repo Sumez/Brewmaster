@@ -26,6 +26,8 @@ namespace Brewmaster.ProjectExplorer
 				}
 			};
 
+			_pipelineSetting.SetOptions("No processing");
+
 			Clear();
 		}
 		private Panel headerPanel;
@@ -53,6 +55,18 @@ namespace Brewmaster.ProjectExplorer
 					_pipelineSetting.Disabled = !(_pipelineSetting.Visible = _file.IsDataFile);
 					_assemblySetting.Disabled = !(_assemblySetting.Visible = _file.Type == FileType.Source || _file.Type == FileType.Include);
 					_assemblySetting.Value = _file.Mode == CompileMode.IncludeInAssembly ? "Yes" : "No";
+
+					switch (_file.Type)
+					{
+						case FileType.TileMap:
+							_pipelineSetting.SetOptions("No processing", "Asm code", "Binary");
+							break;
+						default:
+							_pipelineSetting.SetOptions("No processing");
+							break;
+					}
+
+					if (_file.Pipeline == null) _pipelineSetting.Value = "No processing";
 				}
 			}
 		}
