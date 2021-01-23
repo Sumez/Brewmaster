@@ -15,7 +15,10 @@ namespace Brewmaster.EditorWindows.TileMaps.Tools
 			var tileY = y / _map.BaseTileSize.Height;
 
 			var tile = screen.GetTile(tileX, tileY);
-			var palette = screen.GetColorTile(tileX, tileY);
+			var oldPalette = screen.GetColorTile(tileX, tileY);
+			var palette = GetSelectedPalette();
+
+			if (palette != oldPalette) screen.SetColorTile(tileX, tileY, palette);
 
 			screen.Image.SetPixel(x, y, _map.Palettes[palette].Colors[SelectedColor]);
 

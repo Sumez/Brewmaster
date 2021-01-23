@@ -5,7 +5,7 @@ using Brewmaster.Modules.Ppu;
 
 namespace Brewmaster.EditorWindows.TileMaps.Tools
 {
-	public abstract class PixelTool : MapEditorTool
+	public abstract class PixelTool : MapEditorTool, IPaletteTool
 	{
 		private Bitmap _pixelImage;
 		private Palette _previewSource;
@@ -22,7 +22,7 @@ namespace Brewmaster.EditorWindows.TileMaps.Tools
 			_map = map;
 			Size = new Size(1, 1);
 			Image = _pixelImage = new Bitmap(1, 1, PixelFormat.Format32bppPArgb);
-			PreviewSource = map.Palettes[0];
+			PreviewSource = state.Palette;
 		}
 		public override bool Pixel { get { return true; } }
 		public override bool EditsChr { get { return true; } }
@@ -32,11 +32,13 @@ namespace Brewmaster.EditorWindows.TileMaps.Tools
 		{
 			var tile = screen.GetTile(x / _map.BaseTileSize.Width, y / _map.BaseTileSize.Height);
 			SelectedColor = _state.GetPixel(tile, x % _map.BaseTileSize.Width, y % _map.BaseTileSize.Height);
+			SetSelectedPalette(screen.GetColorTile(x / _map.BaseTileSize.Width, y / _map.BaseTileSize.Height));
+			PreviewSource = _state.Palette;
 		}
 
 		public override void RefreshImage(Palette palette)
 		{
-			_pixelImage.SetPixel(0, 0, palette.Colors[SelectedColor]);
+			_pixelImage.SetPixel(0, 0, PreviewSource.Colors[SelectedColor]);
 		}
 
 		public override void AfterPaint()
@@ -64,5 +66,7 @@ namespace Brewmaster.EditorWindows.TileMaps.Tools
 			}
 		}
 
+		public Func<int> GetSelectedPalette { get; set; }
+		public Action<int> SetSelectedPalette { get; set; }
 	}
 }

@@ -287,14 +287,14 @@ namespace Brewmaster.EditorWindows.TileMaps
 		{
 			var tool = new PixelPen(State, Map);
 			State.Tool = tool;
-			tool.SelectedColor = 0;
+			InitPaletteTool(tool);
 		}
 
 		private void SelectFloodFill()
 		{
 			var tool = new FloodFill(State, Map);
 			State.Tool = tool;
-			tool.SelectedColor = 0;
+			InitPaletteTool(tool);
 		}
 		private void SelectMetaPen()
 		{
@@ -630,7 +630,15 @@ namespace Brewmaster.EditorWindows.TileMaps
 			get { return _tool; }
 			set
 			{
-				if (_tool != null) _tool.Unselect();
+				if (_tool != null)
+				{
+					if (_tool is PixelTool oldPixelTool && value is PixelTool newPixelTool)
+					{
+						// TODO: Store selected color in global palette control along with selected palette, instead of this crappy solution :)
+						newPixelTool.SelectedColor = oldPixelTool.SelectedColor;
+					}
+					_tool.Unselect();
+				}
 				_tool = value;
 				OnToolChanged();
 			}

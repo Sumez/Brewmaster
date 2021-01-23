@@ -39,7 +39,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 				paletteControl.SelectedColorIndexChanged += () =>
 				{
 					if (SelectedColorIndexChanged != null)
-						SelectedColorIndexChanged(paletteControl.SelectedColorIndex, SelectedPaletteIndex);
+						SelectedColorIndexChanged(paletteControl.SelectedColorIndex, paletteIndex);
 				};
 			}
 
