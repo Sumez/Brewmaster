@@ -23,6 +23,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 		public Action PixelTool { get; set; }
 		public Action FloodFillTool { get; set; }
 		public Action MetaTool { get; set; }
+		public Action<bool> FlipTool { get; set; }
 
 		public Action ToggleGrid { get; set; }
 		public Action ToggleMetaValues { get; set; }
@@ -47,6 +48,9 @@ namespace Brewmaster.EditorWindows.TileMaps
 				new ToolStripSeparator(),
 				new ToolStripButton("Pixel Pen", Resources.pen_tool, (s, a) => PixelTool(), "PixelPenTool"),
 				new ToolStripButton("Flood Fill", Resources.bucket_tool, (s, a) => FloodFillTool(), "FloodFillTool"),
+				new ToolStripSeparator(),
+				new ToolStripButton("Flip Horizontal", Resources.flip_h, (s, a) => FlipTool(false), "PixelPenTool"),
+				new ToolStripButton("Flip Vertical", Resources.flip_v, (s, a) => FlipTool(true), "FloodFillTool"),
 				new ToolStripSeparator(),
 			});
 			foreach (var item in Items.OfType<ToolStripButton>()) item.DisplayStyle = ToolStripItemDisplayStyle.Image;

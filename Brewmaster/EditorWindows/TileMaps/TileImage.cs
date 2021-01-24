@@ -109,6 +109,35 @@ namespace Brewmaster.EditorWindows.TileMaps
 		{
 			return 8 * bitDepth;
 		}
+
+		public static void FlipTile(byte[] data, int index, bool vertical, int bitDepth = 2, TargetPlatform platform = TargetPlatform.Nes)
+		{
+			var tileSize = 8 * bitDepth;
+			var offset = index * tileSize;
+			if (data.Length < offset + tileSize || index < 0) return;
+
+			if (vertical)
+			{
+				var flipped = new byte[tileSize];
+				for (var plane = 0; plane < bitDepth; plane++)
+				for (var i = 0; i < 8; i++)
+				{
+					// TODO: Snes format with higher bit depth
+					flipped[plane * 8 + 7 - i] = data[offset + plane * 8 + i];
+				}
+				Buffer.BlockCopy(flipped, 0, data, offset, tileSize);
+			}
+			else
+			{
+				for (var i = 0; i < tileSize; i++)
+				{
+					int row = data[offset + i];
+					row = (row & 0xF0) >> 4 | (row & 0x0F) << 4;
+					row = (row & 0xCC) >> 2 | (row & 0x33) << 2;
+					data[offset + i] = (byte)((row & 0xAA) >> 1 | (row & 0x55) << 1);
+				}
+			}
+		}
 	}
 
 	public class FastBitmap : IDisposable
