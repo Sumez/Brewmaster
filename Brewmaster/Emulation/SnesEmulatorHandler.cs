@@ -370,7 +370,7 @@ namespace Brewmaster.Emulation
 			if (IsRunning())
 			{
 				SnesApi.Pause();
-				Stop();
+				Stop(true);
 			}
 		}
 
@@ -543,13 +543,14 @@ namespace Brewmaster.Emulation
 			SnesDebugApi.Step(CpuType.Cpu, 1);
 		}
 
-		public void Stop()
+		public void Stop(bool releaseResources = false)
 		{
-			if (!IsRunning()) return;
+			if (!IsRunning() && !releaseResources) return;
 			Task.Run(() => {
 				try
 				{
 					SnesApi.Stop();
+					if (releaseResources) SnesApi.Release();
 				}
 				catch (Exception ex)
 				{

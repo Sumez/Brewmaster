@@ -175,7 +175,7 @@ namespace Brewmaster
 			// TODO: Do this dynamically when switching active editor tab
 			if (CurrentProject != null && CurrentProject.Type == ProjectType.AssetOnly) StoredLayoutHandler.LoadEditorLayout(_modules, LayoutMode.MapEditor);
 			else if (editorTab != null) StoredLayoutHandler.LoadEditorLayout(_modules, editorTab.LayoutMode);
-			//else StoredLayoutHandler.LoadEditorLayout(_modules, LayoutMode.Default); // TODO: Default mode per project type (asset / tilemap projects)
+			else if (CurrentProject != null) StoredLayoutHandler.LoadEditorLayout(_modules, LayoutMode.Default); // TODO: Default mode per project type (asset / tilemap projects)
 
 			UpdateTabListInWindowMenu();
 		}
@@ -454,7 +454,7 @@ namespace Brewmaster
 
 		protected override void OnLoad(EventArgs events)
 	    {
-		    base.OnLoad(events);
+			base.OnLoad(events);
 
 			KeyPreview = true;
 			PreviewKeyDown += (s, e) =>
@@ -517,7 +517,7 @@ namespace Brewmaster
 			AddRecentProjects();
 			RefreshView();
 
-		    LoadEmulator(TargetPlatform.Nes); // Load NES emulator so it can be used in the button configuration (TODO: use only emulator for current project to detect buttons?)
+			LoadEmulator(TargetPlatform.Nes); // Load NES emulator so it can be used in the button configuration (TODO: use only emulator for current project to detect buttons?)
 
 			if (RequestFile != null) LoadProject(RequestFile);
 			else if (Settings.ReOpenLastProject && Settings.CurrentProject != null)
@@ -529,7 +529,7 @@ namespace Brewmaster
 			}
 		}
 
-	    private void RemoveBreakpoints(IEnumerable<Breakpoint> breakpoints)
+		private void RemoveBreakpoints(IEnumerable<Breakpoint> breakpoints)
 		{
 			if (CurrentProject != null) CurrentProject.RemoveBreakpoints(breakpoints);
 
@@ -568,7 +568,7 @@ namespace Brewmaster
 	    private void InitializeEmulator(IEmulatorHandler emulator, TargetPlatform platform)
 	    {
 		    emulator.InitializeEmulator(Program.EmulatorDirectory, ThreadSafeLogOutput, Mesen.GetRenderSurface(platform));
-		    emulator.OnBreak += ThreadSafeBreakHandler;
+			emulator.OnBreak += ThreadSafeBreakHandler;
 		    emulator.OnRun += ActivateBreakPointsForCurrentProject;
 		    emulator.OnStatusChange += ThreadSafeStatusHandler;
 		    emulator.OnRegisterUpdate += ThreadSafeDebugStateHandler;
@@ -586,7 +586,7 @@ namespace Brewmaster
 		{
 			if (Mesen.Emulator == null) return;
 
-			Mesen.Emulator.Stop();
+			Mesen.Emulator.Stop(true);
 			Mesen.UnloadEmulator();
 		}
 

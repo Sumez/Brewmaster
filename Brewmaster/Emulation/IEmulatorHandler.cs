@@ -37,7 +37,7 @@ namespace Brewmaster.Emulation
 		void StepInto();
 		void StepOut();
 		void StepOver();
-		void Stop();
+		void Stop(bool releaseResources = false);
 		void SetScale(double scale);
 		void SetSpeed(int speed);
 		void ForceNewState(EmulationState state);

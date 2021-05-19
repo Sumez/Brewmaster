@@ -306,6 +306,7 @@ namespace Brewmaster.Emulation
 
 		private void ThreadSafeEmulationStatusChanged(EmulatorStatus status)
 		{
+			if (this.Handle == null) return;
 			BeginInvoke(new Action<EmulatorStatus>(EmulationStatusChanged), status);
 		}
 		private void EmulationStatusChanged(EmulatorStatus status)

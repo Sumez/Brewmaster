@@ -296,7 +296,7 @@ namespace Brewmaster.Emulation
 			if (IsRunning())
 			{
 				InteropEmu.Pause();
-				Stop();
+				Stop(true);
 			}
 		}
 
@@ -623,15 +623,15 @@ namespace Brewmaster.Emulation
 			InteropEmu.DebugStep(1);
 		}
 
-		public void Stop()
+		public void Stop(bool releaseResources = false)
 		{
-			if (!IsRunning()) return;
+			if (!IsRunning() && !releaseResources) return;
 
 			Task.Run(() =>
 			{
 				InteropEmu.Pause();
 				InteropEmu.Stop();
-				//InteropEmu.Release();
+				if (releaseResources) InteropEmu.Release();
 			});
 			//emulatorThread.Wait();
 
