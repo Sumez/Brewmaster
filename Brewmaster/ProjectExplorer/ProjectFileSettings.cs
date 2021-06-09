@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Windows.Forms;
+using Brewmaster.Pipeline;
 using Brewmaster.ProjectModel;
 
 namespace Brewmaster.ProjectExplorer
@@ -27,10 +28,22 @@ namespace Brewmaster.ProjectExplorer
 			};
 
 			_pipelineSetting.SetOptions("No processing");
+			_pipelineSetting.ValueChanged += (value) =>
+			{
+				if (_file == null) return;
+				if (_file.Pipeline != null) _file.OldPipelines[_file.Pipeline.Type.TypeName] = _file.Pipeline;
+
+				if (value is PipelineOption option)
+				{
+					if (_file.OldPipelines.ContainsKey(option.TypeName)) _file.Pipeline = _file.OldPipelines[option.TypeName];
+					else _file.Pipeline = option.Create(_file);
+				}
+				_file.Project.Pristine = false;
+			};
 
 			Clear();
 		}
-		private Panel headerPanel;
+		private Panel _headerPanel;
 		private Label _fileNameLabel;
 		private SettingControl _pipelineSetting;
 		private SettingControl _outputSetting;
@@ -59,7 +72,10 @@ namespace Brewmaster.ProjectExplorer
 					switch (_file.Type)
 					{
 						case FileType.TileMap:
-							_pipelineSetting.SetOptions("No processing", "Asm code", "Binary");
+							_pipelineSetting.SetOptions(new object[] {"No processing"}.Concat(PipelineSettings.PipelineOptions));
+							break;
+						case FileType.Image:
+							_pipelineSetting.SetOptions();
 							break;
 						default:
 							_pipelineSetting.SetOptions("No processing");
@@ -67,6 +83,10 @@ namespace Brewmaster.ProjectExplorer
 					}
 
 					if (_file.Pipeline == null) _pipelineSetting.Value = "No processing";
+					else
+					{
+						_pipelineSetting.Value = _file.Pipeline.Type;
+					}
 				}
 			}
 		}
@@ -82,26 +102,26 @@ namespace Brewmaster.ProjectExplorer
 
 		private void InitializeComponent()
 		{
-			this.headerPanel = new System.Windows.Forms.Panel();
+			this._headerPanel = new System.Windows.Forms.Panel();
 			this._fileNameLabel = new System.Windows.Forms.Label();
 			this._settingsPanel = new System.Windows.Forms.Panel();
 			this._outputSetting = new Brewmaster.ProjectExplorer.SettingControl();
 			this._compressionSetting = new Brewmaster.ProjectExplorer.SettingControl();
 			this._pipelineSetting = new Brewmaster.ProjectExplorer.SettingControl();
 			this._assemblySetting = new Brewmaster.ProjectExplorer.SettingControl();
-			this.headerPanel.SuspendLayout();
+			this._headerPanel.SuspendLayout();
 			this._settingsPanel.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// headerPanel
 			// 
-			this.headerPanel.BackColor = System.Drawing.SystemColors.ControlLight;
-			this.headerPanel.Controls.Add(this._fileNameLabel);
-			this.headerPanel.Dock = System.Windows.Forms.DockStyle.Top;
-			this.headerPanel.Location = new System.Drawing.Point(0, 0);
-			this.headerPanel.Name = "headerPanel";
-			this.headerPanel.Size = new System.Drawing.Size(476, 18);
-			this.headerPanel.TabIndex = 7;
+			this._headerPanel.BackColor = System.Drawing.SystemColors.ControlLight;
+			this._headerPanel.Controls.Add(this._fileNameLabel);
+			this._headerPanel.Dock = System.Windows.Forms.DockStyle.Top;
+			this._headerPanel.Location = new System.Drawing.Point(0, 0);
+			this._headerPanel.Name = "_headerPanel";
+			this._headerPanel.Size = new System.Drawing.Size(476, 18);
+			this._headerPanel.TabIndex = 7;
 			// 
 			// _fileNameLabel
 			// 
@@ -169,11 +189,11 @@ namespace Brewmaster.ProjectExplorer
 			// ProjectFileSettings
 			// 
 			this.Controls.Add(this._settingsPanel);
-			this.Controls.Add(this.headerPanel);
+			this.Controls.Add(this._headerPanel);
 			this.Name = "ProjectFileSettings";
 			this.Size = new System.Drawing.Size(476, 389);
-			this.headerPanel.ResumeLayout(false);
-			this.headerPanel.PerformLayout();
+			this._headerPanel.ResumeLayout(false);
+			this._headerPanel.PerformLayout();
 			this._settingsPanel.ResumeLayout(false);
 			this.ResumeLayout(false);
 

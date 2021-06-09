@@ -20,10 +20,10 @@ namespace Brewmaster.EditorWindows.Images
 		private FlowLayoutPanel PaletteContainer;
 		private List<List<Color>> _palettes;
 
-		public ChrPipeline Pipeline { get; set; }
+		public Pipeline.ChrPipelineSettings Pipeline { get; set; }
 		public event Action PipelineChanged;
 
-		public PaletteReductionSettings(ChrPipeline pipeline, ImageRenderControl image)
+		public PaletteReductionSettings(Pipeline.ChrPipelineSettings pipeline, ImageRenderControl image)
 		{
 			_loading = true;
 			Pipeline = pipeline;
@@ -72,7 +72,7 @@ namespace Brewmaster.EditorWindows.Images
 
 		private void AssignDefaultPalettes()
 		{
-			_palettes = Pipeline.GetUniqueTilePalettes(_image.ImageSource);
+			_palettes = ChrPipeline.GetUniqueTilePalettes(_image.ImageSource);
 			Pipeline.TilePalettes = new List<Dictionary<Color, int>>();
 
 			foreach (var palette in _palettes)
@@ -128,7 +128,7 @@ namespace Brewmaster.EditorWindows.Images
 		private void UpdatePreview()
 		{
 			if (Pipeline == null || Pipeline.TilePalettes == null) { _image.SetPreviews(); }
-			else _image.SetPreviews(Pipeline.GetReducedImage(_image.ImageSource));
+			else _image.SetPreviews(ChrPipeline.GetReducedImage(Pipeline, _image.ImageSource));
 		}
 
 

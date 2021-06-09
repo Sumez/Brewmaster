@@ -50,19 +50,7 @@ namespace Brewmaster.ProjectModel
 				fileHeader.RelativePath = project.GetRelativePath(file.File.FullName);
 				fileHeader.Id = i;
 				fileHeader.Mode = file.Mode;
-				if (file.Pipeline != null)
-				{
-					var pipelineHeader = new PipelineHeader();
-					if (file.Pipeline is ChrPipeline)
-					{
-						pipelineHeader.Type = "chr";
-					}
-					file.Pipeline.GetSettings(pipelineHeader.Settings);
-					pipelineHeader.LastProcessed = file.Pipeline.LastProcessed;
-					pipelineHeader.Output = file.Pipeline.OutputFiles.Select(project.GetRelativePath).ToArray();
-
-					fileHeader.Pipeline = pipelineHeader;
-				}
+				if (file.Pipeline != null) fileHeader.Pipeline = file.Pipeline.Type.Save(file.Pipeline);
 
 				fileReferences.Add(file, i);
 				filesHeaders.Add(fileHeader);
@@ -111,18 +99,11 @@ namespace Brewmaster.ProjectModel
 
 					if (fileHeader.Pipeline != null)
 					{
-						switch (fileHeader.Pipeline.Type)
-						{
-							case "chr":
-								// TODO: Deserialization method on the pipeline itself
-								var chrOutput = Path.Combine(project.Directory.FullName, fileHeader.Pipeline.Output[0]);
-								var paletteOutput = fileHeader.Pipeline.Output.Length < 2 || fileHeader.Pipeline.Output[1] == null ? null : Path.Combine(project.Directory.FullName, fileHeader.Pipeline.Output[1]);
+						var pipelineType = PipelineSettings.PipelineOptions.FirstOrDefault(o => o.TypeName == fileHeader.Pipeline.Type);
+						if (pipelineType == null) throw new Exception(string.Format("Unrecognized pipeline \"{0}\" for {1}", fileHeader.Pipeline.Type, fileHeader.RelativePath));
 
-								var pipeline = new ChrPipeline(file, chrOutput, paletteOutput, fileHeader.Pipeline.LastProcessed);
-								pipeline.SetSettings(fileHeader.Pipeline.Settings);
-								file.Pipeline = pipeline;
-								break;
-						}
+						file.Pipeline = pipelineType.Load(project, fileHeader.Pipeline);
+						file.Pipeline.File = file;
 					}
 
 					fileReferences.Add(fileHeader.Id, file);

@@ -21,11 +21,11 @@ namespace Brewmaster.EditorWindows.Images
 		public PaletteReductionSettings PaletteReductionPanel;
 		public event Action PipelineChanged;
 
-		public DataPipeline Pipeline { get; protected set; }
+		public PipelineSettings Pipeline { get; protected set; }
 
-		public ChrPipeline PipelineAsChr
+		public Pipeline.ChrPipelineSettings PipelineAsChr
 		{
-			get { return Pipeline as ChrPipeline; }
+			get { return Pipeline as Pipeline.ChrPipelineSettings; }
 		}
 
 		private enum ImagePipelines
@@ -49,7 +49,7 @@ namespace Brewmaster.EditorWindows.Images
 			NewPipelineType.Items.Clear();
 			NewPipelineType.Items.AddRange(_imagePipelineChoices.Select(o => o.Value).ToArray());
 
-			if (file.Pipeline != null) Pipeline = file.Pipeline.Clone(true);
+			if (file.Pipeline != null) Pipeline = file.Pipeline.Clone();
 			PaletteReductionPanel = new PaletteReductionSettings(PipelineAsChr, image) { Dock = DockStyle.Top };
 			ChrPipelinePanel = new ChrPipelineSettings(PipelineAsChr, image) { Dock = DockStyle.Top };
 
@@ -152,10 +152,10 @@ namespace Brewmaster.EditorWindows.Images
 			switch (option)
 			{
 				case ImagePipelines.Chr:
-					var baseFile = _file.GetRelativeDirectory(true) + Path.GetFileNameWithoutExtension(_file.File.Name);
-					Pipeline = new ChrPipeline(_file, baseFile + ".chr", baseFile + ".pal");
-					ChrPipelinePanel.Pipeline = Pipeline as ChrPipeline;
-					PaletteReductionPanel.Pipeline = Pipeline as ChrPipeline;
+					var chrPipeline = PipelineSettings.PipelineOptions.OfType<ChrPipeline>().First();
+					Pipeline = chrPipeline.Create(_file);
+					ChrPipelinePanel.Pipeline = Pipeline as Pipeline.ChrPipelineSettings;
+					PaletteReductionPanel.Pipeline = Pipeline as Pipeline.ChrPipelineSettings;
 					RegisterChange();
 					break;
 			}

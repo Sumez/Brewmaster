@@ -15,53 +15,12 @@ namespace Brewmaster.Pipeline
 		Bpp4 = 2,
 		Bpp8 = 3
 	}
-	public class ChrPipeline : DataPipeline
+
+	public class ChrPipeline : PipelineOption
 	{
-		public ChrOutputType Type = ChrOutputType.Bpp2;
-		public bool ReducePalette = false;
-		public bool ExportPalette = false;
-		public Dictionary<Color, int> PaletteAssignment;
-		public List<Dictionary<Color, int>> TilePalettes { get; set; }
-		public bool DiscardRedundantTiles = false;
+		public override string TypeName { get { return "chr"; } }
 
-		public override IEnumerable<string> OutputFiles
-		{
-			get
-			{
-				return new[] { ChrOutput, PaletteOutput };
-			}
-		}
-
-		public string ChrOutput;
-		public string PaletteOutput;
-
-		public ChrPipeline(AsmProjectFile file, string chrOutput, string paletteOutput, DateTime? lastProcessed = null) : base(file, lastProcessed)
-		{
-			ChrOutput = chrOutput;
-			PaletteOutput = paletteOutput;
-			PaletteAssignment = new Dictionary<Color, int>();
-		}
-
-		public int BitDepth
-		{
-			get
-			{
-				switch (Type)
-				{
-					case ChrOutputType.Bpp3:
-						return 3;
-					case ChrOutputType.Bpp4:
-						return 4;
-					case ChrOutputType.Bpp8:
-						return 8;
-					case ChrOutputType.Bpp2:
-					default:
-						return 2;
-				}
-			}
-		}
-
-		public List<List<Color>> GetUniqueTilePalettes(Bitmap image)
+		public static List<List<Color>> GetUniqueTilePalettes(Bitmap image)
 		{
 			var returnValue = new List<List<Color>>();
 			var tileCount = (image.Width / 8) * (image.Height / 8);
@@ -72,11 +31,11 @@ namespace Brewmaster.Pipeline
 				var offsetY = (offset / image.Width) * 8;
 				var offsetX = (offset % image.Width);
 				for (var y = 0; y < 8; y++)
-				for (var x = 0; x < 8; x++)
-				{
-					var color = image.GetPixel(offsetX + x, offsetY + y);
-					if (!tilePalette.Contains(color)) tilePalette.Add(color);;
-				}
+					for (var x = 0; x < 8; x++)
+					{
+						var color = image.GetPixel(offsetX + x, offsetY + y);
+						if (!tilePalette.Contains(color)) tilePalette.Add(color); ;
+					}
 
 				//var orderedPalette = tilePalette.OrderBy(c => c.A).ThenBy(c => c.R).ThenBy(c => c.G).ThenBy(c => c.B);
 				for (var j = 0; j < returnValue.Count; j++)
@@ -89,7 +48,7 @@ namespace Brewmaster.Pipeline
 					}
 				}
 				if (tilePalette != null)
-//				if (tilePalette.Count > 1 || tilePalette[0].A > 0) // Ignore palettes with only transparency
+					//				if (tilePalette.Count > 1 || tilePalette[0].A > 0) // Ignore palettes with only transparency
 					returnValue.Add(tilePalette);
 
 				// Remove redundant entries
@@ -105,12 +64,12 @@ namespace Brewmaster.Pipeline
 
 			return returnValue;
 		}
-		public Bitmap GetReducedImage(Bitmap image)
+		public static Bitmap GetReducedImage(ChrPipelineSettings settings, Bitmap image)
 		{
 			var bitmap = new Bitmap(image.Width, image.Height, PixelFormat.Format32bppPArgb);
 			var tileCount = (image.Width / 8) * (image.Height / 8);
 
-			var basePalette = TilePalettes.OrderByDescending(p => p.Count).First().ToDictionary(k => k.Value, k => k.Key);
+			var basePalette = settings.TilePalettes.OrderByDescending(p => p.Count).First().ToDictionary(k => k.Value, k => k.Key);
 
 			for (var i = 0; i < tileCount; i++)
 			{
@@ -120,21 +79,21 @@ namespace Brewmaster.Pipeline
 				var offsetY = (offset / image.Width) * 8;
 				var offsetX = (offset % image.Width);
 				for (var y = 0; y < 8; y++)
-				for (var x = 0; x < 8; x++)
-				{
-					var color = image.GetPixel(offsetX + x, offsetY + y);
-					if (!tilePalette.Contains(color)) tilePalette.Add(color);
-				}
+					for (var x = 0; x < 8; x++)
+					{
+						var color = image.GetPixel(offsetX + x, offsetY + y);
+						if (!tilePalette.Contains(color)) tilePalette.Add(color);
+					}
 
-				var paletteReference = TilePalettes.FirstOrDefault(p => tilePalette.All(p.ContainsKey));
+				var paletteReference = settings.TilePalettes.FirstOrDefault(p => tilePalette.All(p.ContainsKey));
 				if (paletteReference == null) paletteReference = tilePalette.Select((color, index) => new { color, index }).ToDictionary(x => x.color, x => x.index); // If no matching palettes are found, new colors has been added since we generated our reduced palette. Just ignore these
 
 				for (var y = 0; y < 8; y++)
-				for (var x = 0; x < 8; x++)
-				{
-					var color = image.GetPixel(offsetX + x, offsetY + y);
-					bitmap.SetPixel(offsetX + x, offsetY + y, basePalette[paletteReference[color]]);
-				}
+					for (var x = 0; x < 8; x++)
+					{
+						var color = image.GetPixel(offsetX + x, offsetY + y);
+						bitmap.SetPixel(offsetX + x, offsetY + y, basePalette[paletteReference[color]]);
+					}
 
 			}
 
@@ -151,32 +110,34 @@ namespace Brewmaster.Pipeline
 
 				var imageSource = new Bitmap(fileSource.Width * frames, fileSource.Height, fileSource.PixelFormat);
 				using (var graphics = Graphics.FromImage(imageSource))
-				for (var i = 0; i < frames; i++)
-				{
-					fileSource.SelectActiveFrame(frameDimension, i);
-					graphics.DrawImageUnscaled(fileSource, i * fileSource.Width, 0);
-				}
+					for (var i = 0; i < frames; i++)
+					{
+						fileSource.SelectActiveFrame(frameDimension, i);
+						graphics.DrawImageUnscaled(fileSource, i * fileSource.Width, 0);
+					}
 
 				return imageSource;
 			}
 		}
 
-		private Bitmap GetImageSource()
+		private static Bitmap GetImageSource(ChrPipelineSettings settings)
 		{
-			if (!ReducePalette || TilePalettes == null) return LoadImageFile(File.File.FullName);
-			
-			using (var image = LoadImageFile(File.File.FullName)) return GetReducedImage(image);
+			if (!settings.ReducePalette || settings.TilePalettes == null) return LoadImageFile(settings.File.File.FullName);
+			using (var image = LoadImageFile(settings.File.File.FullName)) return GetReducedImage(settings, image);
 		}
 
-		public override void Process()
+		public override void Process(PipelineSettings settings)
 		{
-			var platform = File.Project.Platform;
-			var bitDepth = BitDepth;
+			var chrSettings = settings as ChrPipelineSettings;
+			if (chrSettings == null) throw new Exception("Invalid settings for CHR pipeline");
+
+			var platform = chrSettings.File.Project.Platform;
+			var bitDepth = chrSettings.BitDepth;
 
 			var tileSize = 8 * bitDepth;
 			var paletteEntries = (int)Math.Pow(2, bitDepth);
 
-			using (var image = GetImageSource())
+			using (var image = GetImageSource(chrSettings))
 			{
 				var tileCount = (image.Width / 8) * (image.Height / 8);
 				var bytes = new byte[tileCount * tileSize];
@@ -185,7 +146,7 @@ namespace Brewmaster.Pipeline
 				var palette = new Color[paletteEntries];
 				var knownEntries = 0;
 
-				foreach (var assignment in PaletteAssignment)
+				foreach (var assignment in chrSettings.PaletteAssignment)
 				{
 					if (assignment.Value >= paletteEntries) continue;
 
@@ -225,55 +186,55 @@ namespace Brewmaster.Pipeline
 					var offsetX = (offset % image.Width);
 
 					for (var y = 0; y < 8; y++)
-					for (var x = 0; x < 8; x++)
-					{
-						var color = image.GetPixel(offsetX + x, offsetY + y);
-						var colorIndex = -1;
-						for (var c = 0; c < knownEntries; c++)
+						for (var x = 0; x < 8; x++)
 						{
-							if (color == palette[c])
+							var color = image.GetPixel(offsetX + x, offsetY + y);
+							var colorIndex = -1;
+							for (var c = 0; c < knownEntries; c++)
 							{
-								colorIndex = c;
-								break;
+								if (color == palette[c])
+								{
+									colorIndex = c;
+									break;
+								}
+							}
+
+							if (colorIndex == -1)
+							{
+								if (knownEntries >= paletteEntries) throw new Exception("Too many colors in image");
+								palette[knownEntries] = color;
+								colorIndex = knownEntries;
+								knownEntries++;
+							}
+							for (var j = 0; j <= (bitDepth / 2); j += 2)
+							{
+								var byte0 = (colorIndex & (1 << j)) == 0 ? 0 : 1;
+								var byte1 = (colorIndex & (1 << (j + 1))) == 0 ? 0 : 1;
+
+								var mask0 = (byte)(byte0 << (7 - x));
+								var mask1 = (byte)(byte1 << (7 - x));
+
+								var byte0Index = (8 * j) + (platform == TargetPlatform.Snes ? y * 2 : y);
+								var byte1Index = (8 * j) + (platform == TargetPlatform.Snes ? y * 2 + 1 : y + 8);
+
+								tileData[byte0Index] |= mask0;
+								tileData[byte1Index] |= mask1;
 							}
 						}
 
-						if (colorIndex == -1)
-						{
-							if (knownEntries >= paletteEntries) throw new Exception("Too many colors in image");
-							palette[knownEntries] = color;
-							colorIndex = knownEntries;
-							knownEntries++;
-						}
-						for (var j = 0; j <= (bitDepth / 2); j += 2)
-						{
-							var byte0 = (colorIndex & (1 << j)) == 0 ? 0 : 1;
-							var byte1 = (colorIndex & (1 << (j + 1))) == 0 ? 0 : 1;
-
-							var mask0 = (byte)(byte0 << (7 - x));
-							var mask1 = (byte)(byte1 << (7 - x));
-
-							var byte0Index = (8 * j) + (platform == TargetPlatform.Snes ? y * 2 : y);
-							var byte1Index = (8 * j) + (platform == TargetPlatform.Snes ? y * 2 + 1 : y + 8);
-
-							tileData[byte0Index] |= mask0;
-							tileData[byte1Index] |= mask1;
-						}
-					}
-
-					if (DiscardRedundantTiles && exportedTiles.Any(t => t.SequenceEqual(tileData))) continue;
+					if (chrSettings.DiscardRedundantTiles && exportedTiles.Any(t => t.SequenceEqual(tileData))) continue;
 					exportedTiles.Add(tileData);
 					tileData.CopyTo(bytes, tileByteOffset);
 					tileByteOffset += tileSize;
 				}
 
-				using (var outputFile = System.IO.File.Create(ChrOutput))
+				using (var outputFile = File.Create(chrSettings.ChrOutputFullPath))
 				{
 					outputFile.Write(bytes, 0, tileByteOffset);
 					outputFile.Close();
 				}
 
-				if (ExportPalette)
+				if (chrSettings.ExportPalette)
 				{
 					var paletteData = new byte[knownEntries * 2];
 					for (var i = 0; i < knownEntries; i++)
@@ -282,7 +243,7 @@ namespace Brewmaster.Pipeline
 						paletteData[i * 2] = (byte)(color & 0xFF);
 						paletteData[i * 2 + 1] = (byte)((color >> 8) & 0xFF);
 					}
-					using (var outputFile = System.IO.File.Create(PaletteOutput))
+					using (var outputFile = File.Create(chrSettings.PaletteOutputFullPath))
 					{
 						outputFile.Write(paletteData, 0, paletteData.Length);
 						outputFile.Close();
@@ -290,7 +251,6 @@ namespace Brewmaster.Pipeline
 
 				}
 			}
-			LastProcessed = DateTime.Now;
 		}
 		public static int GetColorValue(Color color)
 		{
@@ -301,34 +261,38 @@ namespace Brewmaster.Pipeline
 			return red | (green << 5) | (blue << 10);
 		}
 
-		public override void GetSettings(ProjectModel.Properties headerSettings)
+		public override PipelineSettings Create(AsmProjectFile file)
 		{
-			base.GetSettings(headerSettings);
-
-			headerSettings["DiscardRedundant"] = DiscardRedundantTiles ? "1" : "0";
-			headerSettings["ReducePalette"] = ReducePalette ? "1" : "0";
-			headerSettings["ExportPalette"] = ExportPalette ? "1" : "0";
-			headerSettings["ChrType"] = Type.ToString();
-			headerSettings["Palette"] = SerializePalette(PaletteAssignment);
-			if (TilePalettes != null) headerSettings["TilePalettes"] = string.Join(":", TilePalettes.Select(SerializePalette));
+			var baseFile = file.GetRelativeDirectory(true) + Path.GetFileNameWithoutExtension(file.File.Name);
+			return new ChrPipelineSettings(this, file, baseFile + ".chr", baseFile + ".pal");
 		}
 
-		public override DataPipeline Clone(bool toEditor = false)
+		public override PipelineSettings Load(AsmProject project, PipelineHeader pipelineHeader)
 		{
-			Func<string, string> convertFilePath = (s) => Path.Combine(File.Project.Directory.FullName, s.Trim('/', '\\'));
-			if (toEditor) convertFilePath = (s) => File.Project.GetRelativePath(s);
+			var chrOutput = pipelineHeader.Output[0];
+			var paletteOutput = pipelineHeader.Output.Length < 2 || string.IsNullOrWhiteSpace(pipelineHeader.Output[1]) ? null : pipelineHeader.Output[1];
 
-			var pipeline = new ChrPipeline(File, convertFilePath(ChrOutput), String.IsNullOrWhiteSpace(PaletteOutput) ? null : convertFilePath(PaletteOutput));
-			var settings = new ProjectModel.Properties();
-			GetSettings(settings);
-			pipeline.SetSettings(settings);
+			var pipeline = new ChrPipelineSettings(this, null, chrOutput, paletteOutput, pipelineHeader.LastProcessed);
+			SetSettings(pipeline, pipelineHeader.Settings);
 			return pipeline;
+		}
+
+		public override void GetSettings(PipelineSettings settings, ProjectModel.Properties headerSettings)
+		{
+			base.GetSettings(settings, headerSettings);
+			var pipeline = settings as ChrPipelineSettings;
+
+			headerSettings["DiscardRedundant"] = pipeline.DiscardRedundantTiles ? "1" : "0";
+			headerSettings["ReducePalette"] = pipeline.ReducePalette ? "1" : "0";
+			headerSettings["ExportPalette"] = pipeline.ExportPalette ? "1" : "0";
+			headerSettings["ChrType"] = pipeline.PaletteType.ToString();
+			headerSettings["Palette"] = SerializePalette(pipeline.PaletteAssignment);
+			if (pipeline.TilePalettes != null) headerSettings["TilePalettes"] = string.Join(":", pipeline.TilePalettes.Select(SerializePalette));
 		}
 
 		private static string SerializePalette(Dictionary<Color, int> palette)
 		{
-			return string.Join(";", palette
-				.Select(a => string.Join(",", a.Value.ToString(), a.Key.R.ToString(), a.Key.G.ToString(), a.Key.B.ToString(), a.Key.A.ToString())));
+			return string.Join(";", palette.Select(a => string.Join(",", a.Value.ToString(), a.Key.R.ToString(), a.Key.G.ToString(), a.Key.B.ToString(), a.Key.A.ToString())));
 		}
 		private static Dictionary<Color, int> DeserializePalette(string source)
 		{
@@ -339,23 +303,76 @@ namespace Brewmaster.Pipeline
 				);
 		}
 
-		public void SetSettings(ProjectModel.Properties headerSettings)
+		public override void SetSettings(PipelineSettings settings, ProjectModel.Properties headerSettings)
 		{
-			DiscardRedundantTiles = (headerSettings["DiscardRedundant"] == "1");
-			ReducePalette = (headerSettings["ReducePalette"] == "1");
-			ExportPalette = (headerSettings["ExportPalette"] == "1");
-			Enum.TryParse(headerSettings["ChrType"], true, out Type);
+			base.GetSettings(settings, headerSettings);
+			var pipeline = settings as ChrPipelineSettings;
+
+			pipeline.DiscardRedundantTiles = (headerSettings["DiscardRedundant"] == "1");
+			pipeline.ReducePalette = (headerSettings["ReducePalette"] == "1");
+			pipeline.ExportPalette = (headerSettings["ExportPalette"] == "1");
+			Enum.TryParse(headerSettings["ChrType"], true, out pipeline.PaletteType);
 			if (!string.IsNullOrWhiteSpace(headerSettings["Palette"]))
 			{
-				PaletteAssignment = DeserializePalette(headerSettings["Palette"]);
+				pipeline.PaletteAssignment = DeserializePalette(headerSettings["Palette"]);
 			}
 
 			if (!string.IsNullOrWhiteSpace(headerSettings["TilePalettes"]))
 			{
-				TilePalettes = headerSettings["TilePalettes"].Split(':').Select(DeserializePalette).ToList();
+				pipeline.TilePalettes = headerSettings["TilePalettes"].Split(':').Select(DeserializePalette).ToList();
 			}
 		}
 
+	}
 
+
+	public class ChrPipelineSettings : PipelineSettings
+	{
+		public ChrOutputType PaletteType = ChrOutputType.Bpp2;
+		public bool ReducePalette = false;
+		public bool ExportPalette = false;
+		public Dictionary<Color, int> PaletteAssignment;
+		public List<Dictionary<Color, int>> TilePalettes { get; set; }
+		public bool DiscardRedundantTiles = false;
+
+		public override List<string> OutputFiles
+		{
+			get
+			{
+				return new List<string> { ChrOutput, PaletteOutput };
+			}
+		}
+
+		public string ChrOutput;
+		public string PaletteOutput;
+
+		public ChrPipelineSettings(PipelineOption type, AsmProjectFile file, string chrOutput, string paletteOutput, DateTime? lastProcessed = null) : base(type, file, lastProcessed)
+		{
+			ChrOutput = chrOutput;
+			PaletteOutput = paletteOutput;
+			PaletteAssignment = new Dictionary<Color, int>();
+		}
+
+		public int BitDepth
+		{
+			get
+			{
+				switch (PaletteType)
+				{
+					case ChrOutputType.Bpp3:
+						return 3;
+					case ChrOutputType.Bpp4:
+						return 4;
+					case ChrOutputType.Bpp8:
+						return 8;
+					case ChrOutputType.Bpp2:
+					default:
+						return 2;
+				}
+			}
+		}
+
+		public string ChrOutputFullPath { get { return Path.Combine(File.Project.Directory.FullName, ChrOutput); } }
+		public string PaletteOutputFullPath { get { return Path.Combine(File.Project.Directory.FullName, PaletteOutput); } }
 	}
 }

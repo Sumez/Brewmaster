@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 using Brewmaster.ProjectModel;
 
@@ -113,11 +114,9 @@ namespace Brewmaster.ProjectExplorer
 
 			if (false && fileInfo.Pipeline != null) // TODO: Display pipeline output in explorer?
 			{
-				foreach (var outputFile in fileInfo.Pipeline.OutputFiles)
+				foreach (var outputFile in fileInfo.Pipeline.OutputFiles.Where(f => f != null))
 				{
-					if (outputFile == null) continue;
-
-					var file = new FileInfo(outputFile);
+					var file = new FileInfo(Path.Combine(fileInfo.Project.Directory.FullName, outputFile));
 					Nodes.Add(new PipelineNode(fileInfo, file.Name));
 				}
 			}

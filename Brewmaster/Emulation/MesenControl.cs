@@ -306,11 +306,11 @@ namespace Brewmaster.Emulation
 
 		private void ThreadSafeEmulationStatusChanged(EmulatorStatus status)
 		{
-			if (this.Handle == null) return;
 			BeginInvoke(new Action<EmulatorStatus>(EmulationStatusChanged), status);
 		}
 		private void EmulationStatusChanged(EmulatorStatus status)
 		{
+			if (Handle == null) return;
 			_loadButton.Enabled = _saveButton.Enabled = status != EmulatorStatus.Stopped;
 		}
 
@@ -375,8 +375,16 @@ namespace Brewmaster.Emulation
 			if (Emulator != null) Emulator.UpdateControllerMappings(currentMapping);
 		}
 
-		public void UnloadEmulator()
+		public void UnloadEmulator(bool freeResources = false)
 		{
+			if (freeResources)
+			{
+				if (_snesEmulator != null) _snesEmulator.Stop(true);
+				if (_nesEmulator != null) _nesEmulator.Stop(true);
+				_snesEmulator = null;
+				_nesEmulator = null;
+			}
+
 			Emulator = null;
 		}
 

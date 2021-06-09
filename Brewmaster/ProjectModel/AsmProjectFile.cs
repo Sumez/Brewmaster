@@ -13,7 +13,7 @@ namespace Brewmaster.ProjectModel
 		// DATA ESSENTIAL TO OUR STORED FILE
 		public FileInfo File { get; set; }
 		public CompileMode Mode { get; set; }
-		public DataPipeline Pipeline { get; set; }
+		public PipelineSettings Pipeline { get; set; }
 
 		public IEnumerable<Breakpoint> EditorBreakpoints
 		{
@@ -26,6 +26,8 @@ namespace Brewmaster.ProjectModel
 		public AsmProject Project { get; set; }
 		public Dictionary<int, DebugLine> DebugLines { get; set; }
 		public bool Missing { get; set; }
+		public Dictionary<string, PipelineSettings> OldPipelines { get; set; } = new Dictionary<string, PipelineSettings>();
+
 
 		public static readonly Regex GlobalSymbolRegex = new Regex(@"^\s*\.global(?:zp){0,1}\s+(.+?)\s*$", RegexOptions.IgnoreCase);
 		public static readonly Regex ExportSymbolRegex = new Regex(@"^\s*\.export(?:zp){0,1}\s+(.+?)\s*$", RegexOptions.IgnoreCase);

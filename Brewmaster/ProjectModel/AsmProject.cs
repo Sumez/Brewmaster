@@ -119,7 +119,8 @@ namespace Brewmaster.ProjectModel
 
 		public async Task ParseDebugDataAsync(string debugFile = null)
 		{
-			if (debugFile == null) debugFile = Path.Combine(Directory.FullName, CurrentConfiguration.DebugFile);
+			if (debugFile == null && CurrentConfiguration != null && !string.IsNullOrWhiteSpace(CurrentConfiguration.DebugFile)) debugFile = Path.Combine(Directory.FullName, CurrentConfiguration.DebugFile);
+			if (debugFile == null) return;
 			if (_dbgTask != null && !_dbgTask.IsCompleted)
 			{
 				await _dbgTask; // Await existing task, since cancelling it might interfer with the new task
@@ -367,6 +368,15 @@ namespace Brewmaster.ProjectModel
 				Type = type,
 				Platform = platform
 			};
+			if (type == ProjectType.AssetOnly)
+			{
+				project.BuildConfigurations.Add(new NesCartridge
+				{
+					BuildPath = "bin/obj",
+					Custom = false,
+					Name = "Process assets"
+				});
+			}
 			return project;
 		}
 
@@ -449,8 +459,8 @@ namespace Brewmaster.ProjectModel
 				if (newFile.Type == FileType.Image)
 				{
 					newFile.Mode = CompileMode.ContentPipeline;
-					var baseFile = newFile.File.DirectoryName + @"\" + Path.GetFileNameWithoutExtension(newFile.File.Name);
-					newFile.Pipeline = new ChrPipeline(newFile, baseFile + ".chr", baseFile + ".pal");
+					var chrPipeline = PipelineSettings.PipelineOptions.OfType<ChrPipeline>().First();
+					newFile.Pipeline = chrPipeline.Create(newFile);
 					//var directory = Path.GetDirectoryName(relativeFilePath);
 					//if (!string.IsNullOrWhiteSpace(directory)) directory += @"\";
 					//newFile.Pipeline = new ChrPipeline(newFile, directory + Path.GetFileNameWithoutExtension(relativeFilePath) + ".chr");

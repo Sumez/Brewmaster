@@ -85,9 +85,9 @@ namespace Brewmaster.BuildProcess
 				{
 					foreach (var source in bank.Sources)
 					{
-						if (!(source.Pipeline is ChrPipeline)) continue;
+						if (!(source.Pipeline is ChrPipelineSettings chrPipelineSettings)) continue;
 
-						using (var read = File.OpenRead(((ChrPipeline)source.Pipeline).ChrOutput))
+						using (var read = File.OpenRead(chrPipelineSettings.ChrOutputFullPath))
 						{
 							var bufferSize = (int)read.Length;
 							var chrData = new byte[bufferSize];
@@ -222,11 +222,16 @@ namespace Brewmaster.BuildProcess
 		{
 			var errors = new List<BuildError>();
 			var config = project.CurrentConfiguration;
-			
-			Status("Building NES cartridge...");
 
-			Log(new LogData("Building NES cartridge...", LogType.Headline));
-			Log(new LogData("Processing content pipeline"));
+			var buildStatus = project.Type == ProjectType.AssetOnly
+				? "Processing content pipeline"
+				: (project.Platform == TargetPlatform.Snes
+					? "Building SNES cartridge..."
+					: "Building NES cartridge...");
+
+			Status(buildStatus);
+			Log(new LogData(buildStatus, LogType.Headline));
+			if (project.Type == ProjectType.Game) Log(new LogData("Processing content pipeline"));
 
 			var skippedCount = 0;
 			foreach (var file in project.Files.Where(f => f.Mode == CompileMode.ContentPipeline && f.Pipeline != null))
@@ -251,14 +256,20 @@ namespace Brewmaster.BuildProcess
 					continue;
 				}
 
-				Log(new LogData(string.Format("Building {0}", string.Join(",", file.Pipeline.OutputFiles.Where(f => f != null).Select(project.GetRelativePath)))));
+				Log(new LogData(string.Format("Building {0}", string.Join(",", file.Pipeline.OutputFiles.Where(f => f != null)))));
 				file.Pipeline.Process();
 			}
 			if (skippedCount > 0) Log(new LogData(string.Format("Skipped {0} unchanged files", skippedCount)));
 
-			var processResult = config.Custom 
-				? ProcessCustom(project, config, errors)
-				: ProcessIntegrated(project, config, errors);
+			if (project.Type == ProjectType.AssetOnly)
+			{
+				Log(new LogData("Processing complete\r\n"));
+				Status("Processing complete");
+				buildProcessSource.SetResult(true);
+				return errors;
+			}
+
+			var processResult = config.Custom ? ProcessCustom(project, config, errors) : ProcessIntegrated(project, config, errors);
 			if (!processResult)
 			{
 				buildProcessSource.SetResult(false);

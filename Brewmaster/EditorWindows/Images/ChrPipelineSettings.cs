@@ -26,10 +26,10 @@ namespace Brewmaster.EditorWindows.Images
 		private System.ComponentModel.IContainer components;
 		private List<Color?> _palette;
 
-		public ChrPipeline Pipeline { get; set; }
+		public Pipeline.ChrPipelineSettings Pipeline { get; set; }
 		public event Action PipelineChanged;
 
-		public ChrPipelineSettings(ChrPipeline pipeline, ImageRenderControl image)
+		public ChrPipelineSettings(Pipeline.ChrPipelineSettings pipeline, ImageRenderControl image)
 		{
 			_loading = true;
 			Pipeline = pipeline;
@@ -78,7 +78,7 @@ namespace Brewmaster.EditorWindows.Images
 
 			OutputFile.Text = Pipeline.ChrOutput;
 			PaletteOutputFile.Text = Pipeline.PaletteOutput;
-			ChrPipelineOutput.SelectedIndex = (int)Pipeline.Type;
+			ChrPipelineOutput.SelectedIndex = (int)Pipeline.PaletteType;
 			_enablePaletteAssignments.Checked = Pipeline.PaletteAssignment.Count > 0;
 			_ignoreDuplicates.Checked = Pipeline.DiscardRedundantTiles;
 			PaletteOutputFile.Enabled = _exportPalette.Checked = Pipeline.ExportPalette;
@@ -335,7 +335,7 @@ namespace Brewmaster.EditorWindows.Images
 
 		private void ChrPipelineOutput_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			Pipeline.Type = (ChrOutputType)ChrPipelineOutput.SelectedIndex;
+			Pipeline.PaletteType = (ChrOutputType)ChrPipelineOutput.SelectedIndex;
 			RegisterChange();
 			RefreshPalette();
 		}

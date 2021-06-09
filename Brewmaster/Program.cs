@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Windows.Forms;
+using Brewmaster.Modules;
 using Brewmaster.ProjectExplorer;
 using Brewmaster.Settings;
 
@@ -54,6 +55,8 @@ namespace Brewmaster
 			{
 				Error("Failed trying to associate the .BWM file extension", ex);
 			}
+
+			Language = LanguageHandler.Load("English.xml");
 			new MainForm { RequestFile = file };
 			Application.Run(CurrentWindow);
         }
@@ -71,7 +74,8 @@ namespace Brewmaster
 
 		public static string WorkingDirectory { get; set; }
         public static string EmulatorDirectory { get; set; }
-		public static MainForm CurrentWindow { get; set; }
+        public static MainForm CurrentWindow { get; set; }
+        public static LanguageHandler Language { get; set; }
 
 		public static KeyBindings Keys
 		{
@@ -150,7 +154,8 @@ namespace Brewmaster
 			    "Brewmaster", fileName);
 	    }
     }
-	public class KeyBindingEventArgs
+
+    public class KeyBindingEventArgs
 	{
 		public KeyBindingEventArgs(Keys keys, Feature feature)
 		{

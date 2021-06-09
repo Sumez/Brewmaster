@@ -584,9 +584,6 @@ namespace Brewmaster
 
 	    private void UnloadEmulator()
 		{
-			if (Mesen.Emulator == null) return;
-
-			Mesen.Emulator.Stop(true);
 			Mesen.UnloadEmulator();
 		}
 
