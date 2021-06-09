@@ -435,7 +435,7 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Pipeline\ChrPipeline.cs" />
-    <Compile Include="Pipeline\DataPipeline.cs" />
+    <Compile Include="Pipeline\PipelineSettings.cs" />
     <Compile Include="Modules\Ppu\TileMapRender.cs">
       <SubType>Component</SubType>
     </Compile>
