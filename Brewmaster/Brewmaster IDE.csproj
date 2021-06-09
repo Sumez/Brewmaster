@@ -736,6 +736,9 @@
       <DependentUpon>CpuStatus.cs</DependentUpon>
     </EmbeddedResource>
     <Content Include="brewmaster.ico" />
+    <Content Include="English.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="MenuHelp.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

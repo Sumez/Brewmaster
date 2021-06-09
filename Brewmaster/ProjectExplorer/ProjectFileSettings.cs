@@ -35,9 +35,11 @@ namespace Brewmaster.ProjectExplorer
 
 				if (value is PipelineOption option)
 				{
-					if (_file.OldPipelines.ContainsKey(option.TypeName)) _file.Pipeline = _file.OldPipelines[option.TypeName];
+					if (_file.OldPipelines.ContainsKey(option.TypeName))
+						_file.Pipeline = _file.OldPipelines[option.TypeName];
 					else _file.Pipeline = option.Create(_file);
 				}
+				else _file.Pipeline = null;
 				_file.Project.Pristine = false;
 			};
 
@@ -69,24 +71,10 @@ namespace Brewmaster.ProjectExplorer
 					_assemblySetting.Disabled = !(_assemblySetting.Visible = _file.Type == FileType.Source || _file.Type == FileType.Include);
 					_assemblySetting.Value = _file.Mode == CompileMode.IncludeInAssembly ? "Yes" : "No";
 
-					switch (_file.Type)
-					{
-						case FileType.TileMap:
-							_pipelineSetting.SetOptions(new object[] {"No processing"}.Concat(PipelineSettings.PipelineOptions));
-							break;
-						case FileType.Image:
-							_pipelineSetting.SetOptions();
-							break;
-						default:
-							_pipelineSetting.SetOptions("No processing");
-							break;
-					}
+					_pipelineSetting.SetOptions(new object[] { "No processing" }.Concat(PipelineSettings.PipelineOptions.Where(o => o.SupportedFileTypes.Contains(_file.Type))).ToArray());
 
 					if (_file.Pipeline == null) _pipelineSetting.Value = "No processing";
-					else
-					{
-						_pipelineSetting.Value = _file.Pipeline.Type;
-					}
+					else _pipelineSetting.Value = _file.Pipeline.Type;
 				}
 			}
 		}

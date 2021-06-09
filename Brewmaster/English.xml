@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<Language xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <LanguageString>
+    <Key>tilemap.asm</Key>
+    <Value>Assembly code</Value>
+  </LanguageString>
+  <LanguageString>
+    <Key>tilemap.binary</Key>
+    <Value>Binary nametable</Value>
+  </LanguageString>
+  <LanguageString>
+    <Key>chr</Key>
+    <Value>CHR graphics data</Value>
+  </LanguageString>
+</Language>

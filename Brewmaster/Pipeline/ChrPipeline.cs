@@ -18,6 +18,8 @@ namespace Brewmaster.Pipeline
 
 	public class ChrPipeline : PipelineOption
 	{
+		public override IEnumerable<FileType> SupportedFileTypes { get { return new[] { FileType.Image }; } }
+
 		public override string TypeName { get { return "chr"; } }
 
 		public static List<List<Color>> GetUniqueTilePalettes(Bitmap image)

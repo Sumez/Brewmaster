@@ -56,7 +56,7 @@ namespace Brewmaster
 				Error("Failed trying to associate the .BWM file extension", ex);
 			}
 
-			Language = LanguageHandler.Load("English.xml");
+			Language = LanguageHandler.Load(Path.Combine(Program.WorkingDirectory, "English.xml"));
 			new MainForm { RequestFile = file };
 			Application.Run(CurrentWindow);
         }

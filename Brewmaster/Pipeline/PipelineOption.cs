@@ -1,10 +1,12 @@
-﻿using Brewmaster.ProjectModel;
+﻿using System.Collections.Generic;
+using Brewmaster.ProjectModel;
 
 namespace Brewmaster.Pipeline
 {
 	public abstract class PipelineOption
 	{
 		public abstract string TypeName { get; }
+		public abstract IEnumerable<FileType> SupportedFileTypes { get; }
 		public override string ToString() { return Program.Language.Get(TypeName); }
 		public abstract void Process(PipelineSettings dataPipelineSettings);
 		public abstract PipelineSettings Create(AsmProjectFile file);

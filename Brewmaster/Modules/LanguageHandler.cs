@@ -28,14 +28,15 @@ namespace Brewmaster.Modules
 		public string Get(string key)
 		{
 			if (_dictionary == null) _dictionary = this.ToDictionary(h => h.Key, h => h.Value);
-			if (!_dictionary.ContainsKey(key)) Add(key, null);
-			return _dictionary[key];
+			if (!_dictionary.ContainsKey(key)) Add(key, " ");
+			var value = _dictionary[key];
+			return string.IsNullOrWhiteSpace(value) ? "[" + key + "]" : value;
 		}
 
 		private void Add(string key, string value)
 		{
 			_dictionary.Add(key, value);
-			Add(new LanguageString { Key = key, Value = value ?? " " });
+			Add(new LanguageString { Key = key, Value = value });
 #if DEBUG
 			using (var writer = File.OpenWrite(_fileName)) new XmlSerializer(typeof(LanguageHandler)).Serialize(writer, this);
 #endif
