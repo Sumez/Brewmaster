@@ -303,6 +303,7 @@
     <Compile Include="Controls\NonBuggyComboBox.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Pipeline\PipelineOption.cs" />
     <Compile Include="Pipeline\TilemapAsmPipeline.cs" />
     <Compile Include="Pipeline\TilemapBinaryPipeline.cs" />
     <Compile Include="ProjectExplorer\ProjectExplorer.cs">
