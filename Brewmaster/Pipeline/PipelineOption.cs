@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using Brewmaster.ProjectModel;
 
 namespace Brewmaster.Pipeline
@@ -10,7 +11,13 @@ namespace Brewmaster.Pipeline
 		public override string ToString() { return Program.Language.Get(TypeName); }
 		public abstract void Process(PipelineSettings dataPipelineSettings);
 		public abstract PipelineSettings Create(AsmProjectFile file);
-		public abstract PipelineSettings Load(AsmProject project, PipelineHeader pipelineHeader);
+		public virtual PipelineSettings Load(AsmProject project, PipelineHeader pipelineHeader)
+		{
+			var pipeline = new PipelineSettings(this, null, pipelineHeader.LastProcessed);
+			SetSettings(pipeline, pipelineHeader.Settings);
+			pipeline.OutputFiles.AddRange(pipelineHeader.Output);
+			return pipeline;
+		}
 		public virtual PipelineHeader Save(PipelineSettings settings)
 		{
 			var header = new PipelineHeader
@@ -40,5 +47,13 @@ namespace Brewmaster.Pipeline
 		{
 			
 		}
+		protected PipelineSettings CreateGeneric(AsmProjectFile file, string extension)
+		{
+			var baseFile = file.GetRelativeDirectory(true) + Path.GetFileNameWithoutExtension(file.File.Name);
+			var newPipeline = new PipelineSettings(this, file);
+			newPipeline.OutputFiles.Add(baseFile + extension);
+			return newPipeline;
+		}
+
 	}
 }

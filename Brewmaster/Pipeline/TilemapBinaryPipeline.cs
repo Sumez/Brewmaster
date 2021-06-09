@@ -13,18 +13,9 @@ namespace Brewmaster.Pipeline
 			throw new NotImplementedException();
 		}
 
-		public override PipelineSettings Clone(PipelineSettings dataPipelineSettings)
-		{
-			throw new NotImplementedException();
-		}
 		public override PipelineSettings Create(AsmProjectFile file)
 		{
-			return new PipelineSettings(this, file);
-		}
-
-		public override PipelineSettings Load(AsmProject project, PipelineHeader pipelineHeader)
-		{
-			throw new NotImplementedException();
+			return CreateGeneric(file, ".map");
 		}
 	}
 }
