@@ -9,7 +9,7 @@ namespace Brewmaster.Pipeline
 		public abstract string TypeName { get; }
 		public abstract IEnumerable<FileType> SupportedFileTypes { get; }
 		public override string ToString() { return Program.Language.Get(TypeName); }
-		public abstract void Process(PipelineSettings dataPipelineSettings);
+		public abstract void Process(PipelineSettings settings);
 		public abstract PipelineSettings Create(AsmProjectFile file);
 		public virtual PipelineSettings Load(AsmProject project, PipelineHeader pipelineHeader)
 		{

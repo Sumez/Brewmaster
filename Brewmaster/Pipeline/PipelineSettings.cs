@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using Brewmaster.ProjectModel;
 
 namespace Brewmaster.Pipeline
@@ -42,6 +43,11 @@ namespace Brewmaster.Pipeline
 		public virtual void SettingChanged()
 		{
 			LastProcessed = null;
+		}
+
+		public string GetFilePath(int index)
+		{
+			return Path.Combine(File.Project.Directory.FullName, OutputFiles[index]);
 		}
 	}
 }

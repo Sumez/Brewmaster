@@ -8,7 +8,7 @@ namespace Brewmaster.Pipeline
 	{
 		public override IEnumerable<FileType> SupportedFileTypes { get { return new[] { FileType.TileMap }; } }
 		public override string TypeName { get { return "tilemap.binary"; } }
-		public override void Process(PipelineSettings dataPipelineSettings)
+		public override void Process(PipelineSettings settings)
 		{
 			throw new NotImplementedException();
 		}

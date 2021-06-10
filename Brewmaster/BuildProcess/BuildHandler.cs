@@ -251,13 +251,23 @@ namespace Brewmaster.BuildProcess
 
 				if (file.Pipeline.LastProcessed != null && file.Pipeline.LastProcessed > fileInfo.LastWriteTime)
 				{
-					//Log(new LogData(string.Format("Skipping '{0}'", file.GetRelativePath())));
 					skippedCount++;
 					continue;
 				}
 
-				Log(new LogData(string.Format("Building {0}", string.Join(",", file.Pipeline.OutputFiles.Where(f => f != null)))));
-				file.Pipeline.Process();
+				Log(new LogData(string.Format("Processing {0}", string.Join(",", file.Pipeline.OutputFiles.Where(f => f != null)))));
+				try
+				{
+					file.Pipeline.Process();
+				}
+				catch (Exception ex)
+				{
+					var error = new BuildError(
+						string.Format("Error processing '{0}': {1}", file.GetRelativePath(), ex.Message),
+						BuildError.BuildErrorType.Error);
+					errors.Add(error);
+					ErrorReceived(error);
+				}
 			}
 			if (skippedCount > 0) Log(new LogData(string.Format("Skipped {0} unchanged files", skippedCount)));
 

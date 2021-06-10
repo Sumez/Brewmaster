@@ -21,9 +21,11 @@ namespace Brewmaster.EditorWindows.TileMaps
 		public Size BaseTileSize = new Size(8, 8);
 		public Size AttributeSize = new Size(2, 2);
 		public Size MetaValueSize = new Size(2, 2);
+		public Size ObjectSize = new Size(2, 2);
 		public Size ScreenSize = new Size(32, 30);
 		public int BitsPerPixel = 2;
 		public int ColorCount { get { return (int)Math.Pow(2, BitsPerPixel); } }
+		
 		public List<List<TileMapScreen>> Screens = new List<List<TileMapScreen>>();
 		public Color[] MetaValueColors = { Color.FromArgb(0, 0, 0, 0), Color.FromArgb(128, 255, 255, 255), Color.FromArgb(128, 255, 0, 0), Color.FromArgb(128, 0, 0, 255) };
 
