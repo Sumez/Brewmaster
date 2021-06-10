@@ -306,11 +306,10 @@ namespace Brewmaster.Emulation
 
 		private void ThreadSafeEmulationStatusChanged(EmulatorStatus status)
 		{
-			BeginInvoke(new Action<EmulatorStatus>(EmulationStatusChanged), status);
+			if (ParentForm != null && Visible) BeginInvoke(new Action<EmulatorStatus>(EmulationStatusChanged), status);
 		}
 		private void EmulationStatusChanged(EmulatorStatus status)
 		{
-			if (Handle == null) return;
 			_loadButton.Enabled = _saveButton.Enabled = status != EmulatorStatus.Stopped;
 		}
 

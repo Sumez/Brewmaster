@@ -115,6 +115,13 @@ namespace Brewmaster
 			saveToolStripButton.Enabled =
 				editorTabs.SelectedTab is EditorWindow;
 
+			run.Visible = runMenuItem.Enabled = 
+			runNewBuild.Visible = runNewBuildMenuItem.Enabled =
+			pause.Visible = pauseMenuItem.Enabled =
+			stop.Visible = stopMenuItem.Enabled =
+			restart.Visible = restartMenuItem.Enabled =
+				CurrentProject != null && CurrentProject.Type != ProjectType.AssetOnly;
+
 			EmulatorStatusChanged(_emulatorStatus);
 
 		    ActiveFileChanged();
@@ -161,7 +168,7 @@ namespace Brewmaster
 
 			if (editorTab != null && editorTab.ToolBar != null)
 			{
-				_buildToolStrip.Visible = false;
+				//_buildToolStrip.Visible = false;
 				if (_editorToolStrip != null && _editorToolStrip != editorTab.ToolBar) _editorToolStrip.Visible = false;
 				editorTab.ToolBar.Visible = true;
 				toolstrippanel.Controls.Add(_editorToolStrip = editorTab.ToolBar);
@@ -169,7 +176,7 @@ namespace Brewmaster
 			else
 			{
 				if (_editorToolStrip != null) _editorToolStrip.Visible = false;
-				_buildToolStrip.Visible = true;
+				//_buildToolStrip.Visible = true;
 			}
 
 			// TODO: Do this dynamically when switching active editor tab
@@ -1456,7 +1463,7 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
         }
 		private void SaveAll()
 		{
-			foreach (var tab in editorTabs.TabPages.OfType<ISaveable>())
+			foreach (var tab in editorTabs.TabPages.OfType<ISaveable>().Where(t => !t.Pristine))
 			{
 				tab.Save();
 			}
