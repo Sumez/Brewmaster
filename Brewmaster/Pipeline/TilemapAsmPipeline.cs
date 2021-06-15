@@ -12,7 +12,7 @@ using Newtonsoft.Json.Serialization;
 
 namespace Brewmaster.Pipeline
 {
-	public class TilemapAsmPipeline : PipelineOption
+	public class TileMapAsmPipeline : PipelineOption
 	{
 		public override IEnumerable<FileType> SupportedFileTypes { get { return new [] {FileType.TileMap};}}
 		public override string TypeName { get { return "tilemap.asm"; } }

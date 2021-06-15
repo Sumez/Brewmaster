@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Brewmaster.ProjectModel;
 
 namespace Brewmaster.Pipeline
@@ -8,6 +9,7 @@ namespace Brewmaster.Pipeline
 	{
 		public abstract string TypeName { get; }
 		public abstract IEnumerable<FileType> SupportedFileTypes { get; }
+		public virtual IEnumerable<PipelineProperty> Properties { get { return new PipelineProperty[] {}; } }
 		public override string ToString() { return Program.Language.Get(TypeName); }
 		public abstract void Process(PipelineSettings settings);
 		public abstract PipelineSettings Create(AsmProjectFile file);
@@ -34,26 +36,63 @@ namespace Brewmaster.Pipeline
 			var header = Save(pipelineSettings);
 			var newPipeline = Load(pipelineSettings.File.Project, header);
 			newPipeline.File = pipelineSettings.File;
-			newPipeline.SettingChanged();
+			newPipeline.SettingChanged(false);
 			return newPipeline;
 		}
 
 		public virtual void GetSettings(PipelineSettings settings, ProjectModel.Properties headerSettings)
 		{
-
+			foreach (var property in Properties)
+			{
+				if (!settings.GenericSettings.ContainsKey(property.SystemName)) continue;
+				headerSettings[property.SystemName] = settings.GenericSettings[property.SystemName];
+			}
 		}
 
 		public virtual void SetSettings(PipelineSettings settings, ProjectModel.Properties headerSettings)
 		{
-			
+			foreach (var property in Properties)
+			{
+				settings.GenericSettings[property.SystemName] = headerSettings.ContainsKey(property.SystemName)
+					? headerSettings[property.SystemName]
+					: property.DefaultValue ?? "";
+			}
 		}
 		protected PipelineSettings CreateGeneric(AsmProjectFile file, string extension)
 		{
 			var baseFile = file.GetRelativeDirectory(true) + Path.GetFileNameWithoutExtension(file.File.Name);
 			var newPipeline = new PipelineSettings(this, file);
 			newPipeline.OutputFiles.Add(baseFile + extension);
+			foreach (var property in Properties)
+			{
+				newPipeline.GenericSettings[property.SystemName] = property.DefaultValue ?? "";
+			}
 			return newPipeline;
 		}
 
+	}
+	public enum PipelinePropertyType
+	{
+		Boolean, Select, Text
+	}
+	public class PipelineProperty
+	{
+		public PipelineProperty(string systemName, PipelinePropertyType type, string defaultValue = null, IEnumerable<string> options = null)
+		{
+			SystemName = systemName;
+			Type = type;
+			if (options != null) Options = options.ToList();
+			if (defaultValue != null) DefaultValue = defaultValue;
+		}
+
+		public PipelineProperty(string systemName, PipelinePropertyType type, bool? defaultValue = null, IEnumerable<string> options = null)
+		: this(systemName, type, defaultValue.HasValue ? (defaultValue.Value ? "1" : "0") : null, options)
+		{
+		}
+
+		public string SystemName { get; set; }
+		public PipelinePropertyType Type { get; set; }
+		public List<string> Options { get; set; }
+		public string DefaultValue { get; set; }
 	}
 }

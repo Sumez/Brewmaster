@@ -6,10 +6,18 @@
   </LanguageString>
   <LanguageString>
     <Key>tilemap.binary</Key>
-    <Value>Binary nametable</Value>
+    <Value>Binary NES nametable</Value>
+  </LanguageString>
+	<LanguageString>
+		<Key>chr</Key>
+		<Value>CHR graphics data</Value>
+	</LanguageString>
+  <LanguageString>
+    <Key>tilemap.binary.include-attributes</Key>
+    <Value>Include attributes</Value>
   </LanguageString>
   <LanguageString>
-    <Key>chr</Key>
-    <Value>CHR graphics data</Value>
+    <Key>tilemap.binary.rle</Key>
+    <Value>RLE compression</Value>
   </LanguageString>
 </Language>

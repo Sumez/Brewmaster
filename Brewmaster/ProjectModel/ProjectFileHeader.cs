@@ -183,7 +183,7 @@ namespace Brewmaster.ProjectModel
 	[Serializable]
 	public class Properties : List<Property>
 	{
-		public string this[string key]    // Indexer declaration  
+		public string this[string key]
 		{
 			set
 			{
@@ -191,6 +191,16 @@ namespace Brewmaster.ProjectModel
 				this.Add(new Property { Key = key, Value = value });
 			}
 			get { return this.FirstOrDefault(p => p.Key == key).Value; }
+		}
+
+		public bool ContainsKey(string key)
+		{
+			return this.Any(p => p.Key == key);
+		}
+
+		public bool GetBoolean(string key)
+		{
+			return this[key] == "1";
 		}
 	}
 

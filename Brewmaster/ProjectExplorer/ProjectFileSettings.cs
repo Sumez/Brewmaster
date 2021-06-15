@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
 using Brewmaster.Pipeline;
 using Brewmaster.ProjectModel;
@@ -31,7 +32,9 @@ namespace Brewmaster.ProjectExplorer
 			_pipelineSetting.ValueChanged += (value) =>
 			{
 				if (_file == null) return;
-				if (_file.Pipeline != null) _file.OldPipelines[_file.Pipeline.Type.TypeName] = _file.Pipeline;
+
+				var oldPipeline = _file.Pipeline;
+				if (oldPipeline != null) _file.OldPipelines[oldPipeline.Type.TypeName] = oldPipeline;
 
 				if (value is PipelineOption option)
 				{
@@ -40,11 +43,71 @@ namespace Brewmaster.ProjectExplorer
 					else _file.Pipeline = option.Create(_file);
 				}
 				else _file.Pipeline = null;
-				_file.Project.Pristine = false;
+
+				if (_file.Pipeline != oldPipeline)
+				{
+					_file.Project.Pristine = false;
+					RefreshPipelineSettings();
+				}
 			};
 
 			Clear();
 		}
+
+		private void RefreshPipelineSettings()
+		{
+			_dynamicSettingsPanel.Controls.Clear();
+			if (_file.Pipeline == null)
+			{
+				_outputSetting.Visible = false;
+				return;
+			}
+			_outputSetting.Visible = true;
+			_outputSetting.Value = _file.Pipeline.OutputFiles.Count > 0 ? _file.Pipeline.OutputFiles[0] : "";
+			_outputSetting.Disabled = _file.Pipeline.Type is ChrPipeline;
+
+			_outputSetting.ValueChanged += (value) =>
+			{
+				_file.Pipeline.OutputFiles[0] = value as string;
+				_file.Pipeline.SettingChanged();
+			};
+
+			foreach (var property in _file.Pipeline.Type.Properties)
+			{
+				var settingControl = new SettingControl {
+					Label = Program.Language.Get(_file.Pipeline.Type.TypeName + "." + property.SystemName),
+					InputType = property.Type == PipelinePropertyType.Text ? InputType.Text : InputType.Dropdown
+				};
+				if (property.Type == PipelinePropertyType.Boolean)
+				{
+					settingControl.SetOptions("No", "Yes");
+					settingControl.Value = _file.Pipeline.GenericSettings.GetBoolean(property.SystemName) ? "Yes" : "No";
+				}
+				else if (property.Type == PipelinePropertyType.Select)
+				{
+					settingControl.SetOptions(property.Options.Select(o => Program.Language.Get(_file.Pipeline.Type.TypeName + "." + property.SystemName + "." + o) as object).ToArray());
+					settingControl.Value = _file.Pipeline.GenericSettings[property.SystemName];
+				}
+				else
+				{
+					settingControl.Value = _file.Pipeline.GenericSettings[property.SystemName];
+				}
+
+				settingControl.ValueChanged += (value) =>
+				{
+					var stringValue = value as string;
+					if (property.Type == PipelinePropertyType.Boolean)
+					{
+						_file.Pipeline.GenericSettings[property.SystemName] = stringValue == "Yes" ? "1" : "0";
+					}
+					else _file.Pipeline.GenericSettings[property.SystemName] = stringValue;
+
+					_file.Pipeline.SettingChanged();
+				};
+				_dynamicSettingsPanel.Controls.Add(settingControl);
+			}
+		}
+
 		private Panel _headerPanel;
 		private Label _fileNameLabel;
 		private SettingControl _pipelineSetting;
@@ -52,6 +115,7 @@ namespace Brewmaster.ProjectExplorer
 		private Panel _settingsPanel;
 		private SettingControl _compressionSetting;
 		private SettingControl _assemblySetting;
+		private Panel _dynamicSettingsPanel;
 		private AsmProjectFile _file;
 
 		public AsmProjectFile File
@@ -61,7 +125,7 @@ namespace Brewmaster.ProjectExplorer
 			{
 				_file = value;
 				_fileNameLabel.Text = _file == null ? "" : _file.File.Name;
-				foreach (var settingControl in _settingsPanel.Controls.OfType<SettingControl>())
+				foreach (var settingControl in SettingControls)
 				{
 					settingControl.Disabled = true;
 				}
@@ -75,6 +139,8 @@ namespace Brewmaster.ProjectExplorer
 
 					if (_file.Pipeline == null) _pipelineSetting.Value = "No processing";
 					else _pipelineSetting.Value = _file.Pipeline.Type;
+
+					RefreshPipelineSettings();
 				}
 			}
 		}
@@ -82,17 +148,20 @@ namespace Brewmaster.ProjectExplorer
 		public void Clear()
 		{
 			File = null;
-			foreach (var settingControl in _settingsPanel.Controls.OfType<SettingControl>())
+			foreach (var settingControl in SettingControls)
 			{
 				settingControl.Visible = false;
 			}
 		}
+
+		public IEnumerable<SettingControl> SettingControls { get { return _settingsPanel.Controls.OfType<SettingControl>().Concat(_dynamicSettingsPanel.Controls.OfType<SettingControl>()); } }
 
 		private void InitializeComponent()
 		{
 			this._headerPanel = new System.Windows.Forms.Panel();
 			this._fileNameLabel = new System.Windows.Forms.Label();
 			this._settingsPanel = new System.Windows.Forms.Panel();
+			this._dynamicSettingsPanel = new System.Windows.Forms.Panel();
 			this._outputSetting = new Brewmaster.ProjectExplorer.SettingControl();
 			this._compressionSetting = new Brewmaster.ProjectExplorer.SettingControl();
 			this._pipelineSetting = new Brewmaster.ProjectExplorer.SettingControl();
@@ -101,7 +170,7 @@ namespace Brewmaster.ProjectExplorer
 			this._settingsPanel.SuspendLayout();
 			this.SuspendLayout();
 			// 
-			// headerPanel
+			// _headerPanel
 			// 
 			this._headerPanel.BackColor = System.Drawing.SystemColors.ControlLight;
 			this._headerPanel.Controls.Add(this._fileNameLabel);
@@ -123,6 +192,7 @@ namespace Brewmaster.ProjectExplorer
 			// _settingsPanel
 			// 
 			this._settingsPanel.AutoScroll = true;
+			this._settingsPanel.Controls.Add(this._dynamicSettingsPanel);
 			this._settingsPanel.Controls.Add(this._outputSetting);
 			this._settingsPanel.Controls.Add(this._compressionSetting);
 			this._settingsPanel.Controls.Add(this._pipelineSetting);
@@ -133,9 +203,17 @@ namespace Brewmaster.ProjectExplorer
 			this._settingsPanel.Size = new System.Drawing.Size(476, 371);
 			this._settingsPanel.TabIndex = 14;
 			// 
+			// _dynamicSettingsPanel
+			// 
+			this._dynamicSettingsPanel.AutoSize = true;
+			this._dynamicSettingsPanel.Dock = System.Windows.Forms.DockStyle.Top;
+			this._dynamicSettingsPanel.Location = new System.Drawing.Point(0, 88);
+			this._dynamicSettingsPanel.Name = "_dynamicSettingsPanel";
+			this._dynamicSettingsPanel.Size = new System.Drawing.Size(476, 0);
+			this._dynamicSettingsPanel.TabIndex = 15;
+			// 
 			// _outputSetting
 			// 
-			this._outputSetting.Disabled = true;
 			this._outputSetting.Label = "Output file:";
 			this._outputSetting.Location = new System.Drawing.Point(0, 66);
 			this._outputSetting.Name = "_outputSetting";
@@ -183,6 +261,7 @@ namespace Brewmaster.ProjectExplorer
 			this._headerPanel.ResumeLayout(false);
 			this._headerPanel.PerformLayout();
 			this._settingsPanel.ResumeLayout(false);
+			this._settingsPanel.PerformLayout();
 			this.ResumeLayout(false);
 
 		}
