@@ -156,6 +156,9 @@
     <Compile Include="Controls\AutoFocusMenuStrip.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Controls\CheckedToolStripSplitButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="EditorWindows\Code\AllCompletion.cs" />
     <Compile Include="EditorWindows\Code\CodeMarkers.cs" />
     <Compile Include="EditorWindows\Code\GoToAll.cs">

@@ -7,9 +7,10 @@ namespace Brewmaster.EditorWindows.TileMaps.Tools
 {
 	public class MetaTilePen : TilePen
 	{
-		private readonly int _metaTileSize;
 		public event Action MetaTileChanged;
 		private MetaTile _metaTile;
+		public int MetaTileSize { get; private set; }
+
 		public MetaTile MetaTile
 		{
 			get { return _metaTile; }
@@ -23,32 +24,32 @@ namespace Brewmaster.EditorWindows.TileMaps.Tools
 		
 		public MetaTilePen(int metaTileSize)
 		{
-			_metaTileSize = metaTileSize;
+			MetaTileSize = metaTileSize;
 			Size = new Size(metaTileSize, metaTileSize);
 		}
 
 		public override void Paint(int x, int y, TileMapScreen screen)
 		{
-			screen.PrintMetaTile(x, y, MetaTile, _metaTileSize);
+			screen.PrintMetaTile(x, y, MetaTile, MetaTileSize);
 		}
 
 		public override void EyeDrop(int x, int y, TileMapScreen screen)
 		{
-			MetaTile = screen.GetMetaTile(x, y, _metaTileSize);
+			MetaTile = screen.GetMetaTile(x, y, MetaTileSize);
 		}
 		public override void SetImage(byte[] chrData, TileMap map)
 		{
 			if (MetaTile.Attributes.Length == 1) MetaTile.Attributes[0] = GetSelectedPalette();
-			var image = new Bitmap(map.BaseTileSize.Width * _metaTileSize, map.BaseTileSize.Height * _metaTileSize, PixelFormat.Format32bppPArgb);
+			var image = new Bitmap(map.BaseTileSize.Width * MetaTileSize, map.BaseTileSize.Height * MetaTileSize, PixelFormat.Format32bppPArgb);
 			using (var graphics = Graphics.FromImage(image))
 			{
 				for (var i = 0; i < MetaTile.Tiles.Length; i++)
 				{
-					var paletteIndex = MetaTile.Attributes[((i/_metaTileSize) / map.AttributeSize.Height) * map.AttributeSize.Width + ((i % _metaTileSize) / map.AttributeSize.Width)];
+					var paletteIndex = MetaTile.Attributes[((i/MetaTileSize) / map.AttributeSize.Height) * map.AttributeSize.Width + ((i % MetaTileSize) / map.AttributeSize.Width)];
 					using (var tile = TileImage.GetTileImage(chrData, MetaTile.Tiles[i], map.Palettes[paletteIndex].Colors))
 					{
 						if (tile == null) continue;
-						graphics.DrawImageUnscaled(tile.Image, (i % _metaTileSize) * map.BaseTileSize.Width, (i / _metaTileSize) * map.BaseTileSize.Height);
+						graphics.DrawImageUnscaled(tile.Image, (i % MetaTileSize) * map.BaseTileSize.Width, (i / MetaTileSize) * map.BaseTileSize.Height);
 					}
 				}
 			}

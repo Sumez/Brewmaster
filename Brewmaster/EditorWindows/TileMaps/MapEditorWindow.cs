@@ -107,23 +107,29 @@ namespace Brewmaster.EditorWindows.TileMaps
 			_colorPalette.SelectedPaletteChanged += (paletteIndex) =>
 			{
 				State.Palette = Map.Palettes[paletteIndex];
-				SetToolImage(State.Tool as TilePen);
 			};
 			_colorPalette.PalettesModified += () =>
 			{
 				State.ClearTileCache();
 				State.OnPaletteChanged();
 				_screenPanel.RefreshAllTiles();
-				SetToolImage(State.Tool as TilePen);
 				Pristine = false;
 			};
-			_colorPalette.SelectedColorIndexChanged += (colorIndex, paletteIndex) =>
+			_colorPalette.SelectedColorIndexChanged += (colorIndex, paletteIndex) => { State.ColorIndex = colorIndex; };
+
+			State.ColorIndexChanged += () =>
 			{
-				if (State.Tool is PixelTool pixelTool)
-				{
-					pixelTool.SelectedColor = colorIndex;
-					pixelTool.PreviewSource = Map.Palettes[paletteIndex];
-				}
+				_colorPalette.ShowSelectedColorIndex(State.ColorIndex);
+				if (State.Tool is PixelTool pixelTool) pixelTool.UpdatePreviewSource();
+			};
+			State.PaletteChanged += () =>
+			{
+				SetToolImage(State.Tool as TilePen);
+				if (State.Tool is PixelTool pixelTool) pixelTool.UpdatePreviewSource();
+			};
+			State.ToolChanged += () =>
+			{
+				MapEditorToolBar.SetSelectedTool(State.Tool);
 			};
 
 			_toolSettings = new ToolSettings(Map, State) { Dock = DockStyle.Right };
@@ -150,6 +156,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 			foreach (var screen in Map.GetAllScreens()) InitScreen(screen);
 			State.RefreshTileUsage(Map);
 			State.AfterUndo += (step) => State.RefreshTileUsage(Map);
+			State.ColorIndex = 0;
 
 			_screenPanel.AddFullMap();
 			//ActivateScreen(0, 0);
@@ -186,6 +193,8 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 			MapEditorToolBar.ToggleGrid = () => { State.DisplayGrid = MapEditorToolBar.GridButton.Checked; };
 			MapEditorToolBar.ToggleMetaValues = () => { State.DisplayMetaValues = MapEditorToolBar.CollisionButton.Checked; };
+
+			MapEditorToolBar.SetSelectedTool(State.Tool);
 		}
 
 		protected override void OnControlRemoved(ControlEventArgs e)

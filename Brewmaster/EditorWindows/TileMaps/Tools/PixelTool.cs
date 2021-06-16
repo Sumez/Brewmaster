@@ -31,9 +31,8 @@ namespace Brewmaster.EditorWindows.TileMaps.Tools
 		public override void EyeDrop(int x, int y, TileMapScreen screen)
 		{
 			var tile = screen.GetTile(x / _map.BaseTileSize.Width, y / _map.BaseTileSize.Height);
-			SelectedColor = _state.GetPixel(tile, x % _map.BaseTileSize.Width, y % _map.BaseTileSize.Height);
 			SetSelectedPalette(screen.GetColorTile(x / _map.BaseTileSize.Width, y / _map.BaseTileSize.Height));
-			PreviewSource = _state.Palette;
+			_state.ColorIndex = _state.GetPixel(tile, x % _map.BaseTileSize.Width, y % _map.BaseTileSize.Height);
 		}
 
 		public override void RefreshImage(Palette palette)
@@ -48,12 +47,7 @@ namespace Brewmaster.EditorWindows.TileMaps.Tools
 
 		public int SelectedColor
 		{
-			get { return _selectedColor; }
-			set
-			{
-				_selectedColor = value;
-				if (SelectedColorChanged != null) SelectedColorChanged();
-			}
+			get { return _state.ColorIndex; }
 		}
 
 		public Palette PreviewSource
@@ -68,5 +62,10 @@ namespace Brewmaster.EditorWindows.TileMaps.Tools
 
 		public Func<int> GetSelectedPalette { get; set; }
 		public Action<int> SetSelectedPalette { get; set; }
+
+		public void UpdatePreviewSource()
+		{
+			PreviewSource = _state.Palette;
+		}
 	}
 }

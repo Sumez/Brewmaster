@@ -5,16 +5,16 @@ namespace Brewmaster.EditorWindows.TileMaps.Tools
 {
 	public class FlipTool : MapEditorTool
 	{
-		private MapEditorState _state;
-		private bool _vertical;
+		private readonly MapEditorState _state;
 
 		public FlipTool(MapEditorState state, TileMap map, bool vertical)
 		{
-			_vertical = vertical;
+			Vertical = vertical;
 			_state = state;
 			Size = new Size(1, 1);
 		}
 
+		public bool Vertical { get; private set; }
 		public override bool EditsChr { get { return true; } }
 
 		public override void Paint(int x, int y, TileMapScreen screen)
@@ -29,7 +29,7 @@ namespace Brewmaster.EditorWindows.TileMaps.Tools
 				tile = _state.CopyTile(tile);
 				screen.PrintTile(x, y, tile);
 			}
-			_state.FlipTile(tile, _vertical);
+			_state.FlipTile(tile, Vertical);
 			screen.PrintTile(x, y, tile);
 		}
 		public override void AfterPaint()

@@ -38,8 +38,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 				};
 				paletteControl.SelectedColorIndexChanged += () =>
 				{
-					if (SelectedColorIndexChanged != null)
-						SelectedColorIndexChanged(paletteControl.SelectedColorIndex, paletteIndex);
+					if (SelectedColorIndexChanged != null) SelectedColorIndexChanged(paletteControl.SelectedColorIndex, paletteIndex);
 				};
 			}
 
@@ -92,13 +91,33 @@ namespace Brewmaster.EditorWindows.TileMaps
 			}
 			if (PalettesModified != null) PalettesModified();
 		}
+
+		public void ShowSelectedColorIndex(int stateColorIndex)
+		{
+			for (var i = 0; i < 4; i++)
+			{
+				_paletteControls[i].SelectedColorIndex = stateColorIndex;
+			}
+		}
 	}
 
 	public class ColorPalette : Control
 	{
 		public event Action<Palette> PaletteChanged;
 		public event Action SelectedColorIndexChanged;
-		public int SelectedColorIndex { get; set; }
+
+		public int SelectedColorIndex
+		{
+			get { return _selectedColorIndex; }
+			set
+			{
+				_selectedColorIndex = value;
+				_paletteViewer.DefaultIndex = value;
+				_paletteViewer.Invalidate();
+			}
+		}
+
+		private int _selectedColorIndex;
 		private bool _selected;
 		public bool Selected
 		{

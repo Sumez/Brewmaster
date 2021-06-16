@@ -15,6 +15,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 		private MapEditorTool _tool;
 		private byte[] _chrData = new byte[16]; // TODO: Set to size of single tile when opening a "clean" map with no CHR reference
 		private Palette _palette;
+		private int _colorIndex = 0;
 		private int _zoom = 2;
 		private bool _displayGrid = true;
 		private bool _displayMetaValues = false;
@@ -25,15 +26,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 			get { return _tool; }
 			set
 			{
-				if (_tool != null)
-				{
-					if (_tool is PixelTool oldPixelTool && value is PixelTool newPixelTool)
-					{
-						// TODO: Store selected color in global palette control along with selected palette, instead of this crappy solution :)
-						newPixelTool.SelectedColor = oldPixelTool.SelectedColor;
-					}
-					_tool.Unselect();
-				}
+				if (_tool != null) _tool.Unselect();
 				_tool = value;
 				OnToolChanged();
 			}
@@ -57,6 +50,15 @@ namespace Brewmaster.EditorWindows.TileMaps
 			{
 				_palette = value;
 				OnPaletteChanged();
+			}
+		}
+		public int ColorIndex
+		{
+			get { return _colorIndex; }
+			set
+			{
+				_colorIndex = value;
+				OnColorIndexChanged();
 			}
 		}
 
@@ -92,6 +94,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 		public bool ChrWasChanged { get; set; }
 
 		public event Action PaletteChanged;
+		public event Action ColorIndexChanged;
 		public event Action ChrDataChanged;
 		public event Action ToolChanged;
 		public event Action<int, int> ZoomChanged;
@@ -103,6 +106,10 @@ namespace Brewmaster.EditorWindows.TileMaps
 		public void OnPaletteChanged()
 		{
 			if (PaletteChanged != null) PaletteChanged();
+		}
+		public void OnColorIndexChanged()
+		{
+			if (ColorIndexChanged != null) ColorIndexChanged();
 		}
 		public void OnChrDataChanged()
 		{
