@@ -101,7 +101,8 @@ namespace Brewmaster.EditorWindows.TileMaps
 		public event Action DisplayMetaValuesChanged;
 		public event Action DisplayGridChanged;
 		public event Action<UndoStep> AfterUndo;
-		public event Action<Dictionary<int, int>, UndoStep> TilesMoved;
+		public event Action<Dictionary<int, int>[], UndoStep> TilesMoved;
+		public event Action TileUsageChanged;
 
 		public void OnPaletteChanged()
 		{
@@ -173,8 +174,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 		{
 			TileImage.FlipTile(ChrData, tileIndex, vertical);
 
-			lock (_cachedTiles)
-				_cachedTiles.Remove(tileIndex);
+			lock (_cachedTiles) _cachedTiles.Remove(tileIndex);
 		}
 
 		private readonly Dictionary<TileMapScreen, Dictionary<int, int>> _screenTileUsage = new Dictionary<TileMapScreen, Dictionary<int, int>>();
@@ -187,18 +187,22 @@ namespace Brewmaster.EditorWindows.TileMaps
 				_tileUsage[oldTile]--;
 			}
 
-			if (newTile < 0) return;
+			if (newTile >= 0)
+			{
+				if (_screenTileUsage[screen].ContainsKey(newTile)) _screenTileUsage[screen][newTile]++;
+				else _screenTileUsage[screen][newTile] = 1;
 
-			if (_screenTileUsage[screen].ContainsKey(newTile)) _screenTileUsage[screen][newTile]++;
-			else _screenTileUsage[screen][newTile] = 1;
+				if (_tileUsage.ContainsKey(newTile)) _tileUsage[newTile]++;
+				else _tileUsage[newTile] = 1;
+			}
 
-			if (_tileUsage.ContainsKey(newTile)) _tileUsage[newTile]++;
-			else _tileUsage[newTile] = 1;	
+			if (TileUsageChanged != null) TileUsageChanged();
 		}
 		public void RefreshTileUsage(TileMapScreen screen)
 		{
 			_screenTileUsage[screen] = screen.Tiles.GroupBy(tile => tile).ToDictionary(g => g.Key, g => g.ToArray().Length);
 			_tileUsage = _screenTileUsage.SelectMany(kvp => kvp.Value).GroupBy(kvp => kvp.Key, kvp => kvp.Value).ToDictionary(g => g.Key, g => g.Sum());
+			if (TileUsageChanged != null) TileUsageChanged();
 		}
 
 		public void RefreshTileUsage(TileMap map)
@@ -210,6 +214,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 				_screenTileUsage[screen] = screen.Tiles.GroupBy(tile => tile).ToDictionary(g => g.Key, g => g.ToArray().Length);
 			}
 			_tileUsage = _screenTileUsage.SelectMany(kvp => kvp.Value).GroupBy(kvp => kvp.Key, kvp => kvp.Value).ToDictionary(g => g.Key, g => g.Sum());
+			if (TileUsageChanged != null) TileUsageChanged();
 		}
 
 		public int GetTileUsage(int tile)
@@ -257,7 +262,12 @@ namespace Brewmaster.EditorWindows.TileMaps
 			var tileSize = TileImage.GetTileDataLength();
 			var tileCount = _chrData.Length / tileSize;
 			if (tileCount == 1) return;
+			
+			AdjustForMovedTiles(RemoveChrTileHelper(tile, tileSize, tileCount));
+		}
 
+		private Dictionary<int, int> RemoveChrTileHelper(int tile, int tileSize, int tileCount)
+		{
 			var chrData = new byte[_chrData.Length - tileSize];
 			var moveTiles = tileCount - tile - 1;
 
@@ -269,16 +279,19 @@ namespace Brewmaster.EditorWindows.TileMaps
 			for (var i = tile + 1; i < tileCount; i++) changedTiles.Add(i, i - 1);
 
 			lock (_cachedTiles) _cachedTiles.Remove(tile);
-			AdjustForMovedTiles(changedTiles);
+			return changedTiles;
 		}
 
-		private void AdjustForMovedTiles(Dictionary<int, int> changedTiles)
+		private void AdjustForMovedTiles(params Dictionary<int, int>[] changedTileSets)
 		{
 			var undoStep = new UndoStep();
 			undoStep.AddChr(this);
-			lock (_cachedTiles)
-				foreach (var changedTile in changedTiles.Keys) _cachedTiles.Remove(changedTile);
-			if (TilesMoved != null) TilesMoved(changedTiles, undoStep);
+
+			foreach (var changedTiles in changedTileSets)
+			{
+				lock (_cachedTiles) foreach (var changedTile in changedTiles.Keys) _cachedTiles.Remove(changedTile);
+			}
+			if (TilesMoved != null) TilesMoved(changedTileSets, undoStep);
 			AddUndoStep(undoStep);
 
 			OnChrDataChanged();
@@ -342,6 +355,50 @@ namespace Brewmaster.EditorWindows.TileMaps
 			var chrData = new byte[chr.Length];
 			Buffer.BlockCopy(chr, 0, chrData, 0, Buffer.ByteLength(chr));
 			ChrData = chrData;
+		}
+
+		public void MergeIdenticalTiles(int bitDepth = 2)
+		{
+			var tileSize = TileImage.GetTileDataLength();
+			var tileCount = _chrData.Length / tileSize;
+			if (tileCount == 1) return;
+
+			var changedTileSets = new List<Dictionary<int, int>>();
+			for (var i = 0; i < tileCount; i++)
+			{
+				var tile = new byte[tileSize];
+				var compareTile = new byte[tileSize];
+				Buffer.BlockCopy(ChrData, i * tileSize, tile, 0, tileSize);
+				for (var j = tileCount - 1; j > i; j--)
+				{
+					Buffer.BlockCopy(ChrData, j * tileSize, compareTile, 0, tileSize);
+					if (!tile.SequenceEqual(compareTile)) continue;
+
+					var changedTiles = RemoveChrTileHelper(j, tileSize, tileCount);
+					changedTiles.Add(j, i);
+					changedTileSets.Add(changedTiles);
+					tileCount = _chrData.Length / tileSize;
+				}
+			}
+			AdjustForMovedTiles(changedTileSets.ToArray());
+			ClearTileCache();
+		}
+
+		public void RemoveUnusedTiles()
+		{
+			var tileSize = TileImage.GetTileDataLength();
+			var tileCount = _chrData.Length / tileSize;
+			if (tileCount == 1) return;
+
+			var changedTileSets = new List<Dictionary<int, int>>();
+			for (var i = tileCount - 1; i >= 0; i--)
+			{
+				if (GetTileUsage(i) > 0) continue;
+				changedTileSets.Add(RemoveChrTileHelper(i, tileSize, tileCount));
+				tileCount = _chrData.Length / tileSize;
+			}
+			AdjustForMovedTiles(changedTileSets.ToArray());
+			ClearTileCache();
 		}
 	}
 }

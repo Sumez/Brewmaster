@@ -436,4 +436,16 @@
     <MenuItem>newTileMapToolBarMenuItem</MenuItem>
     <HelpText>Create a new tile map, for editing stages, screens or character graphics</HelpText>
   </MenuHelp>
+  <MenuHelp>
+    <MenuItem>FloodFillTool</MenuItem>
+    <HelpText>Fill enclosed area with the selected color. Flows across tiles and changes any that it reached</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>FlipHorizontalTool</MenuItem>
+    <HelpText>Edits selected tile by flipping it horizontally</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>FlipVerticalTool</MenuItem>
+    <HelpText>Edits selected tile by flipping it vertically</HelpText>
+  </MenuHelp>
 </MenuHelpCollection>

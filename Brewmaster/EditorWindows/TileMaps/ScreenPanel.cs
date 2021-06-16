@@ -51,6 +51,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 			mouseHandler.MouseDown += (point) =>
 			{
 				if (!Visible || !_holdingMoveModifier || !new Rectangle(Point.Empty, Size).Contains(PointToClient(point))) return false;
+				Focus();
 				_panOffset = point;
 				return true;
 			};

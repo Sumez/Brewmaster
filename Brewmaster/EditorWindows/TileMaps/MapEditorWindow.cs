@@ -73,6 +73,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 				{
 					if (!screen.ReplaceTiles(changes)) continue;
 					undoStep.AddScreen(screen);
+					screen.OnEditEnd();
 				}
 			};
 

@@ -9,7 +9,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 		public void AddScreen(TileMapScreen screen)
 		{
-			States.Add(screen, screen.PreviousState);
+			if (!States.ContainsKey(screen)) States.Add(screen, screen.PreviousState);
 			screen.RefreshPreviousState();
 		}
 

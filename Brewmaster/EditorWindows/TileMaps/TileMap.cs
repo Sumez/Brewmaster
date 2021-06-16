@@ -122,6 +122,16 @@ namespace Brewmaster.EditorWindows.TileMaps
 			if (TileChanged != null) TileChanged(x, y, oldTile, tileIndex, true);
 		}
 
+		public bool ReplaceTiles(Dictionary<int, int>[] changeSets)
+		{
+			var changed = false;
+			foreach (var changes in changeSets)
+			{
+				if (ReplaceTiles(changes)) changed = true;
+			}
+			return changed;
+		}
+
 		public bool ReplaceTiles(Dictionary<int, int> changes)
 		{
 			var changed = false;

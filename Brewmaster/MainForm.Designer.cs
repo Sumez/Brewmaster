@@ -1322,7 +1322,7 @@ namespace Brewmaster
             this.newTileMapToolBarMenuItem});
 			this.toolStripDropDownButton1.Image = global::Brewmaster.Properties.Resources.newfile;
 			this.toolStripDropDownButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.toolStripDropDownButton1.Name = "toolStripDropDownButton1";
+			this.toolStripDropDownButton1.Name = "newProjectOrFileToolBarMenuItem";
 			this.toolStripDropDownButton1.Size = new System.Drawing.Size(29, 22);
 			this.toolStripDropDownButton1.Text = "New project or file";
 			// 

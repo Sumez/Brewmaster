@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -61,8 +62,32 @@ namespace Brewmaster.EditorWindows.TileMaps
 			if (_grid != null) _grid.Dispose();
 			_grid = grid;
 		}
+		private void GenerateOverlay()
+		{
+			var tileWidth = _tileWidth * _metaTileWidth * Zoom;
+			var tileHeight = _tileHeight * _metaTileWidth * Zoom;
+			var width = tileWidth * _rowWidth;
+			var height = tileHeight * ColHeight;
 
-		
+			var overlay = new Bitmap(width, height);
+			using (var graphics = Graphics.FromImage(overlay))
+			{
+				graphics.CompositingMode = CompositingMode.SourceCopy;
+				graphics.CompositingQuality = CompositingQuality.HighSpeed;
+				foreach (var tileIndex in _highlightedTiles)
+				{
+					var x = tileIndex % _rowWidth;
+					var y = tileIndex / _rowWidth;
+					graphics.FillRectangle(_overlayBrush, x * tileWidth, y * tileHeight, tileWidth, tileHeight);
+				}
+
+			}
+
+			if (_overlay != null) _overlay.Dispose();
+			_overlay = overlay;
+		}
+
+
 		protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
 		{
 			switch (keyData)
@@ -95,11 +120,14 @@ namespace Brewmaster.EditorWindows.TileMaps
 		private Pen _solid;
 		private int _zoom = 1;
 		private Bitmap _grid;
+		private Bitmap _overlay;
 		private int _selectedTile = -1;
 		private int _hoverTile = -1;
 		private Palette _palette;
 		private SolidBrush _solidBrush;
+		private SolidBrush _overlayBrush;
 		private List<MetaTile> _tiles = new List<MetaTile>();
+		private List<int> _highlightedTiles = new List<int>();
 
 		private int _dragTile = -1;
 		private Point _dragOrigin;
@@ -167,6 +195,18 @@ namespace Brewmaster.EditorWindows.TileMaps
 				}
 				ColHeight = colHeight;
 				RefreshImage();
+			}
+		}
+
+		public List<int> HighlightedTiles
+		{
+			get { return _highlightedTiles; }
+			set
+			{
+				if (_highlightedTiles.SequenceEqual(value)) return;
+				_highlightedTiles = value;
+				GenerateOverlay();
+				Invalidate();
 			}
 		}
 
@@ -251,6 +291,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 			var gridColor = Color.FromArgb(128, 255, 255, 255);
 			_solid = new Pen(gridColor, 1);
 			_solidBrush = new SolidBrush(gridColor);
+			_overlayBrush = new SolidBrush(Color.FromArgb(128, 255, 0, 0));
 
 			GetTileColors = (tile, i) => Palette;
 
@@ -264,6 +305,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 		private readonly object _backBufferLock = new object();
 		private Task _backBufferTask;
 		private Action _cancelBackBufferTask;
+		private int _expectedHeight = 0;
 		public void RefreshImage()
 		{
 			if (Tiles == null) return;
@@ -324,7 +366,15 @@ namespace Brewmaster.EditorWindows.TileMaps
 			e.Graphics.CompositingQuality = CompositingQuality.HighSpeed;
 			e.Graphics.PixelOffsetMode = PixelOffsetMode.Half;
 			e.Graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
-			lock (_backBufferLock) e.Graphics.DrawImage(_image.Image, new Rectangle(0, 0, _image.Width * Zoom, _image.Height * Zoom));
+			lock (_backBufferLock)
+			{
+				if (_image.Height != _expectedHeight) Height = (_expectedHeight = _image.Height) * Zoom;
+				e.Graphics.DrawImage(_image.Image, new Rectangle(0, 0, _image.Width * Zoom, _image.Height * Zoom));
+			}
+
+			e.Graphics.CompositingMode = CompositingMode.SourceOver;
+			e.Graphics.PixelOffsetMode = PixelOffsetMode.None;
+			if (_highlightedTiles.Any()) e.Graphics.DrawImageUnscaled(_overlay, 0, 0);
 
 			if (_dragTile >= 0 && _dragLocation != null)
 			{
@@ -332,9 +382,6 @@ namespace Brewmaster.EditorWindows.TileMaps
 				var y = _dragTile / _rowWidth;
 				e.Graphics.FillRectangle(Brushes.Black, x * tileWidth, y * tileHeight, tileWidth, tileHeight);
 			}
-
-			e.Graphics.CompositingMode = CompositingMode.SourceOver;
-			e.Graphics.PixelOffsetMode = PixelOffsetMode.None;
 			e.Graphics.DrawImageUnscaled(_grid, 0, 0);
 
 			if (_hoverTile >= 0)
