@@ -17,6 +17,7 @@ using Brewmaster.Modules.Watch;
 using Brewmaster.ProjectModel;
 using Brewmaster.Settings;
 using ICSharpCode.TextEditor;
+using ICSharpCode.TextEditor.Actions;
 using ICSharpCode.TextEditor.Document;
 
 namespace Brewmaster.EditorWindows.Code
@@ -41,7 +42,7 @@ namespace Brewmaster.EditorWindows.Code
 
 		private CompletionWindow _codeCompletionWindow;
 		private int _caretLine = 0;
-		private static readonly Keys[] NavigationKeys = { Keys.ShiftKey, Keys.ControlKey, Keys.Alt, Keys.Down, Keys.Up, Keys.Left, Keys.Right, Keys.Home, Keys.End, Keys.Enter, Keys.Escape, Keys.PageDown, Keys.PageUp, Keys.Tab, Keys.Return };
+		private static readonly Keys[] NavigationKeys = { Keys.ShiftKey, Keys.ControlKey, Keys.Alt, Keys.Down, Keys.Up, Keys.Left, Keys.Right, Keys.Home, Keys.End, Keys.Enter, Keys.Escape, Keys.PageDown, Keys.PageUp, Keys.Return };
 
 		private CodeMenu Menu { get; set; }
 		public Func<string, Task<IEnumerable<BuildHandler.BuildError>>> ParseErrors { get; set; }
@@ -589,7 +590,25 @@ namespace Brewmaster.EditorWindows.Code
 
 			if (word.Word.Trim().Length < wordLengthLimit)
 			{
-				if ((word.IsWhiteSpace || string.IsNullOrWhiteSpace(word.Word)) && !_forcedAutoCompleteWindow && _codeCompletionWindow != null) _codeCompletionWindow.Close();
+				if (word.IsWhiteSpace || string.IsNullOrWhiteSpace(word.Word))
+				{
+					if (!_forcedAutoCompleteWindow && _codeCompletionWindow != null) _codeCompletionWindow.Close();
+
+					//var previousWord = line.Words.Take(line.Words.IndexOf(word)).LastOrDefault(w => !w.IsWhiteSpace && !string.IsNullOrWhiteSpace(w.Word)); // TODO: have to go back one character at a time to test if word is different/nonwhitespace
+					if (previousWord is AsmWord asmWord)
+					{
+						if (asmWord.WordType == AsmWord.AsmWordType.Command)
+						{
+							var command = Ca65Parser.GetCommandFromWord(asmWord.Word);
+							if (command != null) ((MainForm)ParentForm).WriteStatus(command.ToString());
+						}
+					}
+					else
+					{
+						var description = GetSymbolDescription(previousWord.Word);
+						if (description != null) ((MainForm)ParentForm).WriteStatus(description);
+					}
+				}
 				return;
 			}
 			var provider = _completionDataProvider;
