@@ -325,7 +325,7 @@ namespace Brewmaster
 
 
 				editorTabs.ActiveTabChanged += ActiveFileChanged;
-				_menuHelper.Prepare(new [] { MainWindowMenu, MainToolStrip, MapEditorWindow.MapEditorToolBar }, WriteStatus);
+				_menuHelper.Prepare(new [] { MainWindowMenu, MainToolStrip, _buildToolStrip, MapEditorWindow.MapEditorToolBar }, WriteStatus);
 
 				// Apply settings
 				viewToolbarMenuItem.Checked = toolstrippanel.Visible = MainToolStrip.Visible = Settings.ShowToolbar;

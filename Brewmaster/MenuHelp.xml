@@ -13,6 +13,7 @@
   </MenuHelp>
   <MenuHelp>
     <MenuItem>copyToolStripButton</MenuItem>
+	<HelpText>Copy</HelpText>
   </MenuHelp>
   <MenuHelp>
     <MenuItem>configurationSelector</MenuItem>
@@ -36,9 +37,11 @@
   </MenuHelp>
   <MenuHelp>
     <MenuItem>cutToolStripButton</MenuItem>
+	<HelpText>Cut</HelpText>
   </MenuHelp>
   <MenuHelp>
     <MenuItem>pasteToolStripButton</MenuItem>
+	<HelpText>Paste</HelpText>
   </MenuHelp>
   <MenuHelp>
     <MenuItem>runNewBuild</MenuItem>
@@ -247,18 +250,23 @@
   </MenuHelp>
   <MenuHelp>
     <MenuItem>Edit_CutMenuItem</MenuItem>
+	<HelpText>Cut</HelpText>
   </MenuHelp>
   <MenuHelp>
     <MenuItem>Edit_CopyMenuItem</MenuItem>
+	<HelpText>Copy</HelpText>
   </MenuHelp>
   <MenuHelp>
     <MenuItem>Edit_PasteMenuItem</MenuItem>
+	<HelpText>Paste</HelpText>
   </MenuHelp>
   <MenuHelp>
     <MenuItem>Edit_UndoMenuItem</MenuItem>
+	<HelpText>Undo</HelpText>
   </MenuHelp>
   <MenuHelp>
     <MenuItem>Edit_RedoMenuItem</MenuItem>
+	<HelpText>Redo</HelpText>
   </MenuHelp>
   <MenuHelp>
     <MenuItem>findMenuItem</MenuItem>
@@ -447,5 +455,9 @@
   <MenuHelp>
     <MenuItem>FlipVerticalTool</MenuItem>
     <HelpText>Edits selected tile by flipping it vertically</HelpText>
+  </MenuHelp>
+  <MenuHelp>
+    <MenuItem>newProjectOrFileToolBarMenuItem</MenuItem>
+    <HelpText> </HelpText>
   </MenuHelp>
 </MenuHelpCollection>
