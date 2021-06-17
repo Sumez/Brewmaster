@@ -72,6 +72,8 @@ namespace Brewmaster.EditorWindows.TileMaps
 				foreach (var screen in Map.GetAllScreens())
 				{
 					if (!screen.ReplaceTiles(changes)) continue;
+
+					State.RefreshTileUsage(screen);
 					undoStep.AddScreen(screen);
 					screen.OnEditEnd();
 				}

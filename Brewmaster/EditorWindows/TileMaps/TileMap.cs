@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
@@ -142,7 +141,10 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 				changed = true;
 				Tiles[i] = changes[oldTile];
-				if (TileChanged != null) TileChanged(i % _map.ScreenSize.Width, i / _map.ScreenSize.Width, oldTile, Tiles[i], false);
+				// It would make sense to fire the TileChanged event, but it's intended for use with the editor UI, not automatic updates, so it won't fire on any screens not currently loaded into the UI. Might need to refactor the naming here
+				// We still want to update the tile count though, so we're doing it manually after the full update from the State.TilesMoved event
+				// Also, calling this event for every individual tile could get absurdly slow when rearranging a lot of tiles
+				// if (TileChanged != null) TileChanged(i % _map.ScreenSize.Width, i / _map.ScreenSize.Width, oldTile, Tiles[i], false);
 			}
 			return changed;
 		}
