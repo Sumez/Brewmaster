@@ -25,17 +25,15 @@ namespace Brewmaster.Pipeline
 		public static List<List<Color>> GetUniqueTilePalettes(Bitmap image)
 		{
 			var returnValue = new List<List<Color>>();
-			var tileCount = (image.Width / 8) * (image.Height / 8);
+			var tileCount = GetTileCount(image);
 			for (var i = 0; i < tileCount; i++)
 			{
 				var tilePalette = new List<Color>();
-				var offset = i * 8;
-				var offsetY = (offset / image.Width) * 8;
-				var offsetX = (offset % image.Width);
+				var offset = GetOffset(image, i);
 				for (var y = 0; y < 8; y++)
 					for (var x = 0; x < 8; x++)
 					{
-						var color = image.GetPixel(offsetX + x, offsetY + y);
+						var color = GetPixel(image, offset.Width + x, offset.Height + y) ?? tilePalette[0];
 						if (!tilePalette.Contains(color)) tilePalette.Add(color); ;
 					}
 
@@ -66,10 +64,11 @@ namespace Brewmaster.Pipeline
 
 			return returnValue;
 		}
+
 		public static Bitmap GetReducedImage(ChrPipelineSettings settings, Bitmap image)
 		{
 			var bitmap = new Bitmap(image.Width, image.Height, PixelFormat.Format32bppPArgb);
-			var tileCount = (image.Width / 8) * (image.Height / 8);
+			var tileCount = GetTileCount(image);
 
 			var basePalette = settings.TilePalettes.OrderByDescending(p => p.Count).First().ToDictionary(k => k.Value, k => k.Key);
 
@@ -77,13 +76,11 @@ namespace Brewmaster.Pipeline
 			{
 				// TODO: Reduce redundancy
 				var tilePalette = new List<Color>();
-				var offset = i * 8;
-				var offsetY = (offset / image.Width) * 8;
-				var offsetX = (offset % image.Width);
+				var offset = GetOffset(image, i);
 				for (var y = 0; y < 8; y++)
 					for (var x = 0; x < 8; x++)
 					{
-						var color = image.GetPixel(offsetX + x, offsetY + y);
+						var color = GetPixel(image, offset.Width + x, offset.Height + y) ?? tilePalette[0];
 						if (!tilePalette.Contains(color)) tilePalette.Add(color);
 					}
 
@@ -93,13 +90,24 @@ namespace Brewmaster.Pipeline
 				for (var y = 0; y < 8; y++)
 					for (var x = 0; x < 8; x++)
 					{
-						var color = image.GetPixel(offsetX + x, offsetY + y);
-						bitmap.SetPixel(offsetX + x, offsetY + y, basePalette[paletteReference[color]]);
+						if (bitmap.Width <= offset.Width + x || bitmap.Height <= offset.Height + y) continue;
+						var color = GetPixel(image, offset.Width + x, offset.Height + y) ?? paletteReference.First().Key;
+						bitmap.SetPixel(offset.Width + x, offset.Height + y, basePalette[paletteReference[color]]);
 					}
 
 			}
 
 			return bitmap;
+		}
+
+		private static int GetTileCount(Image image)
+		{
+			return ((image.Width + 7) / 8) * ((image.Height + 7) / 8); // +7 results in the ceiling number after an uneven division (84+7 / 8 = 11 when all numbers are integer)
+		}
+		private static Size GetOffset(Bitmap image, int tileIndex)
+		{
+			var width = ((image.Width + 7) / 8);
+			return new Size((tileIndex / width) * 8, (tileIndex % width) * 8);
 		}
 
 		public static Bitmap LoadImageFile(string filename)
@@ -136,12 +144,14 @@ namespace Brewmaster.Pipeline
 			var platform = chrSettings.File.Project.Platform;
 			var bitDepth = chrSettings.BitDepth;
 
+			var tileDimensions = 8;
+
 			var tileSize = 8 * bitDepth;
 			var paletteEntries = (int)Math.Pow(2, bitDepth);
 
 			using (var image = GetImageSource(chrSettings))
 			{
-				var tileCount = (image.Width / 8) * (image.Height / 8);
+				var tileCount = GetTileCount(image);
 				var bytes = new byte[tileCount * tileSize];
 				var exportedTiles = new List<byte[]>();
 
@@ -183,15 +193,14 @@ namespace Brewmaster.Pipeline
 				for (var i = 0; i < tileCount; i++)
 				{
 					var tileData = new byte[tileSize];
-					var offset = i * 8;
-					var offsetY = (offset / image.Width) * 8;
-					var offsetX = (offset % image.Width);
+					var offset = GetOffset(image, i);
 
 					for (var y = 0; y < 8; y++)
 						for (var x = 0; x < 8; x++)
 						{
-							var color = image.GetPixel(offsetX + x, offsetY + y);
+							var color = GetPixel(image, offset.Width + x, offset.Height + y) ?? palette[0];
 							var colorIndex = -1;
+
 							for (var c = 0; c < knownEntries; c++)
 							{
 								if (color == palette[c])
@@ -254,6 +263,12 @@ namespace Brewmaster.Pipeline
 				}
 			}
 		}
+
+		private static Color? GetPixel(Bitmap image, int x, int y)
+		{
+			return (x >= image.Width || y >= image.Height) ? null : image.GetPixel(x, y) as Color?;
+		}
+
 		public static int GetColorValue(Color color)
 		{
 			var red = color.R / 8;
