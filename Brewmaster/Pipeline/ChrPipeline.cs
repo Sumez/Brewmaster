@@ -107,7 +107,7 @@ namespace Brewmaster.Pipeline
 		private static Size GetOffset(Bitmap image, int tileIndex)
 		{
 			var width = ((image.Width + 7) / 8);
-			return new Size((tileIndex / width) * 8, (tileIndex % width) * 8);
+			return new Size((tileIndex % width) * 8, (tileIndex / width) * 8);
 		}
 
 		public static Bitmap LoadImageFile(string filename)
