@@ -143,7 +143,6 @@ namespace Brewmaster.Pipeline
 
 			var platform = chrSettings.File.Project.Platform;
 			var bitDepth = chrSettings.BitDepth;
-			var discardRedundantTiles = chrSettings.DiscardRedundantTiles && !chrSettings.BigTiles;
 
 			var tileSize = 8 * bitDepth;
 			var paletteEntries = (int)Math.Pow(2, bitDepth);
@@ -157,6 +156,7 @@ namespace Brewmaster.Pipeline
 
 				var bytes = new byte[tileCount * tileSize];
 				var exportedTiles = new List<byte[]>();
+				var tileMap = new List<int>();
 
 				var palette = new Color[paletteEntries];
 				var knownEntries = 0;
@@ -192,74 +192,141 @@ namespace Brewmaster.Pipeline
 				}
 				if (knownEntries > paletteEntries) throw new Exception("Too many colors in image");
 
-				var tileByteOffset = 0;
-				for (var i = 0; i < tileCount; i++)
+
+				byte[] GetTile(int index, out Size offset)
 				{
 					var tileData = new byte[tileSize];
-					var offset = GetOffset(image, i);
+					offset = GetOffset(image, index);
 
 					for (var y = 0; y < 8; y++)
-						for (var x = 0; x < 8; x++)
+					for (var x = 0; x < 8; x++)
+					{
+						var color = GetPixel(image, offset.Width + x, offset.Height + y) ?? palette[0];
+						var colorIndex = -1;
+
+						for (var c = 0; c < knownEntries; c++)
 						{
-							var color = GetPixel(image, offset.Width + x, offset.Height + y) ?? palette[0];
-							var colorIndex = -1;
-
-							for (var c = 0; c < knownEntries; c++)
+							if (color == palette[c])
 							{
-								if (color == palette[c])
-								{
-									colorIndex = c;
-									break;
-								}
-							}
-
-							if (colorIndex == -1)
-							{
-								if (knownEntries >= paletteEntries) throw new Exception("Too many colors in image");
-								palette[knownEntries] = color;
-								colorIndex = knownEntries;
-								knownEntries++;
-							}
-							for (var j = 0; j <= (bitDepth / 2); j += 2)
-							{
-								var byte0 = (colorIndex & (1 << j)) == 0 ? 0 : 1;
-								var byte1 = (colorIndex & (1 << (j + 1))) == 0 ? 0 : 1;
-
-								var mask0 = (byte)(byte0 << (7 - x));
-								var mask1 = (byte)(byte1 << (7 - x));
-
-								var byte0Index = (8 * j) + (platform == TargetPlatform.Snes ? y * 2 : y);
-								var byte1Index = (8 * j) + (platform == TargetPlatform.Snes ? y * 2 + 1 : y + 8);
-
-								tileData[byte0Index] |= mask0;
-								tileData[byte1Index] |= mask1;
+								colorIndex = c;
+								break;
 							}
 						}
 
-					if (discardRedundantTiles && exportedTiles.Any(t => t.SequenceEqual(tileData))) continue;
-					exportedTiles.Add(tileData);
+						if (colorIndex == -1)
+						{
+							if (knownEntries >= paletteEntries) throw new Exception("Too many colors in image");
+							palette[knownEntries] = color;
+							colorIndex = knownEntries;
+							knownEntries++;
+						}
 
+						for (var j = 0; j <= (bitDepth / 2); j += 2)
+						{
+							var byte0 = (colorIndex & (1 << j)) == 0 ? 0 : 1;
+							var byte1 = (colorIndex & (1 << (j + 1))) == 0 ? 0 : 1;
+
+							var mask0 = (byte) (byte0 << (7 - x));
+							var mask1 = (byte) (byte1 << (7 - x));
+
+							var byte0Index = (8 * j) + (platform == TargetPlatform.Snes ? y * 2 : y);
+							var byte1Index = (8 * j) + (platform == TargetPlatform.Snes ? y * 2 + 1 : y + 8);
+
+							tileData[byte0Index] |= mask0;
+							tileData[byte1Index] |= mask1;
+						}
+					}
+
+					return tileData;
+				}
+
+				int GetTileIndex(int tileIndex)
+				{
+					if (!chrSettings.BigTiles) return tileIndex;
+					tileIndex = ((tileIndex / 8) * 32) + (tileIndex % 8) * 2;
+					return tileIndex;
+				}
+
+				bool CheckRedundantTile(byte[] tile)
+				{
+					if (chrSettings.DiscardRedundantTiles)
+					{
+						var tileIndex = exportedTiles.FindIndex(t => t.SequenceEqual(tile));
+						if (tileIndex >= 0)
+						{
+							tileMap.Add(GetTileIndex(tileIndex));
+							return true;
+						}
+					}
+					tileMap.Add(GetTileIndex(exportedTiles.Count));
+					exportedTiles.Add(tile);
+					return false;
+				}
+				
+				for (var i = 0; i < tileCount; i++)
+				{
+					var tileByteOffset = exportedTiles.Count * tileSize;
+					var tileData = GetTile(i, out var offset);
 					if (chrSettings.BigTiles)
 					{
 						var tileX = offset.Width / 8;
 						var tileY = offset.Height / 8;
-						var bigTileIndex = offset.Width / 16 + (offset.Height / 16) * bigTileRowLength;
+						if (tileX % 2 == 1) continue;
+						if (tileY % 2 == 1) continue;
+
+						var bigTileIndex = exportedTiles.Count;
 						var xOffset = (bigTileIndex * tileSize * 2) % vRamRowSize;
 						var yOffset = vRamRowSize * (bigTileIndex / 8) * 2;
+
+						var tile2 = GetTile(i + 1, out var o2);
+						var tile3 = GetTile(i + (bigTileRowLength*2), out var o3);
+						var tile4 = GetTile(i + (bigTileRowLength * 2) + 1, out var o4);
 
 						tileByteOffset = xOffset + yOffset;
 						if (tileX % 2 == 1) tileByteOffset += tileSize;
 						if (tileY % 2 == 1) tileByteOffset += vRamRowSize;
-					}
 
+						if (CheckRedundantTile(tileData.Concat(tile2).Concat(tile3).Concat(tile4).ToArray())) continue;
+
+						tile2.CopyTo(bytes, tileByteOffset + tileSize);
+						tile3.CopyTo(bytes, tileByteOffset + vRamRowSize);
+						tile4.CopyTo(bytes, tileByteOffset + vRamRowSize + tileSize);
+					}
+					else
+					{
+						if (CheckRedundantTile(tileData)) continue;
+					}
 					tileData.CopyTo(bytes, tileByteOffset);
-					tileByteOffset += tileSize;
 				}
 
 				using (var outputFile = File.Create(chrSettings.ChrOutputFullPath))
 				{
-					outputFile.Write(bytes, 0, discardRedundantTiles ? tileByteOffset : bytes.Length);
+					var fileSize = chrSettings.DiscardRedundantTiles ? exportedTiles.Count * tileSize : bytes.Length;
+					if (chrSettings.DiscardRedundantTiles && chrSettings.BigTiles)
+					{
+						var nextTileIndex = GetTileIndex(exportedTiles.Count);
+						fileSize = nextTileIndex * tileSize;
+						if (nextTileIndex % 16 > 0) fileSize += vRamRowSize;
+					}
+
+					outputFile.Write(bytes, 0, fileSize);
 					outputFile.Close();
+				}
+
+				if (chrSettings.ExportTileMap)
+				{
+					var byteTileMap = new byte[tileMap.Count * 2];
+					for (var i = 0; i < tileMap.Count; i++)
+					{
+						byteTileMap[i * 2] = (byte)(tileMap[i] & 0xFF);
+						byteTileMap[i * 2 + 1] = (byte)((tileMap[i] >> 8) & 0xFF);
+					}
+					using (var outputFile = File.Create(chrSettings.TileMapOutputFullPath))
+					{
+						outputFile.Write(byteTileMap, 0, byteTileMap.Length);
+						outputFile.Close();
+					}
+
 				}
 
 				if (chrSettings.ExportPalette)
@@ -280,7 +347,7 @@ namespace Brewmaster.Pipeline
 				}
 			}
 		}
-
+		
 		private static Color? GetPixel(Bitmap image, int x, int y)
 		{
 			return (x >= image.Width || y >= image.Height) ? null : image.GetPixel(x, y) as Color?;
@@ -298,15 +365,19 @@ namespace Brewmaster.Pipeline
 		public override PipelineSettings Create(AsmProjectFile file)
 		{
 			var baseFile = file.GetRelativeDirectory(true) + Path.GetFileNameWithoutExtension(file.File.Name);
-			return new ChrPipelineSettings(this, file, baseFile + ".chr", baseFile + ".pal");
+			return new ChrPipelineSettings(this, file, baseFile + ".chr", baseFile + ".pal", baseFile + ".map");
 		}
 
 		public override PipelineSettings Load(AsmProject project, PipelineHeader pipelineHeader)
 		{
 			var chrOutput = pipelineHeader.Output[0];
-			var paletteOutput = pipelineHeader.Output.Length < 2 || string.IsNullOrWhiteSpace(pipelineHeader.Output[1]) ? null : pipelineHeader.Output[1];
+			var extIndex = chrOutput.IndexOf('.');
+			var baseFile = extIndex >= 0 ? chrOutput.Substring(0, extIndex) : chrOutput;
 
-			var pipeline = new ChrPipelineSettings(this, null, chrOutput, paletteOutput, pipelineHeader.LastProcessed);
+			var paletteOutput = pipelineHeader.Output.Length < 2 || string.IsNullOrWhiteSpace(pipelineHeader.Output[1]) ? baseFile + ".pal" : pipelineHeader.Output[1];
+			var tileMapOutput = pipelineHeader.Output.Length < 3 || string.IsNullOrWhiteSpace(pipelineHeader.Output[2]) ? baseFile + ".map" : pipelineHeader.Output[2];
+
+			var pipeline = new ChrPipelineSettings(this, null, chrOutput, paletteOutput, tileMapOutput, pipelineHeader.LastProcessed);
 			SetSettings(pipeline, pipelineHeader.Settings);
 			return pipeline;
 		}
@@ -320,6 +391,7 @@ namespace Brewmaster.Pipeline
 			headerSettings["ReducePalette"] = pipeline.ReducePalette ? "1" : "0";
 			headerSettings["ExportPalette"] = pipeline.ExportPalette ? "1" : "0";
 			headerSettings["BigTiles"] = pipeline.BigTiles ? "1" : "0";
+			headerSettings["ExportTileMap"] = pipeline.ExportTileMap ? "1" : "0";
 			headerSettings["ChrType"] = pipeline.PaletteType.ToString();
 			headerSettings["Palette"] = SerializePalette(pipeline.PaletteAssignment);
 			if (pipeline.TilePalettes != null) headerSettings["TilePalettes"] = string.Join(":", pipeline.TilePalettes.Select(SerializePalette));
@@ -347,6 +419,7 @@ namespace Brewmaster.Pipeline
 			pipeline.ReducePalette = (headerSettings["ReducePalette"] == "1");
 			pipeline.ExportPalette = (headerSettings["ExportPalette"] == "1");
 			pipeline.BigTiles = (headerSettings["BigTiles"] == "1");
+			pipeline.ExportTileMap = (headerSettings["ExportTileMap"] == "1");
 			Enum.TryParse(headerSettings["ChrType"], true, out pipeline.PaletteType);
 			if (!string.IsNullOrWhiteSpace(headerSettings["Palette"]))
 			{
@@ -368,6 +441,8 @@ namespace Brewmaster.Pipeline
 		public bool ReducePalette = false;
 		public bool ExportPalette = false;
 		public bool BigTiles = false;
+		public bool ExportTileMap = false;
+
 		public Dictionary<Color, int> PaletteAssignment;
 		public List<Dictionary<Color, int>> TilePalettes { get; set; }
 		public bool DiscardRedundantTiles = false;
@@ -376,17 +451,19 @@ namespace Brewmaster.Pipeline
 		{
 			get
 			{
-				return new List<string> { ChrOutput, PaletteOutput };
+				return new List<string> { ChrOutput, PaletteOutput, TileMapOutput };
 			}
 		}
 
 		public string ChrOutput;
 		public string PaletteOutput;
+		public string TileMapOutput;
 
-		public ChrPipelineSettings(PipelineOption type, AsmProjectFile file, string chrOutput, string paletteOutput, DateTime? lastProcessed = null) : base(type, file, lastProcessed)
+		public ChrPipelineSettings(PipelineOption type, AsmProjectFile file, string chrOutput, string paletteOutput, string tileMapOutput, DateTime? lastProcessed = null) : base(type, file, lastProcessed)
 		{
 			ChrOutput = chrOutput;
 			PaletteOutput = paletteOutput;
+			TileMapOutput = tileMapOutput;
 			PaletteAssignment = new Dictionary<Color, int>();
 		}
 
@@ -411,5 +488,6 @@ namespace Brewmaster.Pipeline
 
 		public string ChrOutputFullPath { get { return Path.Combine(File.Project.Directory.FullName, ChrOutput); } }
 		public string PaletteOutputFullPath { get { return Path.Combine(File.Project.Directory.FullName, PaletteOutput); } }
+		public string TileMapOutputFullPath { get { return Path.Combine(File.Project.Directory.FullName, TileMapOutput); } }
 	}
 }

@@ -25,6 +25,8 @@ namespace Brewmaster.EditorWindows.Images
 		private ContextMenuStrip contextMenuStrip1;
 		private System.ComponentModel.IContainer components;
 		private CheckBox _bigTiles;
+		private TextBox TileMapOutputFile;
+		private CheckBox _exportTileMap;
 		private List<Color?> _palette;
 
 		public Pipeline.ChrPipelineSettings Pipeline { get; set; }
@@ -79,11 +81,13 @@ namespace Brewmaster.EditorWindows.Images
 
 			OutputFile.Text = Pipeline.ChrOutput;
 			PaletteOutputFile.Text = Pipeline.PaletteOutput;
+			TileMapOutputFile.Text = Pipeline.TileMapOutput;
 			ChrPipelineOutput.SelectedIndex = (int)Pipeline.PaletteType;
 			_enablePaletteAssignments.Checked = Pipeline.PaletteAssignment.Count > 0;
 			_ignoreDuplicates.Checked = Pipeline.DiscardRedundantTiles;
 			_bigTiles.Checked = Pipeline.BigTiles;
 			PaletteOutputFile.Enabled = _exportPalette.Checked = Pipeline.ExportPalette;
+			TileMapOutputFile.Enabled = _exportTileMap.Checked = Pipeline.ExportTileMap;
 			RefreshPalette();
 		}
 
@@ -124,12 +128,15 @@ namespace Brewmaster.EditorWindows.Images
 			System.Windows.Forms.GroupBox ExportPaletteGroup;
 			System.Windows.Forms.GroupBox ChrGroup;
 			System.Windows.Forms.Label BitDepthLabel;
+			System.Windows.Forms.GroupBox ExportTileMapGroup;
 			this.PaletteOutputFile = new System.Windows.Forms.TextBox();
 			this._exportPalette = new System.Windows.Forms.CheckBox();
 			this._bigTiles = new System.Windows.Forms.CheckBox();
 			this._ignoreDuplicates = new System.Windows.Forms.CheckBox();
 			this.ChrPipelineOutput = new System.Windows.Forms.ComboBox();
 			this.OutputFile = new System.Windows.Forms.TextBox();
+			this.TileMapOutputFile = new System.Windows.Forms.TextBox();
+			this._exportTileMap = new System.Windows.Forms.CheckBox();
 			this.comboBox1 = new System.Windows.Forms.ComboBox();
 			this.ChrPipelinePanel = new System.Windows.Forms.Panel();
 			this.PaletteGroup = new System.Windows.Forms.GroupBox();
@@ -140,8 +147,10 @@ namespace Brewmaster.EditorWindows.Images
 			ExportPaletteGroup = new System.Windows.Forms.GroupBox();
 			ChrGroup = new System.Windows.Forms.GroupBox();
 			BitDepthLabel = new System.Windows.Forms.Label();
+			ExportTileMapGroup = new System.Windows.Forms.GroupBox();
 			ExportPaletteGroup.SuspendLayout();
 			ChrGroup.SuspendLayout();
+			ExportTileMapGroup.SuspendLayout();
 			this.ChrPipelinePanel.SuspendLayout();
 			this.PaletteGroup.SuspendLayout();
 			this.SuspendLayout();
@@ -254,6 +263,38 @@ namespace Brewmaster.EditorWindows.Images
 			this.OutputFile.TabIndex = 2;
 			this.OutputFile.TextChanged += new System.EventHandler(this.OutputFile_TextChanged);
 			// 
+			// ExportTileMapGroup
+			// 
+			ExportTileMapGroup.Controls.Add(this.TileMapOutputFile);
+			ExportTileMapGroup.Controls.Add(this._exportTileMap);
+			ExportTileMapGroup.Dock = System.Windows.Forms.DockStyle.Top;
+			ExportTileMapGroup.Location = new System.Drawing.Point(0, 295);
+			ExportTileMapGroup.Name = "ExportTileMapGroup";
+			ExportTileMapGroup.Size = new System.Drawing.Size(342, 42);
+			ExportTileMapGroup.TabIndex = 6;
+			ExportTileMapGroup.TabStop = false;
+			ExportTileMapGroup.Text = "Export tile map";
+			// 
+			// TileMapOutputFile
+			// 
+			this.TileMapOutputFile.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.TileMapOutputFile.Location = new System.Drawing.Point(28, 16);
+			this.TileMapOutputFile.Name = "TileMapOutputFile";
+			this.TileMapOutputFile.Size = new System.Drawing.Size(308, 20);
+			this.TileMapOutputFile.TabIndex = 1;
+			this.TileMapOutputFile.TextChanged += new System.EventHandler(this.TileMapOutputFile_TextChanged);
+			// 
+			// _exportTileMap
+			// 
+			this._exportTileMap.AutoSize = true;
+			this._exportTileMap.Location = new System.Drawing.Point(7, 19);
+			this._exportTileMap.Name = "_exportTileMap";
+			this._exportTileMap.Size = new System.Drawing.Size(15, 14);
+			this._exportTileMap.TabIndex = 0;
+			this._exportTileMap.UseVisualStyleBackColor = true;
+			this._exportTileMap.CheckedChanged += new System.EventHandler(this._exportTileMap_CheckedChanged);
+			// 
 			// comboBox1
 			// 
 			this.comboBox1.FormattingEnabled = true;
@@ -267,12 +308,13 @@ namespace Brewmaster.EditorWindows.Images
 			this.ChrPipelinePanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.ChrPipelinePanel.AutoSize = true;
+			this.ChrPipelinePanel.Controls.Add(ExportTileMapGroup);
 			this.ChrPipelinePanel.Controls.Add(ExportPaletteGroup);
 			this.ChrPipelinePanel.Controls.Add(this.PaletteGroup);
 			this.ChrPipelinePanel.Controls.Add(ChrGroup);
 			this.ChrPipelinePanel.Location = new System.Drawing.Point(0, 0);
 			this.ChrPipelinePanel.Name = "ChrPipelinePanel";
-			this.ChrPipelinePanel.Size = new System.Drawing.Size(342, 295);
+			this.ChrPipelinePanel.Size = new System.Drawing.Size(342, 337);
 			this.ChrPipelinePanel.TabIndex = 3;
 			// 
 			// PaletteGroup
@@ -334,11 +376,13 @@ namespace Brewmaster.EditorWindows.Images
 			this.AutoSize = true;
 			this.Controls.Add(this.ChrPipelinePanel);
 			this.Name = "ChrPipelineSettings";
-			this.Size = new System.Drawing.Size(345, 298);
+			this.Size = new System.Drawing.Size(345, 340);
 			ExportPaletteGroup.ResumeLayout(false);
 			ExportPaletteGroup.PerformLayout();
 			ChrGroup.ResumeLayout(false);
 			ChrGroup.PerformLayout();
+			ExportTileMapGroup.ResumeLayout(false);
+			ExportTileMapGroup.PerformLayout();
 			this.ChrPipelinePanel.ResumeLayout(false);
 			this.ChrPipelinePanel.PerformLayout();
 			this.PaletteGroup.ResumeLayout(false);
@@ -408,7 +452,19 @@ namespace Brewmaster.EditorWindows.Images
 
 		private void _bigTiles_CheckedChanged(object sender, EventArgs e)
 		{
-			_ignoreDuplicates.Enabled = !(Pipeline.BigTiles = _bigTiles.Checked);
+			Pipeline.BigTiles = _bigTiles.Checked;
+			RegisterChange();
+		}
+
+		private void _exportTileMap_CheckedChanged(object sender, EventArgs e)
+		{
+			TileMapOutputFile.Enabled = Pipeline.ExportTileMap = _exportTileMap.Checked;
+			RegisterChange();
+		}
+
+		private void TileMapOutputFile_TextChanged(object sender, EventArgs e)
+		{
+			Pipeline.TileMapOutput = TileMapOutputFile.Text;
 			RegisterChange();
 		}
 	}
