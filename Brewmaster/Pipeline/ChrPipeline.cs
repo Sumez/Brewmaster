@@ -143,15 +143,18 @@ namespace Brewmaster.Pipeline
 
 			var platform = chrSettings.File.Project.Platform;
 			var bitDepth = chrSettings.BitDepth;
-
-			var tileDimensions = 8;
+			var discardRedundantTiles = chrSettings.DiscardRedundantTiles && !chrSettings.BigTiles;
 
 			var tileSize = 8 * bitDepth;
 			var paletteEntries = (int)Math.Pow(2, bitDepth);
 
+			var vRamRowSize = 16 * tileSize;
+
 			using (var image = GetImageSource(chrSettings))
 			{
 				var tileCount = GetTileCount(image);
+				var bigTileRowLength = (image.Width + 16 - 1) / 16;
+
 				var bytes = new byte[tileCount * tileSize];
 				var exportedTiles = new List<byte[]>();
 
@@ -233,15 +236,29 @@ namespace Brewmaster.Pipeline
 							}
 						}
 
-					if (chrSettings.DiscardRedundantTiles && exportedTiles.Any(t => t.SequenceEqual(tileData))) continue;
+					if (discardRedundantTiles && exportedTiles.Any(t => t.SequenceEqual(tileData))) continue;
 					exportedTiles.Add(tileData);
+
+					if (chrSettings.BigTiles)
+					{
+						var tileX = offset.Width / 8;
+						var tileY = offset.Height / 8;
+						var bigTileIndex = offset.Width / 16 + (offset.Height / 16) * bigTileRowLength;
+						var xOffset = (bigTileIndex * tileSize * 2) % vRamRowSize;
+						var yOffset = vRamRowSize * (bigTileIndex / 8) * 2;
+
+						tileByteOffset = xOffset + yOffset;
+						if (tileX % 2 == 1) tileByteOffset += tileSize;
+						if (tileY % 2 == 1) tileByteOffset += vRamRowSize;
+					}
+
 					tileData.CopyTo(bytes, tileByteOffset);
 					tileByteOffset += tileSize;
 				}
 
 				using (var outputFile = File.Create(chrSettings.ChrOutputFullPath))
 				{
-					outputFile.Write(bytes, 0, tileByteOffset);
+					outputFile.Write(bytes, 0, discardRedundantTiles ? tileByteOffset : bytes.Length);
 					outputFile.Close();
 				}
 
@@ -302,6 +319,7 @@ namespace Brewmaster.Pipeline
 			headerSettings["DiscardRedundant"] = pipeline.DiscardRedundantTiles ? "1" : "0";
 			headerSettings["ReducePalette"] = pipeline.ReducePalette ? "1" : "0";
 			headerSettings["ExportPalette"] = pipeline.ExportPalette ? "1" : "0";
+			headerSettings["BigTiles"] = pipeline.BigTiles ? "1" : "0";
 			headerSettings["ChrType"] = pipeline.PaletteType.ToString();
 			headerSettings["Palette"] = SerializePalette(pipeline.PaletteAssignment);
 			if (pipeline.TilePalettes != null) headerSettings["TilePalettes"] = string.Join(":", pipeline.TilePalettes.Select(SerializePalette));
@@ -328,6 +346,7 @@ namespace Brewmaster.Pipeline
 			pipeline.DiscardRedundantTiles = (headerSettings["DiscardRedundant"] == "1");
 			pipeline.ReducePalette = (headerSettings["ReducePalette"] == "1");
 			pipeline.ExportPalette = (headerSettings["ExportPalette"] == "1");
+			pipeline.BigTiles = (headerSettings["BigTiles"] == "1");
 			Enum.TryParse(headerSettings["ChrType"], true, out pipeline.PaletteType);
 			if (!string.IsNullOrWhiteSpace(headerSettings["Palette"]))
 			{
@@ -348,6 +367,7 @@ namespace Brewmaster.Pipeline
 		public ChrOutputType PaletteType = ChrOutputType.Bpp2;
 		public bool ReducePalette = false;
 		public bool ExportPalette = false;
+		public bool BigTiles = false;
 		public Dictionary<Color, int> PaletteAssignment;
 		public List<Dictionary<Color, int>> TilePalettes { get; set; }
 		public bool DiscardRedundantTiles = false;

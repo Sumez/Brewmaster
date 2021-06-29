@@ -24,6 +24,7 @@ namespace Brewmaster.EditorWindows.Images
 		private TextBox rgbValue;
 		private ContextMenuStrip contextMenuStrip1;
 		private System.ComponentModel.IContainer components;
+		private CheckBox _bigTiles;
 		private List<Color?> _palette;
 
 		public Pipeline.ChrPipelineSettings Pipeline { get; set; }
@@ -81,6 +82,7 @@ namespace Brewmaster.EditorWindows.Images
 			ChrPipelineOutput.SelectedIndex = (int)Pipeline.PaletteType;
 			_enablePaletteAssignments.Checked = Pipeline.PaletteAssignment.Count > 0;
 			_ignoreDuplicates.Checked = Pipeline.DiscardRedundantTiles;
+			_bigTiles.Checked = Pipeline.BigTiles;
 			PaletteOutputFile.Enabled = _exportPalette.Checked = Pipeline.ExportPalette;
 			RefreshPalette();
 		}
@@ -124,6 +126,7 @@ namespace Brewmaster.EditorWindows.Images
 			System.Windows.Forms.Label BitDepthLabel;
 			this.PaletteOutputFile = new System.Windows.Forms.TextBox();
 			this._exportPalette = new System.Windows.Forms.CheckBox();
+			this._bigTiles = new System.Windows.Forms.CheckBox();
 			this._ignoreDuplicates = new System.Windows.Forms.CheckBox();
 			this.ChrPipelineOutput = new System.Windows.Forms.ComboBox();
 			this.OutputFile = new System.Windows.Forms.TextBox();
@@ -148,7 +151,7 @@ namespace Brewmaster.EditorWindows.Images
 			ExportPaletteGroup.Controls.Add(this.PaletteOutputFile);
 			ExportPaletteGroup.Controls.Add(this._exportPalette);
 			ExportPaletteGroup.Dock = System.Windows.Forms.DockStyle.Top;
-			ExportPaletteGroup.Location = new System.Drawing.Point(0, 231);
+			ExportPaletteGroup.Location = new System.Drawing.Point(0, 253);
 			ExportPaletteGroup.Name = "ExportPaletteGroup";
 			ExportPaletteGroup.Size = new System.Drawing.Size(342, 42);
 			ExportPaletteGroup.TabIndex = 5;
@@ -178,13 +181,14 @@ namespace Brewmaster.EditorWindows.Images
 			// ChrGroup
 			// 
 			ChrGroup.Controls.Add(BitDepthLabel);
+			ChrGroup.Controls.Add(this._bigTiles);
 			ChrGroup.Controls.Add(this._ignoreDuplicates);
 			ChrGroup.Controls.Add(this.ChrPipelineOutput);
 			ChrGroup.Controls.Add(this.OutputFile);
 			ChrGroup.Dock = System.Windows.Forms.DockStyle.Top;
 			ChrGroup.Location = new System.Drawing.Point(0, 0);
 			ChrGroup.Name = "ChrGroup";
-			ChrGroup.Size = new System.Drawing.Size(342, 98);
+			ChrGroup.Size = new System.Drawing.Size(342, 120);
 			ChrGroup.TabIndex = 6;
 			ChrGroup.TabStop = false;
 			ChrGroup.Text = "Tile data (CHR)";
@@ -197,6 +201,17 @@ namespace Brewmaster.EditorWindows.Images
 			BitDepthLabel.Size = new System.Drawing.Size(52, 13);
 			BitDepthLabel.TabIndex = 4;
 			BitDepthLabel.Text = "Bit depth:";
+			// 
+			// _bigTiles
+			// 
+			this._bigTiles.AutoSize = true;
+			this._bigTiles.Location = new System.Drawing.Point(7, 96);
+			this._bigTiles.Name = "_bigTiles";
+			this._bigTiles.Size = new System.Drawing.Size(156, 17);
+			this._bigTiles.TabIndex = 5;
+			this._bigTiles.Text = "Store as 16x16 tiles (SNES)";
+			this._bigTiles.UseVisualStyleBackColor = true;
+			this._bigTiles.CheckedChanged += new System.EventHandler(this._bigTiles_CheckedChanged);
 			// 
 			// _ignoreDuplicates
 			// 
@@ -257,7 +272,7 @@ namespace Brewmaster.EditorWindows.Images
 			this.ChrPipelinePanel.Controls.Add(ChrGroup);
 			this.ChrPipelinePanel.Location = new System.Drawing.Point(0, 0);
 			this.ChrPipelinePanel.Name = "ChrPipelinePanel";
-			this.ChrPipelinePanel.Size = new System.Drawing.Size(342, 273);
+			this.ChrPipelinePanel.Size = new System.Drawing.Size(342, 295);
 			this.ChrPipelinePanel.TabIndex = 3;
 			// 
 			// PaletteGroup
@@ -268,7 +283,7 @@ namespace Brewmaster.EditorWindows.Images
 			this.PaletteGroup.Controls.Add(this.PaletteEntries);
 			this.PaletteGroup.Controls.Add(this._enablePaletteAssignments);
 			this.PaletteGroup.Dock = System.Windows.Forms.DockStyle.Top;
-			this.PaletteGroup.Location = new System.Drawing.Point(0, 98);
+			this.PaletteGroup.Location = new System.Drawing.Point(0, 120);
 			this.PaletteGroup.MinimumSize = new System.Drawing.Size(300, 0);
 			this.PaletteGroup.Name = "PaletteGroup";
 			this.PaletteGroup.Size = new System.Drawing.Size(342, 133);
@@ -319,7 +334,7 @@ namespace Brewmaster.EditorWindows.Images
 			this.AutoSize = true;
 			this.Controls.Add(this.ChrPipelinePanel);
 			this.Name = "ChrPipelineSettings";
-			this.Size = new System.Drawing.Size(345, 276);
+			this.Size = new System.Drawing.Size(345, 298);
 			ExportPaletteGroup.ResumeLayout(false);
 			ExportPaletteGroup.PerformLayout();
 			ChrGroup.ResumeLayout(false);
@@ -388,6 +403,12 @@ namespace Brewmaster.EditorWindows.Images
 		private void PaletteOutputFile_TextChanged(object sender, EventArgs e)
 		{
 			Pipeline.PaletteOutput = PaletteOutputFile.Text;
+			RegisterChange();
+		}
+
+		private void _bigTiles_CheckedChanged(object sender, EventArgs e)
+		{
+			_ignoreDuplicates.Enabled = !(Pipeline.BigTiles = _bigTiles.Checked);
 			RegisterChange();
 		}
 	}

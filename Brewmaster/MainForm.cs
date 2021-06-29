@@ -302,7 +302,7 @@ namespace Brewmaster
 				StoredLayoutHandler.SetDockContainers(eastContainer, westContainer, southContainer);
 				StoredLayoutHandler.LoadPanelLayout(_modules, LayoutMode.Default, Program.GetUserFilePath(LayoutFileName));
 				StoredLayoutHandler.LoadPanelLayout(_modules, LayoutMode.MapEditor, Program.GetUserFilePath(MapEditorLayoutFileName));
-				AddWindowOptions();
+				AddWindowOptions(); 
 
 				// Setup features
 				BuildHandler = new BuildHandler();
