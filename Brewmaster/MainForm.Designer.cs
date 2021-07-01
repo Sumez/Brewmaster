@@ -1,4 +1,5 @@
-﻿using System.Windows.Forms;
+﻿using System.Threading.Tasks;
+using System.Windows.Forms;
 using Brewmaster.EditorWindows;
 using Brewmaster.Layout;
 
@@ -17,7 +18,7 @@ namespace Brewmaster
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
         {
-			Mesen.UnloadEmulator(true);
+	        Task.Run(async () => await Mesen.UnloadEmulator(true)).Wait();
             if (disposing && (components != null))
             {
                 components.Dispose();

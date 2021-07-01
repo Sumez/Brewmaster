@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Windows.Forms;
+using System.Xml;
 using Brewmaster.Modules;
 using Brewmaster.ProjectExplorer;
 using Brewmaster.Settings;
@@ -88,11 +89,15 @@ namespace Brewmaster
 		public static void Error(string message, Exception ex = null)
 		{
 			if (ex != null)
-			try {
-				File.AppendAllLines(GetErrorFilePath(), new [] { string.Format("{0}: {1}", DateTime.Now, ex) });
+			{
+				if (ex is XmlException xmlException) message += Environment.NewLine + string.Format("Source: {0}", xmlException.SourceUri);
+				try
+				{
+					File.AppendAllLines(GetErrorFilePath(), new[] { string.Format("{0}: {1}", DateTime.Now, ex) });
+				}
+				catch (Exception loggingError) { }
 			}
-			catch (Exception loggingError) { }
-			
+
 			MessageBox.Show(CurrentWindow, message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 		}
 

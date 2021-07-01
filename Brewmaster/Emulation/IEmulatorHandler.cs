@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using Brewmaster.Modules.Build;
 using Brewmaster.Modules.SpriteList;
@@ -37,7 +38,7 @@ namespace Brewmaster.Emulation
 		void StepInto();
 		void StepOut();
 		void StepOver();
-		void Stop(bool releaseResources = false);
+		Task Stop(bool releaseResources = false);
 		void SetScale(double scale);
 		void SetSpeed(int speed);
 		void ForceNewState(EmulationState state);

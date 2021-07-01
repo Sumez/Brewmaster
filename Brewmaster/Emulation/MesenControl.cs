@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using Brewmaster.EditorWindows.TileMaps;
 using Brewmaster.Modules.Ppu;
@@ -373,12 +374,12 @@ namespace Brewmaster.Emulation
 			if (Emulator != null) Emulator.UpdateControllerMappings(currentMapping);
 		}
 
-		public void UnloadEmulator(bool freeResources = false)
+		public async Task UnloadEmulator(bool freeResources = false)
 		{
 			if (freeResources)
 			{
-				if (_snesEmulator != null) _snesEmulator.Stop(true);
-				if (_nesEmulator != null) _nesEmulator.Stop(true);
+				if (_snesEmulator != null) await _snesEmulator.Stop(true);
+				if (_nesEmulator != null) await _nesEmulator.Stop(true);
 				_snesEmulator = null;
 				_nesEmulator = null;
 			}
