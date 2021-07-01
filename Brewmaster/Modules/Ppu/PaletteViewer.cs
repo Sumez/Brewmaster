@@ -20,9 +20,12 @@ namespace Brewmaster.Modules.Ppu
 		}
 		public int HoverIndex { get; protected set; }
 		public int Columns { get; set; }
+		public int MaxColors { get; set; } 
 		public int CellHeight { get; set; }
 		public int CellWidth { get; set; }
 		public bool AllowHover { get; set; }
+		public int ColorCount { get { return MaxColors > 0 ? MaxColors : Palette.Colors.Count; } }
+
 
 		public event Action<int> ColorClicked;
 
@@ -53,7 +56,7 @@ namespace Brewmaster.Modules.Ppu
 		{
 			base.OnMouseMove(e);
 			var hoverIndex = (e.Location.Y / CellHeight) * Columns + (e.Location.X / CellWidth);
-			if (hoverIndex >= Palette.Colors.Count || e.Location.X > Columns * CellWidth) hoverIndex = DefaultIndex;
+			if (hoverIndex >= ColorCount || e.Location.X > Columns * CellWidth) hoverIndex = DefaultIndex;
 			if (hoverIndex == HoverIndex) return;
 			HoverIndex = hoverIndex;
 			if (ColorClicked != null) Cursor = HoverIndex >= 0 ? Cursors.Hand : Cursors.Default;
@@ -76,7 +79,7 @@ namespace Brewmaster.Modules.Ppu
 		protected override void OnPaint(PaintEventArgs e)
 		{
 			base.OnPaint(e);
-			for (var i = 0; i < Palette.Colors.Count; i++)
+			for (var i = 0; i < ColorCount; i++)
 			{
 				DrawColor(e.Graphics, i, CellWidth * (i % Columns), CellHeight * (i / Columns));
 			}
@@ -88,14 +91,16 @@ namespace Brewmaster.Modules.Ppu
 				e.Graphics.DrawRectangle(Pens.Black, CellWidth * (i % Columns) + 1, CellHeight * (i / Columns) + 1, CellWidth - 3, CellHeight - 3);
 			}
 		}
+
 		public int BestWidth
 		{
 			get { return Columns * CellWidth; }
 		}
 		public int BestHeight
 		{
-			get { return (Palette.Colors.Count / Columns) * CellHeight; }
+			get { return (ColorCount / Columns) * CellHeight; }
 		}
+
 		protected void FitSize()
 		{
 			if (Palette == null) return;

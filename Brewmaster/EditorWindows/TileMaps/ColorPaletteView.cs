@@ -148,6 +148,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 			{
 				AllowHover = false,
 				Columns = colorCount,
+				MaxColors = colorCount,
 				Width = colorCount * 16,
 				Height = 16,
 				Top = 1,
