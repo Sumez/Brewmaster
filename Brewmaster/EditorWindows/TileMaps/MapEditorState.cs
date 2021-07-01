@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Brewmaster.EditorWindows.TileMaps.Tools;
 using Brewmaster.Modules.Ppu;
 using Brewmaster.Modules.Watch;
+using Brewmaster.ProjectModel;
 
 namespace Brewmaster.EditorWindows.TileMaps
 {
@@ -103,6 +104,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 		public byte[] PreviousChrData { get; private set; }
 		public bool ChrWasChanged { get; set; }
+		public TargetPlatform TargetPlatform { get; set; } = TargetPlatform.Nes;
 
 		public event Action PaletteChanged;
 		public event Action ColorIndexChanged;

@@ -30,13 +30,33 @@ namespace Brewmaster.Modules.Ppu
 		public Color Get(int index)
 		{
 			if (!_snes) return Colors[index];
-			var r = To8Bit(index & 0x1F);
-			var g = To8Bit((index >> 5) & 0x1F);
-			var b = To8Bit((index >> 10) & 0x1F);
+			return From15BitColor(index);
+		}
+
+		public static Color From15BitColor(int value)
+		{
+			var r = To8BitChannel(value & 0x1F);
+			var g = To8BitChannel((value >> 5) & 0x1F);
+			var b = To8BitChannel((value >> 10) & 0x1F);
 
 			return Color.FromArgb(r, g, b);
 		}
-		private static int To8Bit(int color)
+		public static int To15BitColor(Color value)
+		{
+
+			var r = From8BitChannel(value.R) & 0x1F;
+			var g = From8BitChannel(value.G) & 0x1F;
+			var b = From8BitChannel(value.B) & 0x1F;
+
+			return r | (g << 5) | (b << 10);
+		}
+
+		public static int From8BitChannel(byte color)
+		{
+			return color >> 3;
+		}
+
+		public static int To8BitChannel(int color)
 		{
 			return ((color << 3) + (color >> 2));
 		}

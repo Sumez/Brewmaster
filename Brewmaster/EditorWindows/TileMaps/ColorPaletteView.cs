@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using Brewmaster.Modules.Ppu;
+using Brewmaster.ProjectModel;
 
 namespace Brewmaster.EditorWindows.TileMaps
 {
@@ -14,12 +15,12 @@ namespace Brewmaster.EditorWindows.TileMaps
 		public event Action PalettesModified;
 		public event Action<int, int> SelectedColorIndexChanged;
 
-		public ColorPaletteView(List<Palette> palettes, int colorCount)
+		public ColorPaletteView(List<Palette> palettes, int colorCount, TargetPlatform platform)
 		{
 			_paletteControls = new List<ColorPalette>();
 
 			_layoutPanel = new FlowLayoutPanel { AutoSize = true, Dock = DockStyle.Top };
-			RefreshPaletteView(palettes, colorCount);
+			RefreshPaletteView(palettes, colorCount, platform);
 
 			Controls.Add(_layoutPanel);
 
@@ -33,7 +34,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 			};
 		}
 
-		public void RefreshPaletteView(List<Palette> palettes, int colorCount)
+		public void RefreshPaletteView(List<Palette> palettes, int colorCount, TargetPlatform platform)
 		{
 			SuspendLayout();
 			_paletteControls.Clear();
@@ -41,7 +42,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 			for (var i = 0; i < palettes.Count; i++)
 			{
 				var paletteIndex = i;
-				var paletteControl = new ColorPalette(colorCount) { Palette = palettes[i], Margin = new Padding(0, 3, 3, 0) };
+				var paletteControl = new ColorPalette(colorCount, platform) { Palette = palettes[i], Margin = new Padding(0, 3, 3, 0) };
 				_paletteControls.Add(paletteControl);
 
 				if (i == 0) paletteControl.Selected = true;
@@ -135,6 +136,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 			set { _paletteViewer.AllowHover = _selected = value; _paletteViewer.Invalidate(); }
 		}
 		private readonly PaletteViewer _paletteViewer;
+		private readonly TargetPlatform _platform;
 
 		protected override void OnInvalidated(InvalidateEventArgs e)
 		{
@@ -142,8 +144,9 @@ namespace Brewmaster.EditorWindows.TileMaps
 			_paletteViewer.Invalidate();
 		}
 
-		public ColorPalette(int colorCount)
+		public ColorPalette(int colorCount, TargetPlatform platform)
 		{
+			_platform = platform;
 			Controls.Add(_paletteViewer = new PaletteViewer
 			{
 				AllowHover = false,
@@ -189,13 +192,20 @@ namespace Brewmaster.EditorWindows.TileMaps
 		private void PickNewColor()
 		{
 			var paletteIndex = _paletteViewer.HoverIndex;
-			var colorPicker = new NesColorPicker();
+			ColorPicker colorPicker = _platform == TargetPlatform.Nes ? new NesColorPicker() : new SnesColorPicker() as ColorPicker;
 			colorPicker.Color = Palette.Colors[paletteIndex];
 			colorPicker.StartPosition = FormStartPosition.Manual;
 			colorPicker.Location = PointToScreen(new Point(0, -colorPicker.Height));
 			colorPicker.Show();
+			colorPicker.ColorChanged += () =>
+			{
+				//Palette.Colors[paletteIndex] = colorPicker.Color;
+				//_paletteViewer.Invalidate();
+			};
 			colorPicker.FormClosing += (s, a) =>
 			{
+				if (colorPicker.Color == Palette.Colors[paletteIndex]) return;
+
 				Palette.Colors[paletteIndex] = colorPicker.Color;
 				_paletteViewer.Invalidate();
 				if (PaletteChanged != null) PaletteChanged(Palette);

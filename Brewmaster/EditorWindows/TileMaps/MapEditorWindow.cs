@@ -32,6 +32,8 @@ namespace Brewmaster.EditorWindows.TileMaps
 		public MapEditorWindow(MainForm form, AsmProjectFile file, Events events) : base(form, file, events)
 		{
 			State = new MapEditorState();
+			if (file.Project != null) State.TargetPlatform = file.Project.Platform;
+
 			var json = File.ReadAllText(ProjectFile.File.FullName);
 			var map = JsonConvert.DeserializeObject<SerializableTileMap>(json, new JsonSerializerSettings { ContractResolver = new CamelCasePropertyNamesContractResolver() });
 			if (map != null)
@@ -72,7 +74,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 				{
 					while (palette.Colors.Count < Map.ColorCount) palette.Colors.Add(Color.Black);
 				}
-				_colorPalette.RefreshPaletteView(Map.Palettes, Map.ColorCount);
+				_colorPalette.RefreshPaletteView(Map.Palettes, Map.ColorCount, State.TargetPlatform);
 				State.ClearTileCache();
 				State.OnPaletteChanged();
 				_screenPanel.RefreshAllTiles();
@@ -119,7 +121,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 			_screenPanel = new ScreenPanel(State, Map) { Dock = DockStyle.Fill };
 			Controls.Add(_screenPanel);
 
-			_colorPalette = new ColorPaletteView(Map.Palettes, Map.ColorCount) { Width = 256, Height = 40 };
+			_colorPalette = new ColorPaletteView(Map.Palettes, Map.ColorCount, State.TargetPlatform) { Width = 256, Height = 40 };
 			_colorPalette.Dock = DockStyle.Bottom;
 			_colorPalette.SelectedPaletteChanged += (paletteIndex) =>
 			{
