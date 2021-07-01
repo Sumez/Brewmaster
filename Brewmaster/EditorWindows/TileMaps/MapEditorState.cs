@@ -17,6 +17,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 		private Palette _palette;
 		private int _colorIndex = 0;
 		private int _zoom = 2;
+		private int _bitDepth = 2;
 		private bool _displayGrid = true;
 		private bool _displayMetaValues = false;
 
@@ -42,6 +43,16 @@ namespace Brewmaster.EditorWindows.TileMaps
 				OnChrDataChanged();
 			}
 		}
+		public int BitDepth
+		{
+			get { return _bitDepth; }
+			set
+			{
+				_bitDepth = value;
+				OnBitDepthChanged();
+			}
+		}
+
 
 		public Palette Palette
 		{
@@ -103,10 +114,15 @@ namespace Brewmaster.EditorWindows.TileMaps
 		public event Action<UndoStep> AfterUndo;
 		public event Action<Dictionary<int, int>[], UndoStep> TilesMoved;
 		public event Action TileUsageChanged;
+		public event Action BitDepthChanged;
 
 		public void OnPaletteChanged()
 		{
 			if (PaletteChanged != null) PaletteChanged();
+		}
+		public void OnBitDepthChanged()
+		{
+			if (BitDepthChanged != null) BitDepthChanged();
 		}
 		public void OnColorIndexChanged()
 		{
@@ -140,10 +156,11 @@ namespace Brewmaster.EditorWindows.TileMaps
 			lock (_cachedTiles)
 			{
 				if (!_cachedTiles.ContainsKey(index)) _cachedTiles.Add(index, new Dictionary<Palette, TileImage>());
-				if (!_cachedTiles[index].ContainsKey(palette)) _cachedTiles[index].Add(palette, TileImage.GetTileImage(ChrData, index, palette.Colors));
+				if (!_cachedTiles[index].ContainsKey(palette)) _cachedTiles[index].Add(palette, TileImage.GetTileImage(ChrData, index, palette.Colors, BitDepth));
 			}
 			return _cachedTiles[index][palette];
 		}
+
 		public void ClearTileCache()
 		{
 			IEnumerable<TileImage> oldImages;
@@ -157,12 +174,12 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 		public int GetPixel(int tileIndex, int x, int y)
 		{
-			return TileImage.GetTilePixel(ChrData, tileIndex, x, y);
+			return TileImage.GetTilePixel(ChrData, tileIndex, x, y, BitDepth);
 		}
 
 		public void SetPixel(int tileIndex, int x, int y, int colorIndex)
 		{
-			TileImage.SetTilePixel(ChrData, tileIndex, x, y, colorIndex);
+			TileImage.SetTilePixel(ChrData, tileIndex, x, y, colorIndex, BitDepth);
 			lock (_cachedTiles)
 				foreach (var tileCache in _cachedTiles[tileIndex])
 				{
@@ -172,7 +189,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 		}
 		public void FlipTile(int tileIndex, bool vertical)
 		{
-			TileImage.FlipTile(ChrData, tileIndex, vertical);
+			TileImage.FlipTile(ChrData, tileIndex, vertical, BitDepth);
 
 			lock (_cachedTiles) _cachedTiles.Remove(tileIndex);
 		}

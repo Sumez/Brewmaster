@@ -41,7 +41,7 @@ namespace Brewmaster.EditorWindows.TileMaps.Tools
 
 		public virtual void SetImage(byte[] chrData, TileMap map)
 		{
-			var imageTile = TileImage.GetTileImage(chrData, SelectedTile, map.Palettes[GetSelectedPalette()].Colors);
+			var imageTile = TileImage.GetTileImage(chrData, SelectedTile, map.Palettes[GetSelectedPalette()].Colors, map.BitsPerPixel);
 			Image = imageTile.Image;
 			if (_imageTile != null) _imageTile.Dispose();
 			_imageTile = imageTile;

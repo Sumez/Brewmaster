@@ -12,8 +12,10 @@ namespace Brewmaster.EditorWindows.TileMaps
 		private TileImage() : base(8, 8, PixelFormat.Format32bppPArgb)
 		{
 		}
-		public static TileImage GetTileImage(byte[] data, int index, List<Color> palette, int bitDepth = 2, TargetPlatform platform = TargetPlatform.Nes)
+		public static TileImage GetTileImage(byte[] data, int index, List<Color> palette, int bitDepth, TargetPlatform platform = TargetPlatform.Nes)
 		{
+			if (bitDepth > 2) platform = TargetPlatform.Snes;
+
 			var tileSize = 8 * bitDepth;
 			var offset = index * tileSize;
 			if (data.Length < offset + tileSize || index < 0) return null;
@@ -45,8 +47,10 @@ namespace Brewmaster.EditorWindows.TileMaps
 			return tile;
 		}
 
-		public static int GetTilePixel(byte[] data, int index, int x, int y, int bitDepth = 2, TargetPlatform platform = TargetPlatform.Nes)
+		public static int GetTilePixel(byte[] data, int index, int x, int y, int bitDepth, TargetPlatform platform = TargetPlatform.Nes)
 		{
+			if (bitDepth > 2) platform = TargetPlatform.Snes;
+
 			var tileSize = 8 * bitDepth;
 			var offset = index * tileSize;
 			if (data.Length < offset + tileSize || index < 0) return 0;
@@ -70,8 +74,10 @@ namespace Brewmaster.EditorWindows.TileMaps
 			return colorIndex;
 		}
 
-		public static void SetTilePixel(byte[] data, int index, int x, int y, int colorIndex, int bitDepth = 2, TargetPlatform platform = TargetPlatform.Nes)
+		public static void SetTilePixel(byte[] data, int index, int x, int y, int colorIndex, int bitDepth, TargetPlatform platform = TargetPlatform.Nes)
 		{
+			if (bitDepth > 2) platform = TargetPlatform.Snes;
+
 			// TODO: Mostly redundant compared to chrpipeline
 			var tileSize = 8 * bitDepth;
 			var offset = index * tileSize;
@@ -110,8 +116,10 @@ namespace Brewmaster.EditorWindows.TileMaps
 			return 8 * bitDepth;
 		}
 
-		public static void FlipTile(byte[] data, int index, bool vertical, int bitDepth = 2, TargetPlatform platform = TargetPlatform.Nes)
+		public static void FlipTile(byte[] data, int index, bool vertical, int bitDepth, TargetPlatform platform = TargetPlatform.Nes)
 		{
+			if (bitDepth > 2) platform = TargetPlatform.Snes;
+
 			var tileSize = 8 * bitDepth;
 			var offset = index * tileSize;
 			if (data.Length < offset + tileSize || index < 0) return;

@@ -64,6 +64,20 @@ namespace Brewmaster.EditorWindows.TileMaps
 				paletteBase += 3;
 			}
 
+			State.BitDepth = Map.BitsPerPixel;
+			State.BitDepthChanged += () =>
+			{
+				Map.BitsPerPixel = State.BitDepth;
+				foreach (var palette in Map.Palettes)
+				{
+					while (palette.Colors.Count < Map.ColorCount) palette.Colors.Add(Color.Black);
+				}
+				_colorPalette.RefreshPaletteView(Map.Palettes, Map.ColorCount);
+				State.ClearTileCache();
+				State.OnPaletteChanged();
+				_screenPanel.RefreshAllTiles();
+				Pristine = false;
+			};
 
 			State.Palette = Map.Palettes[0];
 
@@ -105,7 +119,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 			_screenPanel = new ScreenPanel(State, Map) { Dock = DockStyle.Fill };
 			Controls.Add(_screenPanel);
 
-			_colorPalette = new ColorPaletteView(Map.Palettes) { Width = 256, Height = 40 };
+			_colorPalette = new ColorPaletteView(Map.Palettes, Map.ColorCount) { Width = 256, Height = 40 };
 			_colorPalette.Dock = DockStyle.Bottom;
 			_colorPalette.SelectedPaletteChanged += (paletteIndex) =>
 			{

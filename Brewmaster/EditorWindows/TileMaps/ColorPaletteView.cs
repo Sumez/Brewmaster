@@ -14,14 +14,34 @@ namespace Brewmaster.EditorWindows.TileMaps
 		public event Action PalettesModified;
 		public event Action<int, int> SelectedColorIndexChanged;
 
-		public ColorPaletteView(List<Palette> palettes)
+		public ColorPaletteView(List<Palette> palettes, int colorCount)
 		{
 			_paletteControls = new List<ColorPalette>();
+
+			_layoutPanel = new FlowLayoutPanel { AutoSize = true, Dock = DockStyle.Top };
+			RefreshPaletteView(palettes, colorCount);
+
+			Controls.Add(_layoutPanel);
+
+			_layoutPanel.Resize += (s, a) =>
+			{
+				if (_layoutPanel.Height != Height)
+				{
+					Height = _layoutPanel.Height;
+					if (Parent != null && Parent.Parent != null) Parent.Parent.ResumeLayout(true);
+				}
+			};
+		}
+
+		public void RefreshPaletteView(List<Palette> palettes, int colorCount)
+		{
+			SuspendLayout();
+			_paletteControls.Clear();
 
 			for (var i = 0; i < palettes.Count; i++)
 			{
 				var paletteIndex = i;
-				var paletteControl = new ColorPalette(4) {Palette = palettes[i], Margin = new Padding(0, 3, 3, 0)};
+				var paletteControl = new ColorPalette(colorCount) { Palette = palettes[i], Margin = new Padding(0, 3, 3, 0) };
 				_paletteControls.Add(paletteControl);
 
 				if (i == 0) paletteControl.Selected = true;
@@ -41,24 +61,14 @@ namespace Brewmaster.EditorWindows.TileMaps
 					if (SelectedColorIndexChanged != null) SelectedColorIndexChanged(paletteControl.SelectedColorIndex, paletteIndex);
 				};
 			}
-
-			var layoutPanel = new FlowLayoutPanel { AutoSize = true, Dock = DockStyle.Top };
-			foreach (var paletteViewer in _paletteControls) layoutPanel.Controls.Add(paletteViewer);
-
-			Controls.Add(layoutPanel);
-
-			layoutPanel.Resize += (s, a) =>
-			{
-				if (layoutPanel.Height != Height)
-				{
-					Height = layoutPanel.Height;
-					if (Parent != null && Parent.Parent != null) Parent.Parent.ResumeLayout(true);
-				}
-			};
+			_layoutPanel.Controls.Clear();
+			_layoutPanel.Controls.AddRange(_paletteControls.Select(p => p as Control).ToArray());
+			ResumeLayout();
 		}
 
 		private int _selectedPaletteIndex;
 		private readonly List<ColorPalette> _paletteControls;
+		private readonly FlowLayoutPanel _layoutPanel;
 
 		public int SelectedPaletteIndex
 		{

@@ -40,7 +40,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 				MetaValueSize = MetaValueSize,
 				BitsPerPixel = BitsPerPixel,
 				Screens = GetScreenArray(),
-				Palettes = Palettes.Select(p => p.Colors).ToList()
+				Palettes = Palettes.Select(p => p.Colors.Take(ColorCount).ToList()).ToList()
 			};
 		}
 

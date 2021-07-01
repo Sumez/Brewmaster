@@ -46,7 +46,7 @@ namespace Brewmaster.EditorWindows.TileMaps.Tools
 				for (var i = 0; i < MetaTile.Tiles.Length; i++)
 				{
 					var paletteIndex = MetaTile.Attributes[((i/MetaTileSize) / map.AttributeSize.Height) * map.AttributeSize.Width + ((i % MetaTileSize) / map.AttributeSize.Width)];
-					using (var tile = TileImage.GetTileImage(chrData, MetaTile.Tiles[i], map.Palettes[paletteIndex].Colors))
+					using (var tile = TileImage.GetTileImage(chrData, MetaTile.Tiles[i], map.Palettes[paletteIndex].Colors, map.BitsPerPixel))
 					{
 						if (tile == null) continue;
 						graphics.DrawImageUnscaled(tile.Image, (i % MetaTileSize) * map.BaseTileSize.Width, (i / MetaTileSize) * map.BaseTileSize.Height);
