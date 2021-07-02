@@ -111,7 +111,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 			}
 		}
 
-		public static int GetTileDataLength(int bitDepth = 2)
+		public static int GetTileDataLength(int bitDepth)
 		{
 			return 8 * bitDepth;
 		}
@@ -200,8 +200,8 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 				stack.Push(index - Width);
 				stack.Push(index + Width);
-				stack.Push(index - 1);
-				stack.Push(index + 1);
+				if (index % Width != 0) stack.Push(index - 1);
+				if (index % Width < Width - 1) stack.Push(index + 1);
 			}
 		}
 		private void TraverseFillDiagonal(int firstIndex, int matchColor, ISet<int> foundValues)
@@ -216,12 +216,20 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 				stack.Push(index - Width);
 				stack.Push(index + Width);
-				stack.Push(index - 1);
-				stack.Push(index + 1);
-				stack.Push(index - Width - 1);
-				stack.Push(index - Width + 1);
-				stack.Push(index + Width - 1);
-				stack.Push(index + Width + 1);
+
+				if (index % Width != 0)
+				{
+					stack.Push(index - 1);
+					stack.Push(index - Width - 1);
+					stack.Push(index + Width - 1);
+				}
+
+				if (index % Width < Width - 1)
+				{
+					stack.Push(index + 1);
+					stack.Push(index - Width + 1);
+					stack.Push(index + Width + 1);
+				}
 			}
 		}
 

@@ -65,6 +65,11 @@ namespace Brewmaster.EditorWindows.TileMaps
 			_highlightButton.CheckStateChanged += (o, a) => { DisplayTileUsage(); };
 			_removeUnusedButton.Click += (o, a) => { _state.RemoveUnusedTiles(); };
 			_mergeButton.Click += (o, a) => { _state.MergeIdenticalTiles(); };
+
+			_tileSizeButton.Click += (o, a) =>
+			{
+				_state.ClearChrData();
+			};
 		}
 		
 		private void DisplayTileUsage()
@@ -100,7 +105,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 		private void RefreshTileCount()
 		{
 			var tiles = _tilePalette.Tiles;
-			var targetTiles = _state.ChrData.Length / TileImage.GetTileDataLength();
+			var targetTiles = _state.ChrData.Length / TileImage.GetTileDataLength(_state.BitDepth);
 			if (targetTiles == tiles.Count)
 			{
 				_tilePalette.RefreshImage();
