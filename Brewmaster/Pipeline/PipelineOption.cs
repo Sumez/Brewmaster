@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Brewmaster.ProjectModel;
@@ -90,6 +91,13 @@ namespace Brewmaster.Pipeline
 		{
 		}
 
+		public PipelineProperty(string systemName, PipelinePropertyType type, string defaultValue, Func<PipelineSettings, string> getFileNameFilter)
+		: this(systemName, type, defaultValue)
+		{
+			GetFileNameFilter = getFileNameFilter;
+		}
+
+		public Func<PipelineSettings, string> GetFileNameFilter { get; set; }
 		public string SystemName { get; set; }
 		public PipelinePropertyType Type { get; set; }
 		public List<string> Options { get; set; }

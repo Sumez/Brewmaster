@@ -27,9 +27,23 @@ namespace Brewmaster.Pipeline
 			{
 				return new[]
 				{
-					new PipelineProperty("script-type", PipelinePropertyType.Select, "JavaScript", new List<string> { "JavaScript", "Python", "Lua" }),
-					new PipelineProperty("script-file", PipelinePropertyType.ProjectFile, "")
+					new PipelineProperty("script-type", PipelinePropertyType.Select, "Python", new List<string> { /*"JavaScript",*/ "Python", "Lua" }),
+					new PipelineProperty("script-file", PipelinePropertyType.ProjectFile, "", GetFileNameFilter)
 				};
+			}
+		}
+
+		private string GetFileNameFilter(PipelineSettings settings)
+		{
+			switch (settings.GenericSettings["script-type"]) {
+				case "Python":
+					return "*.py (Python script)|*.py|*.*|*.*";
+				case "Lua":
+					return "*.lua (Lua script)|*.lua|*.*|*.*";
+				case "JavaScript":
+					return "*.js (JavaScript/EcmaScript)|*.js|*.*|*.*";
+				default:
+					return "*.*|*.*";
 			}
 		}
 	}

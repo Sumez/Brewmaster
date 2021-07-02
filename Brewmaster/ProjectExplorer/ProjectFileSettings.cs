@@ -105,7 +105,8 @@ namespace Brewmaster.ProjectExplorer
 										dialog.InitialDirectory = currentFile.DirectoryName;
 									}
 								}
-								dialog.Filter = "*.*|*.*";
+
+								dialog.Filter = property.GetFileNameFilter != null ? property.GetFileNameFilter(_file.Pipeline) : "*.*|*.*";
 								if (dialog.ShowDialog() != DialogResult.OK) return false;
 								var filePath = _file.Project.GetRelativePath(dialog.FileName, true);
 								if (filePath == null)
@@ -115,7 +116,7 @@ namespace Brewmaster.ProjectExplorer
 								}
 
 								var fullPath = Path.Combine(_file.Project.Directory.FullName, filePath);
-								if (!System.IO.File.Exists(fullPath)) System.IO.File.Create(fullPath);
+								if (!System.IO.File.Exists(fullPath)) using (var file = System.IO.File.Create(fullPath)) { }
 
 								var fileInfo = new FileInfo(fullPath);
 								var projectFile = _file.Project.Files.FirstOrDefault(f => f.File.FullName == fileInfo.FullName);
@@ -124,8 +125,8 @@ namespace Brewmaster.ProjectExplorer
 									projectFile = new AsmProjectFile { Mode = CompileMode.Ignore, Project = _file.Project, File = fileInfo };
 									_file.Project.AddNewProjectFile(projectFile);
 								}
-								_events.OpenFile(projectFile);
-								value = filePath;
+								_file.Pipeline.GenericSettings[property.SystemName] = value = filePath;
+								_events.OpenFile(projectFile); // TODO: Causes settings control to reload, and miss the value info. Plz fix
 								return true;
 							}
 						};
