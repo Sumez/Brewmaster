@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using Brewmaster.Modules;
 using Brewmaster.Pipeline;
 using Brewmaster.ProjectModel;
 
@@ -8,9 +10,10 @@ namespace Brewmaster.ProjectExplorer
 {
 	public class ProjectFileSettings : UserControl
 	{
-		public ProjectFileSettings()
+		public ProjectFileSettings(Events events)
 		{
 			InitializeComponent();
+			_events = events;
 			_assemblySetting.SetOptions("No", "Yes");
 			_assemblySetting.ValueChanged += (value) =>
 			{
@@ -72,25 +75,65 @@ namespace Brewmaster.ProjectExplorer
 				_file.Pipeline.SettingChanged();
 			};
 
-			foreach (var property in _file.Pipeline.Type.Properties)
+			foreach (var property in _file.Pipeline.Type.Properties.Reverse())
 			{
 				var settingControl = new SettingControl {
-					Label = Program.Language.Get(_file.Pipeline.Type.TypeName + "." + property.SystemName),
-					InputType = property.Type == PipelinePropertyType.Text ? InputType.Text : InputType.Dropdown
+					Label = Program.Language.Get(_file.Pipeline.Type.TypeName + "." + property.SystemName) + ":",
+					InputType = property.Type == PipelinePropertyType.Text ? InputType.Text : property.Type == PipelinePropertyType.ProjectFile ? InputType.Callback : InputType.Dropdown
 				};
-				if (property.Type == PipelinePropertyType.Boolean)
+				switch (property.Type)
 				{
-					settingControl.SetOptions("No", "Yes");
-					settingControl.Value = _file.Pipeline.GenericSettings.GetBoolean(property.SystemName) ? "Yes" : "No";
-				}
-				else if (property.Type == PipelinePropertyType.Select)
-				{
-					settingControl.SetOptions(property.Options.Select(o => Program.Language.Get(_file.Pipeline.Type.TypeName + "." + property.SystemName + "." + o) as object).ToArray());
-					settingControl.Value = _file.Pipeline.GenericSettings[property.SystemName];
-				}
-				else
-				{
-					settingControl.Value = _file.Pipeline.GenericSettings[property.SystemName];
+					case PipelinePropertyType.Boolean:
+						settingControl.SetOptions("No", "Yes");
+						settingControl.Value = _file.Pipeline.GenericSettings.GetBoolean(property.SystemName) ? "Yes" : "No";
+						break;
+					case PipelinePropertyType.Select:
+						settingControl.SetOptions(property.Options.Select(o => Program.Language.Get(_file.Pipeline.Type.TypeName + "." + property.SystemName + "." + o) as object).ToArray());
+						settingControl.Value = _file.Pipeline.GenericSettings[property.SystemName];
+						break;
+					case PipelinePropertyType.ProjectFile:
+						settingControl.Callback = (ref string value) =>
+						{
+							using (var dialog = new OpenFileDialog { CheckFileExists = false, InitialDirectory = _file.Project.Directory.FullName })
+							{
+								if (!string.IsNullOrWhiteSpace(value))
+								{
+									var currentFile = new FileInfo(Path.Combine(_file.Project.Directory.FullName, value));
+									if (currentFile.Exists)
+									{
+										dialog.FileName = currentFile.Name;
+										dialog.InitialDirectory = currentFile.DirectoryName;
+									}
+								}
+								dialog.Filter = "*.*|*.*";
+								if (dialog.ShowDialog() != DialogResult.OK) return false;
+								var filePath = _file.Project.GetRelativePath(dialog.FileName, true);
+								if (filePath == null)
+								{
+									MessageBox.Show("File must exist inside project directory", "Invalid file path", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+									return false;
+								}
+
+								var fullPath = Path.Combine(_file.Project.Directory.FullName, filePath);
+								if (!System.IO.File.Exists(fullPath)) System.IO.File.Create(fullPath);
+
+								var fileInfo = new FileInfo(fullPath);
+								var projectFile = _file.Project.Files.FirstOrDefault(f => f.File.FullName == fileInfo.FullName);
+								if (projectFile == null)
+								{
+									projectFile = new AsmProjectFile { Mode = CompileMode.Ignore, Project = _file.Project, File = fileInfo };
+									_file.Project.AddNewProjectFile(projectFile);
+								}
+								_events.OpenFile(projectFile);
+								value = filePath;
+								return true;
+							}
+						};
+						settingControl.Value = _file.Pipeline.GenericSettings[property.SystemName];
+						break;
+					default:
+						settingControl.Value = _file.Pipeline.GenericSettings[property.SystemName];
+						break;
 				}
 
 				settingControl.ValueChanged += (value) =>
@@ -117,6 +160,7 @@ namespace Brewmaster.ProjectExplorer
 		private SettingControl _assemblySetting;
 		private Panel _dynamicSettingsPanel;
 		private AsmProjectFile _file;
+		private readonly Events _events;
 
 		public AsmProjectFile File
 		{

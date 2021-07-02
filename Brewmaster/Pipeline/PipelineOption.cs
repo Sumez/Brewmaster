@@ -73,7 +73,7 @@ namespace Brewmaster.Pipeline
 	}
 	public enum PipelinePropertyType
 	{
-		Boolean, Select, Text
+		Boolean, Select, Text, ProjectFile
 	}
 	public class PipelineProperty
 	{

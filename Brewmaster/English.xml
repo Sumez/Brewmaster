@@ -8,10 +8,10 @@
     <Key>tilemap.binary</Key>
     <Value>Binary NES nametable</Value>
   </LanguageString>
-	<LanguageString>
-		<Key>chr</Key>
-		<Value>CHR graphics data</Value>
-	</LanguageString>
+  <LanguageString>
+    <Key>chr</Key>
+    <Value>CHR graphics data</Value>
+  </LanguageString>
   <LanguageString>
     <Key>tilemap.binary.include-attributes</Key>
     <Value>Include attributes</Value>
@@ -19,5 +19,29 @@
   <LanguageString>
     <Key>tilemap.binary.rle</Key>
     <Value>RLE compression</Value>
+  </LanguageString>
+  <LanguageString>
+    <Key>tilemap.custom</Key>
+    <Value>Custom script</Value>
+  </LanguageString>
+  <LanguageString>
+    <Key>tilemap.custom.script-type</Key>
+    <Value>Script type</Value>
+  </LanguageString>
+  <LanguageString>
+    <Key>tilemap.custom.script-type.JavaScript</Key>
+    <Value>JavaScript</Value>
+  </LanguageString>
+  <LanguageString>
+    <Key>tilemap.custom.script-type.Python</Key>
+    <Value>Python</Value>
+  </LanguageString>
+  <LanguageString>
+    <Key>tilemap.custom.script-type.Lua</Key>
+    <Value>Lua</Value>
+  </LanguageString>
+  <LanguageString>
+    <Key>tilemap.custom.script-file</Key>
+    <Value>Script file</Value>
   </LanguageString>
 </Language>
