@@ -342,8 +342,8 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 		private void LoadChrSource()
 		{
-			if (!File.Exists(ChrSource)) return;
-			using (var stream = File.OpenRead(ChrSource))
+			if (!File.Exists(State.ChrSource)) return;
+			using (var stream = File.OpenRead(State.ChrSource))
 			{
 				var data = new byte[stream.Length];
 				stream.Read(data, 0, data.Length);
@@ -357,13 +357,13 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 		private void TrySaveChrData()
 		{
-			if (ChrSource != null)
+			if (State.ChrSource != null)
 			{
-				if (MessageBox.Show(string.Format("Overwrite the file '{0}'?", ProjectFile.Project.GetRelativePath(ChrSource)), "CHR data was changed", MessageBoxButtons.YesNo) == DialogResult.No)
+				if (MessageBox.Show(string.Format("Overwrite the file '{0}'?", ProjectFile.Project.GetRelativePath(State.ChrSource)), "CHR data was changed", MessageBoxButtons.YesNo) == DialogResult.No)
 				{
 					var newChrFile = GetChrFileName();
 					if (newChrFile == null) return;
-					ChrSource = newChrFile;
+					State.ChrSource = newChrFile;
 				}
 			}
 			else
@@ -371,9 +371,9 @@ namespace Brewmaster.EditorWindows.TileMaps
 				if (MessageBox.Show("Save CHR data?", "CHR data was changed", MessageBoxButtons.YesNo) == DialogResult.No) return;
 				var newChrFile = GetChrFileName();
 				if (newChrFile == null) return;
-				ChrSource = newChrFile;
+				State.ChrSource = newChrFile;
 			}
-			using (var stream = File.Open(ChrSource, FileMode.Create))
+			using (var stream = File.Open(State.ChrSource, FileMode.Create))
 			{
 				stream.Write(State.ChrData, 0, State.ChrData.Length);
 			}
@@ -580,13 +580,11 @@ namespace Brewmaster.EditorWindows.TileMaps
 			{
 				dialog.Filter = "*.chr|*.chr|*.*|*.*";
 				if (dialog.ShowDialog() != DialogResult.OK) return;
-				ChrSource = dialog.FileName;
+				State.ChrSource = dialog.FileName;
 			}
 			LoadChrSource();
 			Pristine = false;
 		}
-
-		public string ChrSource { get; set; }
 
 		public override void Save(Func<FileInfo, string> getNewFileName = null)
 		{
@@ -607,7 +605,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 			var map = Map.GetSerializable();
 			if (State.ChrWasChanged) TrySaveChrData();
-			if (ChrSource != null) map.ChrSource = ProjectFile.Project.GetRelativePath(ChrSource);
+			if (State.ChrSource != null) map.ChrSource = ProjectFile.Project.GetRelativePath(State.ChrSource);
 			var jsonSettings = new JsonSerializerSettings { Formatting = Formatting.Indented, ContractResolver = new CamelCasePropertyNamesContractResolver() };
 			jsonSettings.Converters.Add(new CondensedArrayConverter());
 			var json = JsonConvert.SerializeObject(map, jsonSettings);

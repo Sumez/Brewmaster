@@ -105,6 +105,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 		public byte[] PreviousChrData { get; private set; }
 		public bool ChrWasChanged { get; set; }
 		public TargetPlatform TargetPlatform { get; set; } = TargetPlatform.Nes;
+		public string ChrSource { get; set; }
 
 		public event Action PaletteChanged;
 		public event Action ColorIndexChanged;
