@@ -3,18 +3,19 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 using Brewmaster.Controls;
-using Brewmaster.ProjectModel;
 using Brewmaster.StatusView;
 
 namespace Brewmaster.ProjectExplorer
 {
 	public class SettingControl : Panel
 	{
+		public delegate bool SettingCallback(ref string value);
+
 		public event Action<object> ValueChanged;
 
-		private Label _label;
-		private ComboBox _dropdown;
-		private TextBox _textInput;
+		private readonly Label _label;
+		private readonly ComboBox _dropdown;
+		private readonly TextBox _textInput;
 
 		public SettingControl()
 		{
@@ -57,6 +58,14 @@ namespace Brewmaster.ProjectExplorer
 			{
 				if (ValueChanged != null) ValueChanged(_textInput.Text);
 			};
+			_textInput.Click += (s, a) =>
+			{
+				if (InputType == InputType.Callback && Callback != null)
+				{
+					var value = _textInput.Text;
+					if (Callback(ref value)) _textInput.Text = value;
+				}
+			};
 
 			Controls.Add(_label);
 			Controls.Add(_textInput);
@@ -64,6 +73,7 @@ namespace Brewmaster.ProjectExplorer
 			Controls.Add(border);
 		}
 
+		public SettingCallback Callback { get; set; }
 		public string Label
 		{
 			get { return _label.Text; }
@@ -77,10 +87,12 @@ namespace Brewmaster.ProjectExplorer
 
 		[DefaultValue(InputType.Text)]
 		public InputType InputType {
-			get { return _textInput.Visible ? InputType.Text : InputType.Dropdown; }
+			get { return _textInput.Visible ? (_textInput.ReadOnly ? InputType.Callback : InputType.Text) : InputType.Dropdown; }
 			set
 			{
-				_textInput.Visible = value == InputType.Text;
+				_textInput.Visible = value == InputType.Text || value == InputType.Callback;
+				_textInput.ReadOnly = value == InputType.Callback;
+				_textInput.Cursor = value == InputType.Callback ? Cursors.Hand : Cursors.IBeam;
 				_dropdown.Visible = value == InputType.Dropdown;
 			}
 		}
@@ -131,6 +143,6 @@ namespace Brewmaster.ProjectExplorer
 
 	public enum InputType
 	{
-		Text, Dropdown
+		Text, Dropdown, Callback
 	}
 }

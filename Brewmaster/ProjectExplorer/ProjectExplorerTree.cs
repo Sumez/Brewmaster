@@ -15,10 +15,9 @@ namespace Brewmaster.ProjectExplorer
 		private AsmProject _project;
 		private EditableNode _dataRootNode;
 		private EditableNode _projectRootNode;
-		private Events _events;
+		private readonly Events _events;
 		private bool _showAllFiles;
 
-		public Action<AsmProjectFile> OpenFile;
 		public Action<string, FileTemplate, string, CompileMode> CreateNewFile { set { _menu.CreateNewFile = value; } }
 		public Action<string, string, CompileMode> AddExistingFile { set { _menu.AddExistingFile = value; } get { return _menu.AddExistingFile; } }
 		public bool ShowAllFiles
@@ -249,7 +248,7 @@ namespace Brewmaster.ProjectExplorer
 		private void OpenNode(TreeNode node)
 		{
 			var fileNode = node as FileNode;
-			if (fileNode != null && OpenFile != null) OpenFile(fileNode.FileInfo);
+			if (fileNode != null) _events.OpenFile(fileNode.FileInfo);
 		}
 
 		public void SetProject(AsmProject project)

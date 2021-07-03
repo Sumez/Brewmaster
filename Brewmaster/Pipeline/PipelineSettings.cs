@@ -1,18 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 using Brewmaster.ProjectModel;
 
 namespace Brewmaster.Pipeline
 {
 	public class PipelineSettings
 	{
-		public static readonly List<PipelineOption> PipelineOptions = new List<PipelineOption>
+		public static void LoadProcessingPipeline()
 		{
-			new TileMapAsmPipeline(),
-			new TileMapBinaryPipeline(),
-			new ChrPipeline()
-		};
+			var assembly = Assembly.GetCallingAssembly();
+			var type = typeof(PipelineOption);
+			var optionTypes = assembly.GetTypes().Where(t => type.IsAssignableFrom(t) && t.IsPublic && !t.IsAbstract);
+
+			PipelineOptions.Clear();
+			foreach (var optionType in optionTypes)
+			{
+				if (Activator.CreateInstance(optionType) is PipelineOption option) PipelineOptions.Add(option);
+			}
+		}
+
+		public static readonly List<PipelineOption> PipelineOptions = new List<PipelineOption>();
 
 
 		// DATA ESSENTIAL TO OUR STORED FILE

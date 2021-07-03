@@ -41,7 +41,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 				Map = map.GetMap();
 				if (!string.IsNullOrWhiteSpace(map.ChrSource))
 				{
-					ChrSource = Path.Combine(file.Project.Directory.FullName, map.ChrSource);
+					State.ChrSource = Path.Combine(file.Project.Directory.FullName, map.ChrSource);
 				}
 				Pristine = true;
 			}

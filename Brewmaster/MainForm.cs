@@ -503,7 +503,6 @@ namespace Brewmaster
 
 			FormClosed += (sender, args) => UnloadEmulator();
 
-			ProjectExplorer.Tree.OpenFile = (file) => OpenFileInTab(file);
 		    ProjectExplorer.Tree.CreateNewFile = CreateNewFile;
 		    ProjectExplorer.Tree.AddExistingFile = AddExistingFile;
 

@@ -565,16 +565,18 @@ namespace Brewmaster.ProjectModel
 		{
 			return Platform == TargetPlatform.Snes ? "65816" : "6502";
 		}
-		public static string GetRelativePath(AsmProject project, string filePath)
+		public static string GetRelativePath(AsmProject project, string filePath, bool forceChildDirectory = false)
 		{
 			if (filePath == null) return null;
 			if (filePath == project.Directory.FullName) return "";
-			return Uri.UnescapeDataString(new Uri(project.Directory.FullName + @"\")
-				.MakeRelativeUri(new Uri(filePath)).ToString());
+			var path = Uri.UnescapeDataString(new Uri(project.Directory.FullName + @"\").MakeRelativeUri(new Uri(filePath)).ToString());
+			if (forceChildDirectory && (path.StartsWith("..") || path.StartsWith("/"))) return null;
+
+			return path;
 		}
-		public string GetRelativePath(string filePath)
+		public string GetRelativePath(string filePath, bool forceChildDirectory = false)
 		{
-			return GetRelativePath(this, filePath);
+			return GetRelativePath(this, filePath, forceChildDirectory);
 		}
 
 		public IEnumerable<Breakpoint> GetAllBreakpoints()

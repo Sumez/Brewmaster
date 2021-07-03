@@ -244,7 +244,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 		public int CopyTile(int tile)
 		{
-			var tileSize = TileImage.GetTileDataLength();
+			var tileSize = TileImage.GetTileDataLength(BitDepth);
 			var newData = new byte[_chrData.Length + tileSize];
 			Buffer.BlockCopy(_chrData, 0, newData, 0, _chrData.Length);
 			Buffer.BlockCopy(_chrData, tileSize * tile, newData, _chrData.Length, tileSize);
@@ -253,7 +253,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 		}
 		public void MoveChrTile(int fromTile, int toTile)
 		{
-			var tileSize = TileImage.GetTileDataLength();
+			var tileSize = TileImage.GetTileDataLength(BitDepth);
 			var length = Math.Abs(fromTile - toTile);
 			var sourceOffset = fromTile > toTile ? toTile : (fromTile + 1);
 			var destinationOffset = fromTile > toTile ? (toTile + 1) : fromTile;
@@ -279,7 +279,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 		{
 			if (GetTileUsage(tile) > 0) return;
 
-			var tileSize = TileImage.GetTileDataLength();
+			var tileSize = TileImage.GetTileDataLength(BitDepth);
 			var tileCount = _chrData.Length / tileSize;
 			if (tileCount == 1) return;
 			
@@ -379,7 +379,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 		public void MergeIdenticalTiles(int bitDepth = 2)
 		{
-			var tileSize = TileImage.GetTileDataLength();
+			var tileSize = TileImage.GetTileDataLength(BitDepth);
 			var tileCount = _chrData.Length / tileSize;
 			if (tileCount == 1) return;
 
@@ -406,7 +406,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 		public void RemoveUnusedTiles()
 		{
-			var tileSize = TileImage.GetTileDataLength();
+			var tileSize = TileImage.GetTileDataLength(BitDepth);
 			var tileCount = _chrData.Length / tileSize;
 			if (tileCount == 1) return;
 
@@ -419,6 +419,13 @@ namespace Brewmaster.EditorWindows.TileMaps
 			}
 			AdjustForMovedTiles(changedTileSets.ToArray());
 			ClearTileCache();
+		}
+
+		public void ClearChrData()
+		{
+			Array.Clear(ChrData, 0, ChrData.Length);
+			ChrSource = null; // Avoid accidentally overriding file with existing CHR data unless user intends to
+			ChrData = ChrData; // Triggers all events
 		}
 	}
 }

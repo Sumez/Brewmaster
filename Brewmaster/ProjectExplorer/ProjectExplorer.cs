@@ -10,7 +10,7 @@ namespace Brewmaster.ProjectExplorer
 		{
 			InitializeComponent();
 			_multiSplitContainer.AddPanel(Tree = new ProjectExplorerTree(events));
-			_multiSplitContainer.AddPanel(Settings = new ProjectFileSettings { Dock = DockStyle.Fill }).StaticWidth = 150;
+			_multiSplitContainer.AddPanel(Settings = new ProjectFileSettings(events) { Dock = DockStyle.Fill }).StaticWidth = 150;
 
 			Tree.AfterSelect += (s, a) =>
 			{

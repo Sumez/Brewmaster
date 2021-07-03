@@ -5,6 +5,7 @@ using System.Threading;
 using System.Windows.Forms;
 using System.Xml;
 using Brewmaster.Modules;
+using Brewmaster.Pipeline;
 using Brewmaster.ProjectExplorer;
 using Brewmaster.Settings;
 
@@ -57,6 +58,7 @@ namespace Brewmaster
 				Error("Failed trying to associate the .BWM file extension", ex);
 			}
 
+			PipelineSettings.LoadProcessingPipeline();
 			Language = LanguageHandler.Load(Path.Combine(Program.WorkingDirectory, "English.xml"));
 			new MainForm { RequestFile = file };
 			Application.Run(CurrentWindow);
