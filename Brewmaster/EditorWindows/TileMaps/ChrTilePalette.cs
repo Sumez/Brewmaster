@@ -342,6 +342,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 		private void _clearButton_Click(object sender, EventArgs e)
 		{
 			if (MessageBox.Show(this.Parent, "Clear all character graphics?", "Confirm", MessageBoxButtons.OKCancel) != DialogResult.OK) return;
+			_state.ClearChrData();
 		}
 	}
 }

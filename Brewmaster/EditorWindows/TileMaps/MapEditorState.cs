@@ -423,9 +423,13 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 		public void ClearChrData()
 		{
-			Array.Clear(ChrData, 0, ChrData.Length);
+			var undoStep = new UndoStep();
+			undoStep.AddChr(this);
+
+			var newChrData = new byte[ChrData.Length];
 			ChrSource = null; // Avoid accidentally overriding file with existing CHR data unless user intends to
-			ChrData = ChrData; // Triggers all events
+			ChrData = newChrData; // Triggers all events
+			AddUndoStep(undoStep);
 		}
 	}
 }
