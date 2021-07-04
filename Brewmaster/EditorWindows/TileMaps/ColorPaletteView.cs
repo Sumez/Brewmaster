@@ -197,19 +197,17 @@ namespace Brewmaster.EditorWindows.TileMaps
 			colorPicker.StartPosition = FormStartPosition.Manual;
 			colorPicker.Location = PointToScreen(new Point(0, -colorPicker.Height));
 			colorPicker.Show();
-			colorPicker.ColorChanged += () =>
-			{
-				//Palette.Colors[paletteIndex] = colorPicker.Color;
-				//_paletteViewer.Invalidate();
-			};
-			colorPicker.FormClosing += (s, a) =>
+
+			void updateColor()
 			{
 				if (colorPicker.Color == Palette.Colors[paletteIndex]) return;
 
 				Palette.Colors[paletteIndex] = colorPicker.Color;
 				_paletteViewer.Invalidate();
 				if (PaletteChanged != null) PaletteChanged(Palette);
-			};
+			}
+			colorPicker.ColorChanged += updateColor;
+			colorPicker.FormClosing += (s, a) => updateColor();
 		}
 
 		public Palette Palette
