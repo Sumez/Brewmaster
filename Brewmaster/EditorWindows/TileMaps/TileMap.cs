@@ -93,15 +93,42 @@ namespace Brewmaster.EditorWindows.TileMaps
 		public TileMapScreen(TileMap map)
 		{
 			_map = map;
-			Tiles = new int[map.ScreenSize.Width * map.ScreenSize.Height];
-			ColorAttributes = new int[(map.ScreenSize.Width / map.AttributeSize.Width) * (map.ScreenSize.Height / map.AttributeSize.Height)];
-			MetaValues = new int[(map.ScreenSize.Width / map.MetaValueSize.Width) * (map.ScreenSize.Height / map.MetaValueSize.Height)];
+			Tiles = new int[TileLength()];
+			ColorAttributes = new int[AttributeLength()];
+			MetaValues = new int[MetaLength()];
 			Image = new FastBitmap(map.ScreenSize.Width * map.BaseTileSize.Width, map.ScreenSize.Height * map.BaseTileSize.Height, PixelFormat.Format32bppPArgb);
 			MetaImage = new FastBitmap(map.ScreenSize.Width / map.MetaValueSize.Width, map.ScreenSize.Height / map.MetaValueSize.Height, PixelFormat.Format32bppArgb);
 			Objects = new MapObject[0];
 
 			RefreshPreviousState();
 		}
+
+		private int TileLength() { return _map.ScreenSize.Width * _map.ScreenSize.Height; }
+		private int AttributeLength() { return (_map.ScreenSize.Width / _map.AttributeSize.Width) * (_map.ScreenSize.Height / _map.AttributeSize.Height); }
+		private int MetaLength() { return (_map.ScreenSize.Width / _map.MetaValueSize.Width) * (_map.ScreenSize.Height / _map.MetaValueSize.Height); }
+
+		public void CheckArraySizes()
+		{
+			if (Tiles.Length < TileLength())
+			{
+				var tiles = new int[TileLength()];
+				Array.Copy(Tiles, tiles, Tiles.Length);
+				Tiles = tiles;
+			}
+			if (ColorAttributes.Length < AttributeLength())
+			{
+				var attributes = new int[AttributeLength()];
+				Array.Copy(ColorAttributes, attributes, ColorAttributes.Length);
+				ColorAttributes = attributes;
+			}
+			if (MetaValues.Length < MetaLength())
+			{
+				var metaValues = new int[MetaLength()];
+				Array.Copy(MetaValues, metaValues, MetaValues.Length);
+				MetaValues = metaValues;
+			}
+		}
+
 
 		public void Unload()
 		{
@@ -412,6 +439,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 					if (screenSource.ColorAttributes != null) screen.ColorAttributes = screenSource.ColorAttributes;
 					if (screenSource.MetaValues != null) screen.MetaValues = screenSource.MetaValues;
 					if (screenSource.Objects != null) screen.Objects = screenSource.Objects;
+					screen.CheckArraySizes();
 					screen.RefreshPreviousState();
 					row.Add(screen);
 				}

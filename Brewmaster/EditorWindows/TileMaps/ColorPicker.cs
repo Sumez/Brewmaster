@@ -96,7 +96,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 				Cursor = Cursors.Hand
 			};
 			labelR.Left = labelG.Left = labelB.Left = 0;
-			labelR.Width = labelG.Width = labelB.Width = 30;
+			labelR.Width = labelG.Width = labelB.Width = 40;
 			labelR.Height = labelG.Height = labelB.Height = 18;
 			labelR.Top = _red.Top;
 			labelG.Top = _green.Top;

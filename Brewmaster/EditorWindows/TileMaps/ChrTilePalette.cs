@@ -20,6 +20,9 @@ namespace Brewmaster.EditorWindows.TileMaps
 		private Panel _settingsPanel;
 		private LinkLabel _tileSizeButton;
 		private MemoryViewer.SimpleComboBox _bitDepthSelector;
+		private Button _clearButton;
+		private Button _saveButton;
+		private Button _loadButton;
 		private ToolTip _toolTip;
 		public event Action<int> HoverTile;
 		public event Action UserSelectedTile;
@@ -135,6 +138,9 @@ namespace Brewmaster.EditorWindows.TileMaps
 			this._settingsPanel = new System.Windows.Forms.Panel();
 			this._tileSizeButton = new System.Windows.Forms.LinkLabel();
 			this._bitDepthSelector = new Brewmaster.MemoryViewer.SimpleComboBox();
+			this._clearButton = new System.Windows.Forms.Button();
+			this._saveButton = new System.Windows.Forms.Button();
+			this._loadButton = new System.Windows.Forms.Button();
 			label2 = new System.Windows.Forms.Label();
 			label1 = new System.Windows.Forms.Label();
 			this._controlPanel.SuspendLayout();
@@ -147,7 +153,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 			label2.AutoSize = true;
 			label2.Location = new System.Drawing.Point(80, 4);
 			label2.Name = "label2";
-			label2.Size = new System.Drawing.Size(52, 13);
+			label2.Size = new System.Drawing.Size(45, 13);
 			label2.TabIndex = 14;
 			label2.Text = "Bit depth:";
 			// 
@@ -221,6 +227,43 @@ namespace Brewmaster.EditorWindows.TileMaps
 			this._toolTip.SetToolTip(this._mergeButton, "Merge identical tiles into a single shared tile");
 			this._mergeButton.UseVisualStyleBackColor = true;
 			// 
+			// _clearButton
+			// 
+			this._clearButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)));
+			this._clearButton.Image = global::Brewmaster.Properties.Resources.smallclear;
+			this._clearButton.Location = new System.Drawing.Point(194, 0);
+			this._clearButton.Name = "_clearButton";
+			this._clearButton.Size = new System.Drawing.Size(22, 20);
+			this._clearButton.TabIndex = 2;
+			this._toolTip.SetToolTip(this._clearButton, "Clear character data");
+			this._clearButton.UseVisualStyleBackColor = true;
+			this._clearButton.Click += new System.EventHandler(this._clearButton_Click);
+			// 
+			// _saveButton
+			// 
+			this._saveButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)));
+			this._saveButton.Image = global::Brewmaster.Properties.Resources.smallsave;
+			this._saveButton.Location = new System.Drawing.Point(216, 0);
+			this._saveButton.Name = "_saveButton";
+			this._saveButton.Size = new System.Drawing.Size(22, 20);
+			this._saveButton.TabIndex = 2;
+			this._toolTip.SetToolTip(this._saveButton, "Save character data");
+			this._saveButton.UseVisualStyleBackColor = true;
+			this._saveButton.Click += new System.EventHandler(this._saveButton_Click);
+			// 
+			// _loadButton
+			// 
+			this._loadButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)));
+			this._loadButton.Image = global::Brewmaster.Properties.Resources.smallload;
+			this._loadButton.Location = new System.Drawing.Point(238, 0);
+			this._loadButton.Name = "_loadButton";
+			this._loadButton.Size = new System.Drawing.Size(22, 20);
+			this._loadButton.TabIndex = 1;
+			this._toolTip.SetToolTip(this._loadButton, "Load character data");
+			this._loadButton.UseVisualStyleBackColor = true;
+			this._loadButton.Click += new System.EventHandler(this._loadButton_Click);
+
+			// 
 			// _mainPanel
 			// 
 			this._mainPanel.AutoScroll = true;
@@ -233,6 +276,9 @@ namespace Brewmaster.EditorWindows.TileMaps
 			// 
 			// _settingsPanel
 			// 
+			this._settingsPanel.Controls.Add(this._loadButton);
+			this._settingsPanel.Controls.Add(this._saveButton);
+			this._settingsPanel.Controls.Add(this._clearButton);
 			this._settingsPanel.Controls.Add(this._bitDepthSelector);
 			this._settingsPanel.Controls.Add(label2);
 			this._settingsPanel.Controls.Add(this._tileSizeButton);
@@ -263,9 +309,9 @@ namespace Brewmaster.EditorWindows.TileMaps
             "2bpp",
             "4bpp",
             "8bpp"});
-			this._bitDepthSelector.Location = new System.Drawing.Point(131, 0);
+			this._bitDepthSelector.Location = new System.Drawing.Point(132, 0);
 			this._bitDepthSelector.Name = "_bitDepthSelector";
-			this._bitDepthSelector.Size = new System.Drawing.Size(70, 21);
+			this._bitDepthSelector.Size = new System.Drawing.Size(60, 21);
 			this._bitDepthSelector.TabIndex = 17;
 			// 
 			// ChrTilePalette
@@ -281,6 +327,22 @@ namespace Brewmaster.EditorWindows.TileMaps
 			this._settingsPanel.PerformLayout();
 			this.ResumeLayout(false);
 
+		}
+
+		private void _loadButton_Click(object sender, EventArgs e)
+		{
+			throw new NotImplementedException();
+		}
+
+		private void _saveButton_Click(object sender, EventArgs e)
+		{
+			throw new NotImplementedException();
+		}
+
+		private void _clearButton_Click(object sender, EventArgs e)
+		{
+			if (MessageBox.Show(this.Parent, "Clear all character graphics?", "Confirm", MessageBoxButtons.OKCancel) != DialogResult.OK) return;
+			_state.ClearChrData();
 		}
 	}
 }
