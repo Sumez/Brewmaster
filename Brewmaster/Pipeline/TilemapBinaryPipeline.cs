@@ -12,7 +12,7 @@ namespace Brewmaster.Pipeline
 	{
 		public override IEnumerable<FileType> SupportedFileTypes { get { return new[] { FileType.TileMap }; } }
 		public override string TypeName { get { return "tilemap.binary"; } }
-		public override void Process(PipelineSettings settings)
+		public override void Process(PipelineSettings settings, Action<string> action)
 		{
 			var json = File.ReadAllText(settings.File.File.FullName);
 			var deserializedMap = JsonConvert.DeserializeObject<SerializableTileMap>(json, new JsonSerializerSettings { ContractResolver = new CamelCasePropertyNamesContractResolver() });

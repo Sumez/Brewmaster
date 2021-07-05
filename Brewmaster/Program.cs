@@ -57,6 +57,7 @@ namespace Brewmaster
 			{
 				Error("Failed trying to associate the .BWM file extension", ex);
 			}
+			PythonPath = OsFeatures.FindPythonBinary();
 
 			PipelineSettings.LoadProcessingPipeline();
 			Language = LanguageHandler.Load(Path.Combine(Program.WorkingDirectory, "English.xml"));
@@ -64,7 +65,8 @@ namespace Brewmaster
 			Application.Run(CurrentWindow);
         }
 
-	    private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+
+        private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
 	    {
 			if (e.ExceptionObject is Exception ex) Error("Unexpected error:\n\n" + ex.Message, ex);
 			else throw new Exception(e.ExceptionObject.ToString());
@@ -79,6 +81,7 @@ namespace Brewmaster
         public static string EmulatorDirectory { get; set; }
         public static MainForm CurrentWindow { get; set; }
         public static LanguageHandler Language { get; set; }
+        public static string PythonPath { get; set; }
 
 		public static KeyBindings Keys
 		{

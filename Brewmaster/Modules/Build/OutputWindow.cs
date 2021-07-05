@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
@@ -118,19 +119,20 @@ namespace Brewmaster.Modules.Build
 			{
 				var logData = _log[i];
 				string newText;
+				var escapedString = string.Join(@" \line ", logData.Text.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries).Select(Regex.Escape));
 				switch (logData.Type)
 				{
 					case LogType.Headline:
-						newText = (@"\b " + Regex.Escape(logData.Text) + @"\b0 \line ");
+						newText = @"\b " + escapedString + @"\b0 \line ";
 						break;
 					case LogType.Error:
-						newText = (@"\cf2 " + Regex.Escape(logData.Text) + @"\cf1 \line ");
+						newText = @"\cf2 " + escapedString + @"\cf1 \line ";
 						break;
 					case LogType.Warning:
-						newText = (@"\cf3 " + Regex.Escape(logData.Text) + @"\cf1 \line ");
+						newText = @"\cf3 " + escapedString + @"\cf1 \line ";
 						break;
 					default:
-						newText = (Regex.Escape(logData.Text) + @"\line ");
+						newText = escapedString + @"\line ";
 						break;
 				}
 

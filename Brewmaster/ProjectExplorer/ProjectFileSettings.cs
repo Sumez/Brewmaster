@@ -117,6 +117,7 @@ namespace Brewmaster.ProjectExplorer
 
 								var fullPath = Path.Combine(_file.Project.Directory.FullName, filePath);
 								if (!System.IO.File.Exists(fullPath)) using (var file = System.IO.File.Create(fullPath)) { }
+								_file.Pipeline.GenericSettings[property.SystemName] = value = filePath; // Set path on pipeline settings *before* potentially adding a new file to the project, project explorer would reload the view too early
 
 								var fileInfo = new FileInfo(fullPath);
 								var projectFile = _file.Project.Files.FirstOrDefault(f => f.File.FullName == fileInfo.FullName);
@@ -125,8 +126,7 @@ namespace Brewmaster.ProjectExplorer
 									projectFile = new AsmProjectFile { Mode = CompileMode.Ignore, Project = _file.Project, File = fileInfo };
 									_file.Project.AddNewProjectFile(projectFile);
 								}
-								_file.Pipeline.GenericSettings[property.SystemName] = value = filePath;
-								_events.OpenFile(projectFile); // TODO: Causes settings control to reload, and miss the value info. Plz fix
+								_events.OpenFile(projectFile);
 								return true;
 							}
 						};

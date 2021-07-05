@@ -58,8 +58,8 @@ namespace Brewmaster.ProjectExplorer
 
 		public static void SetRecommendedProgram(string ext, string item, string program)
 		{
-			string baseKey = @"Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\" + ext;
-			string commandKey = @"Software\Classes\";
+			var baseKey = @"Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\" + ext;
+			var commandKey = @"Software\Classes\";
 
 			using (var rk = Registry.CurrentUser.CreateSubKey(baseKey + @"\OpenWithProgids"))
 				rk.SetValue(item, new byte[0], RegistryValueKind.None);
@@ -141,5 +141,16 @@ namespace Brewmaster.ProjectExplorer
 			return false;
 		}
 
+		public static string FindPythonBinary()
+		{
+#if WINDOWS
+			using (var key = Registry.LocalMachine.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\App Paths\python.exe"))
+			{
+				return key?.GetValue(null) as string ?? "python.exe";
+			}
+#else
+			return "python";
+#endif
+		}
 	}
 }

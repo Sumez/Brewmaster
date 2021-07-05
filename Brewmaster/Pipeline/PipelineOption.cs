@@ -12,7 +12,7 @@ namespace Brewmaster.Pipeline
 		public abstract IEnumerable<FileType> SupportedFileTypes { get; }
 		public virtual IEnumerable<PipelineProperty> Properties { get { return new PipelineProperty[] {}; } }
 		public override string ToString() { return Program.Language.Get(TypeName); }
-		public abstract void Process(PipelineSettings settings);
+		public abstract void Process(PipelineSettings settings, Action<string> output);
 		public abstract PipelineSettings Create(AsmProjectFile file);
 		public virtual PipelineSettings Load(AsmProject project, PipelineHeader pipelineHeader)
 		{
@@ -71,6 +71,15 @@ namespace Brewmaster.Pipeline
 			return newPipeline;
 		}
 
+		/// <summary>
+		/// Allows individual processors to indicate whether it's safe to skip a file (in cases of dependency on other external resources). Return false to always force processing.
+		/// </summary>
+		/// <param name="filePipeline"></param>
+		/// <returns></returns>
+		public virtual bool CanSkip(PipelineSettings filePipeline)
+		{
+			return true;
+		}
 	}
 	public enum PipelinePropertyType
 	{

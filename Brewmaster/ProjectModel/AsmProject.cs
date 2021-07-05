@@ -579,6 +579,11 @@ namespace Brewmaster.ProjectModel
 			return GetRelativePath(this, filePath, forceChildDirectory);
 		}
 
+		public string GetFullPath(string relativePath)
+		{
+			return Path.Combine(Directory.FullName, relativePath);
+		}
+
 		public IEnumerable<Breakpoint> GetAllBreakpoints()
 		{
 			var editorBreakpoints = new List<Breakpoint>();

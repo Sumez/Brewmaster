@@ -237,19 +237,17 @@ namespace Brewmaster.BuildProcess
 			foreach (var file in project.Files.Where(f => f.Mode == CompileMode.ContentPipeline && f.Pipeline != null))
 			{
 				// Get a fresh File Info from the file system in case something was changed since we loaded the project
-				var fileInfo = new FileInfo(file.File.FullName); // TODO: Refresh ProjectFile.File using file system watch to get LastWriteTime
-                                                     // ?
+				var fileInfo = new FileInfo(file.File.FullName); // TODO: Refresh ProjectFile.File using file system watch to get LastWriteTime ?
+
 				if (!fileInfo.Exists)
 				{
-					var error = new BuildError(
-						string.Format(@"File '{0}' is missing. Skipping data processing...", file.GetRelativePath()),
-						BuildError.BuildErrorType.Warning);
+					var error = new BuildError(string.Format(@"File '{0}' is missing. Skipping data processing...", file.GetRelativePath()), BuildError.BuildErrorType.Warning);
 					errors.Add(error);
 					ErrorReceived(error);
 					continue;
 				}
 
-				if (file.Pipeline.LastProcessed != null && file.Pipeline.LastProcessed > fileInfo.LastWriteTime)
+				if (file.Pipeline.LastProcessed != null && file.Pipeline.LastProcessed > fileInfo.LastWriteTime && file.Pipeline.Type.CanSkip(file.Pipeline))
 				{
 					skippedCount++;
 					continue;
@@ -258,7 +256,7 @@ namespace Brewmaster.BuildProcess
 				Log(new LogData(string.Format("Processing {0}", string.Join(",", file.Pipeline.OutputFiles.Where(f => f != null)))));
 				try
 				{
-					file.Pipeline.Process();
+					file.Pipeline.Process(output => { if (output != null) Log(new LogData(output)); });
 				}
 				catch (Exception ex)
 				{

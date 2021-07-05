@@ -136,7 +136,7 @@ namespace Brewmaster.Pipeline
 			using (var image = LoadImageFile(settings.File.File.FullName)) return GetReducedImage(settings, image);
 		}
 
-		public override void Process(PipelineSettings settings)
+		public override void Process(PipelineSettings settings, Action<string> output)
 		{
 			var chrSettings = settings as ChrPipelineSettings;
 			if (chrSettings == null) throw new Exception("Invalid settings for CHR pipeline");

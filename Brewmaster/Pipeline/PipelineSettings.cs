@@ -40,9 +40,9 @@ namespace Brewmaster.Pipeline
 			Type = type;
 		}
 
-		public void Process()
+		public void Process(Action<string> output)
 		{
-			Type.Process(this);
+			Type.Process(this, output);
 			LastProcessed = DateTime.Now;
 		}
 
@@ -59,7 +59,7 @@ namespace Brewmaster.Pipeline
 
 		public string GetFilePath(int index)
 		{
-			return Path.Combine(File.Project.Directory.FullName, OutputFiles[index]);
+			return File.Project.GetFullPath(OutputFiles[index]);
 		}
 	}
 }

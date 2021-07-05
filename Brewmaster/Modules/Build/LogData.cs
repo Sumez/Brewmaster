@@ -1,4 +1,5 @@
-﻿using Brewmaster.BuildProcess;
+﻿using System;
+using Brewmaster.BuildProcess;
 
 namespace Brewmaster.Modules.Build
 {
@@ -14,6 +15,7 @@ namespace Brewmaster.Modules.Build
 
 		public LogData(string text, LogType type = LogType.Normal, IFileLocation fileLocation = null)
 		{
+			if (text == null) throw new ArgumentNullException("text", "Log message cannot be null");
 			Text = text;
 			Type = type;
 			Location = fileLocation;
