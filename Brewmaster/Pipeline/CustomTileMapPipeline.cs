@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
@@ -55,7 +56,16 @@ namespace Brewmaster.Pipeline
 
 				commandProcess.ErrorDataReceived += (s, e) => errorMessage.AppendLine(e.Data);
 
-				commandProcess.Start();
+				try
+				{
+					commandProcess.Start();
+				}
+				catch (Win32Exception ex)
+				{
+					if (ex.ErrorCode == -0x7FFFBFFB) {
+						throw new Exception("Python installation was not found. Either install missing binaries, or add the location of Python to your PATHS variable.");
+					}
+				}
 				commandProcess.BeginOutputReadLine();
 				commandProcess.BeginErrorReadLine();
 				commandProcess.WaitForExit();

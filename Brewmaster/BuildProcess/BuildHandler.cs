@@ -269,6 +269,12 @@ namespace Brewmaster.BuildProcess
 			}
 			if (skippedCount > 0) Log(new LogData(string.Format("Skipped {0} unchanged files", skippedCount)));
 
+			if (errors.Any())
+			{
+				buildProcessSource.SetResult(false);
+				return errors;
+			}
+
 			if (project.Type == ProjectType.AssetOnly)
 			{
 				Log(new LogData("Processing complete\r\n"));
