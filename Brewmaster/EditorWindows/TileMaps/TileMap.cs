@@ -35,9 +35,9 @@ namespace Brewmaster.EditorWindows.TileMaps
 			{
 				Width = Width,
 				Height = Height,
-				ScreenSize = ScreenSize,
-				AttributeSize = AttributeSize,
-				MetaValueSize = MetaValueSize,
+				ScreenSize = new[] { ScreenSize.Width, ScreenSize.Height },
+				AttributeSize = new[] { AttributeSize.Width, AttributeSize.Height },
+				MetaValueSize = new[] { MetaValueSize.Width, MetaValueSize.Height },
 				BitsPerPixel = BitsPerPixel,
 				Screens = GetScreenArray(),
 				Palettes = Palettes.Select(p => p.Colors.Take(ColorCount).ToList()).ToList()
@@ -399,15 +399,15 @@ namespace Brewmaster.EditorWindows.TileMaps
 	[Serializable]
 	public class SerializableTileMap
 	{
-		public Size ScreenSize = new Size(32, 30);
-		public Size AttributeSize = new Size(2, 2);
-		public Size MetaValueSize = new Size(2, 2);
+		public int[] ScreenSize = { 32, 30 };
+		public int[] AttributeSize = { 2, 2 };
+		public int[] MetaValueSize = { 2, 2 };
 		public int BitsPerPixel;
 		public int Width;
 		public int Height;
 		public string ChrSource;
 		public SerializableScreen[] Screens;
-		public List<List<Color>> Palettes;
+		public List<List<Color>> Palettes; // TODO: Serialize "properly" with easily understandable R,G,B arrays
 
 		public TileMap GetMap()
 		{
@@ -415,10 +415,10 @@ namespace Brewmaster.EditorWindows.TileMaps
 			{
 				Width = Width,
 				Height = Height,
-				ScreenSize = ScreenSize,
+				ScreenSize = new Size(ScreenSize[0], ScreenSize[1]),
 				BitsPerPixel = BitsPerPixel,
-				AttributeSize = AttributeSize,
-				MetaValueSize = MetaValueSize,
+				AttributeSize = new Size(AttributeSize[0], AttributeSize[1]),
+				MetaValueSize = new Size(MetaValueSize[0], MetaValueSize[1]),
 				Palettes = Palettes != null ? Palettes.Select(c => new Palette { Colors = c }).ToList() : new List<Palette>()
 			};
 			for (var y = 0; y < Height; y++)

@@ -119,7 +119,7 @@ namespace Brewmaster.Modules.Build
 			{
 				var logData = _log[i];
 				string newText;
-				var escapedString = string.Join(@" \line ", logData.Text.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries).Select(Regex.Escape));
+				var escapedString = Regex.Escape(logData.Text);
 				switch (logData.Type)
 				{
 					case LogType.Headline:

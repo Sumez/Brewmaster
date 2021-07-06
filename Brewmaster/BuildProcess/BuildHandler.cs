@@ -271,6 +271,8 @@ namespace Brewmaster.BuildProcess
 
 			if (errors.Any())
 			{
+				Log(new LogData("Failed processing data pipeline", LogType.Error));
+				Status("Failed processing data pipeline");
 				buildProcessSource.SetResult(false);
 				return errors;
 			}
@@ -286,6 +288,7 @@ namespace Brewmaster.BuildProcess
 			var processResult = config.Custom ? ProcessCustom(project, config, errors) : ProcessIntegrated(project, config, errors);
 			if (!processResult)
 			{
+				Status("Build failed");
 				buildProcessSource.SetResult(false);
 				return errors;
 			}
@@ -539,10 +542,11 @@ namespace Brewmaster.BuildProcess
 		}
 		private void ErrorReceived(BuildError error, string message = null)
 		{
-			Log(new LogData(
-				message ?? error.FullMessage, 
-				error.Type == BuildError.BuildErrorType.Warning ? LogType.Warning : LogType.Error, 
-				error));
+			message = message ?? error.FullMessage;
+			foreach (var messageLine in message.Split(new [] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries))
+			{
+				Log(new LogData(messageLine, error.Type == BuildError.BuildErrorType.Warning ? LogType.Warning : LogType.Error, error));
+			}
 		}
 
 		private void OutputReceived(object sender, DataReceivedEventArgs args)
