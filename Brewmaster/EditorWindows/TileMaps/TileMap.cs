@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Xml.Serialization;
 using Brewmaster.EditorWindows.TileMaps.Tools;
 using Brewmaster.Modules.Ppu;
+using Newtonsoft.Json;
 
 namespace Brewmaster.EditorWindows.TileMaps
 {
@@ -40,7 +41,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 				MetaValueSize = new[] { MetaValueSize.Width, MetaValueSize.Height },
 				BitsPerPixel = BitsPerPixel,
 				Screens = GetScreenArray(),
-				Palettes = Palettes.Select(p => p.Colors.Take(ColorCount).ToList()).ToList()
+				ColorPalettes = Palettes.Select(p => p.Colors.Take(ColorCount).Select(SerializableTileMap.SerializeColor).ToArray()).ToArray()
 			};
 		}
 
@@ -407,7 +408,10 @@ namespace Brewmaster.EditorWindows.TileMaps
 		public int Height;
 		public string ChrSource;
 		public SerializableScreen[] Screens;
-		public List<List<Color>> Palettes; // TODO: Serialize "properly" with easily understandable R,G,B arrays
+		public int[][][] ColorPalettes;
+
+		[JsonIgnore] private List<List<Color>> _legacyPalette;
+		public List<List<Color>> Palettes { set { _legacyPalette = value; } }
 
 		public TileMap GetMap()
 		{
@@ -419,8 +423,9 @@ namespace Brewmaster.EditorWindows.TileMaps
 				BitsPerPixel = BitsPerPixel,
 				AttributeSize = new Size(AttributeSize[0], AttributeSize[1]),
 				MetaValueSize = new Size(MetaValueSize[0], MetaValueSize[1]),
-				Palettes = Palettes != null ? Palettes.Select(c => new Palette { Colors = c }).ToList() : new List<Palette>()
+				Palettes = ColorPalettes != null ? ColorPalettes.Select(p => new Palette { Colors = p.Select(DeserializeColor).ToList() }).ToList() : new List<Palette>()
 			};
+			if (_legacyPalette != null) map.Palettes = _legacyPalette.Select(c => new Palette { Colors = c }).ToList();
 			for (var y = 0; y < Height; y++)
 			{
 				var row = new List<TileMapScreen>();
@@ -446,6 +451,16 @@ namespace Brewmaster.EditorWindows.TileMaps
 			}
 			
 			return map;
+		}
+
+		public static int[] SerializeColor(Color color)
+		{
+			return new int[] {color.R, color.G, color.B};
+		}
+
+		public static Color DeserializeColor(int[] channels)
+		{
+			return Color.FromArgb(channels[0], channels[1], channels[2]);
 		}
 	}
 
