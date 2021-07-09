@@ -31,7 +31,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 		public MapEditorWindow(MainForm form, AsmProjectFile file, Events events) : base(form, file, events)
 		{
-			State = new MapEditorState();
+			State = new MapEditorState(ProjectFile);
 			if (file.Project != null) State.TargetPlatform = file.Project.Platform;
 
 			var json = File.ReadAllText(ProjectFile.File.FullName);
@@ -169,7 +169,13 @@ namespace Brewmaster.EditorWindows.TileMaps
 			}
 			//form.LayoutHandler.ShowPanel(new IdePanel(_colorPalette) { Label = "Tile Map Palettes" });
 
-			LoadChrSource();
+			State.LoadChrSource();
+			State.ChrSourceChanged += () =>
+			{
+				_screenPanel.RefreshAllTiles(); // TODO: Should probably react to ChrDataChanged event instead, but unsure how much overhead that creates while drawing tiles
+				Pristine = false;
+			};
+			
 			SelectTilePen(0);
 
 			foreach (var screen in Map.GetAllScreens()) InitScreen(screen);
@@ -194,7 +200,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 			MapEditorToolBar.SetMetaTileSizes(Map.MetaTileResolutions);
 
 			MapEditorToolBar.ImportImage = ImportImage;
-			MapEditorToolBar.ImportChr = ImportChr;
+			MapEditorToolBar.ImportChr = State.LoadChrData;
 			MapEditorToolBar.ImportMap = ImportMap;
 			MapEditorToolBar.ImportJsonSession = ImportJson;
 			MapEditorToolBar.ImportPalette = ImportPalette;
@@ -338,57 +344,6 @@ namespace Brewmaster.EditorWindows.TileMaps
 		{
 			tool.GetSelectedPalette = () => _colorPalette.SelectedPaletteIndex;
 			tool.SetSelectedPalette = (index) => _colorPalette.SelectedPaletteIndex = index;
-		}
-
-		private void LoadChrSource()
-		{
-			if (!File.Exists(State.ChrSource)) return;
-			using (var stream = File.OpenRead(State.ChrSource))
-			{
-				var data = new byte[stream.Length];
-				stream.Read(data, 0, data.Length);
-				State.ChrData = data;
-			}
-
-			State.ChrWasChanged = false;
-			State.ClearUndoStack();
-			_screenPanel.RefreshAllTiles(); // TODO: Should probably react to ChrDataChanged event, but unsure how much overhead that creates while drawing tiles
-		}
-
-		private void TrySaveChrData()
-		{
-			if (State.ChrSource != null)
-			{
-				if (MessageBox.Show(string.Format("Overwrite the file '{0}'?", ProjectFile.Project.GetRelativePath(State.ChrSource)), "CHR data was changed", MessageBoxButtons.YesNo) == DialogResult.No)
-				{
-					var newChrFile = GetChrFileName();
-					if (newChrFile == null) return;
-					State.ChrSource = newChrFile;
-				}
-			}
-			else
-			{
-				if (MessageBox.Show("Save CHR data?", "CHR data was changed", MessageBoxButtons.YesNo) == DialogResult.No) return;
-				var newChrFile = GetChrFileName();
-				if (newChrFile == null) return;
-				State.ChrSource = newChrFile;
-			}
-			using (var stream = File.Open(State.ChrSource, FileMode.Create))
-			{
-				stream.Write(State.ChrData, 0, State.ChrData.Length);
-			}
-			State.ChrWasChanged = false;
-		}
-
-		public string GetChrFileName()
-		{
-			using (var chrFileDialog = new SaveFileDialog())
-			{
-				chrFileDialog.DefaultExt = "*.chr";
-				chrFileDialog.Filter = "CHR data|*.chr";
-				chrFileDialog.InitialDirectory = ProjectFile.File.DirectoryName;
-				return chrFileDialog.ShowDialog(this) == DialogResult.OK ? chrFileDialog.FileName : null;
-			}
 		}
 
 		public TileMap Map { get; set; }
@@ -574,17 +529,6 @@ namespace Brewmaster.EditorWindows.TileMaps
 			throw new NotImplementedException();
 			_screenPanel.InvalidateVisibleViews();
 		}
-		private void ImportChr()
-		{
-			using (var dialog = new OpenFileDialog())
-			{
-				dialog.Filter = "*.chr|*.chr|*.*|*.*";
-				if (dialog.ShowDialog() != DialogResult.OK) return;
-				State.ChrSource = dialog.FileName;
-			}
-			LoadChrSource();
-			Pristine = false;
-		}
 
 		public override void Save(Func<FileInfo, string> getNewFileName = null)
 		{
@@ -604,7 +548,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 			}
 
 			var map = Map.GetSerializable();
-			if (State.ChrWasChanged) TrySaveChrData();
+			if (State.ChrWasChanged) State.SaveChrData();
 			if (State.ChrSource != null) map.ChrSource = ProjectFile.Project.GetRelativePath(State.ChrSource);
 			var jsonSettings = new JsonSerializerSettings { Formatting = Formatting.Indented, ContractResolver = new CamelCasePropertyNamesContractResolver() };
 			jsonSettings.Converters.Add(new CondensedArrayConverter());

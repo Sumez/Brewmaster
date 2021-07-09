@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using Brewmaster.EditorWindows.TileMaps.Tools;
 using Brewmaster.Modules.Ppu;
 using Brewmaster.Modules.Watch;
@@ -11,6 +13,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 {
 	public class MapEditorState
 	{
+		private readonly AsmProjectFile _projectFile;
 		private Dictionary<int, Dictionary<Palette, TileImage>> _cachedTiles = new Dictionary<int, Dictionary<Palette, TileImage>>();
 
 		private MapEditorTool _tool;
@@ -118,6 +121,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 		public event Action<Dictionary<int, int>[], UndoStep> TilesMoved;
 		public event Action TileUsageChanged;
 		public event Action BitDepthChanged;
+		public event Action ChrSourceChanged;
 
 		public void OnPaletteChanged()
 		{
@@ -327,7 +331,12 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 		private readonly LinkedList<UndoStep> _undoStack = new LinkedList<UndoStep>();
 		private readonly LinkedList<UndoStep> _redoStack = new LinkedList<UndoStep>();
-		
+
+		public MapEditorState(AsmProjectFile projectFile)
+		{
+			_projectFile = projectFile;
+		}
+
 		public void AddUndoStep(UndoStep undoStep)
 		{
 			_redoStack.Clear();
@@ -431,5 +440,68 @@ namespace Brewmaster.EditorWindows.TileMaps
 			ChrData = newChrData; // Triggers all events
 			AddUndoStep(undoStep);
 		}
+
+		public void LoadChrData()
+		{
+			using (var dialog = new OpenFileDialog())
+			{
+				dialog.Filter = "*.chr|*.chr|*.*|*.*";
+				if (dialog.ShowDialog() != DialogResult.OK) return;
+				ChrSource = dialog.FileName;
+			}
+			LoadChrSource();
+		}
+
+		public void LoadChrSource()
+		{
+			if (!File.Exists(ChrSource)) return;
+			using (var stream = File.OpenRead(ChrSource))
+			{
+				var data = new byte[stream.Length];
+				stream.Read(data, 0, data.Length);
+				ChrData = data;
+			}
+
+			ChrWasChanged = false;
+			ClearUndoStack();
+			if (ChrSourceChanged != null) ChrSourceChanged();
+		}
+
+		public void SaveChrData(bool userRequested = false)
+		{
+			if (ChrSource != null)
+			{
+				if (MessageBox.Show(string.Format("Overwrite the file '{0}'?", _projectFile.Project.GetRelativePath(ChrSource)), "CHR data was changed", MessageBoxButtons.YesNo) == DialogResult.No)
+				{
+					var newChrFile = GetChrFileName();
+					if (newChrFile == null) return;
+					ChrSource = newChrFile;
+				}
+			}
+			else
+			{
+				if (!userRequested && MessageBox.Show("Save CHR data?", "CHR data was changed", MessageBoxButtons.YesNo) == DialogResult.No) return;
+				var newChrFile = GetChrFileName();
+				if (newChrFile == null) return;
+				ChrSource = newChrFile;
+			}
+			using (var stream = File.Open(ChrSource, FileMode.Create))
+			{
+				stream.Write(ChrData, 0, ChrData.Length);
+			}
+			ChrWasChanged = false;
+		}
+
+		private string GetChrFileName()
+		{
+			using (var chrFileDialog = new SaveFileDialog())
+			{
+				chrFileDialog.DefaultExt = "*.chr";
+				chrFileDialog.Filter = "CHR data|*.chr";
+				chrFileDialog.InitialDirectory = _projectFile.File.DirectoryName;
+				return chrFileDialog.ShowDialog() == DialogResult.OK ? chrFileDialog.FileName : null;
+			}
+		}
+
 	}
 }

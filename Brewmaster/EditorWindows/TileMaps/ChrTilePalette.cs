@@ -331,12 +331,12 @@ namespace Brewmaster.EditorWindows.TileMaps
 
 		private void _loadButton_Click(object sender, EventArgs e)
 		{
-			throw new NotImplementedException();
+			_state.LoadChrData();
 		}
 
 		private void _saveButton_Click(object sender, EventArgs e)
 		{
-			throw new NotImplementedException();
+			_state.SaveChrData(true);
 		}
 
 		private void _clearButton_Click(object sender, EventArgs e)
