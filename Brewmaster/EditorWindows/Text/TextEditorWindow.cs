@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -22,6 +23,7 @@ namespace Brewmaster.EditorWindows.Text
 
 		public Action ThreadSafeRefreshWarning { get; set; }
 		public Action ThreadSafeRefresh { get; set; }
+		public Encoding Encoding { get; set; }
 		public TextEditorWindow(MainForm form, AsmProjectFile file, Events moduleEvents) : base(form, file, moduleEvents)
 		{
 			switch (file.Type)
@@ -93,10 +95,14 @@ namespace Brewmaster.EditorWindows.Text
 		// Update editor contents to file contents. Only done when opening the tab or file was changed from outside
 		public void RefreshEditorContents()
 		{
-
-			//first read text of a file
-			var fileText = File.ReadAllText(ProjectFile.File.FullName);
-
+			string fileText;
+			using (var reader = new StreamReader(ProjectFile.File.FullName, Encoding.Default, true))
+			{
+				reader.Peek();
+				Encoding = reader.CurrentEncoding;
+				fileText = reader.ReadToEnd();
+			}
+			
 			if (Regex.IsMatch(fileText, @"\r\r\n") && Prompt.ShowDialog(string.Format("This file ({0}) has an issue with line endings.\nFix endings by removing double carriage returns?", ProjectFile.File.Name), "Open File"))
 			{
 				TextEditor.Text = Regex.Replace(fileText, @"\r\r\n", "\r\n", RegexOptions.Singleline); // Fix Nesicide oddity
@@ -176,14 +182,14 @@ namespace Brewmaster.EditorWindows.Text
 			}
 
 			if (_fileSystemWatcher != null) _fileSystemWatcher.EnableRaisingEvents = false;
-			using (RichTextBox rtb = new RichTextBox())
+			using (var rtb = new RichTextBox())
 			{
 				rtb.Text = TextEditor.Text;
 				File.WriteAllText(filename, "");
-				using (var strwriter = File.AppendText(filename))
+				using (var stream = new StreamWriter(filename, true, Encoding))
 				{
-					strwriter.Write(rtb.Text);
-					strwriter.Close();
+					stream.Write(rtb.Text);
+					stream.Close();
 				}
 			}
 			if (_fileSystemWatcher != null) _fileSystemWatcher.EnableRaisingEvents = true;
