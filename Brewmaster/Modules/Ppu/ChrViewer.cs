@@ -12,6 +12,20 @@ namespace Brewmaster.Modules.Ppu
 		public ChrViewer(Events events)
 		{
 			InitializeComponent();
+
+			_bitDepthSelector.Items.Add("2bpp");
+			_bitDepthSelector.Items.Add("4bpp");
+			_bitDepthSelector.Items.Add("8bpp");
+			_bitDepthSelector.Items.Add("Direct color");
+			_bitDepthSelector.Items.Add("Mode 7");
+			_bitDepthSelector.Items.Add("Mode 7 direct color");
+
+			_bitDepthSelector.SelectedIndexChanged += (s, a) => {
+				if (_data == null) return;
+				_data.RequestRefresh(_bitDepthSelector.SelectedIndex);
+			};
+			_bitDepthSelector.SelectedIndex = 1;
+
 			events.EmulationStateUpdate += (state) => UpdateChrData(state.CharacterData, state.Type);
 			events.PlatformChanged += (type) =>
 			{
@@ -25,23 +39,6 @@ namespace Brewmaster.Modules.Ppu
 			_data = characterData;
 			_chrDisplay.UpdateChrData(characterData, type);
 			if (_bitDepthSelector.SelectedIndex != characterData.ColorMode && !_bitDepthSelector.Focused) _bitDepthSelector.SelectedIndex = characterData.ColorMode;
-		}
-
-		protected override void OnLoad(EventArgs e)
-		{
-			base.OnLoad(e);
-			_bitDepthSelector.Items.Add("2bpp");
-			_bitDepthSelector.Items.Add("4bpp");
-			_bitDepthSelector.Items.Add("8bpp");
-			_bitDepthSelector.Items.Add("Direct color");
-			_bitDepthSelector.Items.Add("Mode 7");
-			_bitDepthSelector.Items.Add("Mode 7 direct color");
-
-			_bitDepthSelector.SelectedIndexChanged += (s, a) => {
-				if (_data == null) return;
-				_data.RequestRefresh(_bitDepthSelector.SelectedIndex);
-			};
-			_bitDepthSelector.SelectedIndex = 1;
 		}
 
 		protected override void OnLayout(LayoutEventArgs e)

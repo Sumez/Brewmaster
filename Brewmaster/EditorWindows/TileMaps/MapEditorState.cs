@@ -129,6 +129,12 @@ namespace Brewmaster.EditorWindows.TileMaps
 		}
 		public void OnBitDepthChanged()
 		{
+			if (ChrData.Length < 8 * BitDepth)
+			{
+				var newChr = new byte[8 * BitDepth];
+				Array.Copy(ChrData, newChr, ChrData.Length);
+				ChrData = newChr;
+			}
 			if (BitDepthChanged != null) BitDepthChanged();
 		}
 		public void OnColorIndexChanged()
