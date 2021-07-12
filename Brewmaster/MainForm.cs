@@ -618,7 +618,7 @@ namespace Brewmaster
 			}));
 	    }
 
-		private void AddExistingFile(string targetFile, string targetDirectory, CompileMode mode)
+		private void AddExistingFile(string targetFile, string targetDirectory)
 	    {
 		    if (!Directory.Exists(targetDirectory))
 		    {
@@ -633,13 +633,14 @@ namespace Brewmaster
 			    targetFile = OpenFilesFileDialog.FileName;
 		    }
 
-		    if (!File.Exists(targetFile))
+		    var file = new FileInfo(targetFile);
+		    if (!file.Exists || file.Directory == null)
 		    {
 			    Error(string.Format("Could not find the file {0}", targetFile));
 			    return;
 		    }
 
-		    if (!targetFile.StartsWith(CurrentProject.Directory.FullName))
+		    if (!file.Directory.FullName.StartsWith(CurrentProject.Directory.FullName))
 		    {
 			    var newFilename = Path.Combine(targetDirectory, new FileInfo(targetFile).Name);
 				if (File.Exists(newFilename))
@@ -648,13 +649,19 @@ namespace Brewmaster
 				    return;
 				}
 				File.Copy(targetFile, targetFile = newFilename);
+				file = new FileInfo(targetFile);
 		    }
 
-			var file = new FileInfo(targetFile);
-			if (mode == CompileMode.IncludeInAssembly && new string[] { ".ini", ".conf", ".ld", ".cfg", ".x" }.Contains(file.Extension))
-			{
-				mode = CompileMode.LinkerConfig;
-			}
+		    if (CurrentProject.Files.Any(f => f.File.FullName == file.FullName))
+		    {
+			    Error("Selected file is already a part of the project");
+			    return;
+		    }
+
+			var type = AsmProjectFile.GuessFileType(file.Extension);
+			var mode = type == FileType.Source ? CompileMode.IncludeInAssembly : AsmProjectFile.ContentFiles.Contains(type) ? CompileMode.ContentPipeline : CompileMode.Ignore;
+			if (new [] { ".ini", ".conf", ".ld", ".cfg", ".x" }.Contains(file.Extension)) mode = CompileMode.LinkerConfig;
+
 		    var projectFile = new AsmProjectFile
 		    {
 			    Mode = mode,
@@ -1124,6 +1131,7 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 
 			//loadingForm.Close();
 			project.PristineChanged += RefreshTitle;
+			project.NameChanged += RefreshTitle;
 			RefreshView();
 			RefreshConfigurationList();
 			SetStatus("Parsing debug symbols...");
