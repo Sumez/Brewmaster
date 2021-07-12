@@ -10,14 +10,11 @@ namespace Brewmaster.ProjectExplorer
 	class ProjectExplorerMenu : ContextMenuStrip
 	{
 		private readonly ToolStripMenuItem NewMenu;
-		private readonly ToolStripMenuItem PipelineNewMenu;
 		private readonly ToolStripMenuItem OpenOption;
 		private readonly ToolStripMenuItem DeleteOption;
 		private readonly ToolStripMenuItem RenameOption;
 		private readonly ToolStripMenuItem OpenFolderOption;
 		private readonly ToolStripItem AddExistingOption;
-		private readonly ToolStripItem PipelineAddExistingOption;
-		private readonly ToolStripItem AddToPipelineOption;
 		private readonly ToolStripItem RemoveFromProjectOption;
 		private readonly ToolStripSeparator MoveSeparator;
 		private readonly ToolStripSeparator OpenFolderSeperator;
@@ -26,7 +23,7 @@ namespace Brewmaster.ProjectExplorer
 
 		public bool AllowFileEditing { get; set; }
 		public Action<string, FileTemplate, string, CompileMode> CreateNewFile;
-		public Action<string, string, CompileMode> AddExistingFile;
+		public Action<string, string> AddExistingFile;
 		public Action<TreeNode> OpenNode;
 		public Action<TreeNode> EditNode;
 		public Action<DirectoryInfo> AddSubdirectory;
@@ -41,16 +38,14 @@ namespace Brewmaster.ProjectExplorer
 			NewMenu.DropDownItems.Add("New Source File...", null, (s, e) => { NewFile(".s", FileTemplate.AssemblyCode, CompileMode.IncludeInAssembly); });
 			NewMenu.DropDownItems.Add("New Include File...", null, (s, e) => { NewFile(".inc", FileTemplate.AssemblyInclude, CompileMode.Ignore); });
 			NewMenu.DropDownItems.Add("New Linker Configuration...", null, (s, e) => { NewFile(".cfg", FileTemplate.LinkerConfig, CompileMode.LinkerConfig); });
+			NewMenu.DropDownItems.Add(new ToolStripSeparator());
+			NewMenu.DropDownItems.Add("New Tile Map ...", null, (s, e) => { NewFile(".bwmap", FileTemplate.TileMap, CompileMode.ContentPipeline); });
+			NewMenu.DropDownItems.Add("New Famitracker Project...", null, (s, e) => { NewFile(".ftm", FileTemplate.Famitracker, CompileMode.ContentPipeline); });
+			NewMenu.DropDownItems.Add("New Level Data...", null, (s, e) => { NewFile(".level", FileTemplate.None, CompileMode.ContentPipeline); });
+			NewMenu.DropDownItems.Add(new ToolStripSeparator());
 			NewMenu.DropDownItems.Add("New Directory", null, (s, e) => { NewDirectory(); });
 
-			PipelineNewMenu = new ToolStripMenuItem { Text = "Add" };
-			PipelineNewMenu.DropDownItems.Add("New Tile Map ...", null, (s, e) => { NewFile(".bwmap", FileTemplate.TileMap, CompileMode.ContentPipeline); });
-			PipelineNewMenu.DropDownItems.Add("New Famitracker Project...", null, (s, e) => { NewFile(".ftm", FileTemplate.Famitracker, CompileMode.ContentPipeline); });
-			PipelineNewMenu.DropDownItems.Add("New Level Data...", null, (s, e) => { NewFile(".level", FileTemplate.None, CompileMode.ContentPipeline); });
-			PipelineNewMenu.DropDownItems.Add("New Directory", null, (s, e) => { NewDirectory(); });
-
-			AddExistingOption = new ToolStripMenuItem("Add existing File...", null, (s, e) => ExistingFile(CompileMode.IncludeInAssembly));
-			PipelineAddExistingOption = new ToolStripMenuItem("Add existing File...", null, (s, e) => ExistingFile(CompileMode.ContentPipeline));
+			AddExistingOption = new ToolStripMenuItem("Add existing File...", null, (s, e) => ExistingFile());
 			OpenOption = new ToolStripMenuItem("Open", null, OpenFile_Click);
 			DeleteOption = new ToolStripMenuItem("Delete", null, DeleteFile_Click);
 			RenameOption = new ToolStripMenuItem("Rename", null, RenameFile_Click);
@@ -58,8 +53,6 @@ namespace Brewmaster.ProjectExplorer
 
 			Items.Add(NewMenu);
 			Items.Add(AddExistingOption);
-			Items.Add(PipelineNewMenu);
-			Items.Add(PipelineAddExistingOption);
 			Items.Add(OpenOption);
 			Items.Add(EditSeparator = new ToolStripSeparator());
 			Items.Add(DeleteOption);
@@ -73,7 +66,6 @@ namespace Brewmaster.ProjectExplorer
 
 			Items.Add(MoveSeparator = new ToolStripSeparator());
 			RemoveFromProjectOption = Items.Add("Remove From Project", null, RemoveFromProject_Click);
-			AddToPipelineOption = Items.Add("Move to Data Pipeline", null, MoveToPipeline_Click);
 
 			Enabled = false;
 		}
@@ -95,12 +87,6 @@ namespace Brewmaster.ProjectExplorer
 			if (EditNode != null) EditNode(CurrentNode);
 		}
 
-		private void MoveToPipeline_Click(object sender, EventArgs e)
-		{
-			var fileNode = CurrentNode as FileNode;
-			if (fileNode != null && MoveToPipeline != null) MoveToPipeline(fileNode.FileInfo);
-		}
-
 		private void NewDirectory()
 		{
 			var directoryNode = CurrentNode as DirectoryNode;
@@ -114,11 +100,11 @@ namespace Brewmaster.ProjectExplorer
 			if (CreateNewFile != null) CreateNewFile(directoryNode.DirectoryInfo.FullName, template, extension, compileMode);
 		}
 
-		private void ExistingFile(CompileMode mode)
+		private void ExistingFile()
 		{
 			var directoryNode = CurrentNode as DirectoryNode;
 			if (directoryNode == null) return;
-			if (AddExistingFile != null) AddExistingFile(null, directoryNode.DirectoryInfo.FullName, mode);
+			if (AddExistingFile != null) AddExistingFile(null, directoryNode.DirectoryInfo.FullName);
 		}
 
 		protected override void OnOpening(CancelEventArgs e)
@@ -144,7 +130,7 @@ namespace Brewmaster.ProjectExplorer
 		{
 			CurrentNode = node;
 
-			if (node == null)
+			if (node == null || node is PipelineNode)
 			{
 				Enabled = false;
 				return;
@@ -155,18 +141,7 @@ namespace Brewmaster.ProjectExplorer
 			var editableNode = node as EditableNode;
 
 			var root = ProjectExplorerTree.GetRoot(node);
-			if (root.Name == "data")
-			{
-				// Data pipeline
-				NewMenu.Visible = AddExistingOption.Visible = false;
-				PipelineNewMenu.Visible = PipelineAddExistingOption.Visible = dirNode && AllowFileEditing;
-			}
-			else
-			{
-				NewMenu.Visible = AddExistingOption.Visible = dirNode && AllowFileEditing;
-				PipelineNewMenu.Visible = PipelineAddExistingOption.Visible = false;
-			}
-
+			NewMenu.Visible = AddExistingOption.Visible = dirNode && AllowFileEditing;
 			EditSeparator.Visible = AllowFileEditing;
 			OpenOption.Visible = fileNode && AllowFileEditing;
 			DeleteOption.Enabled = node != root;
@@ -176,9 +151,8 @@ namespace Brewmaster.ProjectExplorer
 
 			OpenFolderSeperator.Visible = OpenFolderOption.Visible = dirNode;
 
-			RemoveFromProjectOption.Visible = AddToPipelineOption.Visible = fileNode;
+			RemoveFromProjectOption.Visible = fileNode;
 			MoveSeparator.Visible = fileNode && AllowFileEditing;
-			AddToPipelineOption.Enabled = (root.Name != "data");
 			Enabled = AllowFileEditing || fileNode;
 		}
 	}

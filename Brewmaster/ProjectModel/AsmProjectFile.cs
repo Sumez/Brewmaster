@@ -49,13 +49,13 @@ namespace Brewmaster.ProjectModel
 			{FileType.FamiTracker, new[] {".ftm"}},
 		};
 
-		private static readonly FileType[] TextFiles = {
+		public static readonly FileType[] TextFiles = {
 			FileType.Script,
 			FileType.Source,
 			FileType.Text,
 			FileType.Include
 		};
-		private static readonly FileType[] ContentFiles = {
+		public static readonly FileType[] ContentFiles = {
 			FileType.Image,
 			FileType.Audio,
 			FileType.FamiTracker,
@@ -69,16 +69,20 @@ namespace Brewmaster.ProjectModel
 				if (_type != FileType.Unknown) return _type;
 				if (Mode == CompileMode.IncludeInAssembly) return FileType.Source;
 				if (Mode == CompileMode.LinkerConfig) return FileType.Text;
-				var extension = File.Extension.ToLower();
-				foreach (var type in FileTypes)
-				{
-					if (type.Value.Contains(extension)) return type.Key;
-				}
-				return FileType.Unknown;
+				return GuessFileType(File.Extension);
 			}
 			set { _type = value; }
 		}
 
+		public static FileType GuessFileType(string extension)
+		{
+			extension = extension.ToLower();
+			foreach (var type in FileTypes)
+			{
+				if (type.Value.Contains(extension)) return type.Key;
+			}
+			return FileType.Unknown;
+		}
 		public bool IsTextFile
 		{
 			get { return TextFiles.Contains(Type); }

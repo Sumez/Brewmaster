@@ -35,7 +35,16 @@ namespace Brewmaster.ProjectModel
 	public class AsmProject : IDisposable, ISaveable, ISymbolSource
 	{
 		// DATA ESSENTIAL TO OUR STORED FILE
-		public string Name { get; set; }
+		public string Name
+		{
+			get { return _name; }
+			set {
+				_name = value;
+				if (NameChanged != null) NameChanged();
+				Pristine = false;
+			}
+		}
+
 		public List<NesCartridge> BuildConfigurations { get; set; }
 		public readonly ObservableCollection<AsmProjectFile> Files;
 		public int CurrentConfigurationIndex { get; private set; }
@@ -47,6 +56,7 @@ namespace Brewmaster.ProjectModel
 		public event Action ContentsChanged;
 		public event Action<IEnumerable<Breakpoint>> BreakpointsChanged;
 		public event Action PristineChanged;
+		public event Action NameChanged;
 		public Action<string, int, int> GoTo;
 
 		public FileInfo ProjectFile { get; set; }
@@ -247,6 +257,7 @@ namespace Brewmaster.ProjectModel
 		}
 
 		public Dictionary<string, List<FileInclude>> IncludeChain = new Dictionary<string, List<FileInclude>>();
+		private string _name;
 
 		public struct FileInclude
 		{

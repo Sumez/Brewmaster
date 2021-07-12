@@ -33,6 +33,9 @@ namespace Brewmaster.ProjectExplorer
 		{
 			_projectFile = fileInfo;
 			Text = fileName;
+			ForeColor = Color.DarkGray;
+			ImageIndex = 9;
+			Editable = false;
 		}
 	}
 
@@ -112,14 +115,14 @@ namespace Brewmaster.ProjectExplorer
 			}
 			SelectedImageIndex = ImageIndex;
 
-			if (false && fileInfo.Pipeline != null) // TODO: Display pipeline output in explorer?
+			/*if (fileInfo.Pipeline != null) // TODO: Display pipeline output in explorer?
 			{
 				foreach (var outputFile in fileInfo.Pipeline.OutputFiles.Where(f => f != null))
 				{
-					var file = new FileInfo(Path.Combine(fileInfo.Project.Directory.FullName, outputFile));
-					Nodes.Add(new PipelineNode(fileInfo, file.Name));
+					var file = new FileInfo(fileInfo.Project.GetFullPath(outputFile));
+					if (file.Exists) Nodes.Add(new PipelineNode(fileInfo, file.Name));
 				}
-			}
+			}*/
 		}
 	}
 	public interface IIdentifiableNode
