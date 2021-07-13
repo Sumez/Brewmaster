@@ -88,8 +88,8 @@ namespace Brewmaster.ProjectExplorer
 						settingControl.Value = _file.Pipeline.GenericSettings.GetBoolean(property.SystemName) ? "Yes" : "No";
 						break;
 					case PipelinePropertyType.Select:
-						settingControl.SetOptions(property.Options.Select(o => Program.Language.Get(_file.Pipeline.Type.TypeName + "." + property.SystemName + "." + o) as object).ToArray());
-						settingControl.Value = _file.Pipeline.GenericSettings[property.SystemName];
+						settingControl.SetOptions(property.Options.Select(o => new Option(o, _file.Pipeline.Type.TypeName + "." + property.SystemName) as object).ToArray());
+						settingControl.Value = new Option(_file.Pipeline.GenericSettings[property.SystemName], _file.Pipeline.Type.TypeName + "." + property.SystemName);
 						break;
 					case PipelinePropertyType.ProjectFile:
 						settingControl.Callback = (ref string value) =>
@@ -144,12 +144,34 @@ namespace Brewmaster.ProjectExplorer
 					{
 						_file.Pipeline.GenericSettings[property.SystemName] = stringValue == "Yes" ? "1" : "0";
 					}
+					else if (property.Type == PipelinePropertyType.Select)
+					{
+						var objectValue = (Option)value;
+						_file.Pipeline.GenericSettings[property.SystemName] = objectValue.Name;
+					}
 					else _file.Pipeline.GenericSettings[property.SystemName] = stringValue;
 
 					_file.Pipeline.SettingChanged();
 				};
 				_dynamicSettingsPanel.Controls.Add(settingControl);
 			}
+
+		}
+		private struct Option
+		{
+			public override string ToString()
+			{
+				return Program.Language.Get(Prefix + "." + Name);
+			}
+
+			public Option(string name, string prefix)
+			{
+				Prefix = prefix;
+				Name = name;
+			}
+
+			public string Prefix { get; }
+			public string Name { get; }
 		}
 
 		private Panel _headerPanel;

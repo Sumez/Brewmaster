@@ -44,4 +44,24 @@
     <Key>tilemap.custom.script-file</Key>
     <Value>Script file</Value>
   </LanguageString>
+  <LanguageString>
+    <Key>image.palette-compression</Key>
+    <Value>Palette compression</Value>
+  </LanguageString>
+  <LanguageString>
+    <Key>image.palette-compression.palette-count</Key>
+    <Value>Max palettes</Value>
+  </LanguageString>
+  <LanguageString>
+    <Key>image.palette-compression.bitdepth</Key>
+    <Value>Bit depth</Value>
+  </LanguageString>
+  <LanguageString>
+    <Key>image.palette-compression.bitdepth.2</Key>
+    <Value>2bpp</Value>
+  </LanguageString>
+  <LanguageString>
+    <Key>image.palette-compression.bitdepth.4</Key>
+    <Value>4bpp</Value>
+  </LanguageString>
 </Language>

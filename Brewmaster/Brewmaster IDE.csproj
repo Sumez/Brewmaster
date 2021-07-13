@@ -307,6 +307,7 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Pipeline\CustomTileMapPipeline.cs" />
+    <Compile Include="Pipeline\PaletteCompression.cs" />
     <Compile Include="Pipeline\PipelineOption.cs" />
     <Compile Include="Pipeline\TilemapAsmPipeline.cs" />
     <Compile Include="Pipeline\TilemapBinaryPipeline.cs" />
