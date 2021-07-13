@@ -244,7 +244,8 @@ namespace Brewmaster.EditorWindows.Images
             "2bpp",
             "3bpp",
             "4bpp",
-            "8bpp"});
+            "8bpp",
+			"Mode7"});
 			this.ChrPipelineOutput.Location = new System.Drawing.Point(78, 45);
 			this.ChrPipelineOutput.MinimumSize = new System.Drawing.Size(100, 0);
 			this.ChrPipelineOutput.Name = "ChrPipelineOutput";

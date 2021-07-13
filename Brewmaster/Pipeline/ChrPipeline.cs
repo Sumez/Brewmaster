@@ -13,7 +13,8 @@ namespace Brewmaster.Pipeline
 		Bpp2 = 0,
 		Bpp3 = 1,
 		Bpp4 = 2,
-		Bpp8 = 3
+		Bpp8 = 3,
+		Mode7 = 4
 	}
 
 	public class ChrPipeline : PipelineOption
@@ -221,22 +222,28 @@ namespace Brewmaster.Pipeline
 							knownEntries++;
 						}
 
-						for (var j = 0; j <= (bitDepth / 2); j += 2)
+						if (chrSettings.PaletteType == ChrOutputType.Mode7)
 						{
-							var byte0 = (colorIndex & (1 << j)) == 0 ? 0 : 1;
-							var byte1 = (colorIndex & (1 << (j + 1))) == 0 ? 0 : 1;
+							tileData[y * 8 + x] = (byte)colorIndex;
+						}
+						else
+						{
+							for (var j = 0; j <= (bitDepth / 2); j += 2)
+							{
+								var byte0 = (colorIndex & (1 << j)) == 0 ? 0 : 1;
+								var byte1 = (colorIndex & (1 << (j + 1))) == 0 ? 0 : 1;
 
-							var mask0 = (byte) (byte0 << (7 - x));
-							var mask1 = (byte) (byte1 << (7 - x));
+								var mask0 = (byte) (byte0 << (7 - x));
+								var mask1 = (byte) (byte1 << (7 - x));
 
-							var byte0Index = (8 * j) + (platform == TargetPlatform.Snes ? y * 2 : y);
-							var byte1Index = (8 * j) + (platform == TargetPlatform.Snes ? y * 2 + 1 : y + 8);
+								var byte0Index = (8 * j) + (platform == TargetPlatform.Snes ? y * 2 : y);
+								var byte1Index = (8 * j) + (platform == TargetPlatform.Snes ? y * 2 + 1 : y + 8);
 
-							tileData[byte0Index] |= mask0;
-							tileData[byte1Index] |= mask1;
+								tileData[byte0Index] |= mask0;
+								tileData[byte1Index] |= mask1;
+							}
 						}
 					}
-
 					return tileData;
 				}
 
@@ -478,6 +485,7 @@ namespace Brewmaster.Pipeline
 					case ChrOutputType.Bpp4:
 						return 4;
 					case ChrOutputType.Bpp8:
+					case ChrOutputType.Mode7:
 						return 8;
 					case ChrOutputType.Bpp2:
 					default:
