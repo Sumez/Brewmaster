@@ -120,7 +120,7 @@ namespace Brewmaster.Pipeline
 
 				var sampleDirectory = new List<Int16>(sampleDirectoryLength);
 				var trackDirectory = new List<Int16>(trackDirectoryLength);
-				var baseAddress = 0xC00;
+				var baseAddress = 0x0D00;
 				var sampleAddress = (Int16)(baseAddress + sampleDirectoryLength * 2 + trackDirectoryLength * 2);
 				var sampleData = new List<byte>();
 				var trackData = new List<byte>();
@@ -629,10 +629,10 @@ namespace Brewmaster.Pipeline
 				var header = (note.Effect > 0 ? 0x80 : 0) | (note.VolumeEffect > 0 ? 0x40 : 0) | instrument;
 
 				currentBlock.Add((byte)header);
-				if (instrument < 55) currentBlock.Add(note.Note);
 				if (note.VolumeEffect > 0) currentBlock.Add(note.VolumeEffect);
 				if (note.Effect > 0) currentBlock.Add(note.Effect);
 				if (note.Effect > 0) currentBlock.Add(note.EffectParam);
+				if (instrument < 55) currentBlock.Add(note.Note);
 				currentBlockRows++;
 			}
 			FlushBlock();
