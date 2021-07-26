@@ -306,7 +306,9 @@
     <Compile Include="Controls\NonBuggyComboBox.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Pipeline\BrrPipeline.cs" />
     <Compile Include="Pipeline\CustomTileMapPipeline.cs" />
+    <Compile Include="Pipeline\ModulePipeline.cs" />
     <Compile Include="Pipeline\PaletteCompression.cs" />
     <Compile Include="Pipeline\PipelineOption.cs" />
     <Compile Include="Pipeline\TilemapAsmPipeline.cs" />
@@ -920,6 +922,7 @@
   <ItemGroup>
     <Folder Include="Templates\LoRom\" />
     <Folder Include="Templates\SnesInc\" />
+    <Folder Include="tools\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
