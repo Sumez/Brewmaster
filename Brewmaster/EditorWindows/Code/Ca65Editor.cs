@@ -113,6 +113,7 @@ namespace Brewmaster.EditorWindows.Code
 				}
 			};
 			Menu.ToggleBreakpoint = ToggleBreakpointAtCaret;
+			Menu.SetPerformanceMarker = SetPerformanceMarkerAtCaret;
 
 
 			Document.HighlightingStrategy = new Ca65Highlighting(File.Project.Platform);
@@ -494,7 +495,7 @@ namespace Brewmaster.EditorWindows.Code
 				//var buildLine = Document.BookmarkManager.Marks.OfType<BuildLineMarker>().FirstOrDefault(m => m.BuildLine == line);
 				//if (buildLine != null) line = buildLine.LineNumber;
 				//var marker = AddBreakpointMarker(line, !breakpoint.Disabled);
-				var marker = AddBreakpointMarker(breakpoint.CurrentLine - 1, !breakpoint.Disabled);
+				var marker = AddBreakpointMarker(breakpoint.CurrentLine - 1, !breakpoint.Disabled, (breakpoint.Type & Breakpoint.Types.Marked) != 0);
 				marker.GlobalBreakpoint = breakpoint;
 				breakpoint.EnabledChanged += () => marker.IsEnabled = !breakpoint.Disabled;
 			}
@@ -509,7 +510,7 @@ namespace Brewmaster.EditorWindows.Code
 			File.SetEditorBreakpoints(Document.BookmarkManager.Marks.OfType<BreakpointMarker>()
 				.Select(b => b.GlobalBreakpoint ?? new Breakpoint
 				{
-					Type = Breakpoint.Types.Execute,
+					Type = b is PerformancePointMarker ? (Breakpoint.Types.Marked | Breakpoint.Types.Execute) : Breakpoint.Types.Execute,
 					AddressType = Breakpoint.AddressTypes.PrgRom,
 					Automatic = true,
 					File = File,
@@ -656,7 +657,7 @@ namespace Brewmaster.EditorWindows.Code
 		public void ToggleBreakpointAtCaret()
 		{
 			var line = ActiveTextAreaControl.Caret.Line;
-			var existingBreakpoint = Document.BookmarkManager.Marks.OfType<BreakpointMarker>().FirstOrDefault(m => m.LineNumber == line);
+			var existingBreakpoint = Document.BookmarkManager.Marks.OfType<BreakpointMarker>().FirstOrDefault(m => !(m is PerformancePointMarker) && m.LineNumber == line);
 			if (existingBreakpoint != null)
 			{
 				Document.BookmarkManager.RemoveMark(existingBreakpoint);
@@ -667,14 +668,25 @@ namespace Brewmaster.EditorWindows.Code
 			AddBreakpointMarker(line);
 			RefreshBreakpointsInProject();
 		}
-		private BreakpointMarker AddBreakpointMarker(int line, bool enabled = true)
+
+		public void SetPerformanceMarkerAtCaret()
+		{
+			var line = ActiveTextAreaControl.Caret.Line;
+			var existingBreakpoint = Document.BookmarkManager.Marks.OfType<PerformancePointMarker>().FirstOrDefault(m => m.LineNumber == line);
+			if (existingBreakpoint != null) return;
+			AddBreakpointMarker(line, false, true);
+			RefreshBreakpointsInProject();
+		}
+		private BreakpointMarker AddBreakpointMarker(int line, bool enabled = true, bool performanceMarker = false)
 		{
 			var buildLine = Document.BookmarkManager.Marks.OfType<BuildLineMarker>().FirstOrDefault(m => m.LineNumber == line);
-			return AddBreakpointMarker(line, buildLine == null ? line : buildLine.BuildLine, buildLine != null, enabled);
+			return AddBreakpointMarker(line, buildLine == null ? line : buildLine.BuildLine, buildLine != null, enabled, performanceMarker);
 		}
-		private BreakpointMarker AddBreakpointMarker(int line, int buildLine, bool healthy, bool enabled)
+		private BreakpointMarker AddBreakpointMarker(int line, int buildLine, bool healthy, bool enabled, bool performanceMarker)
 		{
-			var marker = new BreakpointMarker(Document, line, buildLine, enabled, healthy, RefreshBreakpointsInProject);
+			var marker = performanceMarker
+					? new PerformancePointMarker(Document, line, buildLine, enabled, healthy, RefreshBreakpointsInProject)
+					: new BreakpointMarker(Document, line, buildLine, enabled, healthy, RefreshBreakpointsInProject);
 			Document.BookmarkManager.AddMark(marker);
 			var arrow = Document.BookmarkManager.Marks.OfType<PcArrow>().FirstOrDefault();
 			if (arrow != null)

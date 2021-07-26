@@ -235,6 +235,17 @@ namespace Brewmaster.Emulation
 					if (OnStatusChange != null) OnStatusChange(EmulatorStatus.Paused);
 					EmitDebugData();
 					break;
+				case ConsoleNotificationType.EventViewerRefresh:
+					var options = new Mesen.GUI.EventViewerDisplayOptions
+					{
+						ShowMarkedBreakpoints = true,
+						BreakpointColor = 0,
+						ShowPpuRegisterVramWrites = true,
+						PpuRegisterWriteVramColor = 9
+					};
+					var test = SnesDebugApi.GetDebugEvents(options);
+
+					break;
 				case ConsoleNotificationType.PpuFrameDone:
 					CountFrame();
 					break;
@@ -478,10 +489,10 @@ namespace Brewmaster.Emulation
 					var emuBreakpoint = new SnesBreakpoint
 					{
 						Id = id,
-						Enabled = true,
+						Enabled = (breakpoint.Type & Breakpoint.Types.Marked) == 0,
 						StartAddress = breakpoint.StartAddress,
 						EndAddress = breakpoint.EndAddress == null ? -1 : breakpoint.EndAddress.Value,
-						MarkEvent = false,
+						MarkEvent = (breakpoint.Type & Breakpoint.Types.Marked) != 0,
 						Condition = new byte[1000],
 						CpuType = CpuType.Cpu
 					};

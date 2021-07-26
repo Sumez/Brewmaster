@@ -15,11 +15,20 @@ namespace Brewmaster.EditorWindows.Code
 			ToolTip = message;
 		}
 	}
+
+	public class PerformancePointMarker : BreakpointMarker
+	{
+		protected override Brush FillColor { get { return Brushes.LightSeaGreen; } }
+		public PerformancePointMarker(IDocument document, int line, int buildLine, bool isEnabled, bool isHealthy, Action onRemove) : base(document, line, buildLine, isEnabled, isHealthy, onRemove)
+		{
+		}
+	}
 	public class BreakpointMarker : Bookmark
 	{
 		public int BuildLine { get; set; }
 		public bool Healthy { get; set; }
 		public Breakpoint GlobalBreakpoint { get; set; }
+		protected virtual Brush FillColor { get { return Brushes.OrangeRed; } }
 
 		public event Action OnRemove;
 		public BreakpointMarker(IDocument document, int line, int buildLine, bool isEnabled, bool isHealthy, Action onRemove)
@@ -31,7 +40,7 @@ namespace Brewmaster.EditorWindows.Code
 		}
 		public override void Draw(IconBarMargin margin, Graphics g, Point p)
 		{
-			var brush = Healthy ? Brushes.OrangeRed : Brushes.Gold;
+			var brush = Healthy ? FillColor : Brushes.Gold;
 			var diameter = margin.Size.Width / 1.5f;
 			if (IsEnabled)
 				g.FillEllipse(brush, p.X, p.Y + (diameter / 4), diameter, diameter);

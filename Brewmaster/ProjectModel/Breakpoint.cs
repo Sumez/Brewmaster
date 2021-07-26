@@ -14,7 +14,8 @@ namespace Brewmaster.ProjectModel
 		{
 			Execute = 1,
 			Read = 2,
-			Write = 4
+			Write = 4,
+			Marked = 8
 		}
 
 		public event Action EnabledChanged;

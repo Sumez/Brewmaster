@@ -565,17 +565,17 @@ namespace Brewmaster.Emulation
 			{
 				_breakpoints = new List<InteropBreakpoint>();
 				var id = 0;
-				byte[] condition = Encoding.UTF8.GetBytes("");
+				var condition = Encoding.UTF8.GetBytes("");
 
 				foreach (var breakpoint in breakpoints)
 				{
 					var emuBreakpoint = new InteropBreakpoint
 					{
 						Id = id,
-						Enabled = true,
+						Enabled = (breakpoint.Type & Breakpoint.Types.Marked) == 0,
 						StartAddress = breakpoint.StartAddress,
 						EndAddress = breakpoint.EndAddress == null ? -1 : breakpoint.EndAddress.Value,
-						MarkEvent = false,
+						MarkEvent = (breakpoint.Type & Breakpoint.Types.Marked) != 0,
 						ProcessDummyReadWrites = false,
 						Condition = new byte[1000]
 					};

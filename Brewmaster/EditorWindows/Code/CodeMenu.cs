@@ -11,6 +11,7 @@ namespace Brewmaster.EditorWindows.Code
 	{
 		public Action GoToDefinition;
 		public Action ToggleBreakpoint;
+		public Action SetPerformanceMarker;
 		public Action AddToWatch;
 		public Action<Breakpoint.Types> BreakOnAccess;
 
@@ -24,6 +25,7 @@ namespace Brewmaster.EditorWindows.Code
 			Items.Add(BreakOnReadOption = new ToolStripMenuItem("Break On Read", null, (s, e) => { if (BreakOnAccess != null) BreakOnAccess(Breakpoint.Types.Read); }));
 			Items.Add(new ToolStripSeparator());
 			Items.Add(AddBreakpointOption = new ToolStripMenuItem("Toggle Breakpoint", null, AddBreakpoint_Click));
+			Items.Add(new ToolStripMenuItem("Set performance marker", null, SetPerformanceMarker_Click));
 
 			Program.BindKey(Feature.GoToDefinition, (keys) => GoToDefinitionOption.ShortcutKeys = keys);
 			Program.BindKey(Feature.AddToWatch, (keys) => AddToWatchOption.ShortcutKeys = keys);
@@ -37,6 +39,11 @@ namespace Brewmaster.EditorWindows.Code
 		private void AddBreakpoint_Click(object sender, EventArgs e)
 		{
 			if (ToggleBreakpoint != null) ToggleBreakpoint();
+		}
+
+		private void SetPerformanceMarker_Click(object sender, EventArgs e)
+		{
+			if (SetPerformanceMarker != null) SetPerformanceMarker();
 		}
 
 		private void AddToWatch_Click(object sender, EventArgs e)
