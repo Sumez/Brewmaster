@@ -20,165 +20,127 @@ namespace Brewmaster.Pipeline
 
 		public override void Process(PipelineSettings settings, Action<string> output)
 		{
-			var module = new ItModule();
-			using (var stream = File.OpenRead(settings.File.File.FullName))
+			var modules = new List<ItModule> { ItModule.LoadFromFile(settings.File.File.FullName) };
+			output(string.Format("Converting song \"{0}\" to Brewsic music format", modules[0].Title));
+
+			var sampleDirectoryLength = (byte)(modules[0].Samples.Count * 2);
+			var trackDirectoryLength = 1;
+
+			var sampleDirectory = new List<int>(sampleDirectoryLength);
+			var trackDirectory = new List<int>(trackDirectoryLength);
+			var baseAddress = 0x1000;
+			var sampleAddress = baseAddress + sampleDirectoryLength * 2 + trackDirectoryLength * 2;
+			var sampleData = new List<byte>();
+			var trackData = new List<byte>();
+
+			foreach (var sample in modules[0].Samples)
 			{
-				var buffer = new byte[192];
-				stream.Read(buffer, 0, 192);
-				var impm = new byte[4];
-				var title = new byte[26];
-
-				var int16 = new UInt16[9];
-				var int32 = new UInt32[2];
-				var chanPan = new byte[64];
-				var chanVolume = new byte[64];
-				Buffer.BlockCopy(buffer, 0, impm, 0, 4);
-				Buffer.BlockCopy(buffer, 4, title, 0, 26);
-
-				Buffer.BlockCopy(buffer, 32, int16, 0, 16);
-				Buffer.BlockCopy(buffer, 54, int16, 16, 2);
-
-				Buffer.BlockCopy(buffer, 56, int32, 0, 8);
-
-				Buffer.BlockCopy(buffer, 64, chanPan, 0, 64);
-				Buffer.BlockCopy(buffer, 128, chanVolume, 0, 64);
-
-				int highlightMinor = buffer[30];
-				int highlightMajor = buffer[31];
-
-				int orderCount = int16[0];
-				int instrumentCount = int16[1];
-				int sampleCount = int16[2];
-				int patternCount = int16[3];
-
-				int cwtv = int16[4];
-				int cmwt = int16[5];
-				int flags = int16[6];
-				int special = int16[7];
-
-				int generalVolume = buffer[48];
-				int mixingVolume = buffer[49];
-				int initialSpeed = buffer[50];
-				int initialTempo = buffer[51];
-				int panSeparation = buffer[52];
-				int pwd = buffer[53];
-
-				int msgLength = int16[8];
-				uint msgOffset = int32[0];
-				uint reserved = int32[1];
-
-				if (Encoding.ASCII.GetString(impm) != "IMPM") throw new Exception("Invalid Impulse Tracker module");
-				module.Title = System.Text.Encoding.ASCII.GetString(title);
-
-				for (var i = 0; i < 64; i++) {
-					module.Channels.Add(new Channel
-					{
-						Panning = Math.Min(64, (int)chanPan[i]),
-						Volume = Math.Min(64, (int)chanVolume[i])
-					});
-				}
-
-				var orders = new byte[orderCount];
-				stream.Read(orders, 0, orderCount);
-				module.OrderList = orders.Where(o => o < 255).Select(o => (int)o).ToList();
-				var instrumentPointers = Read32BitBuffer(stream, instrumentCount);
-				var samplePointers = Read32BitBuffer(stream, sampleCount);
-				var patternPointers = Read32BitBuffer(stream, patternCount);
-
-				UInt16 historySize = 0;
-				if ((special & 2) != 0)
+				var filename = sample.Name;
+				foreach (var ch in Path.GetInvalidFileNameChars())
 				{
-					var histBuffer = new byte[2];
-					stream.Read(histBuffer, 0, 2);
-					Buffer.BlockCopy(histBuffer, 0, int16, 0, 2);
-					historySize = int16[0];
+					filename = filename.Replace(ch.ToString(), "");
 				}
-				if (historySize > 0)
+				/*using (var stream2 = new MemoryStream())
 				{
-					var histBuffer = new byte[historySize * 8];
-					stream.Read(histBuffer, 0, historySize * 8);
-				}
+					var data = new byte[sample.Data.Length * 2];
+					Buffer.BlockCopy(sample.Data, 0, data, 0, data.Length);
+					WriteWavHeader(stream2, false, 1, 16, 32000, data.Length);
+					stream2.Write(data, 0, data.Length);
+					var waveBytes = new byte[stream2.Length];
+					stream2.Position = 0;
+					stream2.Read(waveBytes, 0, waveBytes.Length);
+					File.WriteAllBytes(settings.GetFilePath(0) + "." + filename + ".wav", waveBytes);
+				}*/
+				var brr = sample.GetBrr(500, output);
+				//File.WriteAllBytes(settings.GetFilePath(0) + "." + filename + ".brr", brr);
 
-				foreach (var pointer in instrumentPointers.Where(p => p > 0))
-				{
-					stream.Position = pointer;
-					module.Instruments.Add(cmwt >= 0x0200 ? LoadInstrument(stream) : LoadInstrumentOld(stream));
-				}
-				foreach (var pointer in samplePointers.Where(p => p > 0))
-				{
-					stream.Position = pointer;
-					module.Samples.Add(LoadSample(stream));
-				}
-				foreach (var pointer in patternPointers.Where(p => p > 0))
-				{
-					stream.Position = pointer;
-					module.Patterns.Add(LoadPattern(stream));
-				}
+				sampleDirectory.Add(sampleAddress); // Start address
+				sampleDirectory.Add(sampleAddress); // Loop address
 
-				var sampleDirectoryLength = (byte)(module.Samples.Count * 2);
-				var trackDirectoryLength = 1;
+				sampleAddress += brr.Length;
+				sampleData.AddRange(brr);
+			}
 
-				var sampleDirectory = new List<Int16>(sampleDirectoryLength);
-				var trackDirectory = new List<Int16>(trackDirectoryLength);
-				var baseAddress = 0x0D00;
-				var sampleAddress = (Int16)(baseAddress + sampleDirectoryLength * 2 + trackDirectoryLength * 2);
-				var sampleData = new List<byte>();
-				var trackData = new List<byte>();
 
-				foreach (var sample in module.Samples)
-				{
-					var filename = sample.Name;
-					foreach (var ch in Path.GetInvalidFileNameChars())
-					{
-						filename = filename.Replace(ch.ToString(), "");
-					}
-					using (var stream2 = new MemoryStream())
-					{
-						var data = new byte[sample.Data.Length * 2];
-						Buffer.BlockCopy(sample.Data, 0, data, 0, data.Length);
-						WriteWavHeader(stream2, false, 1, 16, 32000, data.Length);
-						stream2.Write(data, 0, data.Length);
-						var waveBytes = new byte[stream2.Length];
-						stream2.Position = 0;
-						stream2.Read(waveBytes, 0, waveBytes.Length);
-						File.WriteAllBytes(settings.GetFilePath(0) + "." + filename + ".wav", waveBytes);
-					}
-					var brr = sample.GetBrr(output);
-					File.WriteAllBytes(settings.GetFilePath(0) + "." + filename + ".brr", brr);
 
-					sampleDirectory.Add(sampleAddress); // Start address
-					sampleDirectory.Add(sampleAddress); // Loop address
+			var trackAddress = sampleAddress;
+			foreach (var module in modules)
+			{
+				var compressedTrack = module.GetCompressedPatternData();
+				trackDirectory.Add(trackAddress);
+				trackData.AddRange(compressedTrack);
+			}
+			output(string.Format("Sample data size: {0} bytes", sampleData.Count));
+			output(string.Format("Track data size: {0} bytes", trackData.Count));
 
-					sampleAddress += (Int16)brr.Length;
-					sampleData.AddRange(brr);
-				}
+			var sampleDirectoryData = GetAsByteArray(sampleDirectory);
+			var trackDirectoryData = GetAsByteArray(trackDirectory);
+			using (var bankStream = File.Create(settings.GetFilePath(0)))
+			{
+				bankStream.WriteByte(sampleDirectoryLength);
+				bankStream.Write(sampleDirectoryData, 0, sampleDirectoryData.Length);
+				bankStream.Write(trackDirectoryData, 0, trackDirectoryData.Length);
+				bankStream.Write(sampleData.ToArray(), 0, sampleData.Count);
+				bankStream.Write(trackData.ToArray(), 0, trackData.Count);
 
-				var trackAddress = sampleAddress;
-				//foreach (var module in modules)
-				{
-					var compressedTrack = module.GetCompressedPatternData();
-					trackDirectory.Add(trackAddress);
-					trackData.AddRange(compressedTrack);
-				}
-
-				using (var bankStream = File.OpenWrite(settings.GetFilePath(0)))
-				{
-					var sampleDirectoryData = new byte[sampleDirectoryLength * 2];
-					var trackDirectoryData = new byte[trackDirectoryLength * 2];
-
-					Buffer.BlockCopy(sampleDirectory.ToArray(), 0, sampleDirectoryData, 0, sampleDirectoryData.Length);
-					Buffer.BlockCopy(trackDirectory.ToArray(), 0, trackDirectoryData, 0, trackDirectoryData.Length);
-
-					bankStream.WriteByte(sampleDirectoryLength);
-					bankStream.Write(sampleDirectoryData, 0, sampleDirectoryData.Length);
-					bankStream.Write(trackDirectoryData, 0, trackDirectoryData.Length);
-					bankStream.Write(sampleData.ToArray(), 0, sampleData.Count);
-					bankStream.Write(trackData.ToArray(), 0, trackData.Count);
-
-					bankStream.Close();
-				}
+				bankStream.Close();
 			}
 		}
+
+		private static byte[] GetAsByteArray(IReadOnlyList<int> list)
+		{
+			var array = new byte[list.Count * 2];
+			for (var i = 0; i < list.Count; i++)
+			{
+				var value = list[i];
+				if (value > 0xffff) throw new Exception("Module is too large to store in 64kb");
+				array[i * 2] = (byte)(value & 0xff);
+				array[i * 2 + 1] = (byte)((value >> 8) & 0xff);
+			}
+			return array;
+		}
+
+		private void WriteWavHeader(MemoryStream stream, bool isFloatingPoint, int channelCount, int bitDepth, int sampleRate, int size)
+		{
+			stream.Position = 0;
+			stream.Write(Encoding.ASCII.GetBytes("RIFF"), 0, 4);
+			// Chunk size.
+			stream.Write(BitConverter.GetBytes(size + 36), 0, 4);
+			stream.Write(Encoding.ASCII.GetBytes("WAVE"), 0, 4);
+
+			// Sub-chunk 1.
+			stream.Write(Encoding.ASCII.GetBytes("fmt "), 0, 4);
+			// Sub-chunk 1 size.
+			stream.Write(BitConverter.GetBytes(16), 0, 4);
+			// Audio format (floating point (3) or PCM (1)). Any other format indicates compression.
+			stream.Write(BitConverter.GetBytes((ushort)(isFloatingPoint ? 3 : 1)), 0, 2);
+			// Channels.
+			stream.Write(BitConverter.GetBytes(channelCount), 0, 2);
+			// Sample rate.
+			stream.Write(BitConverter.GetBytes(sampleRate), 0, 4);
+			// Bytes rate.
+			stream.Write(BitConverter.GetBytes(sampleRate * channelCount * (bitDepth / 8)), 0, 4);
+			// Block align.
+			stream.Write(BitConverter.GetBytes((ushort)channelCount * (bitDepth / 8)), 0, 2);
+			// Bits per sample.
+			stream.Write(BitConverter.GetBytes(bitDepth), 0, 2);
+
+			// Sub-chunk 2.
+			stream.Write(Encoding.ASCII.GetBytes("data"), 0, 4);
+			// Sub-chunk 2 size.
+			stream.Write(BitConverter.GetBytes(size), 0, 4);
+		}
+	}
+
+	public class ItModule
+	{
+		public string Title { get; set; }
+		public List<Channel> Channels { get; set; } = new List<Channel>(64);
+		public List<int> OrderList { get; set; }
+		public List<Instrument> Instruments = new List<Instrument>();
+		public List<Sample> Samples = new List<Sample>();
+		public List<Pattern> Patterns = new List<Pattern>();
+		private int NextMacroId { get; set; }
 
 		private enum ItNote
 		{
@@ -191,7 +153,7 @@ namespace Brewmaster.Pipeline
 			SAME_VOLUME = 64,
 			SAME_EFFECT = 128,
 		}
-		private Pattern LoadPattern(FileStream stream)
+		private static Pattern LoadPattern(FileStream stream)
 		{
 
 			var pattern = new Pattern();
@@ -219,7 +181,7 @@ namespace Brewmaster.Pipeline
 					continue;
 				}
 				var channel = (chanvar - 1) & 63;
-				while (pattern.Channels.Count < (channel+1))
+				while (pattern.Channels.Count < (channel + 1))
 				{
 					pattern.Channels.Add(new PatternNote[pattern.Rows]);
 				}
@@ -277,7 +239,7 @@ namespace Brewmaster.Pipeline
 			return pattern;
 		}
 
-		private Sample LoadSample(FileStream stream)
+		private static Sample LoadSample(FileStream stream)
 		{
 			var sample = new Sample();
 
@@ -292,7 +254,7 @@ namespace Brewmaster.Pipeline
 			sample.Length = ReadUInt32(stream);
 			sample.LoopStart = ReadUInt32(stream);
 			sample.LoopEnd = ReadUInt32(stream);
-			var c5speed = ReadUInt32(stream);
+			sample.C5Speed = (double)ReadUInt32(stream);
 			var sustainStart = ReadUInt32(stream);
 			var sustainEnd = ReadUInt32(stream);
 			var samplePointer = ReadUInt32(stream);
@@ -322,7 +284,7 @@ namespace Brewmaster.Pipeline
 			return sample;
 		}
 
-		private Int16[] ReadSampleData(FileStream stream, Sample sample, Compression compression, int bitDepth, bool stereo)
+		private static Int16[] ReadSampleData(FileStream stream, Sample sample, Compression compression, int bitDepth, bool stereo)
 		{
 			var size = (int)sample.Length;
 			if (bitDepth == 16) size *= 2;
@@ -360,43 +322,13 @@ namespace Brewmaster.Pipeline
 
 			return sampleData;
 		}
-		private void WriteWavHeader(MemoryStream stream, bool isFloatingPoint, int channelCount, int bitDepth, int sampleRate, int size)
-		{
-			stream.Position = 0;
-			stream.Write(Encoding.ASCII.GetBytes("RIFF"), 0, 4);
-			// Chunk size.
-			stream.Write(BitConverter.GetBytes(size + 36), 0, 4);
-			stream.Write(Encoding.ASCII.GetBytes("WAVE"), 0, 4);
-
-			// Sub-chunk 1.
-			stream.Write(Encoding.ASCII.GetBytes("fmt "), 0, 4);
-			// Sub-chunk 1 size.
-			stream.Write(BitConverter.GetBytes(16), 0, 4);
-			// Audio format (floating point (3) or PCM (1)). Any other format indicates compression.
-			stream.Write(BitConverter.GetBytes((ushort)(isFloatingPoint ? 3 : 1)), 0, 2);
-			// Channels.
-			stream.Write(BitConverter.GetBytes(channelCount), 0, 2);
-			// Sample rate.
-			stream.Write(BitConverter.GetBytes(sampleRate), 0, 4);
-			// Bytes rate.
-			stream.Write(BitConverter.GetBytes(sampleRate * channelCount * (bitDepth / 8)), 0, 4);
-			// Block align.
-			stream.Write(BitConverter.GetBytes((ushort)channelCount * (bitDepth / 8)), 0, 2);
-			// Bits per sample.
-			stream.Write(BitConverter.GetBytes(bitDepth), 0, 2);
-
-			// Sub-chunk 2.
-			stream.Write(Encoding.ASCII.GetBytes("data"), 0, 4);
-			// Sub-chunk 2 size.
-			stream.Write(BitConverter.GetBytes(size), 0, 4);
-		}
 
 		private enum Compression
 		{
 			IT214, IT215, PCMD, PCMS, PCMU
 		}
 
-		private UInt32 ReadUInt32(FileStream stream)
+		private static UInt32 ReadUInt32(FileStream stream)
 		{
 			var buffer = new byte[4];
 			var int32 = new UInt32[1];
@@ -404,7 +336,7 @@ namespace Brewmaster.Pipeline
 			Buffer.BlockCopy(buffer, 0, int32, 0, 4);
 			return int32[0];
 		}
-		private UInt16 ReadUInt16(FileStream stream)
+		private static UInt16 ReadUInt16(FileStream stream)
 		{
 			var buffer = new byte[2];
 			var int16 = new UInt16[1];
@@ -413,17 +345,15 @@ namespace Brewmaster.Pipeline
 			return int16[0];
 		}
 
-		private string ReadString(FileStream stream, int length)
+		private static string ReadString(FileStream stream, int length)
 		{
 			var buffer = new byte[length];
 			stream.Read(buffer, 0, length);
 			return System.Text.Encoding.ASCII.GetString(buffer);
 		}
 
-		private Instrument LoadInstrument(FileStream stream)
+		private static Instrument LoadInstrument(FileStream stream)
 		{
-			var instrument = new Instrument();
-
 			var buffer = new byte[570];
 			var int16 = new UInt16[1];
 			stream.Read(buffer, 0, buffer.Length);
@@ -466,26 +396,39 @@ namespace Brewmaster.Pipeline
 			Buffer.BlockCopy(buffer, 62, int16, 0, 2);
 			var midiBank = int16[0];
 
-			var notetrans = new byte[240];
-			Buffer.BlockCopy(buffer, 64, notetrans, 0, 240);
+			var sampleMapping = new byte[240];
+			Buffer.BlockCopy(buffer, 64, sampleMapping, 0, 240);
 
 			var envelope = new byte[82];
-			Buffer.BlockCopy(buffer, 304, notetrans, 0, 82);
-			Buffer.BlockCopy(buffer, 386, notetrans, 0, 82);
-			Buffer.BlockCopy(buffer, 468, notetrans, 0, 82);
+			Buffer.BlockCopy(buffer, 304, envelope, 0, 82);
+			Buffer.BlockCopy(buffer, 386, envelope, 0, 82);
+			Buffer.BlockCopy(buffer, 468, envelope, 0, 82);
 
 
-			var test2 = System.Text.Encoding.ASCII.GetString(filename);
-			var test3 = System.Text.Encoding.ASCII.GetString(name);
+			var instrument = new Instrument();
+			instrument.Name = System.Text.Encoding.ASCII.GetString(name);
+			instrument.Sample = sampleMapping[121];
+			instrument.Sample--; // Sample map uses 1-index
+			instrument.FadeOut = (byte)fadeout;
+
+			for (var i = 0; i < 120; i++)
+			{
+				instrument.NoteMap.Add(i, sampleMapping[i * 2]);
+			}
+
+			if (fadeout > 255)
+			{
+				throw new Exception(string.Format("Instrument \"{0}\" FadeOut setting uses incorrect format", instrument.Name));
+			}
 
 			return instrument;
 		}
-		private Instrument LoadInstrumentOld(FileStream stream)
+		private static Instrument LoadInstrumentOld(FileStream stream)
 		{
 			throw new NotImplementedException();
 		}
 
-		private List<uint> Read32BitBuffer(Stream stream, int count)
+		private static List<uint> Read32BitBuffer(Stream stream, int count)
 		{
 			var buffer = new byte[count * 4];
 			var array = new UInt32[count];
@@ -493,55 +436,171 @@ namespace Brewmaster.Pipeline
 			Buffer.BlockCopy(buffer, 0, array, 0, count * 4);
 			return array.ToList();
 		}
-	}
 
-	public class ItModule
-	{
-		public string Title;
-		public List<Channel> Channels = new List<Channel>(64);
+		private readonly Dictionary<int, int> _noteProgressionStats = new Dictionary<int, int>();
+		private static readonly Dictionary<int, int> NoteProgressionMacros = new Dictionary<int, int>
+		{
+			{0, 59},
+			{12, 58},
+			{-12, 57},
+			{-1, 56},
+			{-2, 55},
+			{-3, 54}
+		};
 
-		public List<int> OrderList { get; set; }
-		public List<Instrument> Instruments = new List<Instrument>();
-		public List<Sample> Samples = new List<Sample>();
-		public List<Pattern> Patterns = new List<Pattern>();
+		private class PatternMacro
+		{
+			private readonly ItModule _module;
+
+			public PatternMacro(ItModule module, IEnumerable<PatternNote> pattern)
+			{
+				_module = module;
+				Pattern = pattern.ToArray();
+				Data = _module.GetCompressedPatternData(Pattern);
+				Value = Data.Length - 1; // Each macro usage has one byte of overhead
+				BytesSaved = -Data.Length; // Each macro has an overall overhead of its own size (obviously)
+			}
+
+			public int? Id { get; set; }
+			public byte[] Data { get; private set; }
+			public PatternNote[] Pattern { get; private set; }
+			public int Value { get; private set; }
+
+			public int BytesSaved;
+			public readonly Dictionary<PatternNote[], int> PatternMatch = new Dictionary<PatternNote[], int>();
+			public readonly Dictionary<PatternNote[], int> PatternStart = new Dictionary<PatternNote[], int>();
+		}
+		private List<PatternMacro> GetPatternMacros(int macroStep)
+		{
+			// Get a list of unique patterns that exist in the order list
+			var allPatterns = new List<PatternNote[]>();
+			for (var i = 0; i < Patterns.Count; i++)
+			{
+				if (!OrderList.Contains(i)) continue;
+				foreach (var channelPattern in Patterns[i].Channels)
+				{
+					if (allPatterns.Any(p => p.SequenceEqual(channelPattern))) continue;
+					allPatterns.Add(channelPattern);
+				}
+			}
+			var macros = new List<PatternMacro>();
+			var largestRowLength = allPatterns.Max(p => p.Length);
+			for (var macroLength = macroStep; macroLength <= largestRowLength / 2; macroLength += macroStep)
+			{
+				foreach (var pattern in allPatterns)
+				{
+					for (var i = 0; i < pattern.Length - macroLength; i += macroLength)
+					{
+						var subPattern = pattern.Skip(i).Take(macroLength);
+						if (!macros.Any(m => m.Pattern.SequenceEqual(subPattern))) macros.Add(new PatternMacro(this, subPattern));
+					}
+				}
+			}
+
+			foreach (var macro in macros)
+			{
+				var macroLength = macro.Pattern.Length;
+				foreach (var pattern in allPatterns)
+				{
+					for (var i = 0; i < pattern.Length - macroLength; i++)
+					{
+						if (pattern.Skip(i).Take(macroLength).SequenceEqual(macro.Pattern))
+						{
+							if (!macro.PatternMatch.ContainsKey(pattern))
+							{
+								macro.PatternMatch.Add(pattern, 0);
+								macro.PatternStart[pattern] = i;
+							}
+							macro.PatternMatch[pattern] += macro.Value;
+							macro.BytesSaved += macro.Value;
+							i += macroLength;
+						}
+					}
+				}
+			}
+
+			var bestMacros = macros.OrderByDescending(m => m.BytesSaved).Take(64).ToList();
+			return bestMacros;
+		}
 
 		public byte[] GetCompressedPatternData()
 		{
+			var macroStep = 0;
+			var data = GetCompressedPatternData(new List<PatternMacro>());
+			var smallestSize = data.Length;
+			while (true)
+			{
+				// Attempt various macro settings and use the data with the best results (smallest file)
+				macroStep += 4;
+				NextMacroId = 0;
+				var patternMacros = GetPatternMacros(macroStep);
+				if (!patternMacros.Any()) break;
+				var testData = GetCompressedPatternData(patternMacros);
+				if (testData.Length >= smallestSize) continue;
+				
+				smallestSize = testData.Length;
+				data = testData;
+			}
+			return data;
+		}
+
+		private byte[] GetCompressedPatternData(List<PatternMacro> patternMacros)
+		{
 			var data = new List<byte>();
 			var orderReferences = new UInt16[OrderList.Count * 8 + 1];
-			var orderPatternSizes = new byte[OrderList.Count];
-			var patternAddress = orderReferences.Length * 2 + orderPatternSizes.Length;
+			var orderPatternSizes = new byte[OrderList.Count + 1];
 
-			//var pattern0 = Patterns[0].Channels[2];
-			//data.AddRange(GetCompressedPatternData(pattern0));
+			var instrumentData = new List<byte>();
+			for (var i = 0; i < Instruments.Count; i++)
+			{
+				instrumentData.AddRange(GetInstrumentData(Instruments[i]));
+			}
+
+			var patternAddress = orderReferences.Length * 2 + orderPatternSizes.Length + instrumentData.Count;
 
 			var patternMap = new Dictionary<int, int>();
 			var patternAddressMap = new Dictionary<int, int>();
 			var channelPatterns = new List<byte[]>();
-			var patternIndex = 0;
-			foreach (var pattern in Patterns)
+			var processedPatterns = new List<PatternNote[]>();
+			for (var j = 0; j < Patterns.Count; j++)
 			{
+				if (!OrderList.Contains(j)) continue; // Don't store unused patterns
+				var patternIndex = j * 8;
+				var pattern = Patterns[j];
 				for (var i = 0; i < 8; i++)
 				{
-					byte[] patternData = i >= pattern.Channels.Count ? GetSilentPattern(pattern) : GetCompressedPatternData(pattern.Channels[i]);
-					//byte[] patternData = i >= pattern.Channels.Count ? GetSilentPattern(pattern) : GetCompressedPatternData(pattern.Channels[3]);
-					var existing = channelPatterns.FindIndex(d => d.SequenceEqual(patternData));
+					var patternChannel = i >= pattern.Channels.Count ? null : pattern.Channels[i];
+					var existing = patternChannel != null ? processedPatterns.FindIndex(d => d.SequenceEqual(patternChannel)) : -1;
 					if (existing >= 0)
 					{
 						patternMap[patternIndex + i] = existing;
 					}
 					else
 					{
+						byte[] patternData = patternChannel != null ? GetCompressedPatternData(patternChannel, patternMacros) : GetSilentPattern(pattern);
+
 						patternMap[patternIndex + i] = channelPatterns.Count;
 						patternAddressMap[channelPatterns.Count] = patternAddress;
 						patternAddress += patternData.Length;
-						
+
+						if (patternChannel != null) processedPatterns.Add(patternChannel);
 						channelPatterns.Add(patternData);
 					}
 				}
-				patternIndex += 8;
 			}
-			// TODO: Skip storing unused patterns if any
+
+			var macroAddress = patternAddress;
+			var macroDirectory = new List<UInt16>();
+			var macroData = new List<byte>();
+			foreach (var macro in patternMacros.Where(m => m.Id.HasValue).OrderBy(m => m.Id))
+			{
+				macroData.AddRange(macro.Data);
+				macroDirectory.Add((UInt16)macroAddress);
+				macroAddress += macro.Data.Length;
+			}
+			macroDirectory.Add(0xffff);
+
+			var stats = _noteProgressionStats.ToList().OrderByDescending(kvp => kvp.Value);
 			for (var i = 0; i < OrderList.Count; i++) {
 				var patternId = OrderList[i] * 8;
 				for (var j = 0; j < 8; j++)
@@ -551,17 +610,45 @@ namespace Brewmaster.Pipeline
 				if (Patterns[OrderList[i]].Rows > 255) throw new Exception(string.Format("Two many rows in pattern #{0}. Maximum is 255", OrderList[i]));
 				orderPatternSizes[i] = (byte)Patterns[OrderList[i]].Rows;
 			}
-			orderReferences[OrderList.Count * 8] = 0xffff;
+			orderReferences[OrderList.Count * 8] = 0xffff; // Indicates end of pattern references (address can't be 0xffff)
+			orderPatternSizes[OrderList.Count] = 0x00; // Indicates end of pattern sizes (size can't be 0)
+
+			// Fix address offsets to account for header data
+			var offset = (UInt16)(macroDirectory.Count * 2);
+			for (var i = 0; i < orderReferences.Length - 1; i++) orderReferences[i] += offset;
+			for (var i = 0; i < macroDirectory.Count - 1; i++) macroDirectory[i] += offset;
+
 			var orderData = new byte[orderReferences.Length * 2];
 			Buffer.BlockCopy(orderReferences, 0, orderData, 0, orderData.Length);
+			var macroDirectoryData = new byte[macroDirectory.Count * 2];
+			Buffer.BlockCopy(macroDirectory.ToArray(), 0, macroDirectoryData, 0, macroDirectoryData.Length);
 
 			data.AddRange(orderData);
 			data.AddRange(orderPatternSizes);
+			data.AddRange(instrumentData);
 			foreach (var patternData in channelPatterns) data.AddRange(patternData);
+
 			
 			return data.ToArray();
 		}
 
+		public byte[] GetInstrumentData(Instrument instrument)
+		{
+			var data = new byte[4];
+			if (instrument.Sample >= Samples.Count) return data; // TODO: Remove invalid instruments and adjust instrument index references
+
+			var sample = Samples[instrument.Sample];
+			var playbackRate = sample.C5Speed / 8363; // 8363 means C-5 plays at a $042E pitch (~8khz)
+			var pitchAdjust = (int)Math.Round(768 * Math.Log(playbackRate) / Math.Log(2)); // Adjust pitch by this number to get the correct playback rate
+
+			data[0] = instrument.Sample;
+			data[1] = (byte)(pitchAdjust & 0xff);
+			data[2] = (byte)((pitchAdjust >> 8) & 0xff);
+			data[3] = instrument.FadeOut;
+			
+			return data;
+		}
+		
 		private byte[] GetSilentPattern(Pattern pattern)
 		{
 			var data = new List<byte>();
@@ -575,8 +662,27 @@ namespace Brewmaster.Pipeline
 			return data.ToArray();
 		}
 
-		private byte[] GetCompressedPatternData(PatternNote[] pattern)
+		private int GetNextGoodMacroMatch(PatternNote[] pattern, List<PatternMacro> candidatesSortedByPriority, int startIndex)
 		{
+			foreach (var macro in candidatesSortedByPriority)
+			{
+				for (var i = startIndex; macro.Pattern.Length <= pattern.Length - i; i++)
+				{
+					var subPattern = pattern.Skip(i).Take(macro.Pattern.Length);
+					if (macro.Pattern.SequenceEqual(subPattern)) return i;
+				}
+			}
+			return pattern.Length;
+		}
+		private byte[] GetCompressedPatternData(PatternNote[] pattern, List<PatternMacro> patternMacros = null)
+		{
+			if (patternMacros == null) patternMacros = new List<PatternMacro>();
+			patternMacros = patternMacros.Where(m => m.PatternMatch.ContainsKey(pattern)).OrderByDescending(m => m.PatternMatch[pattern]).ToList();
+			var firstMacroRow = GetNextGoodMacroMatch(pattern, patternMacros, 0);
+			
+			var lastNote = -1;
+			var lastInstrument = -1;
+
 			var data = new List<byte>();
 			var clearCount = 0;
 			var currentBlock = new List<byte>();
@@ -594,8 +700,36 @@ namespace Brewmaster.Pipeline
 				}
 			}
 
-			foreach (var note in pattern)
+			for (var i = 0; i < pattern.Length; i++)
 			{
+				var usedMacro = false;
+				if (i >= firstMacroRow)
+				{
+					foreach (var macro in patternMacros)
+					{
+						if (macro.Pattern.Length > pattern.Length - i) continue;
+
+						var subPattern = pattern.Skip(i).Take(macro.Pattern.Length);
+						if (!macro.Pattern.SequenceEqual(subPattern)) continue;
+
+						FlushBlock();
+						if (clearCount > 0) data.Add((byte) (0x80 | clearCount));
+						clearCount = 0;
+
+						if (!macro.Id.HasValue) macro.Id = NextMacroId;
+						NextMacroId++;
+						data.Add((byte) (0x40 | macro.Id.Value));
+						i += macro.Pattern.Length;
+						firstMacroRow = GetNextGoodMacroMatch(pattern, patternMacros, i);
+						i--;
+						usedMacro = true;
+						break;
+					}
+
+					if (usedMacro) continue;
+				}
+
+				var note = pattern[i];
 				if (!note.HasNote && note.Effect == 0 && note.VolumeEffect == 0)
 				{
 					if (clearCount == 128)
@@ -620,25 +754,167 @@ namespace Brewmaster.Pipeline
 					currentBlockRows++;
 					clearCount--;
 				}
-				var instrument = note.Instrument - 1;
-				if (instrument >= 55) throw new Exception("Maximum of 54 instruments supported in a track, sorry");
-				if (!note.HasNote) instrument = 63; // none
-				if (note.Note == 255) instrument = 62; // off
-				if (note.Note == 254) instrument = 61; // cut
-				if (note.Note == 253) instrument = 60; // fade
-				var header = (note.Effect > 0 ? 0x80 : 0) | (note.VolumeEffect > 0 ? 0x40 : 0) | instrument;
+				var instrumentId = note.Instrument - 1;
+				if (instrumentId >= 54) throw new Exception("Maximum of 53 instruments supported in a track, sorry");
 
-				currentBlock.Add((byte)header);
+				var noteByte = note.Note;
+				if (!note.HasNote) instrumentId = 63; // none
+				else
+				{
+					if (noteByte == 255) instrumentId = 62; // off
+					else if (noteByte == 254) instrumentId = 60; // cut
+					else if (noteByte == 253) instrumentId = 61; // fade
+					else
+					{
+						if (Instruments.Count <= instrumentId)
+						{
+							// TODO: Sample mode (if instrument doesn't exist)
+							throw new Exception(string.Format("Invalid instrument reference ({0})", instrumentId));
+						}
+						var instrument = Instruments[instrumentId];
+						noteByte = instrument.NoteMap[noteByte];
+
+						var delta = noteByte - lastNote;
+						//if (!_noteProgressionStats.ContainsKey(delta)) _noteProgressionStats.Add(delta, 0);
+						//_noteProgressionStats[delta]++;
+						if (instrumentId == lastInstrument && NoteProgressionMacros.ContainsKey(delta))
+						{
+							instrumentId = NoteProgressionMacros[delta];
+							lastNote = noteByte;
+						}
+						else
+						{
+							lastInstrument = instrumentId;
+							lastNote = noteByte;
+						}
+					}
+				}
+
+				var headerByte = (note.Effect > 0 ? 0x80 : 0) | (note.VolumeEffect > 0 ? 0x40 : 0) | instrumentId;
+
+				currentBlock.Add((byte)headerByte);
 				if (note.VolumeEffect > 0) currentBlock.Add(note.VolumeEffect);
 				if (note.Effect > 0) currentBlock.Add(note.Effect);
 				if (note.Effect > 0) currentBlock.Add(note.EffectParam);
-				if (instrument < 55) currentBlock.Add(note.Note);
+				if (instrumentId < 54) currentBlock.Add(noteByte);
+
 				currentBlockRows++;
 			}
 			FlushBlock();
 			if (clearCount > 0) data.Add((byte)(0x80 | clearCount));
 
 			return data.ToArray();
+		}
+
+		public static ItModule LoadFromStream(FileStream stream)
+		{
+			var module = new ItModule();
+			
+			var buffer = new byte[192];
+			stream.Read(buffer, 0, 192);
+			var impm = new byte[4];
+			var title = new byte[26];
+
+			var int16 = new UInt16[9];
+			var int32 = new UInt32[2];
+			var chanPan = new byte[64];
+			var chanVolume = new byte[64];
+			Buffer.BlockCopy(buffer, 0, impm, 0, 4);
+			Buffer.BlockCopy(buffer, 4, title, 0, 26);
+
+			Buffer.BlockCopy(buffer, 32, int16, 0, 16);
+			Buffer.BlockCopy(buffer, 54, int16, 16, 2);
+
+			Buffer.BlockCopy(buffer, 56, int32, 0, 8);
+
+			Buffer.BlockCopy(buffer, 64, chanPan, 0, 64);
+			Buffer.BlockCopy(buffer, 128, chanVolume, 0, 64);
+
+			int highlightMinor = buffer[30];
+			int highlightMajor = buffer[31];
+
+			int orderCount = int16[0];
+			int instrumentCount = int16[1];
+			int sampleCount = int16[2];
+			int patternCount = int16[3];
+
+			int cwtv = int16[4];
+			int cmwt = int16[5];
+			int flags = int16[6];
+			int special = int16[7];
+
+			int generalVolume = buffer[48];
+			int mixingVolume = buffer[49];
+			int initialSpeed = buffer[50];
+			int initialTempo = buffer[51];
+			int panSeparation = buffer[52];
+			int pwd = buffer[53];
+
+			int msgLength = int16[8];
+			uint msgOffset = int32[0];
+			uint reserved = int32[1];
+
+			if (Encoding.ASCII.GetString(impm) != "IMPM") throw new Exception("Invalid Impulse Tracker module");
+			module.Title = Encoding.ASCII.GetString(title).Trim('\0');
+
+			for (var i = 0; i < 64; i++)
+			{
+				module.Channels.Add(new Channel
+				{
+					Panning = Math.Min(64, (int)chanPan[i]),
+					Volume = Math.Min(64, (int)chanVolume[i])
+				});
+			}
+
+			var orders = new byte[orderCount];
+			stream.Read(orders, 0, orderCount);
+			module.OrderList = orders.Where(o => o < 255).Select(o => (int)o).ToList();
+			var instrumentPointers = Read32BitBuffer(stream, instrumentCount);
+			var samplePointers = Read32BitBuffer(stream, sampleCount);
+			var patternPointers = Read32BitBuffer(stream, patternCount);
+
+			UInt16 historySize = 0;
+			if ((special & 2) != 0)
+			{
+				var histBuffer = new byte[2];
+				stream.Read(histBuffer, 0, 2);
+				Buffer.BlockCopy(histBuffer, 0, int16, 0, 2);
+				historySize = int16[0];
+			}
+			if (historySize > 0)
+			{
+				var histBuffer = new byte[historySize * 8];
+				stream.Read(histBuffer, 0, historySize * 8);
+			}
+
+			foreach (var pointer in instrumentPointers.Where(p => p > 0))
+			{
+				stream.Position = pointer;
+				module.Instruments.Add(cmwt >= 0x0200 ? LoadInstrument(stream) : LoadInstrumentOld(stream));
+			}
+			foreach (var pointer in samplePointers.Where(p => p > 0))
+			{
+				stream.Position = pointer;
+				module.Samples.Add(LoadSample(stream));
+			}
+			while (patternPointers[patternPointers.Count - 1] == 0) patternPointers.RemoveAt(patternPointers.Count - 1); // Trim unused patterns in the end
+			foreach (var pointer in patternPointers)
+			{
+				if (pointer == 0)
+				{
+					module.Patterns.Add(new Pattern(64));
+					continue;
+				}
+				stream.Position = pointer;
+				module.Patterns.Add(LoadPattern(stream));
+			}
+
+			return module;
+		}
+
+		public static ItModule LoadFromFile(string fileName)
+		{
+			using (var stream = File.OpenRead(fileName)) return LoadFromStream(stream);
 		}
 	}
 	public class Channel
@@ -648,7 +924,10 @@ namespace Brewmaster.Pipeline
 	}
 	public class Instrument
 	{
-
+		public string Name { get; set; }
+		public byte Sample { get; set; }
+		public byte FadeOut { get; set; }
+		public Dictionary<int, byte> NoteMap { get; set; } = new Dictionary<int, byte>();
 	}
 
 	public struct PatternNote
@@ -667,6 +946,17 @@ namespace Brewmaster.Pipeline
 	}
 	public class Pattern
 	{
+		public Pattern() {}
+
+		/// <summary>
+		/// Creates an empty pattern with a set number of rows
+		/// </summary>
+		/// <param name="rows"></param>
+		public Pattern(UInt16 rows)
+		{
+			Rows = rows;
+		}
+
 		public ushort Rows { get; set; }
 		public List<PatternNote[]> Channels { get; set; } = new List<PatternNote[]>();
 	}
@@ -680,23 +970,70 @@ namespace Brewmaster.Pipeline
 		public int Panning { get; set; }
 		public int Volume { get; set; }
 		public int GlobalVolume { get; set; }
+		public double C5Speed { get; set; }
 
-		public byte[] GetBrr(Action<string> output = null)
+		private Int16[] ResampleLoop(uint samplesToAdd)
+		{
+			var loopSize = LoopEnd - LoopStart;
+			var newLoopSize = loopSize + samplesToAdd;
+			var newLength = (uint)Data.Length + samplesToAdd;
+			var newLoopStart = newLength - newLoopSize;
+
+			var resizeFactor = (double)Data.Length / newLength;
+
+			var data = new Int16[newLength];
+			for (var t = 0; t < data.Length; t++)
+			{
+				// Let's say we're interpolating 5 samples into 10, that means position 5 in the new sample
+				// should sound like "position" 2.5 in the old one, so we'd need to calculate the sample 50%
+				// between index 2 and 3
+				var sampleIndex = (double)t * resizeFactor; 
+				var s1Index = (int)Math.Floor(sampleIndex);
+				var s2Index = s1Index + 1;
+				double sample1 = s1Index < Data.Length ? Data[s1Index] : Data[s1Index - loopSize];
+				double sample2 = s2Index < Data.Length ? Data[s2Index] : Data[s2Index - loopSize];
+				
+				var ratio = sampleIndex % 1;
+				var newSample = (int)(Math.Floor(sample1 * (1 - ratio) + sample2 * ratio + 0.5)); // Interpolate between the two samples
+				
+				data[t] = (Int16)Clamp(newSample, 16); // Clip the new sample value if it exceeds 16bit range
+			}
+
+			LoopStart = newLoopStart;
+			C5Speed /= resizeFactor; // Since the loop becomes a little longer, we need to play it back a little faster
+
+			return data;
+		}
+
+
+		private Int16[] UnrollLoop(uint startAlign, uint endAlign)
+		{
+			var data = new Int16[LoopEnd + endAlign];
+			Array.Copy(Data, data, Math.Min(Data.Length, LoopEnd));
+
+			for (var i = 0; i < endAlign; i++) data[LoopEnd + i] = data[LoopStart + i];
+
+			// 16-sample align loop_start
+			LoopStart += startAlign;
+			return data;
+		}
+		
+		public byte[] GetBrr(int maximumSampleGrowth = 500, Action<string> output = null)
 		{
 			var brrData = new List<byte>();
+			if (Data == null || Data.Length == 0) return brrData.ToArray();
 
 			var data = new Int16[Data.Length];
 			Array.Copy(Data, data, Data.Length);
 			if (LoopEnd > 0)
 			{
-				// TODO: SNESBRR style super wasteful loop padding, make it possible to disable this in process settings (and probably by default)
-				// Instead warn the user when loops don't align up to 16 samples
+				// Align our sample loop so it's a multiple of 16
 
-				var startAlign = (16 - (LoopStart & 15)) & 15;
+				var startAlign = (16 - (LoopStart % 16)) % 16;
 				var loopSize = LoopEnd - LoopStart;
 				var endAlign = loopSize;
 
-				while ((endAlign & 15) != 0) endAlign <<= 1;
+				while ((endAlign % 16) != 0) endAlign <<= 1;
 
 				// remove the existing loop block from the alignment
 				endAlign -= loopSize;
@@ -704,22 +1041,30 @@ namespace Brewmaster.Pipeline
 				// also include the loop_start alignment
 				endAlign += startAlign;
 
-				if (endAlign != 0)
+				var addedBytes = Math.Ceiling(endAlign / 16f) * 9;
+				if (endAlign != 0) // If endAlign == 0, the loop is already aligned
 				{
-					if (output != null) {
-						var addedBytes = Math.Ceiling(endAlign / 16f) * 9;
-						output(string.Format("WARNING: Sample \"{0}\" loop not aligned to 16 frames, results in {1} bytes larger file size", Name, addedBytes));
+					if (addedBytes > maximumSampleGrowth)
+					{
+						data = ResampleLoop(16 - (loopSize % 16));
+					}
+					else
+					{
+						if (output != null) output(string.Format("WARNING: Sample \"{0}\" loop not aligned to 16 frames, results in {1} bytes larger file size", Name, addedBytes));
+						data = UnrollLoop(startAlign, endAlign);
 					}
 
-					data = new Int16[LoopEnd + endAlign];
-					Array.Copy(Data, data, Math.Min(Data.Length, LoopEnd));
-
-					for (var i = 0; i < endAlign; i++) data[LoopEnd + i] = data[LoopStart + i];
-					
-					// 16-sample align loop_start
-					LoopStart += startAlign;
 				}
 			}
+			// TODO: Is is better to add zeroes at the *end* of non-looping samples?
+			if (data.Length % 16 != 0)
+			{
+				var samplesToAdd = 16 - data.Length % 16;
+				var newData = new Int16[data.Length + samplesToAdd];
+				Array.Copy(data, 0, newData, samplesToAdd, data.Length);
+			}
+
+
 			const float base_adjust_rate = 0.0004f;
 			float adjust_rate = base_adjust_rate;
 			var loopBlock = (int)Math.Round(LoopStart / 16f);
@@ -932,6 +1277,8 @@ namespace Brewmaster.Pipeline
 			brrData[brrData.Count - 9] |= (byte)(1 | (LoopEnd > 0 ? 2 : 0)); // Set end bit
 			return brrData.ToArray();
 		}
+
+
 		private static int Clamp(int x, int N)
 		{
 			var low = -1 << (N - 1);
