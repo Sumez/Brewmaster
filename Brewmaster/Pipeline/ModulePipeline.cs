@@ -595,8 +595,9 @@ namespace Brewmaster.Pipeline
 			foreach (var macro in patternMacros.Where(m => m.Id.HasValue).OrderBy(m => m.Id))
 			{
 				macroData.AddRange(macro.Data);
+				macroData.Add(0xff);
 				macroDirectory.Add((UInt16)macroAddress);
-				macroAddress += macro.Data.Length;
+				macroAddress += macro.Data.Length + 1;
 			}
 			macroDirectory.Add(0xffff);
 
@@ -625,10 +626,11 @@ namespace Brewmaster.Pipeline
 
 			data.AddRange(orderData);
 			data.AddRange(orderPatternSizes);
+			data.AddRange(macroDirectoryData);
 			data.AddRange(instrumentData);
 			foreach (var patternData in channelPatterns) data.AddRange(patternData);
+			data.AddRange(macroData);
 
-			
 			return data.ToArray();
 		}
 
