@@ -336,10 +336,11 @@ namespace Brewmaster.EditorWindows.Code
 		{
 			var memoryState = GetCpuMemory();
 			if (memoryState == null) return word;
-			
+
+			var cpuType = File.Mode == CompileMode.Spc ? MemoryState.CpuType.Spc : MemoryState.CpuType.Cpu;
 			var addressReference = new AddressReference(word, s => File.Project.DebugSymbols.ContainsKey(s) ? File.Project.DebugSymbols[s] : null);
-			var val8 = memoryState.ReadAddress(addressReference.BaseAddress, false, addressReference.OffsetRegister, out var address);
-			var val16 = memoryState.ReadAddress(addressReference.BaseAddress, true, addressReference.OffsetRegister);
+			var val8 = memoryState.ReadAddress(cpuType, addressReference.BaseAddress, false, addressReference.OffsetRegister, out var address);
+			var val16 = memoryState.ReadAddress(cpuType, addressReference.BaseAddress, true, addressReference.OffsetRegister);
 			return string.Format("{0} ({1})\n\nValue: {2} ({3})\nWord value: {4} ({5})",
 				word,
 				WatchValue.FormatHexAddress(address),
@@ -507,11 +508,12 @@ namespace Brewmaster.EditorWindows.Code
 				if (breakpointMarker.GlobalBreakpoint != null)
 					breakpointMarker.GlobalBreakpoint.BuildLine = breakpointMarker.BuildLine + 1;
 
+			var breakpointAddressType = File.Mode == CompileMode.Spc ? Breakpoint.AddressTypes.SpcRam : Breakpoint.AddressTypes.PrgRom;
 			File.SetEditorBreakpoints(Document.BookmarkManager.Marks.OfType<BreakpointMarker>()
 				.Select(b => b.GlobalBreakpoint ?? new Breakpoint
 				{
 					Type = b is PerformancePointMarker ? (Breakpoint.Types.Marked | Breakpoint.Types.Execute) : Breakpoint.Types.Execute,
-					AddressType = Breakpoint.AddressTypes.PrgRom,
+					AddressType = breakpointAddressType,
 					Automatic = true,
 					File = File,
 					CurrentLine = b.LineNumber + 1,

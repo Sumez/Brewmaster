@@ -27,6 +27,7 @@ namespace Brewmaster.Modules
 		public event Action<EmulationState> EmulationStateUpdate;
 		public int SelectedSprite { get; private set; } = -1;
 		public TargetPlatform Platform { get; private set; } = TargetPlatform.Nes;
+		public DebugMode DebugMode { get; private set; } = DebugMode.Spc;
 
 		public event Action<int> SelectedSpriteChanged;
 		public event Action<TargetPlatform> PlatformChanged;
@@ -73,5 +74,10 @@ namespace Brewmaster.Modules
 		{
 			if (FilenameChanged != null) FilenameChanged(projectFile);
 		}
+	}
+
+	public enum DebugMode
+	{
+		MainCpu, Spc
 	}
 }

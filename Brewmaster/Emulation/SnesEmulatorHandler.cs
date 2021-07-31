@@ -56,7 +56,7 @@ namespace Brewmaster.Emulation
 		private Action<LogData> _logHandler;
 
 		public event Action OnRun;
-		public event Action<int> OnBreak;
+		public event Action<BreakInfo> OnBreak;
 		public event Action<EmulatorStatus> OnStatusChange;
 		public event Action<EmulationState> OnRegisterUpdate;
 
@@ -110,7 +110,8 @@ namespace Brewmaster.Emulation
 		}
 		public void EnableDebugger()
 		{
-			SnesConfigApi.SetDebuggerFlag(SnesDebuggerFlags.CpuDebuggerEnabled, true);
+			//SnesConfigApi.SetDebuggerFlag(SnesDebuggerFlags.CpuDebuggerEnabled, true);
+			//SnesConfigApi.SetDebuggerFlag(SnesDebuggerFlags.SpcDebuggerEnabled, true);
 			//SnesApi.DebugRun();
 			RefreshBreakpoints();
 		}
@@ -220,17 +221,23 @@ namespace Brewmaster.Emulation
 					break;
 
 				case ConsoleNotificationType.CodeBreak:
-					var source = (SnesBreakSource)(byte)e.Parameter.ToInt64();
+					var source = (BreakEvent)Marshal.PtrToStructure(e.Parameter, typeof(BreakEvent));
 					//if (source == SnesBreakSource.Breakpoint && OnBreak != null)
 					if (OnBreak != null)
 					{
 						var state = SnesDebugApi.GetState();
-						var address = SnesDebugApi.GetAbsoluteAddress(new AddressInfo
+						var cpuAddress = SnesDebugApi.GetAbsoluteAddress(new AddressInfo
 						{
 							Address = (state.Cpu.K << 16) | state.Cpu.PC,
 							Type = SnesMemoryType.CpuMemory
 						});
-						OnBreak(address.Address);
+						var spcAddress = SnesDebugApi.GetAbsoluteAddress(new AddressInfo
+						{
+							Address = state.Spc.PC,
+							Type = SnesMemoryType.SpcMemory
+						});
+
+						OnBreak(new BreakInfo { CpuAddress = cpuAddress.Address, SpcAddress = spcAddress.Address });
 					}
 					if (OnStatusChange != null) OnStatusChange(EmulatorStatus.Paused);
 					EmitDebugData();
@@ -277,6 +284,7 @@ namespace Brewmaster.Emulation
 			_state.Memory.OamData = SnesDebugApi.GetMemoryState(SnesMemoryType.SpriteRam);
 			_state.Memory.CgRam = SnesDebugApi.GetMemoryState(SnesMemoryType.CGRam);
 			_state.Memory.CpuData = SnesDebugApi.GetMemoryState(SnesMemoryType.CpuMemory);
+			_state.Memory.SpcData = SnesDebugApi.GetMemoryState(SnesMemoryType.SpcMemory);
 			_state.Memory.X = _state.SnesState.Cpu.X & (_state.SnesState.Cpu.PS.HasFlag(ProcFlags.IndexMode8) ? 0xFF : 0xFFFF);
 			_state.Memory.Y = _state.SnesState.Cpu.Y & (_state.SnesState.Cpu.PS.HasFlag(ProcFlags.IndexMode8) ? 0xFF : 0xFFFF);
 			SnesDebugApi.GetSpritePreview(_spriteOptions, _state.SnesState.Ppu, _state.Memory.PpuData, _state.Memory.OamData, _state.Memory.CgRam, _state.Sprites.PixelData);
@@ -505,6 +513,11 @@ namespace Brewmaster.Emulation
 					if (breakpoint.AddressType == Breakpoint.AddressTypes.Cpu) emuBreakpoint.MemoryType = SnesMemoryType.CpuMemory;
 					if (breakpoint.AddressType == Breakpoint.AddressTypes.Ppu) emuBreakpoint.MemoryType = SnesMemoryType.VideoRam;
 					if (breakpoint.AddressType == Breakpoint.AddressTypes.Apu) emuBreakpoint.MemoryType = SnesMemoryType.SpcMemory;
+					if (breakpoint.AddressType == Breakpoint.AddressTypes.SpcRam)
+					{
+						emuBreakpoint.MemoryType = SnesMemoryType.SpcRam;
+						emuBreakpoint.CpuType = CpuType.Spc;
+					}
 
 					// Map mirrored CPU addresses to their actual address
 					if (IsRunning() && breakpoint.AddressType == Breakpoint.AddressTypes.Cpu && breakpoint.StartAddress < 0x1000000)

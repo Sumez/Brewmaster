@@ -222,6 +222,7 @@ namespace Brewmaster.ProjectModel
 		Ignore = 0,
 		IncludeInAssembly = 1,
 		ContentPipeline = 2,
-		LinkerConfig = 3
+		LinkerConfig = 3,
+		Spc = 4
 	}
 }

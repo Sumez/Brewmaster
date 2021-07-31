@@ -61,7 +61,7 @@ namespace Brewmaster
 		public ProjectExplorer.ProjectExplorer ProjectExplorer { get; private set; }
 
 		private readonly Action<LogData> _logHandler;
-		private readonly Action<int> _breakHandler;
+		private readonly Action<BreakInfo> _breakHandler;
 	    private readonly Action<IEnumerable<Breakpoint>> _breakpointHandler;
 		private readonly Action<EmulatorStatus> _emulationStatusHandler;
 		private readonly Action<EmulationState> _debugStateHandler;
@@ -216,9 +216,9 @@ namespace Brewmaster
 		{
 			BeginInvoke(new Action<List<BuildHandler.BuildError>>(BuildErrorUpdate), list);
 		}
-		private void ThreadSafeBreakHandler(int address)
+		private void ThreadSafeBreakHandler(BreakInfo breakInfo)
 		{
-			BeginInvoke(_breakHandler, address);
+			BeginInvoke(_breakHandler, breakInfo);
 		}
 	    private void ThreadSafeBreakpointHandler(IEnumerable<Breakpoint> breakpoints)
 	    {
@@ -727,12 +727,19 @@ namespace Brewmaster
 	    }
 
 		private CodeEditor _currentFocus = null;
-		private void FocusOnCodeLine(int address)
+		private void FocusOnCodeLine(BreakInfo breakInfo)
 		{
 			//TODO: Index all known program lines in debug info for quick lookup?
 			foreach (var file in CurrentProject.Files.Where(f => f.DebugLines != null))
 			{
-				var matchingLine = file.DebugLines.Values.FirstOrDefault(l => l.RomAddress == address);
+				DebugLine matchingLine;
+				if ((file.Mode == CompileMode.Spc) != (_moduleEvents.DebugMode == DebugMode.Spc)) continue;
+
+				if (file.Mode == CompileMode.Spc)
+					matchingLine = file.DebugLines.Values.FirstOrDefault(l => l.CpuAddress == breakInfo.SpcAddress);
+				else
+					matchingLine = file.DebugLines.Values.FirstOrDefault(l => l.RomAddress == breakInfo.CpuAddress);
+
 				if (matchingLine != null)
 				{
 					if (!FocusOnCodeLine(file, matchingLine.Line, true, true)) break;
@@ -1192,14 +1199,24 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 	    {
 			allBreakpoints = breakpoints.ToList();
 
-		    foreach (var breakpoint in allBreakpoints.Where(bp => bp.Symbol != null)) breakpoint.UpdateFromSymbols(CurrentProject.DebugSymbols);
-			if (Mesen.Emulator != null) Mesen.Emulator.SetBreakpoints(allBreakpoints.Where(bp => !bp.Broken && !bp.Disabled));
+			foreach (var breakpoint in allBreakpoints.Where(bp => bp.Symbol != null))
+			{
+				if (breakpoint.AddressType == Breakpoint.AddressTypes.SpcRam) breakpoint.UpdateFromSymbols(CurrentProject.SpcDebugSymbols);
+				else breakpoint.UpdateFromSymbols(CurrentProject.DebugSymbols);
+			}
+
+			var currentBreakpoints = _moduleEvents.DebugMode == DebugMode.Spc
+				? allBreakpoints.Where(bp => bp.AddressType == Breakpoint.AddressTypes.SpcRam)
+				: allBreakpoints.Where(bp => bp.AddressType != Breakpoint.AddressTypes.SpcRam);
+			
+			if (Mesen.Emulator != null) Mesen.Emulator.SetBreakpoints(currentBreakpoints.Where(bp => !bp.Broken && !bp.Disabled));
 		    BreakpointList.SetBreakpoints(allBreakpoints);
 		    MemoryTabs.Cpu.SetBreakpoints(allBreakpoints.Where(bp => bp.AddressType == Breakpoint.AddressTypes.Cpu));
 		    MemoryTabs.Ppu.SetBreakpoints(allBreakpoints.Where(bp => bp.AddressType == Breakpoint.AddressTypes.Ppu));
 		    MemoryTabs.Oam.SetBreakpoints(allBreakpoints.Where(bp => bp.AddressType == Breakpoint.AddressTypes.Oam));
+		    MemoryTabs.Spc.SetBreakpoints(allBreakpoints.Where(bp => bp.AddressType == Breakpoint.AddressTypes.SpcRam && (bp.Type.HasFlag(Breakpoint.Types.Read) || bp.Type.HasFlag(Breakpoint.Types.Write))));
 
-		    foreach (var editor in editorTabs.TabPages.OfType<TextEditorWindow>()) editor.RefreshEditorBreakpoints();
+			foreach (var editor in editorTabs.TabPages.OfType<TextEditorWindow>()) editor.RefreshEditorBreakpoints();
 		}
 
 		private bool CloseCurrentProject(bool closingApplication = false)

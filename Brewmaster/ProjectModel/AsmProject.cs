@@ -87,6 +87,7 @@ namespace Brewmaster.ProjectModel
 		public TargetPlatform Platform { get; set; }
 		public ProjectType Type { get; set; }
 
+		public Dictionary<string, DebugSymbol> SpcDebugSymbols { get; private set; }
 		public Dictionary<string, DebugSymbol> DebugSymbols { get; private set; }
 		public List<DirectoryInfo> Directories { get; internal set; }
 		public bool UpdatedSinceLastBuild { get; set; }
@@ -127,7 +128,7 @@ namespace Brewmaster.ProjectModel
 			await (_symbolTask = Task.Run(() => { LoadAllSymbols(); }));
 		}
 
-		public async Task ParseDebugDataAsync(string debugFile = null)
+		public async Task ParseDebugDataAsync(string debugFile = null, string spcDebugFile = null)
 		{
 			if (debugFile == null && CurrentConfiguration != null && !string.IsNullOrWhiteSpace(CurrentConfiguration.DebugFile)) debugFile = Path.Combine(Directory.FullName, CurrentConfiguration.DebugFile);
 			if (debugFile == null) return;
@@ -136,7 +137,11 @@ namespace Brewmaster.ProjectModel
 				await _dbgTask; // Await existing task, since cancelling it might interfer with the new task
 				// TODO: deadlocks when 3 or more is started
 			}
-			await (_dbgTask = Task.Run(() => { ParseDebugData(debugFile); }));
+			await (_dbgTask = Task.Run(() =>
+			{
+				if (spcDebugFile != null) ParseDebugData(spcDebugFile, true);
+				ParseDebugData(debugFile);
+			}));
 		}
 
 		public void AwaitDebugTask()
@@ -146,7 +151,7 @@ namespace Brewmaster.ProjectModel
 			_dbgTask.Wait();
 		}
 
-		public void ParseDebugData(string debugFile)
+		public void ParseDebugData(string debugFile, bool spc = false)
 		{
 			var headerLength = Platform == TargetPlatform.Nes ? 16 : 0; // TODO: Base extra offset on info in the debug file
 			var debugInfo = new DebugInfo();
@@ -244,7 +249,7 @@ namespace Brewmaster.ProjectModel
 
 					debugLine.File.Lines.Add(debugLine.Line, debugLine);
 				}
-				foreach (var projectFile in Files)
+				foreach (var projectFile in Files.Where(f => (f.Mode == CompileMode.Spc) == spc))
 				{
 					projectFile.DebugLines = new Dictionary<int, DebugLine>();
 					foreach (var file in debugInfo.Files.Values.Where(f => f.Name == projectFile.File.FullName))
@@ -252,7 +257,8 @@ namespace Brewmaster.ProjectModel
 						if (file.Lines.Any()) projectFile.DebugLines = file.Lines;
 					}
 				}
-				DebugSymbols = debugInfo.Symbols;
+				if (spc) SpcDebugSymbols = debugInfo.Symbols;
+				else DebugSymbols = debugInfo.Symbols;
 			}
 		}
 
@@ -605,11 +611,20 @@ namespace Brewmaster.ProjectModel
 				foreach (var breakpoint in projectFile.EditorBreakpoints)
 				{
 					if (projectFile.DebugLines != null
-					    && projectFile.DebugLines.ContainsKey(breakpoint.BuildLine)
-					    && projectFile.DebugLines[breakpoint.BuildLine].RomAddress.HasValue)
+					    && projectFile.DebugLines.ContainsKey(breakpoint.BuildLine))
 					{
-						breakpoint.Broken = false;
-						breakpoint.StartAddress = projectFile.DebugLines[breakpoint.BuildLine].RomAddress.Value;
+						var matchingDebugLine = projectFile.DebugLines[breakpoint.BuildLine];
+						var address = breakpoint.AddressType == Breakpoint.AddressTypes.SpcRam ||
+						              breakpoint.AddressType == Breakpoint.AddressTypes.Cpu
+							? matchingDebugLine.CpuAddress
+							: matchingDebugLine.RomAddress;
+
+						if (address.HasValue)
+						{
+							breakpoint.Broken = false;
+							breakpoint.StartAddress = address.Value;
+						}
+						else breakpoint.Broken = true;
 					}
 					else breakpoint.Broken = true;
 

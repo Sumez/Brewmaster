@@ -14,19 +14,23 @@ namespace Brewmaster.ProjectExplorer
 		{
 			InitializeComponent();
 			_events = events;
-			_assemblySetting.SetOptions("No", "Yes");
+			_assemblySetting.SetOptions("No", "Yes", "Build as SPC");
 			_assemblySetting.ValueChanged += (value) =>
 			{
 				if (_file == null || (_file.Type != FileType.Source && _file.Type != FileType.Include)) return;
-				if (_file.Mode == CompileMode.IncludeInAssembly && value == "No")
+				if (_file.Mode != CompileMode.Ignore && value == "No")
 				{
 					_file.Mode = CompileMode.Ignore;
 					_file.Project.Pristine = false;
 				}
-
 				if (_file.Mode != CompileMode.IncludeInAssembly && value == "Yes")
 				{
 					_file.Mode = CompileMode.IncludeInAssembly;
+					_file.Project.Pristine = false;
+				}
+				if (_file.Mode != CompileMode.Spc && value == "Build as SPC")
+				{
+					_file.Mode = CompileMode.Spc;
 					_file.Project.Pristine = false;
 				}
 			};
@@ -200,7 +204,18 @@ namespace Brewmaster.ProjectExplorer
 				{
 					_pipelineSetting.Disabled = !(_pipelineSetting.Visible = _file.IsDataFile);
 					_assemblySetting.Disabled = !(_assemblySetting.Visible = _file.Type == FileType.Source || _file.Type == FileType.Include);
-					_assemblySetting.Value = _file.Mode == CompileMode.IncludeInAssembly ? "Yes" : "No";
+					switch (_file.Mode)
+					{
+						case CompileMode.Ignore:
+							_assemblySetting.Value = "No";
+							break;
+						case CompileMode.IncludeInAssembly:
+							_assemblySetting.Value = "Yes";
+							break;
+						case CompileMode.Spc:
+							_assemblySetting.Value = "No";
+							break;
+					}
 
 					_pipelineSetting.SetOptions(new object[] { "No processing" }.Concat(PipelineSettings.PipelineOptions.Where(o => o.SupportedFileTypes.Contains(_file.Type))).ToArray());
 

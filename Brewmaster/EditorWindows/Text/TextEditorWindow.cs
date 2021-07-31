@@ -57,10 +57,11 @@ namespace Brewmaster.EditorWindows.Text
 				SourceNavigator.Visible = true;
 				if (ProjectFile.LocalSymbols != null) SourceNavigator.UpdateSymbols(ProjectFile.LocalSymbols.Where(s => s.Source == ProjectFile.File.FullName));
 
+				var breakpointAddressType = file.Mode == CompileMode.Spc ? Breakpoint.AddressTypes.SpcRam : Breakpoint.AddressTypes.Cpu;
 				codeEditor.ParseErrors = (code) => form.BuildHandler.ParseErrors(code, ProjectFile);
 				codeEditor.AddToWatch = form.AddWatch;
-				codeEditor.AddAddressBreakpoint = (address, types) => { form.AddBreakpoint(address, types, Breakpoint.AddressTypes.Cpu); };
-				codeEditor.AddSymbolBreakpoint = (symbol, types) => { form.AddBreakpoint(-1, types, Breakpoint.AddressTypes.Cpu, symbol); };
+				codeEditor.AddAddressBreakpoint = (address, types) => { form.AddBreakpoint(address, types, breakpointAddressType); };
+				codeEditor.AddSymbolBreakpoint = (symbol, types) => { form.AddBreakpoint(-1, types, breakpointAddressType, symbol); };
 				codeEditor.GetCpuMemory = form.GetCpuMemory;
 				codeEditor.ActiveTextAreaControl.Caret.PositionChanged += (sender, args) =>
 				{

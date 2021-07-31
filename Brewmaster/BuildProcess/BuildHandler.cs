@@ -308,7 +308,7 @@ namespace Brewmaster.BuildProcess
 			Log(new LogData("Parsing debug info"));
 			var debugFile = Path.Combine(project.Directory.FullName, config.DebugFile);
 			if (!File.Exists(debugFile)) throw new Exception(string.Format("Debug file not found: '{0}'\nPlease check the build configuration.", debugFile));
-			var debugDataTask = project.ParseDebugDataAsync(debugFile);
+			var debugDataTask = project.ParseDebugDataAsync(debugFile, debugFile + ".spc");
 			debugDataTask.ContinueWith((t) =>
 			{
 				if (t.Status != TaskStatus.RanToCompletion)
@@ -365,8 +365,6 @@ namespace Brewmaster.BuildProcess
 				linkerConfig = configFiles.First();
 			}
 
-			var asmFailed = false;
-
 			var projectFolder = project.Directory.FullName;
 			if (projectFolder == null) throw new Exception("Project directory not found");
 
@@ -390,80 +388,16 @@ namespace Brewmaster.BuildProcess
 
 			Log(new LogData("Building PRG from source files", LogType.Headline));
 
-			var asmParams = GetAsmParams(projectFolder);
-
 			var sourceFiles = project.Files.Where(f => f.Mode == CompileMode.IncludeInAssembly);
-			var objectFiles = new List<string>();
-			foreach (var projectFile in sourceFiles)
-			{
-				using (var asmProcess = new Process())
-				{
-					asmProcess.StartInfo = asmParams;
-					asmProcess.EnableRaisingEvents = true;
-					asmProcess.OutputDataReceived += OutputReceived;
-					string multilineError = null;
-					asmProcess.ErrorDataReceived += (s, e) => { ProcessErrorData(e.Data, errors, ref multilineError); };
-
-					var directory = Path.Combine(projectFolder, config.BuildPath, projectFile.GetRelativeDirectory());
-					if (!Directory.Exists(directory)) Directory.CreateDirectory(directory);
-					var fileBase = projectFile.GetRelativeDirectory() + @"/" + Path.GetFileNameWithoutExtension(projectFile.File.Name);
-					var sourceFile = projectFile.GetRelativePath();
-					var objectFile = config.BuildPath + @"/" + fileBase + ".o";
-					var dependencyFile = config.BuildPath + @"/" + fileBase + ".d";
-					objectFiles.Add(objectFile);
-
-					asmProcess.StartInfo.Arguments = string.Format("\"{0}\" -o \"{1}\" --create-dep \"{2}\" -t nes --cpu {3}{4} -g -I .",
-						sourceFile,
-						objectFile,
-						dependencyFile,
-						project.GetTargetCpu(),
-						string.Join("", config.Symbols.Select(s => " -D " + s)));
-
-					Log(new LogData("ca65 " + asmProcess.StartInfo.Arguments));
-					asmProcess.Start();
-					asmProcess.BeginOutputReadLine();
-					asmProcess.BeginErrorReadLine();
-					asmProcess.WaitForExit();
-					if (asmProcess.ExitCode != 0) asmFailed = true;
-				}
-			}
-
-			if (asmFailed) return false;
-
-			if (File.Exists(targetFile)) File.Delete(targetFile);
+			var spcFiles = project.Files.Where(f => f.Mode == CompileMode.Spc);
 			var outputFile = targetFile;
 			if (config.PrgBuildPath != null && config.PrgFile != null)
 			{
 				outputFile = Path.Combine(projectFolder, config.PrgBuildPath, config.PrgFile);
 			}
-
-			using (var linkerProcess = new Process())
-			{
-				linkerProcess.StartInfo = asmParams;
-				linkerProcess.EnableRaisingEvents = true;
-				linkerProcess.OutputDataReceived += OutputReceived;
-				string multilineError = null;
-				linkerProcess.ErrorDataReceived += (s, e) => { ProcessErrorData(e.Data, errors, ref multilineError); };
-
-				//linkerProcess.StartInfo.FileName = string.Format(@"{0}\cc65\bin\cl65.exe", ideFolder);
-				//linkerProcess.StartInfo.Arguments = string.Format("-t nes -C {0} --mapfile {1} -Wl --dbgfile,{2} -o {3} {4}", cartridge.LinkerConfigFile, cartridge.MapFile, cartridge.DebugFile, prgFile, string.Join(" ", objectFiles));
-
-				linkerProcess.StartInfo.FileName = string.Format(@"{0}\cc65\bin\ld65.exe", Program.WorkingDirectory);
-				linkerProcess.StartInfo.Arguments = string.Format("-o \"{3}\" -C \"{0}\" -m \"{1}\" --dbgfile \"{2}\" {4}",
-					linkerConfig.GetRelativePath(),
-					config.MapFile,
-					config.DebugFile,
-					outputFile,
-					string.Join(" ", objectFiles.Select(f => string.Format("\"{0}\"", f)))
-				);
-
-				Log(new LogData("ld65 " + linkerProcess.StartInfo.Arguments));
-				linkerProcess.Start();
-				linkerProcess.BeginOutputReadLine();
-				linkerProcess.BeginErrorReadLine();
-				linkerProcess.WaitForExit();
-				if (linkerProcess.ExitCode != 0) return false;
-			}
+			
+			if (spcFiles.Any() && !RunAssembler(outputFile + ".spc", project.GetTargetCpu(), projectFolder, spcFiles, errors, config, config.DebugFile + ".spc", project.Files.First(f => f.File.Name == "spc.cfg"))) return false;
+			if (!RunAssembler(outputFile, project.GetTargetCpu(), projectFolder, sourceFiles, errors, config, config.DebugFile, linkerConfig)) return false;
 
 			if (project.Platform == TargetPlatform.Snes && config.CalculateChecksum)
 				using (var stream = File.Open(outputFile, FileMode.Open, FileAccess.ReadWrite))
@@ -498,6 +432,8 @@ namespace Brewmaster.BuildProcess
 
 			if (prgFolder != null)
 			{
+				if (File.Exists(targetFile)) File.Delete(targetFile);
+
 				if (project.Platform == TargetPlatform.Nes) Log(new LogData("Merging into iNES file", LogType.Headline));
 				using (var write = File.OpenWrite(targetFile))
 				{
@@ -520,6 +456,76 @@ namespace Brewmaster.BuildProcess
 					write.Close();
 					Log(new LogData(targetFile.Replace('/', '\\')));
 				}
+			}
+
+			return true;
+		}
+
+		private bool RunAssembler(string outputFile, string targetCpu, string projectFolder,
+			IEnumerable<AsmProjectFile> sourceFiles, List<BuildError> errors, NesCartridge config, string debugFile, AsmProjectFile linkerConfig)
+		{
+			var asmFailed = false;
+			var asmParams = GetAsmParams(projectFolder);
+			var objectFiles = new List<string>();
+			foreach (var projectFile in sourceFiles)
+			{
+				using (var asmProcess = new Process())
+				{
+					asmProcess.StartInfo = asmParams;
+					asmProcess.EnableRaisingEvents = true;
+					asmProcess.OutputDataReceived += OutputReceived;
+					string multilineError = null;
+					asmProcess.ErrorDataReceived += (s, e) => { ProcessErrorData(e.Data, errors, ref multilineError); };
+
+					var directory = Path.Combine(projectFolder, config.BuildPath, projectFile.GetRelativeDirectory());
+					if (!Directory.Exists(directory)) Directory.CreateDirectory(directory);
+					var fileBase = projectFile.GetRelativeDirectory() + @"/" + Path.GetFileNameWithoutExtension(projectFile.File.Name);
+					var sourceFile = projectFile.GetRelativePath();
+					var objectFile = config.BuildPath + @"/" + fileBase + ".o";
+					var dependencyFile = config.BuildPath + @"/" + fileBase + ".d";
+					objectFiles.Add(objectFile);
+
+					asmProcess.StartInfo.Arguments = string.Format("\"{0}\" -o \"{1}\" --create-dep \"{2}\" -t nes --cpu {3}{4} -g -I .",
+						sourceFile,
+						objectFile,
+						dependencyFile,
+						targetCpu,
+						string.Join("", config.Symbols.Select(s => " -D " + s)));
+
+					Log(new LogData("ca65 " + asmProcess.StartInfo.Arguments));
+					asmProcess.Start();
+					asmProcess.BeginOutputReadLine();
+					asmProcess.BeginErrorReadLine();
+					asmProcess.WaitForExit();
+					if (asmProcess.ExitCode != 0) asmFailed = true;
+				}
+			}
+
+			if (asmFailed) return false;
+
+			if (File.Exists(outputFile)) File.Delete(outputFile);
+			using (var linkerProcess = new Process())
+			{
+				linkerProcess.StartInfo = asmParams;
+				linkerProcess.EnableRaisingEvents = true;
+				linkerProcess.OutputDataReceived += OutputReceived;
+				string multilineError = null;
+				linkerProcess.ErrorDataReceived += (s, e) => { ProcessErrorData(e.Data, errors, ref multilineError); };
+				linkerProcess.StartInfo.FileName = string.Format(@"{0}\cc65\bin\ld65.exe", Program.WorkingDirectory);
+				linkerProcess.StartInfo.Arguments = string.Format("-o \"{3}\" -C \"{0}\" -m \"{1}\" --dbgfile \"{2}\" {4}",
+					linkerConfig.GetRelativePath(),
+					config.MapFile,
+					debugFile,
+					outputFile,
+					string.Join(" ", objectFiles.Select(f => string.Format("\"{0}\"", f)))
+				);
+
+				Log(new LogData("ld65 " + linkerProcess.StartInfo.Arguments));
+				linkerProcess.Start();
+				linkerProcess.BeginOutputReadLine();
+				linkerProcess.BeginErrorReadLine();
+				linkerProcess.WaitForExit();
+				if (linkerProcess.ExitCode != 0) return false;
 			}
 
 			return true;

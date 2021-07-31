@@ -21,7 +21,7 @@ namespace Brewmaster.ProjectModel
 		public event Action EnabledChanged;
 		public enum AddressTypes
 		{
-			PrgRom = 1, ChrRom = 2, Cpu = 3, Ppu = 4, Apu = 5, Oam = 6
+			PrgRom = 1, ChrRom = 2, Cpu = 3, Ppu = 4, Apu = 5, Oam = 6, SpcRam = 7
 		}
 		public int StartAddress { get; set; }
 		public int? EndAddress { get; set; }

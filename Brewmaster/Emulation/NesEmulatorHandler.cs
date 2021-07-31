@@ -22,7 +22,7 @@ namespace Brewmaster.Emulation
 		private Action<LogData> _logHandler;
 
 		public event Action OnRun;
-		public event Action<int> OnBreak;
+		public event Action<BreakInfo> OnBreak;
 		public event Action<EmulatorStatus> OnStatusChange;
 		public event Action<EmulationState> OnRegisterUpdate;
 
@@ -218,7 +218,7 @@ namespace Brewmaster.Emulation
 						DebugState state = default(DebugState);
 						InteropEmu.DebugGetState(ref state);
 						var address = InteropEmu.DebugGetAbsoluteAddress(state.CPU.DebugPC);
-						OnBreak(address);
+						OnBreak(new BreakInfo { CpuAddress = address });
 					}
 					if (OnStatusChange != null) OnStatusChange(EmulatorStatus.Paused);
 					EmitDebugData();

@@ -166,7 +166,7 @@ namespace Brewmaster.Modules.Watch
 		private int ReadAddress(int index, bool readWord, OffsetRegister offset)
 		{
 			if (_memoryState == null) return -2;
-			return _memoryState.ReadAddress(index, readWord, offset);
+			return _memoryState.ReadAddress(MemoryState.CpuType.Cpu, index, readWord, offset);
 		}
 
 		public void ClearValues()
