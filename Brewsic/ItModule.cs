@@ -89,6 +89,7 @@ namespace Brewsic
 				}
 				if (mask.HasFlag(ItNote.VOLUME))
 				{
+					lastNote[channel].HasVolumeEffect = rowNotes[channel].HasVolumeEffect = true;
 					lastNote[channel].VolumeEffect = rowNotes[channel].VolumeEffect = (byte)stream.ReadByte();
 				}
 				if (mask.HasFlag(ItNote.EFFECT))
@@ -104,7 +105,10 @@ namespace Brewsic
 				if (mask.HasFlag(ItNote.SAME_SAMPLE))
 					rowNotes[channel].Instrument = lastNote[channel].Instrument;
 				if (mask.HasFlag(ItNote.SAME_VOLUME))
+				{
+					rowNotes[channel].HasVolumeEffect = true;
 					rowNotes[channel].VolumeEffect = lastNote[channel].VolumeEffect;
+				}
 				if (mask.HasFlag(ItNote.SAME_EFFECT))
 				{
 					rowNotes[channel].Effect = lastNote[channel].Effect;
@@ -722,7 +726,7 @@ namespace Brewsic
 				}
 
 				var note = pattern[i];
-				if (!note.HasNote && note.Effect == 0 && note.VolumeEffect == 0)
+				if (!note.HasNote && note.Effect == 0 && !note.HasVolumeEffect)
 				{
 					if (clearCount == 128)
 					{
@@ -797,10 +801,10 @@ namespace Brewsic
 					}
 				}
 
-				var headerByte = (note.Effect > 0 ? 0x80 : 0) | (note.VolumeEffect > 0 ? 0x40 : 0) | instrumentId;
+				var headerByte = (note.Effect > 0 ? 0x80 : 0) | (note.HasVolumeEffect ? 0x40 : 0) | instrumentId;
 
 				currentBlock.Add((byte)headerByte);
-				if (note.VolumeEffect > 0) currentBlock.Add(note.VolumeEffect);
+				if (note.HasVolumeEffect) currentBlock.Add(note.VolumeEffect);
 				if (note.Effect > 0) currentBlock.Add(note.Effect);
 				if (note.Effect > 0) currentBlock.Add(note.EffectParam);
 				if (instrumentId < 54) currentBlock.Add(noteByte);
