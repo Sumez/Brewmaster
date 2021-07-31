@@ -32,16 +32,20 @@ namespace Brewmaster.BuildProcess
 			Task.Run(() =>
 			{
 				if (RefreshErrorList != null) RefreshErrorList(new List<BuildError>());
+#if !THROWERRORS
 				try
+#endif
 				{
 					var errors = BuildSync(project, buildProcessSource);
 					if (RefreshErrorList != null) RefreshErrorList(errors);
 				}
+#if !THROWERRORS
 				catch (Exception ex)
 				{
 					Log(new LogData("Unexpected error: " + ex.Message, LogType.Error));
 					buildProcessSource.SetResult(false);
 				}
+#endif
 			});
 
 			return buildProcessSource.Task;
@@ -104,7 +108,7 @@ namespace Brewmaster.BuildProcess
 		public class BuildError : IFileLocation
 		{
 			public enum BuildErrorType { Unknown, Warning, Error };
-			private const string ErrorMatch = @"^(.*)\(([0-9]+)\):\s+(Error|Warning):\s+(.*)$";
+			private const string ErrorMatch = @"^(.*)(\([0-9]+\)|:[0-9]+):\s+(Error|Warning|Note):\s+(.*)$";
 			private const string LinkerMatch = @"^ld65\.exe:\s+(Error|Warning):\s+(.*)\(([0-9]+)\):\s+(.*)$";
 			private const string LinkerMatch2 = @"^ld65\.exe:\s+(Error|Warning):\s+(.*\s+`(.*)'),\s+line\s+([0-9]+)$";
 			private const string ReferenceMatch = @"^(.+)\s+(referenced in:)\s+(.*)\(([0-9]+)\)$";
@@ -122,7 +126,7 @@ namespace Brewmaster.BuildProcess
 				{
 					Type = match.Groups[3].Value == "Error" ? BuildErrorType.Error : BuildErrorType.Warning;
 					File = match.Groups[1].Value;
-					Line = int.Parse(match.Groups[2].Value);
+					Line = int.Parse(match.Groups[2].Value.Trim('(', ')', ':'));
 					Message = match.Groups[4].Value;
 				}
 				else if ((match = Regex.Match(message, LinkerMatch)).Success)
@@ -254,6 +258,9 @@ namespace Brewmaster.BuildProcess
 				}
 
 				Log(new LogData(string.Format("Processing {0}", string.Join(",", file.Pipeline.OutputFiles.Where(f => f != null)))));
+#if THROWERRORS
+				file.Pipeline.Process(output => { if (output != null) Log(new LogData(output)); });
+#else
 				try
 				{
 					file.Pipeline.Process(output => { if (output != null) Log(new LogData(output)); });
@@ -266,6 +273,7 @@ namespace Brewmaster.BuildProcess
 					errors.Add(error);
 					ErrorReceived(error);
 				}
+#endif
 			}
 			if (skippedCount > 0) Log(new LogData(string.Format("Skipped {0} unchanged files", skippedCount)));
 

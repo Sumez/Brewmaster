@@ -5,3 +5,5 @@ $ cat .gitignore
 /Brewmaster/obj/*
 *.user
 *.suo
+/Brewsic/bin
+/Brewsic/obj
