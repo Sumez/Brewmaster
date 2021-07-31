@@ -182,19 +182,22 @@ namespace Brewmaster.ProjectModel
 							if (!data.ContainsKey("span")) break;
 							foreach (var span in data["span"].Split('+'))
 							{
-								if (debugInfo.Lines.ContainsKey(int.Parse(span)))
+								var lineSpanId = int.Parse(span);
+								/*if (debugInfo.Lines.ContainsKey(int.Parse(span)))
 								{
-									// TODO: If span already exists but file is different? (macro)
+									// TODO: If macro has multiple lines, debug in macro definition, otherwise debug where it was used
 									if (data.ContainsKey("type") && data["type"] == "2")
 									{
 										debugInfo.Lines.Remove(int.Parse(span));
 									}
 									else continue;
-								}
-								debugInfo.Lines.Add(int.Parse(span), debugInfo.LineIds[int.Parse(data["id"])] = new DebugLine
+								}*/
+								if (!debugInfo.Lines.ContainsKey(lineSpanId)) debugInfo.Lines.Add(lineSpanId, new DebugSpan());
+								debugInfo.Lines[lineSpanId].Lines.Add(debugInfo.LineIds[int.Parse(data["id"])] = new DebugLine
 								{
 									File = debugInfo.Files[int.Parse(data["file"])],
 									Line = int.Parse(data["line"]),
+									IsMacroDefinition = data.ContainsKey("type") && data["type"] == "2"
 								});
 							}
 							break;
@@ -242,16 +245,21 @@ namespace Brewmaster.ProjectModel
 					}
 				}
 
-				foreach (var debugLine in debugInfo.Lines.Values)
+				foreach (var span in debugInfo.Lines.Values)
 				{
-					if (!debugLine.RomAddress.HasValue && !debugLine.CpuAddress.HasValue) continue;
-					if (debugLine.File.Lines.ContainsKey(debugLine.Line)) continue; // TODO: Lines covering multiple spans due to MACROs!
+					if (!span.RomAddress.HasValue && !span.CpuAddress.HasValue) continue;
+					foreach (var debugLine in span.Lines)
+					{
+						debugLine.CpuAddress = span.CpuAddress;
+						debugLine.RomAddress = span.RomAddress;
 
-					debugLine.File.Lines.Add(debugLine.Line, debugLine);
+						if (!debugLine.File.Lines.ContainsKey(debugLine.Line)) debugLine.File.Lines.Add(debugLine.Line, new List<DebugLine>());
+						debugLine.File.Lines[debugLine.Line].Add(debugLine);
+					}
 				}
 				foreach (var projectFile in Files.Where(f => (f.Mode == CompileMode.Spc) == spc))
 				{
-					projectFile.DebugLines = new Dictionary<int, DebugLine>();
+					projectFile.DebugLines = new Dictionary<int, List<DebugLine>>();
 					foreach (var file in debugInfo.Files.Values.Where(f => f.Name == projectFile.File.FullName))
 					{
 						if (file.Lines.Any()) projectFile.DebugLines = file.Lines;
@@ -610,14 +618,13 @@ namespace Brewmaster.ProjectModel
 			{
 				foreach (var breakpoint in projectFile.EditorBreakpoints)
 				{
-					if (projectFile.DebugLines != null
-					    && projectFile.DebugLines.ContainsKey(breakpoint.BuildLine))
+					if (projectFile.DebugLines != null && projectFile.DebugLines.ContainsKey(breakpoint.BuildLine))
 					{
 						var matchingDebugLine = projectFile.DebugLines[breakpoint.BuildLine];
 						var address = breakpoint.AddressType == Breakpoint.AddressTypes.SpcRam ||
 						              breakpoint.AddressType == Breakpoint.AddressTypes.Cpu
-							? matchingDebugLine.CpuAddress
-							: matchingDebugLine.RomAddress;
+							? matchingDebugLine.Min(l => l.CpuAddress)
+							: matchingDebugLine.Min(l => l.CpuAddress);
 
 						if (address.HasValue)
 						{

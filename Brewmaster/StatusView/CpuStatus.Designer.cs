@@ -199,7 +199,7 @@
 			RegisterGroup.Location = new System.Drawing.Point(2, 20);
 			RegisterGroup.Name = "RegisterGroup";
 			RegisterGroup.Padding = new System.Windows.Forms.Padding(0, 5, 0, 0);
-			RegisterGroup.Size = new System.Drawing.Size(647, 26);
+			RegisterGroup.Size = new System.Drawing.Size(620, 26);
 			RegisterGroup.TabIndex = 0;
 			RegisterGroup.Text = "Registers";
 			// 
@@ -219,7 +219,7 @@
 			this.registerPanel.Location = new System.Drawing.Point(0, 3);
 			this.registerPanel.Margin = new System.Windows.Forms.Padding(0);
 			this.registerPanel.Name = "registerPanel";
-			this.registerPanel.Size = new System.Drawing.Size(647, 23);
+			this.registerPanel.Size = new System.Drawing.Size(620, 23);
 			this.registerPanel.TabIndex = 12;
 			// 
 			// panelA
@@ -237,6 +237,8 @@
 			// RegisterA
 			// 
 			this.RegisterA.Cursor = System.Windows.Forms.Cursors.IBeam;
+			this.RegisterA.DimColor = System.Drawing.Color.Gray;
+			this.RegisterA.DimUpperByte = false;
 			this.RegisterA.Dock = System.Windows.Forms.DockStyle.Left;
 			this.RegisterA.Font = new System.Drawing.Font("Consolas", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
 			this.RegisterA.Location = new System.Drawing.Point(17, 0);
@@ -275,6 +277,8 @@
 			// RegisterX
 			// 
 			this.RegisterX.Cursor = System.Windows.Forms.Cursors.IBeam;
+			this.RegisterX.DimColor = System.Drawing.Color.Gray;
+			this.RegisterX.DimUpperByte = false;
 			this.RegisterX.Dock = System.Windows.Forms.DockStyle.Left;
 			this.RegisterX.Font = new System.Drawing.Font("Consolas", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
 			this.RegisterX.Location = new System.Drawing.Point(17, 0);
@@ -315,6 +319,8 @@
 			// RegisterY
 			// 
 			this.RegisterY.Cursor = System.Windows.Forms.Cursors.IBeam;
+			this.RegisterY.DimColor = System.Drawing.Color.Gray;
+			this.RegisterY.DimUpperByte = false;
 			this.RegisterY.Dock = System.Windows.Forms.DockStyle.Left;
 			this.RegisterY.Font = new System.Drawing.Font("Consolas", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
 			this.RegisterY.Location = new System.Drawing.Point(17, 0);
@@ -355,6 +361,8 @@
 			// RegisterPC
 			// 
 			this.RegisterPC.Cursor = System.Windows.Forms.Cursors.IBeam;
+			this.RegisterPC.DimColor = System.Drawing.Color.Gray;
+			this.RegisterPC.DimUpperByte = false;
 			this.RegisterPC.Dock = System.Windows.Forms.DockStyle.Left;
 			this.RegisterPC.Font = new System.Drawing.Font("Consolas", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
 			this.RegisterPC.Location = new System.Drawing.Point(24, 0);
@@ -397,6 +405,8 @@
 			// RegisterDB
 			// 
 			this.RegisterDB.Cursor = System.Windows.Forms.Cursors.IBeam;
+			this.RegisterDB.DimColor = System.Drawing.Color.Gray;
+			this.RegisterDB.DimUpperByte = false;
 			this.RegisterDB.Dock = System.Windows.Forms.DockStyle.Left;
 			this.RegisterDB.Font = new System.Drawing.Font("Consolas", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
 			this.RegisterDB.Location = new System.Drawing.Point(25, 0);
@@ -435,6 +445,8 @@
 			// RegisterSP
 			// 
 			this.RegisterSP.Cursor = System.Windows.Forms.Cursors.IBeam;
+			this.RegisterSP.DimColor = System.Drawing.Color.Gray;
+			this.RegisterSP.DimUpperByte = false;
 			this.RegisterSP.Dock = System.Windows.Forms.DockStyle.Left;
 			this.RegisterSP.Font = new System.Drawing.Font("Consolas", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
 			this.RegisterSP.Location = new System.Drawing.Point(24, 0);
@@ -476,6 +488,8 @@
 			// RegisterDP
 			// 
 			this.RegisterDP.Cursor = System.Windows.Forms.Cursors.IBeam;
+			this.RegisterDP.DimColor = System.Drawing.Color.Gray;
+			this.RegisterDP.DimUpperByte = false;
 			this.RegisterDP.Dock = System.Windows.Forms.DockStyle.Left;
 			this.RegisterDP.Font = new System.Drawing.Font("Consolas", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
 			this.RegisterDP.Location = new System.Drawing.Point(25, 0);
@@ -512,6 +526,8 @@
 			// RegisterP
 			// 
 			this.RegisterP.Cursor = System.Windows.Forms.Cursors.IBeam;
+			this.RegisterP.DimColor = System.Drawing.Color.Gray;
+			this.RegisterP.DimUpperByte = false;
 			this.RegisterP.Dock = System.Windows.Forms.DockStyle.Left;
 			this.RegisterP.Font = new System.Drawing.Font("Consolas", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
 			this.RegisterP.Location = new System.Drawing.Point(17, 0);
@@ -542,7 +558,7 @@
 			FlagGroup.Dock = System.Windows.Forms.DockStyle.Top;
 			FlagGroup.Location = new System.Drawing.Point(2, 67);
 			FlagGroup.Name = "FlagGroup";
-			FlagGroup.Size = new System.Drawing.Size(647, 29);
+			FlagGroup.Size = new System.Drawing.Size(620, 29);
 			FlagGroup.TabIndex = 0;
 			FlagGroup.Text = "Flags";
 			// 
@@ -556,7 +572,7 @@
 			this.flagPanel.Controls.Add(this.snesFlags);
 			this.flagPanel.Location = new System.Drawing.Point(0, 6);
 			this.flagPanel.Name = "flagPanel";
-			this.flagPanel.Size = new System.Drawing.Size(647, 20);
+			this.flagPanel.Size = new System.Drawing.Size(620, 20);
 			this.flagPanel.TabIndex = 1;
 			// 
 			// panel7
@@ -718,7 +734,7 @@
 			TimingGroup.Location = new System.Drawing.Point(2, 117);
 			TimingGroup.Name = "TimingGroup";
 			TimingGroup.Padding = new System.Windows.Forms.Padding(0, 5, 0, 0);
-			TimingGroup.Size = new System.Drawing.Size(647, 52);
+			TimingGroup.Size = new System.Drawing.Size(620, 52);
 			TimingGroup.TabIndex = 1;
 			TimingGroup.Text = "Timing";
 			// 
@@ -732,7 +748,7 @@
 			this.flowLayoutPanel4.Controls.Add(this.panel11);
 			this.flowLayoutPanel4.Location = new System.Drawing.Point(0, 3);
 			this.flowLayoutPanel4.Name = "flowLayoutPanel4";
-			this.flowLayoutPanel4.Size = new System.Drawing.Size(647, 46);
+			this.flowLayoutPanel4.Size = new System.Drawing.Size(620, 46);
 			this.flowLayoutPanel4.TabIndex = 4;
 			// 
 			// panel9
@@ -1373,7 +1389,7 @@
 			horizontalLine5.LineColor = System.Drawing.SystemColors.ButtonShadow;
 			horizontalLine5.Location = new System.Drawing.Point(2, 211);
 			horizontalLine5.Name = "horizontalLine5";
-			horizontalLine5.Size = new System.Drawing.Size(647, 1);
+			horizontalLine5.Size = new System.Drawing.Size(620, 1);
 			horizontalLine5.TabIndex = 14;
 			horizontalLine5.Text = "horizontalLine5";
 			// 
@@ -1383,7 +1399,7 @@
 			horizontalLine4.LineColor = System.Drawing.SystemColors.ButtonShadow;
 			horizontalLine4.Location = new System.Drawing.Point(2, 190);
 			horizontalLine4.Name = "horizontalLine4";
-			horizontalLine4.Size = new System.Drawing.Size(647, 1);
+			horizontalLine4.Size = new System.Drawing.Size(620, 1);
 			horizontalLine4.TabIndex = 10;
 			horizontalLine4.Text = "horizontalLine4";
 			// 
@@ -1393,7 +1409,7 @@
 			horizontalLine3.LineColor = System.Drawing.SystemColors.ButtonShadow;
 			horizontalLine3.Location = new System.Drawing.Point(2, 169);
 			horizontalLine3.Name = "horizontalLine3";
-			horizontalLine3.Size = new System.Drawing.Size(647, 1);
+			horizontalLine3.Size = new System.Drawing.Size(620, 1);
 			horizontalLine3.TabIndex = 9;
 			horizontalLine3.Text = "horizontalLine3";
 			// 
@@ -1403,7 +1419,7 @@
 			horizontalLine2.LineColor = System.Drawing.SystemColors.ButtonShadow;
 			horizontalLine2.Location = new System.Drawing.Point(2, 96);
 			horizontalLine2.Name = "horizontalLine2";
-			horizontalLine2.Size = new System.Drawing.Size(647, 1);
+			horizontalLine2.Size = new System.Drawing.Size(620, 1);
 			horizontalLine2.TabIndex = 8;
 			horizontalLine2.Text = "horizontalLine2";
 			// 
@@ -1413,7 +1429,7 @@
 			horizontalLine1.LineColor = System.Drawing.SystemColors.ButtonShadow;
 			horizontalLine1.Location = new System.Drawing.Point(2, 46);
 			horizontalLine1.Name = "horizontalLine1";
-			horizontalLine1.Size = new System.Drawing.Size(647, 1);
+			horizontalLine1.Size = new System.Drawing.Size(620, 1);
 			horizontalLine1.TabIndex = 7;
 			horizontalLine1.Text = "horizontalLine1";
 			// 
@@ -1427,7 +1443,7 @@
 			this.expandPpu.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
 			this.expandPpu.Location = new System.Drawing.Point(2, 191);
 			this.expandPpu.Name = "expandPpu";
-			this.expandPpu.Size = new System.Drawing.Size(647, 20);
+			this.expandPpu.Size = new System.Drawing.Size(620, 20);
 			this.expandPpu.TabIndex = 6;
 			this.expandPpu.UseVisualStyleBackColor = true;
 			// 
@@ -1441,7 +1457,7 @@
 			this.expandStack.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
 			this.expandStack.Location = new System.Drawing.Point(2, 170);
 			this.expandStack.Name = "expandStack";
-			this.expandStack.Size = new System.Drawing.Size(647, 20);
+			this.expandStack.Size = new System.Drawing.Size(620, 20);
 			this.expandStack.TabIndex = 3;
 			this.expandStack.UseVisualStyleBackColor = true;
 			// 
@@ -1455,7 +1471,7 @@
 			this.expandTiming.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
 			this.expandTiming.Location = new System.Drawing.Point(2, 97);
 			this.expandTiming.Name = "expandTiming";
-			this.expandTiming.Size = new System.Drawing.Size(647, 20);
+			this.expandTiming.Size = new System.Drawing.Size(620, 20);
 			this.expandTiming.TabIndex = 2;
 			this.expandTiming.UseVisualStyleBackColor = true;
 			// 
@@ -1469,7 +1485,7 @@
 			this.expandFlags.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
 			this.expandFlags.Location = new System.Drawing.Point(2, 47);
 			this.expandFlags.Name = "expandFlags";
-			this.expandFlags.Size = new System.Drawing.Size(647, 20);
+			this.expandFlags.Size = new System.Drawing.Size(620, 20);
 			this.expandFlags.TabIndex = 1;
 			this.expandFlags.UseVisualStyleBackColor = true;
 			// 
@@ -1483,7 +1499,7 @@
 			this.expandCpu.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
 			this.expandCpu.Location = new System.Drawing.Point(2, 0);
 			this.expandCpu.Name = "expandCpu";
-			this.expandCpu.Size = new System.Drawing.Size(647, 20);
+			this.expandCpu.Size = new System.Drawing.Size(620, 20);
 			this.expandCpu.TabIndex = 0;
 			this.expandCpu.UseVisualStyleBackColor = true;
 			// 
@@ -1511,7 +1527,7 @@
 			this.MinimumSize = new System.Drawing.Size(100, 0);
 			this.Name = "CpuStatus";
 			this.Padding = new System.Windows.Forms.Padding(2, 0, 0, 0);
-			this.Size = new System.Drawing.Size(649, 622);
+			this.Size = new System.Drawing.Size(622, 622);
 			RegisterGroup.ResumeLayout(false);
 			RegisterGroup.PerformLayout();
 			this.registerPanel.ResumeLayout(false);

@@ -5,7 +5,7 @@ namespace Brewmaster.ProjectModel
 	public class DebugInfo
 	{
 		public Dictionary<int, DebugFile> Files { get; private set; }
-		public Dictionary<int, DebugLine> Lines { get; private set; }
+		public Dictionary<int, DebugSpan> Lines { get; private set; }
 		public Dictionary<int, DebugLine> LineIds { get; private set; }
 		public Dictionary<int, DebugSegment> Segments { get; private set; }
 		public Dictionary<string, DebugSymbol> Symbols { get; private set; }
@@ -13,14 +13,20 @@ namespace Brewmaster.ProjectModel
 		public DebugInfo()
 		{
 			Files = new Dictionary<int, DebugFile>();
-			Lines = new Dictionary<int, DebugLine>();
+			Lines = new Dictionary<int, DebugSpan>();
 			LineIds = new Dictionary<int, DebugLine>();
 			Segments = new Dictionary<int, DebugSegment>();
 			Symbols = new Dictionary<string, DebugSymbol>();
 		}
 	}
 
-
+	public class DebugSpan
+	{
+		public int? RomAddress;
+		public int? CpuAddress;
+		public int Size;
+		public List<DebugLine> Lines = new List<DebugLine>();
+	}
 	public struct DebugSegment
 	{
 		public int? RomOffset;
@@ -30,11 +36,11 @@ namespace Brewmaster.ProjectModel
 	public class DebugFile
 	{
 		public string Name;
-		public Dictionary<int, DebugLine> Lines;
+		public Dictionary<int, List<DebugLine>> Lines;
 
 		public DebugFile()
 		{
-			Lines = new Dictionary<int, DebugLine>();
+			Lines = new Dictionary<int, List<DebugLine>>();
 		}
 	}
 
@@ -43,8 +49,8 @@ namespace Brewmaster.ProjectModel
 		public DebugFile File;
 		public int Line;
 		public int? RomAddress;
-		public int Size;
 		public int? CpuAddress;
+		public bool IsMacroDefinition;
 	}
 	public class DebugSymbol
 	{

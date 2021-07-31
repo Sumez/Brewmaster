@@ -27,8 +27,7 @@ namespace Brewmaster.EditorWindows.Code
 		}
 		public override Size Size
 		{
-			get { return new Size(textArea.TextView.WideSpaceWidth * (_addressWidth + 3),
-				-1); }
+			get { return new Size(textArea.TextView.WideSpaceWidth * (_addressWidth + 3), -1); }
 		}
 
 		public override void Paint(Graphics graphics, Rectangle bounds)

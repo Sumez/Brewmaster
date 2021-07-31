@@ -50,6 +50,14 @@ namespace Brewmaster.EditorWindows.Code
 		public Action<string, Breakpoint.Types> AddSymbolBreakpoint { get; set; }
 		public Func<MemoryState> GetCpuMemory { get; set; }
 
+		public Dictionary<string, DebugSymbol> DebugSymbols
+		{
+			get
+			{
+				return File.Mode != CompileMode.Spc ? File.Project.DebugSymbols : File.Project.SpcDebugSymbols;
+			}
+		}
+
 		public CodeEditor(AsmProjectFile file, Events events)
 		{
 			File = file;
@@ -64,7 +72,7 @@ namespace Brewmaster.EditorWindows.Code
 			ActiveTextAreaControl.TextArea.InsertLeftMargin(1, 
 				new CpuAddressMargin(ActiveTextAreaControl.TextArea,
 					GetDebugLine,
-					file.Project.Platform == TargetPlatform.Snes ? 6 : 4));
+					file.Project.Platform == TargetPlatform.Snes && file.Mode != CompileMode.Spc ? 6 : 4));
 
 			Menu = new CodeMenu(events);
 			Menu.Enabled = true;
@@ -302,7 +310,7 @@ namespace Brewmaster.EditorWindows.Code
 			if (buildLine == null) return null;
 
 			if (!File.DebugLines.ContainsKey(buildLine.BuildLine + 1)) return null;
-			return File.DebugLines[buildLine.BuildLine + 1];
+			return File.DebugLines[buildLine.BuildLine + 1].OrderBy(l => l.CpuAddress).First();
 		}
 
 		private bool _forcedAutoCompleteWindow = false;
@@ -319,13 +327,13 @@ namespace Brewmaster.EditorWindows.Code
 		{
 			//TODO: Watch manually written addresses, too!
 			//TODO: X/Y offsets, maybe even DP?
-			if (!File.Project.DebugSymbols.ContainsKey(word))
+			if (!DebugSymbols.ContainsKey(word))
 			{
 				var macro = File.LocalSymbols.FirstOrDefault(s => s.Text == word) as MacroSymbol;
 				if (macro != null) return macro.ToString();
 				return word;
 			}
-			var symbol = File.Project.DebugSymbols[word];
+			var symbol = DebugSymbols[word];
 			var memoryState = GetCpuMemory();
 			if (memoryState == null) return string.Format("{0} ({1})", word, WatchValue.FormatHexAddress(symbol.Value));
 
@@ -338,7 +346,7 @@ namespace Brewmaster.EditorWindows.Code
 			if (memoryState == null) return word;
 
 			var cpuType = File.Mode == CompileMode.Spc ? MemoryState.CpuType.Spc : MemoryState.CpuType.Cpu;
-			var addressReference = new AddressReference(word, s => File.Project.DebugSymbols.ContainsKey(s) ? File.Project.DebugSymbols[s] : null);
+			var addressReference = new AddressReference(word, s => DebugSymbols.ContainsKey(s) ? DebugSymbols[s] : null);
 			var val8 = memoryState.ReadAddress(cpuType, addressReference.BaseAddress, false, addressReference.OffsetRegister, out var address);
 			var val16 = memoryState.ReadAddress(cpuType, addressReference.BaseAddress, true, addressReference.OffsetRegister);
 			return string.Format("{0} ({1})\n\nValue: {2} ({3})\nWord value: {4} ({5})",
@@ -397,8 +405,8 @@ namespace Brewmaster.EditorWindows.Code
 			if (word == null) return null;
 			var asmWord = word as AsmWord;
 
-			if(asmWord == null && File.Project.Symbols != null && File.Project.DebugSymbols != null
-				&& (File.Project.DebugSymbols.ContainsKey(word.Word) || File.Project.Symbols.Any(s => s.Key == word.Word)))
+			if(asmWord == null && File.Project.Symbols != null && DebugSymbols != null
+				&& (DebugSymbols.ContainsKey(word.Word) || File.Project.Symbols.Any(s => s.Key == word.Word)))
 			{
 				var type = AsmWord.AsmWordType.LabelReference;
 				var macro = File.Project.Symbols.FirstOrDefault(s => s.Key == word.Word).Value as MacroSymbol;
@@ -527,7 +535,7 @@ namespace Brewmaster.EditorWindows.Code
 			Document.BookmarkManager.RemoveMarks((mark) => mark is BuildLineMarker);
 			if (File.DebugLines == null) return;
 			
-			foreach (var buildLine in File.DebugLines.Values)
+			foreach (var buildLine in File.DebugLines.SelectMany(dl => dl.Value))
 			{
 				Document.BookmarkManager.AddMark(new BuildLineMarker(Document, buildLine.Line - 1));
 			}
@@ -561,7 +569,7 @@ namespace Brewmaster.EditorWindows.Code
 		{
 			var arrow = Document.BookmarkManager.Marks.OfType<PcArrow>().FirstOrDefault();
 			var buildLine = Document.BookmarkManager.Marks.OfType<BuildLineMarker>().FirstOrDefault(m => m.LineNumber == arrow.LineNumber);
-			return File.DebugLines.Values.FirstOrDefault(dbl => dbl.Line == buildLine.BuildLine + 1);
+			return File.DebugLines.Values.SelectMany(dl => dl).FirstOrDefault(dbl => dbl.Line == buildLine.BuildLine + 1);
 		}
 
 		private void ShowIntellisense(char keyValue, int wordLengthLimit)

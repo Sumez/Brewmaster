@@ -113,8 +113,14 @@ namespace Brewmaster.StatusView
 			_loading = true;
 			_lastState = state;
 			if (state.Type == TargetPlatform.Nes) UpdateNesState(state.NesState);
-			if (state.Type == TargetPlatform.Snes) UpdateSnesState(state.SnesState);
+			if (state.Type == TargetPlatform.Snes)
+			{
+				if (_moduleEvents.DebugMode != DebugMode.Spc) UpdateSnesState(state.SnesState);
+				else UpdateSpcState(state.SnesState);
+			}
 			_cpuMemory = state.Memory.CpuData;
+			_spcMemory = state.Memory.SpcData;
+
 			RefreshStack();
 			_loading = false;
 		}
@@ -154,6 +160,33 @@ namespace Brewmaster.StatusView
 			EditPixel.Text = state.Ppu.Cycle.ToString();
 			EditFrame.Text = (_lastFrame - _frameBase).ToString();
 		}
+
+		private void UpdateSpcState(Mesen.GUI.DebugState state)
+		{
+			RegisterA.DimUpperByte = true;
+			RegisterX.DimUpperByte = true;
+
+			RegisterPC.Value = state.Spc.PC;
+			RegisterP.Value = (int)state.Spc.PS;
+
+			RegisterA.Value = state.Spc.A;
+			RegisterX.Value = state.Spc.X;
+			RegisterY.Value = state.Spc.Y;
+			RegisterSP.Value = state.Spc.SP;
+
+			_stackPointer = state.Cpu.SP;
+
+			_lastCycle = state.Spc.Cycle;
+			_lastFrame = state.Ppu.FrameCount;
+			if (_lastCycle < _cycleBase) _cycleBase = 0;
+			if (_lastFrame < _frameBase) _frameBase = 0;
+
+			EditCycle.Text = (_lastCycle - _cycleBase).ToString();
+			EditScanline.Text = state.Ppu.Scanline.ToString();
+			EditPixel.Text = state.Ppu.Cycle.ToString();
+			EditFrame.Text = (_lastFrame - _frameBase).ToString();
+		}
+
 
 		private void UpdateNesState(Emulation.DebugState state)
 		{
@@ -379,8 +412,9 @@ namespace Brewmaster.StatusView
 		}
 
 		private byte[] _cpuMemory = new byte[0];
+		private byte[] _spcMemory = new byte[0];
 		private int _stackPointer = 0;
-		private Events _moduleEvents;
+		private readonly Events _moduleEvents;
 
 		private void StackSizeChanged(object sender, EventArgs e)
 		{

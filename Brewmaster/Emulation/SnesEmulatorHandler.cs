@@ -600,24 +600,24 @@ namespace Brewmaster.Emulation
 			SnesInputApi.SetKeyState(scanCode, state);
 		}
 
-		public void StepOver()
+		public void StepOver(MemoryState.CpuType cpuType)
 		{
-			SnesDebugApi.Step(CpuType.Cpu, 1, StepType.StepOver);
+			SnesDebugApi.Step(cpuType != MemoryState.CpuType.Spc ? CpuType.Cpu : CpuType.Spc, 1, StepType.StepOver);
 		}
 
-		public void StepInto()
+		public void StepInto(MemoryState.CpuType cpuType)
 		{
-			SnesDebugApi.Step(CpuType.Cpu, 1, StepType.Step);
+			SnesDebugApi.Step(cpuType != MemoryState.CpuType.Spc ? CpuType.Cpu : CpuType.Spc, 1, StepType.Step);
 		}
 
-		public void StepOut()
+		public void StepOut(MemoryState.CpuType cpuType)
 		{
-			SnesDebugApi.Step(CpuType.Cpu, 1, StepType.StepOut);
+			SnesDebugApi.Step(cpuType != MemoryState.CpuType.Spc ? CpuType.Cpu : CpuType.Spc, 1, StepType.StepOut);
 		}
 
-		public void StepBack()
+		public void StepBack(MemoryState.CpuType cpuType)
 		{
-			//SnesDebugApi.Step(CpuType.Cpu, 1, StepType.StepBack);
+			//SnesDebugApi.Step(cpuType == MemoryState.CpuType.Spc ? CpuType.Cpu : CpuType.Spc, 1, StepType.StepBack);
 		}
 	}
 }

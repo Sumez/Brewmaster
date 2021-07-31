@@ -34,10 +34,10 @@ namespace Brewmaster.Emulation
 		void SetCpuMemory(int offset, byte value);
 		void SetOamMemory(int offset, byte value);
 		void SetPpuMemory(int offset, byte value);
-		void StepBack();
-		void StepInto();
-		void StepOut();
-		void StepOver();
+		void StepBack(MemoryState.CpuType cpuType);
+		void StepInto(MemoryState.CpuType cpuType);
+		void StepOut(MemoryState.CpuType cpuType);
+		void StepOver(MemoryState.CpuType cpuType);
 		Task Stop(bool releaseResources = false);
 		void SetScale(double scale);
 		void SetSpeed(int speed);

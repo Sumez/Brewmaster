@@ -651,22 +651,22 @@ namespace Brewmaster.Emulation
 			InteropEmu.SetKeyState(scanCode, state);
 		}
 
-		public void StepOver()
+		public void StepOver(MemoryState.CpuType cpuType)
 		{
 			InteropEmu.DebugStepOver();
 		}
 
-		public void StepInto()
+		public void StepInto(MemoryState.CpuType cpuType)
 		{
 			InteropEmu.DebugStep(1);
 		}
 
-		public void StepOut()
+		public void StepOut(MemoryState.CpuType cpuType)
 		{
 			InteropEmu.DebugStepOut();
 		}
 
-		public void StepBack()
+		public void StepBack(MemoryState.CpuType cpuType)
 		{
 			InteropEmu.DebugStepBack();
 		}

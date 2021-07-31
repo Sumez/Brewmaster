@@ -736,9 +736,9 @@ namespace Brewmaster
 				if ((file.Mode == CompileMode.Spc) != (_moduleEvents.DebugMode == DebugMode.Spc)) continue;
 
 				if (file.Mode == CompileMode.Spc)
-					matchingLine = file.DebugLines.Values.FirstOrDefault(l => l.CpuAddress == breakInfo.SpcAddress);
+					matchingLine = file.DebugLines.SelectMany(dl => dl.Value).FirstOrDefault(l => l.CpuAddress == breakInfo.SpcAddress);
 				else
-					matchingLine = file.DebugLines.Values.FirstOrDefault(l => l.RomAddress == breakInfo.CpuAddress);
+					matchingLine = file.DebugLines.SelectMany(dl => dl.Value).FirstOrDefault(l => l.RomAddress == breakInfo.CpuAddress);
 
 				if (matchingLine != null)
 				{
@@ -1762,25 +1762,25 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 		private void stepOverMenuItem_Click(object sender, EventArgs e)
 		{
 			if (!Mesen.Emulator.IsRunning()) return;
-			Mesen.Emulator.StepOver();
+			Mesen.Emulator.StepOver(_moduleEvents.DebugMode != DebugMode.Spc ? MemoryState.CpuType.Cpu : MemoryState.CpuType.Spc);
 		}
 
 		private void stepIntoToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			if (!Mesen.Emulator.IsRunning()) return;
-			Mesen.Emulator.StepInto();
+			Mesen.Emulator.StepInto(_moduleEvents.DebugMode != DebugMode.Spc ? MemoryState.CpuType.Cpu : MemoryState.CpuType.Spc);
 		}
 
 		private void stepOutToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			if (!Mesen.Emulator.IsRunning()) return;
-			Mesen.Emulator.StepOut();
+			Mesen.Emulator.StepOut(_moduleEvents.DebugMode != DebugMode.Spc ? MemoryState.CpuType.Cpu : MemoryState.CpuType.Spc);
 		}
 
 		private void stepBackToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			if (!Mesen.Emulator.IsRunning()) return;
-			Mesen.Emulator.StepBack();
+			Mesen.Emulator.StepBack(_moduleEvents.DebugMode != DebugMode.Spc ? MemoryState.CpuType.Cpu : MemoryState.CpuType.Spc);
 		}
 
 	    public void AddWatch(string expression, bool word)

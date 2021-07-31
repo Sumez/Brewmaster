@@ -24,7 +24,7 @@ namespace Brewmaster.ProjectModel
 		// END
 
 		public AsmProject Project { get; set; }
-		public Dictionary<int, DebugLine> DebugLines { get; set; }
+		public Dictionary<int, List<DebugLine>> DebugLines { get; set; }
 		public bool Missing { get; set; }
 		public Dictionary<string, PipelineSettings> OldPipelines { get; set; } = new Dictionary<string, PipelineSettings>();
 
