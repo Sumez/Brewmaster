@@ -414,6 +414,7 @@ namespace Brewsic
 			public readonly Dictionary<PatternNote[], int> PatternMatch = new Dictionary<PatternNote[], int>();
 			public readonly Dictionary<PatternNote[], int> PatternStart = new Dictionary<PatternNote[], int>();
 		}
+
 		private List<PatternMacro> GetPatternMacros(int macroStep)
 		{
 			// Get a list of unique patterns that exist in the order list
@@ -446,7 +447,7 @@ namespace Brewsic
 				var macroLength = macro.Pattern.Length;
 				foreach (var pattern in allPatterns)
 				{
-					for (var i = 0; i < pattern.Length - macroLength; i++)
+					for (var i = 0; i < pattern.Length - macroLength; i += 4)
 					{
 						if (pattern.Skip(i).Take(macroLength).SequenceEqual(macro.Pattern))
 						{
@@ -747,15 +748,16 @@ namespace Brewsic
 					clearCount--;
 				}
 				var instrumentId = note.Instrument - 1;
+				var hasNote = note.HasNote;
 				if (instrumentId < 0)
 				{
 					instrumentId = lastInstrument;
-					if (instrumentId < 0 && note.Note < 253) note.HasNote = false; // Avoid playing notes with no instrument
+					if (instrumentId < 0 && note.Note < 253) hasNote = false; // Avoid playing notes with no instrument TODO: Prevent generating macros using these
 				}
 				if (instrumentId >= 54) throw new Exception("Maximum of 53 instruments supported in a track, sorry");
 
 				var noteByte = note.Note;
-				if (!note.HasNote) instrumentId = 63; // none
+				if (!hasNote) instrumentId = 63; // none
 				else
 				{
 					if (noteByte == 255) instrumentId = 62; // off
