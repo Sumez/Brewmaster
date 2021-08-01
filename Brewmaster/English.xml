@@ -64,4 +64,32 @@
     <Key>image.palette-compression.bitdepth.4</Key>
     <Value>4bpp</Value>
   </LanguageString>
+  <LanguageString>
+    <Key>audio.brr</Key>
+    <Value>BRR audio compression</Value>
+  </LanguageString>
+  <LanguageString>
+    <Key>brewsic.module</Key>
+    <Value>Brewsic music track</Value>
+  </LanguageString>
+  <LanguageString>
+    <Key>brewsic.module.max-sample-growth</Key>
+    <Value>Max sample growth</Value>
+  </LanguageString>
+  <LanguageString>
+    <Key>brewsic.module.max-sample-size</Key>
+    <Value>Max sample size</Value>
+  </LanguageString>
+  <LanguageString>
+    <Key>brewsic.module.compress-patterns</Key>
+    <Value>Compress patterns</Value>
+  </LanguageString>
+  <LanguageString>
+    <Key>brewsic.module.compress-patterns.1</Key>
+    <Value>Yes (slower)</Value>
+  </LanguageString>
+  <LanguageString>
+    <Key>brewsic.module.compress-patterns.0</Key>
+    <Value>No (smaller)</Value>
+  </LanguageString>
 </Language>

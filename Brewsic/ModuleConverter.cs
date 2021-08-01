@@ -7,7 +7,7 @@ namespace Brewsic
 	public class ModuleConverter
 	{
 		public const int BaseAddress = 0x1000;
-		public static byte[] GetBrewsicMusicDump(List<ItModule> modules, Action<string> output)
+		public static byte[] GetBrewsicMusicDump(List<ItModule> modules, Action<string> output, int maximumSampleGrowth = 500, bool compressPatterns = true, int maxSampleSize = 0)
 		{
 			var sampleDirectoryLength = (byte)(modules[0].Samples.Count * 2);
 			var trackDirectoryLength = modules.Count;
@@ -20,7 +20,7 @@ namespace Brewsic
 
 			foreach (var sample in modules[0].Samples)
 			{
-				var brr = sample.GetBrr(500, output);
+				var brr = sample.GetBrr(maximumSampleGrowth, maxSampleSize, output);
 				if (sample.LoopStart % 16 != 0) throw new Exception(string.Format("Looping error on Sample \"{0}\"", sample.Name));
 
 				sampleDirectory.Add(sampleAddress); // Start address
@@ -29,16 +29,16 @@ namespace Brewsic
 				sampleAddress += brr.Length;
 				sampleData.AddRange(brr);
 			}
-			
+			output(string.Format("Sample data size: {0} bytes", sampleData.Count));
+
 			var trackAddress = sampleAddress;
 			foreach (var module in modules)
 			{
-				output("Compressing pattern data...");
-				var compressedTrack = module.GetCompressedPatternData();
+				if (compressPatterns) output("Compressing pattern data...");
+				var compressedTrack = module.GetCompressedPatternData(compressPatterns);
 				trackDirectory.Add(trackAddress);
 				trackData.AddRange(compressedTrack);
 			}
-			output(string.Format("Sample data size: {0} bytes", sampleData.Count));
 			output(string.Format("Track data size: {0} bytes", trackData.Count));
 
 			var sampleDirectoryData = GetAsByteArray(sampleDirectory);

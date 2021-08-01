@@ -15,7 +15,6 @@ using Mesen.GUI;
 using Mesen.GUI.Config;
 using Mesen.GUI.Config.Shortcuts;
 using SnesBreakpointTypeFlags = Mesen.GUI.Debugger.BreakpointTypeFlags;
-using SnesBreakSource = Brewmaster.Emulation.BreakSource;
 using SnesApi = Mesen.GUI.EmuApi;
 using SnesDebugApi = Mesen.GUI.DebugApi;
 using SnesConfigApi = Mesen.GUI.ConfigApi;
@@ -110,7 +109,7 @@ namespace Brewmaster.Emulation
 		}
 		public void EnableDebugger()
 		{
-			//SnesConfigApi.SetDebuggerFlag(SnesDebuggerFlags.CpuDebuggerEnabled, true);
+			SnesConfigApi.SetDebuggerFlag(SnesDebuggerFlags.CpuDebuggerEnabled, true);
 			//SnesConfigApi.SetDebuggerFlag(SnesDebuggerFlags.SpcDebuggerEnabled, true);
 			//SnesApi.DebugRun();
 			RefreshBreakpoints();

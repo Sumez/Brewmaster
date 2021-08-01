@@ -53,6 +53,13 @@ Build your entire toolchain into the IDE by including data sources (such as tile
 ### Modular workspace
 Show/hide any panel, and drag/dock them around as you prefer, with the potential to make good use of a multi-monitor setup. Your workspace will be saved between sessions.
 
+## Partly implemented features (use at your own risk)
+### Map editor
+Design tiled maps by drawing directly on the tiles and place them as single tiles or metatiles in various sizes. Asign color attributes according to NES or SNES specs, and export them as straight up nametable data or via a custom script.
+
+### SPC debugging
+Use a macro pack to write code using SPC700 semantics, build as a separate image file, and use SPC mode to debug and step through the source code like regular CA65 code.
+
 
 ## FAQ
 ### My existing programming experience have been in other assemblers such as NESASM or ASM6. Does Brewmaster give me the option to use these?

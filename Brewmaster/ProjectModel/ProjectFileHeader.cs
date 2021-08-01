@@ -202,6 +202,12 @@ namespace Brewmaster.ProjectModel
 		{
 			return this[key] == "1";
 		}
+
+		public int GetInt(string key)
+		{
+			if (int.TryParse(this[key], out var result)) return result;
+			throw new Exception("Invalid setting for " + key);
+		}
 	}
 
 	[Serializable]

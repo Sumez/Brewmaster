@@ -175,6 +175,7 @@ namespace Brewsic
 			var buffer = new byte[size];
 			stream.Read(buffer, 0, size);
 
+			var sampleData = new Int16[sample.Length * (stereo ? 2 : 1)];
 			switch (compression)
 			{
 				case Compression.PCMS:
@@ -182,20 +183,29 @@ namespace Brewsic
 				case Compression.PCMU:
 					if (bitDepth == 8) for (var i = 0; i < size; i++) buffer[i] -= (byte)0x80; // Prepare the bytes for 16bit signed samples
 					break;
+				case Compression.IT214:
+				case Compression.IT215:
+					sampleData = Sample.DecompressItSample(buffer, sample.Length, compression == Compression.IT215, bitDepth, stereo);
+					bitDepth = 16;
+					break;
 				default:
-					throw new NotImplementedException("Compression type " + compression + " not yet implemented");
+					throw new Exception("Unsupported sample compression method");
 			}
-			var sampleData = new Int16[sample.Length * (stereo ? 2 : 1)];
-			if (bitDepth == 16)
+
+			if (compression == Compression.PCMS || compression == Compression.PCMU)
 			{
-				Buffer.BlockCopy(buffer, 0, sampleData, 0, size);
+				if (bitDepth == 16)
+				{
+					Buffer.BlockCopy(buffer, 0, sampleData, 0, size);
+				}
+				else
+				{
+					var signedData = new sbyte[size];
+					Buffer.BlockCopy(buffer, 0, signedData, 0, size);
+					for (var i = 0; i < size; i++) sampleData[i] = (Int16) (signedData[i] << 8);
+				}
 			}
-			else
-			{
-				var signedData = new sbyte[size];
-				Buffer.BlockCopy(buffer, 0, signedData, 0, size);
-				for (var i = 0; i < size; i++) sampleData[i] = (Int16)(signedData[i] << 8);
-			}
+
 			if (stereo)
 			{
 				var monoSample = new List<Int16>();
@@ -472,12 +482,12 @@ namespace Brewsic
 			return bestMacros;
 		}
 
-		public byte[] GetCompressedPatternData()
+		public byte[] GetCompressedPatternData(bool compressPatterns = true)
 		{
 			var macroStep = 0;
 			var data = GetCompressedPatternData(new List<PatternMacro>());
 			var smallestSize = data.Length;
-			while (true)
+			while (compressPatterns)
 			{
 				// Attempt various macro settings and use the data with the best results (smallest file)
 				macroStep += 4;
@@ -925,6 +935,9 @@ namespace Brewsic
 				stream.Position = pointer;
 				module.Patterns.Add(LoadPattern(stream));
 			}
+			// Filter out invalid patterns
+			module.OrderList = module.OrderList.Where(o => o < module.Patterns.Count && module.Patterns[o].Rows > 0).ToList();
+			
 
 			return module;
 		}

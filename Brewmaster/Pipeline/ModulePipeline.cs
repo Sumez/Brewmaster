@@ -23,15 +23,15 @@ namespace Brewmaster.Pipeline
 		{
 			var modules = new List<ItModule> { ItModule.LoadFromFile(settings.File.File.FullName) };
 			output(string.Format("Converting song \"{0}\" to Brewsic music format", modules[0].Title));
-			var musicBank = ModuleConverter.GetBrewsicMusicDump(modules, output);
+			var musicBank = ModuleConverter.GetBrewsicMusicDump(modules, output, 500, true, 0);
 
-			foreach (var sample in modules[0].Samples.Where(s => s.Name == "DOUCHE"))
+			/*foreach (var sample in modules[0].Samples)
 			{
 				var filename = sample.Name;
 				foreach (var ch in Path.GetInvalidFileNameChars()) filename = filename.Replace(ch.ToString(), "");
 				File.WriteAllBytes(settings.GetFilePath(0) + "." + filename + ".brewsic.wav", GetWavFile(sample.Data));
 				File.WriteAllBytes(settings.GetFilePath(0) + "." + filename + ".brewsic.brr", sample.GetBrr());
-			}
+			}*/
 			using (var bankStream = File.Create(settings.GetFilePath(0)))
 			{
 				bankStream.Write(musicBank, 0, musicBank.Length);

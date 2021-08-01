@@ -339,6 +339,7 @@
     <Compile Include="Controls\NonBuggyComboBox.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Pipeline\BrewsicModulePipeline.cs" />
     <Compile Include="Pipeline\BrrPipeline.cs" />
     <Compile Include="Pipeline\CustomTileMapPipeline.cs" />
     <Compile Include="Pipeline\ModulePipeline.cs" />

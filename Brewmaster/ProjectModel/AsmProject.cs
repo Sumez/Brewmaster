@@ -624,7 +624,7 @@ namespace Brewmaster.ProjectModel
 						var address = breakpoint.AddressType == Breakpoint.AddressTypes.SpcRam ||
 						              breakpoint.AddressType == Breakpoint.AddressTypes.Cpu
 							? matchingDebugLine.Min(l => l.CpuAddress)
-							: matchingDebugLine.Min(l => l.CpuAddress);
+							: matchingDebugLine.Min(l => l.RomAddress);
 
 						if (address.HasValue)
 						{

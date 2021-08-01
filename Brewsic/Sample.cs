@@ -81,7 +81,35 @@ namespace Brewsic
 
 		}
 
-		private void ResampleLoop(uint samplesToAdd)
+		private void Downsample(int newLength)
+		{
+			//if (newLength < Data.Length / 2) newLength = Data.Length / 2; // Never cut a sample down to less than half its size
+			var resizeFactor = (double)Data.Length / newLength;
+
+			var data = new Int16[newLength];
+			for (var t = 0; t < data.Length; t++)
+			{
+				// Let's say we're interpolating 5 samples into 10, that means position 5 in the new sample
+				// should sound like "position" 2.5 in the old one, so we'd need to calculate the sample 50%
+				// between index 2 and 3
+				var sampleIndex = t * resizeFactor;
+				var s1Index = (int)Math.Floor(sampleIndex);
+				var s2Index = s1Index + 1;
+				double sample1 = Data[s1Index];
+				double sample2 = Data[s2Index];
+
+				var ratio = sampleIndex % 1 + 0.5; // Find target distance between the two samples
+				var newSample = (int)(Math.Floor(sample1 * (1 - ratio) + sample2 * ratio)); // Interpolate between the two samples
+
+				data[t] = (Int16)Clamp(newSample, 16); // Clip the new sample value if it exceeds 16bit range
+			}
+			C5Speed /= resizeFactor; // Since the loop becomes a little longer, we need to play it back a little faster
+			LoopStart = (UInt32)Math.Round(LoopStart / resizeFactor);
+			LoopEnd = (UInt32)Math.Round(LoopEnd / resizeFactor);
+			Data = data;
+		}
+
+		private void ResampleLoop(UInt32 samplesToAdd)
 		{
 			var loopSize = LoopEnd - LoopStart;
 			var newLoopSize = loopSize + samplesToAdd;
@@ -137,12 +165,16 @@ namespace Brewsic
 			return true;
 		}
 
-		public byte[] GetBrr(int maximumSampleGrowth = 500, Action<string> output = null)
+		public byte[] GetBrr(int maximumSampleGrowth = 500, int maxSampleSize = 0, Action<string> output = null)
 		{
 			var brrData = new List<byte>();
 			if (Data == null || Data.Length == 0) return brrData.ToArray();
 
+			maxSampleSize = maxSampleSize / 9 * 16; // Convert BRR sample size to sample length;
+			if (maxSampleSize > 500 && Data.Length > maxSampleSize) Downsample(maxSampleSize);
+			//while (C5Speed > 20000) Downsample((int)(Data.Length * 20000 / C5Speed));
 			FixLooping(maximumSampleGrowth, output);
+
 			if (!StartsWithSilence(Data, 8))
 			{
 				// Add a silent block to prevent popping samples
@@ -626,6 +658,128 @@ namespace Brewsic
 			}  // wave loop
 			brrData[brrData.Count - 9] |= (byte)(1 | (LoopEnd > 0 ? 2 : 0)); // Set end bit
 			return brrData.ToArray();
+		}
+
+		public static Int16[] DecompressItSample(byte[] buffer, uint length, bool v215, int bitDepth, bool stereo)
+		{
+			var srcbuf = 0;          // current position in source buffer
+			var destpos = 0;                // position in destination buffer which will be returned
+			UInt16 blklen;                // length of compressed data block in samples
+			UInt16 blkpos;                // position in block
+			byte width;                  // actual "bit width"
+			UInt32 value;                 // value read from file to be processed
+			Int16 d1, d2;                  // integrator buffers (d2 for it2.15)
+			Int16 v;                       // sample value
+			UInt32 bitbuf, bitnum;        // state for it_readbits
+
+			var maxWidth = bitDepth == 16 ? 17 : 9;
+			var data = new List<Int16>();
+			// now unpack data till the dest buffer is full
+			while (length > 0)
+			{
+				// read a new block of compressed data and reset variables
+				// block layout: word size, <size> bytes data
+				if (srcbuf + 2 > buffer.Length || srcbuf + 2 + (buffer[srcbuf] | (buffer[srcbuf + 1] << 8)) > buffer.Length)
+				{
+					// truncated!
+					return null;
+				}
+				srcbuf += 2;
+				bitbuf = bitnum = 0;
+
+				blklen = (UInt16)Math.Min(bitDepth == 16 ? 0x4000 : 0x8000, length);
+				blkpos = 0;
+
+				width = (byte)(maxWidth); // start with width of 9 bits
+				d1 = d2 = 0; // reset integrator buffers
+
+				// now uncompress the data block
+				while (blkpos < blklen)
+				{
+					if (width > maxWidth) throw new Exception(string.Format("Illegal bit width {0} for 8-bit sample", width));
+					value = it_readbits(buffer, width, ref bitbuf, ref bitnum, ref srcbuf);
+
+					if (width < 7)
+					{
+						// method 1 (1-6 bits)
+						// check for "100..."
+						if (value == (1 << (width - 1)))
+						{
+							// yes!
+							value = it_readbits(buffer, bitDepth == 16 ? 4 : 3, ref bitbuf, ref bitnum, ref srcbuf) + 1; // read new width
+							width = (byte)((value < width) ? value : value + 1); // and expand it
+							continue; // ... next value
+						}
+					}
+					else if (width < maxWidth)
+					{
+						// method 2 (7-8 bits)
+						var border = bitDepth == 16 // lower border for width chg
+							? (0xFFFF >> (17 - width)) - 8
+							: (0xFF >> (9 - width)) - 4;
+						if (value > border && value <= (border + bitDepth))
+						{
+							value -= (UInt32)border; // convert width to 1-8
+							width = (byte)((value < width) ? value : value + 1); // and expand it
+							continue; // ... next value
+						}
+					}
+					else
+					{
+						// method 3 (9 bits)
+						// bit 8 set?
+						if ((value & (bitDepth == 16 ? 0x10000 : 0x100)) != 0)
+						{
+							width = (byte)((value + 1) & 0xff); // new width...
+							continue; // ... and next value
+						}
+					}
+
+					// now expand value to signed byte
+					if (width < bitDepth)
+					{
+						var shift = (byte)(bitDepth - width);
+						v = (Int16)(value << shift);
+						v >>= shift;
+					}
+					else
+					{
+						v = (Int16)value;
+					}
+
+					// integrate upon the sample values
+					d1 += v;
+					d2 += d1;
+
+					// .. and store it into the buffer
+					data.Add((Int16)(v215 ? d2 : d1));
+					if (stereo) data.Add(0);
+					blkpos++;
+				}
+
+				// now subtract block length from total length and go on
+				length -= blklen;
+			}
+			return data.ToArray();
+		}
+		private static UInt32 it_readbits(byte[] buffer, int size, ref UInt32 bitbuf, ref UInt32 bitnum, ref int ibuf)
+		{
+			UInt32 value = 0;
+			var i = size;
+
+			// this could be better
+			while (i-- > 0) {
+				if (bitnum == 0) {
+					bitbuf = buffer[ibuf];
+					ibuf++;
+					bitnum = 8;
+				}
+				value >>= 1;
+				value |=  bitbuf << 31;
+				bitbuf >>= 1;
+				bitnum--;
+			}
+			return value >> (32 - size);
 		}
 	}
 }
