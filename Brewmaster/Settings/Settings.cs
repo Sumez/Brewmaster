@@ -177,14 +177,15 @@ namespace Brewmaster.Settings
 		}
 
 
-		public void SetProjectState(AsmProject project, IEnumerable<EditorWindow> openWindows, IEnumerable<WatchValueData> watchData, IEnumerable<Breakpoint> breakpoints)
+		public void SetProjectState(AsmProject project, EditorTabs openTabs, IEnumerable<WatchValueData> watchData, IEnumerable<Breakpoint> breakpoints)
 		{
 			if (project.ProjectFile == null) return;
 			var newState = new ProjectUserSettings
 			{
 				Filename = project.ProjectFile.FullName,
 				CurrentConfiguration = project.CurrentConfiguration != null ? project.CurrentConfiguration.Name : null,
-				OpenFiles = openWindows.Select(w => w.ProjectFile.File.FullName).ToArray(),
+				OpenFiles = openTabs.TabPages.OfType<EditorWindow>().Select(w => w.ProjectFile.File.FullName).ToArray(),
+				ActiveFile = (openTabs.SelectedTab as EditorWindow)?.ProjectFile.File.FullName,
 				WatchData = watchData.ToArray(),
 				Breakpoints = breakpoints.Select(bp => bp.GetSerializable()).ToArray()
 			};
@@ -197,6 +198,7 @@ namespace Brewmaster.Settings
 	{
 		public string CurrentConfiguration;
 		public string Filename;
+		public string ActiveFile;
 		[XmlElement(ElementName = "OpenFile")]
 		public string[] OpenFiles;
 		[XmlElement(ElementName = "WatchValue")]

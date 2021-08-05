@@ -1197,7 +1197,7 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 		{
 			if (CurrentProject == null) return;
 			Settings.SetProjectState(CurrentProject, 
-				editorTabs.TabPages.OfType<EditorWindow>(), 
+				editorTabs, 
 				WatchValues.GetSerializableData(),
 				allBreakpoints);
 			Settings.Save();
@@ -1226,12 +1226,12 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 			if (savedState.CurrentConfiguration != null)
 				CurrentProject.CurrentConfiguration = CurrentProject.BuildConfigurations.FirstOrDefault(c => c.Name == savedState.CurrentConfiguration);
 			if (savedState.OpenFiles != null)
-			foreach (var filename in savedState.OpenFiles)
-			{
-				var projectFile = CurrentProject.Files.FirstOrDefault(f => f.File.FullName == filename);
-				if (projectFile == null) continue;
-				OpenFileInTab(projectFile, true);
-			}
+				foreach (var filename in savedState.OpenFiles)
+				{
+					var projectFile = CurrentProject.Files.FirstOrDefault(f => f.File.FullName == filename);
+					if (projectFile == null) continue;
+					OpenFileInTab(projectFile, filename != savedState.ActiveFile);
+				}
 		}
 
 		private void File_ExitMenuItem_Click(object sender, EventArgs e)
