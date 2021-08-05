@@ -16,14 +16,10 @@ namespace Brewsic
 		public byte[] Data { get; private set; }
 		public static SpcFile Create(byte[] musicBank, string songTitle)
 		{
-			byte[] driverData;
-			using (var driverStream = File.OpenRead(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"spcdriver.bin")))
-			{
-				driverData = new byte[0x10000];
-				driverStream.Read(driverData, 0, ModuleConverter.BaseAddress);
-			}
-			
-			const int entryPoint = 0x03AA;
+			byte[] driverData = new byte[0x10000];
+			Array.Copy(Resources.spcdriver, 0, driverData, 0x200, Resources.spcdriver.Length);
+
+			const int entryPoint = 0x0202;
 			var titleData = Encoding.ASCII.GetBytes(songTitle);
 			var titleBlock = new byte[32];
 			Array.Copy(titleData, 0, titleBlock, 0, Math.Min(32, titleData.Length));
