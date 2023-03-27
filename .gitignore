@@ -7,3 +7,4 @@ $ cat .gitignore
 *.suo
 /Brewsic/bin
 /Brewsic/obj
+packages

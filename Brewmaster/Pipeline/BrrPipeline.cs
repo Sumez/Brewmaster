@@ -1,4 +1,5 @@
 ﻿using Brewmaster.ProjectModel;
+using Brewsic;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -27,8 +28,18 @@ namespace Brewmaster.Pipeline
 		{
 			return CreateGeneric(file, ".brr");
 		}
-
 		public override void Process(PipelineSettings settings, Action<string> output)
+		{
+			var audioFile = AudioFile.LoadFromFile(settings.File.File.FullName, output);
+			using (var outputStream = System.IO.File.Create(settings.GetFilePath(0)))
+			{
+				var brrFile = audioFile.Sample.GetBrr();
+				outputStream.Write(brrFile, 0, brrFile.Length);
+				outputStream.Close();
+			}
+		}
+
+		public void OldProcess(PipelineSettings settings, Action<string> output)
 		{
 			var pitchSetting = settings.GenericSettings["pitch"];
 			var loopSetting = settings.GenericSettings["loop-start"];
