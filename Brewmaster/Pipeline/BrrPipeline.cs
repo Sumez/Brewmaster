@@ -1,4 +1,5 @@
 ﻿using Brewmaster.ProjectModel;
+using Brewsic;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -19,6 +20,7 @@ namespace Brewmaster.Pipeline
 				return new[]
 				{
 					new PipelineProperty("pitch", PipelinePropertyType.Text, ""),
+					new PipelineProperty("max-size", PipelinePropertyType.Text, ""),
 				};
 			}
 		}
@@ -27,8 +29,21 @@ namespace Brewmaster.Pipeline
 		{
 			return CreateGeneric(file, ".brr");
 		}
-
 		public override void Process(PipelineSettings settings, Action<string> output)
+		{
+			var audioFile = AudioFile.LoadFromFile(settings.File.File.FullName, output);
+			using (var outputStream = System.IO.File.Create(settings.GetFilePath(0)))
+			{
+
+				var maxSize = 0;
+				if (int.TryParse(settings.GenericSettings["max-size"], out int intValue)) maxSize = intValue;
+				var brrFile = audioFile.Sample.GetBrr(500, maxSize, output);
+				outputStream.Write(brrFile, 0, brrFile.Length);
+				outputStream.Close();
+			}
+		}
+
+		public void OldProcess(PipelineSettings settings, Action<string> output)
 		{
 			var pitchSetting = settings.GenericSettings["pitch"];
 			var loopSetting = settings.GenericSettings["loop-start"];
