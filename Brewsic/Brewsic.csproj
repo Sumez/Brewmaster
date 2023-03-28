@@ -79,6 +79,6 @@
     <VisualStudio AllowExistingFolder="true" />
   </ProjectExtensions>
   <PropertyGroup>
-    <PreBuildEvent>xcopy "C:\Users\dkmrs\OneDrive - Group Online A S\Documents\NesDev\snes\obj\snes.sfc.spc" "$(ProjectDir)spcdriver.bin" /y</PreBuildEvent>
+    <PreBuildEvent>xcopy "%25homepath%25\OneDrive - Group Online A S\Documents\NesDev\snes\obj\snes.sfc.spc" "$(ProjectDir)spcdriver.bin" /y</PreBuildEvent>
   </PropertyGroup>
 </Project>

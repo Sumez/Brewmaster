@@ -146,7 +146,7 @@ namespace Brewmaster.ProjectExplorer
 #if WINDOWS
 			using (var key = Registry.LocalMachine.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\App Paths\python.exe"))
 			{
-				return key?.GetValue(null) as string ?? "python.exe";
+				return key?.GetValue(null) as string ?? "py"; // "python.exe";
 			}
 #else
 			return "python";
