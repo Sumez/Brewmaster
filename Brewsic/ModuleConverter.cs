@@ -9,7 +9,9 @@ namespace Brewsic
 		public const int BaseAddress = 0x1000;
 		public static byte[] GetBrewsicMusicDump(List<ItModule> modules, Action<string> output, int maximumSampleGrowth = 500, bool compressPatterns = true, int maxSampleSize = 0)
 		{
-			var sampleDirectoryLength = (byte)(modules[0].Samples.Count * 2);
+			var emptySampleSlots = 1; // For sound effects
+			var sampleCount = modules[0].Samples.Count + emptySampleSlots;
+			var sampleDirectoryLength = (byte)(sampleCount * 2);
 			var trackDirectoryLength = modules.Count;
 
 			var sampleDirectory = new List<int>(sampleDirectoryLength);
@@ -29,6 +31,7 @@ namespace Brewsic
 				sampleAddress += brr.Length;
 				sampleData.AddRange(brr);
 			}
+			sampleDirectory.AddRange(new int[2 * emptySampleSlots]);
 			output(string.Format("Sample data size: {0} bytes", sampleData.Count));
 
 			var trackAddress = sampleAddress;
