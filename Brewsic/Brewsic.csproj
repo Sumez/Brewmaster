@@ -108,6 +108,7 @@
     <EmbeddedResource Include="Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
@@ -119,7 +120,7 @@
     <VisualStudio AllowExistingFolder="true" />
   </ProjectExtensions>
   <PropertyGroup>
-    <PreBuildEvent>xcopy "C:\Users\dkmrs\OneDrive - Group Online A S\Documents\NesDev\snes\obj\snes.sfc.spc" "$(ProjectDir)spcdriver.bin" /y</PreBuildEvent>
+    <PreBuildEvent>xcopy "%25homepath%25\OneDrive - Group Online A S\Documents\NesDev\snes\obj\snes.sfc.spc" "$(ProjectDir)spcdriver.bin" /y</PreBuildEvent>
   </PropertyGroup>
   <Import Project="..\packages\NAudio.Lame.2.0.1\build\NAudio.Lame.targets" Condition="Exists('..\packages\NAudio.Lame.2.0.1\build\NAudio.Lame.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
