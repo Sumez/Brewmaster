@@ -52,6 +52,7 @@ namespace Brewmaster.Modules
 		public void SetDebugMode(DebugMode debugMode)
 		{
 			DebugMode = debugMode;
+			if (GetCurrentProject != null && GetCurrentProject() != null) GetCurrentProject().RefreshBreakpoints();
 		}
 
 		public void SelectSprite(int spriteIndex)
