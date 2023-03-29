@@ -49,6 +49,11 @@ namespace Brewmaster.Modules
 			if (EmulationStateUpdate != null) EmulationStateUpdate(state);
 		}
 
+		public void SetDebugMode(DebugMode debugMode)
+		{
+			DebugMode = debugMode;
+		}
+
 		public void SelectSprite(int spriteIndex)
 		{
 			if (spriteIndex == SelectedSprite) return;

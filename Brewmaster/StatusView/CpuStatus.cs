@@ -115,6 +115,7 @@ namespace Brewmaster.StatusView
 			if (state.Type == TargetPlatform.Nes) UpdateNesState(state.NesState);
 			if (state.Type == TargetPlatform.Snes)
 			{
+				// TODO: Always update both
 				if (_moduleEvents.DebugMode != DebugMode.Spc) UpdateSnesState(state.SnesState);
 				else UpdateSpcState(state.SnesState);
 			}

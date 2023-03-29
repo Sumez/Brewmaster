@@ -259,6 +259,10 @@ namespace Brewmaster
 				// Makes sure a control's handle is set before setting visible state
 				foreach (Control control in Controls) { var handle = control.Handle; }
 
+				debugModeSelector.Items.AddRange(new[] { "CPU", "SPC" });
+				debugModeSelector.SelectedIndex = 0;
+				debugModeSelector.SelectedIndexChanged += (s, e) => { _moduleEvents.SetDebugMode(debugModeSelector.SelectedIndex == 1 ? DebugMode.Spc : DebugMode.MainCpu); };
+
 				// Load layout
 				LoadModule(ChrViewer = new ChrViewer(_moduleEvents), "Chr");
 				LoadModule(TileMap = new TileMapViewer(_moduleEvents), "Nametables");

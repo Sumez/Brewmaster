@@ -127,6 +127,7 @@ namespace Brewmaster
 			this.stepIntoMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.stepOutMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.stepBackMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.debugModeSelector = new System.Windows.Forms.ToolStripComboBox();
 			this.toolStripSeparator21 = new System.Windows.Forms.ToolStripSeparator();
 			this.buildSettingsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.EmulatorMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -1460,7 +1461,8 @@ namespace Brewmaster
             this.stepOver,
             this.stepInto,
             this.stepOut,
-            this.stepBack});
+            this.stepBack,
+			this.debugModeSelector});
 			this._buildToolStrip.Location = new System.Drawing.Point(268, 0);
 			this._buildToolStrip.Name = "_buildToolStrip";
 			this._buildToolStrip.Size = new System.Drawing.Size(420, 25);
@@ -1472,6 +1474,12 @@ namespace Brewmaster
 			this.configurationSelector.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.configurationSelector.Name = "configurationSelector";
 			this.configurationSelector.Size = new System.Drawing.Size(121, 25);
+			// 
+			// debugModeSelector
+			// 
+			this.debugModeSelector.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.debugModeSelector.Name = "debugModeSelector";
+			this.debugModeSelector.Size = new System.Drawing.Size(50, 25);
 			// 
 			// buildSettings
 			// 
@@ -2023,6 +2031,7 @@ namespace Brewmaster
 		private ToolStripMenuItem continueWithNewBuildMenuItem;
 		private ToolStripButton continueWithNewBuild;
 		private ToolStripComboBox configurationSelector;
+		private ToolStripComboBox debugModeSelector;
 		private ToolStripButton buildSettings;
 		private ToolStripMenuItem integerScalingMenuItem;
 		private ToolStripMenuItem randomValuesAtPowerOnMenuItem;
