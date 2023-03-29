@@ -166,15 +166,18 @@ namespace Brewmaster.Pipeline
 				{
 					if (assignment.Value >= paletteEntries) continue;
 
-					palette[assignment.Value] = assignment.Key;
+					var parsedColor = (bitDepth == 3 || bitDepth == 4) ? GetReducedColor(assignment.Key) : assignment.Key;
+					palette[assignment.Value] = parsedColor;
 					knownEntries = Math.Max(knownEntries, assignment.Value + 1);
 				}
+				// TODO: If there's a palette assignment, always override image's palette, and make everything else entry 0?)
 				if (image.Palette.Entries.Length > knownEntries)
 				{
 					var j = 0;
 					for (var i = knownEntries; i < paletteEntries; i++)
 					{
-						palette[i] = image.Palette.Entries[j];
+						var parsedColor = (bitDepth == 3 || bitDepth == 4) ? GetReducedColor(image.Palette.Entries[j]) : image.Palette.Entries[j];
+						palette[i] = parsedColor;
 						knownEntries++;
 						j++;
 					}
@@ -184,9 +187,10 @@ namespace Brewmaster.Pipeline
 					for (var x = 0; x < image.Width && knownEntries < paletteEntries; x++)
 					{
 						var color = image.GetPixel(x, y);
-						if (!palette.Contains(color))
+						var parsedColor = (bitDepth == 3 || bitDepth == 4) ? GetReducedColor(color) : color;
+						if (!palette.Contains(parsedColor))
 						{
-							palette[knownEntries] = color;
+							palette[knownEntries] = parsedColor;
 							knownEntries++;
 						}
 					}
@@ -203,11 +207,12 @@ namespace Brewmaster.Pipeline
 					for (var x = 0; x < 8; x++)
 					{
 						var color = GetPixel(image, offset.Width + x, offset.Height + y) ?? palette[0];
+						var parsedColor = (bitDepth == 3 || bitDepth == 4) ? GetReducedColor(color) : color;
 						var colorIndex = -1;
 
 						for (var c = 0; c < knownEntries; c++)
 						{
-							if (color == palette[c])
+							if (parsedColor == palette[c])
 							{
 								colorIndex = c;
 								break;
@@ -217,7 +222,7 @@ namespace Brewmaster.Pipeline
 						if (colorIndex == -1)
 						{
 							if (knownEntries >= paletteEntries) throw new Exception("Too many colors in image");
-							palette[knownEntries] = color;
+							palette[knownEntries] = parsedColor;
 							colorIndex = knownEntries;
 							knownEntries++;
 						}
@@ -360,13 +365,35 @@ namespace Brewmaster.Pipeline
 			return (x >= image.Width || y >= image.Height) ? null : image.GetPixel(x, y) as Color?;
 		}
 
+		private static Color GetReducedColor(Color color) => GetColorValueReverse(GetColorValue(color));
+
 		public static int GetColorValue(Color color)
 		{
+			//TODO: Round color values!
 			var red = color.R / 8;
 			var green = color.G / 8;
 			var blue = color.B / 8;
 
 			return red | (green << 5) | (blue << 10);
+		}
+		public static Color GetColorValueReverse(int color)
+		{
+			// Not a precise RGB replication of the 15bit color (according to SNES), but will always result in a color that converts back into the same value using GetColorValue
+			var r = 8 * (color & 0x1F);
+			var g = 8 * ((color >> 5) & 0x1F);
+			var b = 8 * ((color >> 10) & 0x1F);
+			
+			return Color.FromArgb(r, g, b);
+		}
+
+		public static Color[] ImportPalette(byte[] paletteData)
+		{
+			var palette = new Color[paletteData.Length / 2];
+			for (var i = 0; i < paletteData.Length; i += 2)
+			{
+				palette[i / 2] = GetColorValueReverse(paletteData[i] | (paletteData[i + 1] << 8));
+			}
+			return palette;
 		}
 
 		public override PipelineSettings Create(AsmProjectFile file)

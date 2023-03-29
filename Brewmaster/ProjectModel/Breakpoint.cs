@@ -62,7 +62,7 @@ namespace Brewmaster.ProjectModel
 
 		public void UpdateFromSymbols(Dictionary<string, DebugSymbol> symbols)
 		{
-			if (symbols.ContainsKey(Symbol))
+			if (symbols != null && symbols.ContainsKey(Symbol))
 			{
 				StartAddress = symbols[Symbol].Value;
 				Broken = false;
