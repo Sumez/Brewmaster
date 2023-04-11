@@ -191,6 +191,7 @@ namespace Brewmaster.Emulation
 
 		public void UpdateSettings(EmulatorSettings settings)
 		{
+			EmulationConfig.Region = settings.Timing == RegionTiming.PAL ? ConsoleRegion.Pal : ConsoleRegion.Ntsc;
 			EmulationConfig.RamPowerOnState = settings.RandomPowerOnState ? RamState.Random : RamState.AllZeros;
 			EmulationConfig.EnableRandomPowerOnState = settings.RandomPowerOnState;
 			VideoConfig.HideBgLayer0 = !settings.ShowBgLayer1;

@@ -9,22 +9,43 @@ namespace Brewsic
 	{
 		public Sample Sample { get; private set; }
 
-		public static AudioFile LoadFromFile(string fileName, Action<string> output = null)
+		public static AudioFile LoadFromFile(string fileName, int? sampleRate, Action<string> output = null)
 		{
-			return new AudioFile { Sample = GetSampleFromFile(fileName, output) };
+			return new AudioFile { Sample = GetSampleFromFile(fileName, sampleRate, output) };
 		}
 
-		private static Sample GetSampleFromFile(string fileName, Action<string> output)
+		private static Sample GetSampleFromFile(string fileName, int? sampleRate, Action<string> output)
 		{
 			using (var fileReader = File.OpenRead(fileName))
 			{
-				using (var reader = new Mp3FileReader(fileReader))
+				var extension = fileName.Substring(fileName.LastIndexOf('.') + 1);
+				switch (extension)
 				{
-					return GetSampleFromWaveProvider(reader, output);
+					case "wav":
+						using (var reader = new WaveFileReader(fileReader))
+							return sampleRate.HasValue ? GetResampled(sampleRate.Value, reader, output) : GetSampleFromWaveProvider(reader, output);
+					case "mp3":
+						using (var reader = new Mp3FileReader(fileReader))
+							return sampleRate.HasValue ? GetResampled(sampleRate.Value, reader, output) : GetSampleFromWaveProvider(reader, output);
+					default:
+						throw new Exception("Unrecognized file format");
 				}
 			}
 
 		}
+		private static Sample GetResampled(int sampleRate, IWaveProvider waveProvider, Action<string> output)
+		{
+			var originalRate = waveProvider.WaveFormat.SampleRate;
+			if (sampleRate == originalRate) return GetSampleFromWaveProvider(waveProvider, output);
+
+			output("Resampling audio from " + originalRate + "hz to " + sampleRate + "hz");
+			using (var resampler = new MediaFoundationResampler(waveProvider, new WaveFormat(sampleRate, 1)))
+			{
+				return GetSampleFromWaveProvider(resampler, output);
+			}
+
+		}
+
 		private static Sample GetSampleFromWaveProvider(IWaveProvider waveProvider, Action<string> output)
 		{
 			var samples = new List<short>();
@@ -41,23 +62,6 @@ namespace Brewsic
 
 
 			var sample = new Sample();
-
-			/*sample.GlobalVolume = stream.ReadByte(); // 0-64
-			sample.Volume = stream.ReadByte(); // 0-64
-			sample.Name = ReadString(stream, 26).Trim('\0', ' ');
-			sample.Panning = stream.ReadByte(); // 0-64 (32 = center)
-			sample.Length = ReadUInt32(stream);
-			sample.LoopStart = ReadUInt32(stream);
-			sample.LoopEnd = ReadUInt32(stream);
-			sample.C5Speed = (double)ReadUInt32(stream);
-
-			stream.Position = samplePointer;
-			sample.ConvertedFromStereo = stereo;
-
-			sample.Data = new 
-			ms.Read(sample.Data, 0, ms.Length);
-			sample.Data = ReadSampleData(stream, sample, compression, bitDepth, stereo);
-			*/
 
 			sample.ConvertedFromStereo = false;
 			sample.Data = samples.ToArray();

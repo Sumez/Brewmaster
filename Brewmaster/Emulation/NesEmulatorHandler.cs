@@ -335,6 +335,7 @@ namespace Brewmaster.Emulation
 		}
 		public void UpdateSettings(EmulatorSettings settings)
 		{
+			InteropEmu.SetNesModel(settings.Timing == RegionTiming.PAL ? NesModel.PAL : NesModel.NTSC);
 			InteropEmu.SetRamPowerOnState(settings.RandomPowerOnState ? RamPowerOnState.Random : RamPowerOnState.AllZeros);
 			InteropEmu.SetFlag(EmulationFlags.RandomizeMapperPowerOnState, settings.RandomPowerOnState);
 			InteropEmu.SetFlag(EmulationFlags.RandomizeCpuPpuAlignment, settings.RandomPowerOnState);

@@ -197,6 +197,10 @@ namespace Brewmaster.Emulation
 
 		public EmulatorSettings EmulatorSettings { get; private set; }
 
+		public RegionTiming Timing
+		{
+			set { EmulatorSettings.Timing = value; if (Emulator != null) Emulator.UpdateSettings(EmulatorSettings); }
+		}
 		public bool RandomPowerOnState
 		{
 			set { EmulatorSettings.RandomPowerOnState = value; if (Emulator != null) Emulator.UpdateSettings(EmulatorSettings); }
@@ -434,6 +438,7 @@ namespace Brewmaster.Emulation
 
 	public class EmulatorSettings
 	{
+		public RegionTiming Timing = RegionTiming.NTSC;
 		public bool RandomPowerOnState = true;
 		public bool PlayAudio = true;
 		public bool ShowBgLayer = true;
@@ -450,4 +455,5 @@ namespace Brewmaster.Emulation
 		public Palette NesPalette = new Palette();
 		public Palette SnesPalette = new Palette();
 	}
+	public enum RegionTiming { NTSC, PAL }
 }

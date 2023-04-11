@@ -10,6 +10,7 @@ using System.Xml;
 using System.Xml.Serialization;
 using Brewmaster.EditorWindows;
 using ICSharpCode.TextEditor.Document;
+using Brewmaster.Emulation;
 
 namespace Brewmaster.Settings
 {
@@ -37,6 +38,8 @@ namespace Brewmaster.Settings
 		public bool EmuIntegerScaling = true;
 		[XmlElement(ElementName = "EmuRandomPowerOn")]
 		public bool EmuRandomPowerOn = true;
+		[XmlElement(ElementName = "EmuTiming")]
+		public RegionTiming EmuTiming = RegionTiming.NTSC;
 		[XmlElement(ElementName = "EmuPlayAudio")]
 		public bool EmuPlayAudio = true;
 		[XmlElement(ElementName = "EmuPlayPulse1")]

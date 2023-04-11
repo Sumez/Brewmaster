@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Windows.Forms;
 
 namespace Brewmaster.EditorWindows.TileMaps.Tools
 {
@@ -10,6 +11,8 @@ namespace Brewmaster.EditorWindows.TileMaps.Tools
 
 		public override void Paint(int x, int y, TileMapScreen screen)
 		{
+			var createNewTile = CreateNewTile || Control.ModifierKeys.HasFlag(Keys.Control);
+
 			screen.EnsureRefreshedImage(); // Makes sure screen.Image is reliable
 			var fillRegion = screen.Image.GetFillRegion(x, y);
 
@@ -24,6 +27,11 @@ namespace Brewmaster.EditorWindows.TileMaps.Tools
 				var tilePixelX = pixelX % tileWidth;
 				var tilePixelY = pixelY % tileHeight;
 				var pixelTile = screen.GetTile(pixelX / tileWidth, pixelY / tileHeight);
+				if (createNewTile && _state.GetTileUsage(pixelTile) > 1)
+				{
+					pixelTile = _state.CopyTile(pixelTile);
+					screen.PrintTile(pixelX / tileWidth, pixelY / tileHeight, pixelTile);
+				}
 
 				// Prevent updating the same CHR address more than once, by generating a unique hash for each tile+coordinate combination
 				var pixelId = pixelTile * tileSize + tilePixelY * tileWidth + tilePixelX;

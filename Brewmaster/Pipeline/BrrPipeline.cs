@@ -19,6 +19,7 @@ namespace Brewmaster.Pipeline
 			{
 				return new[]
 				{
+					new PipelineProperty("sample-rate", PipelinePropertyType.Text, "32000"),
 					new PipelineProperty("pitch", PipelinePropertyType.Text, ""),
 					new PipelineProperty("max-size", PipelinePropertyType.Text, ""),
 				};
@@ -31,12 +32,13 @@ namespace Brewmaster.Pipeline
 		}
 		public override void Process(PipelineSettings settings, Action<string> output)
 		{
-			var audioFile = AudioFile.LoadFromFile(settings.File.File.FullName, output);
+			var sampleRate = 32000;
+			if (int.TryParse(settings.GenericSettings["sample-rate"], out var parsedSampleRate)) sampleRate = parsedSampleRate;
+			var audioFile = AudioFile.LoadFromFile(settings.File.File.FullName, sampleRate, output);
 			using (var outputStream = System.IO.File.Create(settings.GetFilePath(0)))
 			{
-
 				var maxSize = 0;
-				if (int.TryParse(settings.GenericSettings["max-size"], out int intValue)) maxSize = intValue;
+				if (int.TryParse(settings.GenericSettings["max-size"], out var intValue)) maxSize = intValue;
 				var brrFile = audioFile.Sample.GetBrr(500, maxSize, output);
 				outputStream.Write(brrFile, 0, brrFile.Length);
 				outputStream.Close();

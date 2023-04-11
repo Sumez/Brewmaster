@@ -348,6 +348,10 @@ namespace Brewmaster
 				playPcmMenuItem.Checked = Mesen.PlayPcm = Settings.EmuPlayPcm;
 				displayNesBgMenuItem.Checked = Mesen.ShowBgLayer = Settings.EmuDisplayNesBg;
 				displayNesObjectsMenuItem.Checked = Mesen.ShowSpriteLayer = Settings.EmuDisplaySprites;
+				palTimingMenuItem.Checked = (Settings.EmuTiming == RegionTiming.PAL);
+				ntscTimingMenuItem.Checked = (Settings.EmuTiming == RegionTiming.NTSC);
+
+				Mesen.Timing = Settings.EmuTiming;
 				Mesen.EmulatorBackgroundColor = Settings.EmuBackgroundColor;
 
 				TileMap.ShowScrollOverlay = Settings.ShowScrollOverlay;
@@ -2037,6 +2041,20 @@ private void File_OpenProjectMenuItem_Click(object sender, EventArgs e)
 		private void newTileMapToolBarMenuItem_Click(object sender, EventArgs e)
 		{
 			tileMapMenuItem.PerformClick();
+		}
+
+		private void ntscTimingMenuItem_Click(object sender, EventArgs e)
+		{
+			Mesen.Timing = Settings.EmuTiming = ntscTimingMenuItem.Checked ? RegionTiming.NTSC : RegionTiming.PAL;
+			palTimingMenuItem.Checked = !ntscTimingMenuItem.Checked;
+			Settings.Save();
+		}
+
+		private void palTimingMenuItem_Click(object sender, EventArgs e)
+		{
+			Mesen.Timing = Settings.EmuTiming = palTimingMenuItem.Checked ? RegionTiming.PAL : RegionTiming.NTSC;
+			ntscTimingMenuItem.Checked = !palTimingMenuItem.Checked;
+			Settings.Save();
 		}
 	}
 

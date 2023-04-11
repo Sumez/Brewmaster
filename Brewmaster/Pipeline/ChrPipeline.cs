@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Brewmaster.ProjectModel;
 
 namespace Brewmaster.Pipeline
@@ -327,11 +329,16 @@ namespace Brewmaster.Pipeline
 
 				if (chrSettings.ExportTileMap)
 				{
+					var attribute = 0;
+					if (chrSettings.TileMapAttribute != null && Regex.IsMatch(chrSettings.TileMapAttribute, @"^0*[0-9a-fA-F]{0,4}$")) {
+						attribute = int.Parse(chrSettings.TileMapAttribute, NumberStyles.HexNumber);
+					}
 					var byteTileMap = new byte[tileMap.Count * 2];
 					for (var i = 0; i < tileMap.Count; i++)
 					{
-						byteTileMap[i * 2] = (byte)(tileMap[i] & 0xFF);
-						byteTileMap[i * 2 + 1] = (byte)((tileMap[i] >> 8) & 0xFF);
+						var value16bit = tileMap[i] | attribute;
+						byteTileMap[i * 2] = (byte)(value16bit & 0xFF);
+						byteTileMap[i * 2 + 1] = (byte)((value16bit >> 8) & 0xFF);
 					}
 					using (var outputFile = File.Create(chrSettings.TileMapOutputFullPath))
 					{
@@ -426,6 +433,7 @@ namespace Brewmaster.Pipeline
 			headerSettings["ExportPalette"] = pipeline.ExportPalette ? "1" : "0";
 			headerSettings["BigTiles"] = pipeline.BigTiles ? "1" : "0";
 			headerSettings["ExportTileMap"] = pipeline.ExportTileMap ? "1" : "0";
+			headerSettings["TileMapAttribute"] = pipeline.TileMapAttribute;
 			headerSettings["ChrType"] = pipeline.PaletteType.ToString();
 			headerSettings["Palette"] = SerializePalette(pipeline.PaletteAssignment);
 			if (pipeline.TilePalettes != null) headerSettings["TilePalettes"] = string.Join(":", pipeline.TilePalettes.Select(SerializePalette));
@@ -454,6 +462,7 @@ namespace Brewmaster.Pipeline
 			pipeline.ExportPalette = (headerSettings["ExportPalette"] == "1");
 			pipeline.BigTiles = (headerSettings["BigTiles"] == "1");
 			pipeline.ExportTileMap = (headerSettings["ExportTileMap"] == "1");
+			pipeline.TileMapAttribute = headerSettings["TileMapAttribute"];
 			Enum.TryParse(headerSettings["ChrType"], true, out pipeline.PaletteType);
 			if (!string.IsNullOrWhiteSpace(headerSettings["Palette"]))
 			{
@@ -476,6 +485,7 @@ namespace Brewmaster.Pipeline
 		public bool ExportPalette = false;
 		public bool BigTiles = false;
 		public bool ExportTileMap = false;
+		public string TileMapAttribute = "0000";
 
 		public Dictionary<Color, int> PaletteAssignment;
 		public List<Dictionary<Color, int>> TilePalettes { get; set; }

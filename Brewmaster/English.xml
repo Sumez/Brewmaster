@@ -92,4 +92,20 @@
     <Key>brewsic.module.compress-patterns.0</Key>
     <Value>No (smaller)</Value>
   </LanguageString>
+  <LanguageString>
+    <Key>tracker.module</Key>
+    <Value> </Value>
+  </LanguageString>
+  <LanguageString>
+    <Key>audio.brr.max-size</Key>
+    <Value> </Value>
+  </LanguageString>
+  <LanguageString>
+    <Key>audio.brr.pitch</Key>
+    <Value>Pitch</Value>
+  </LanguageString>
+  <LanguageString>
+    <Key>audio.brr.sample-rate</Key>
+    <Value>Target sample rate</Value>
+  </LanguageString>
 </Language>

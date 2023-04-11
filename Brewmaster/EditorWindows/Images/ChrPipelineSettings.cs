@@ -29,6 +29,7 @@ namespace Brewmaster.EditorWindows.Images
 		private TextBox TileMapOutputFile;
 		private CheckBox _exportTileMap;
 		private Button _paletteImport;
+		private TextBox AttributeValue;
 		private List<Color?> _palette;
 
 		public Pipeline.ChrPipelineSettings Pipeline { get; set; }
@@ -84,12 +85,13 @@ namespace Brewmaster.EditorWindows.Images
 			OutputFile.Text = Pipeline.ChrOutput;
 			PaletteOutputFile.Text = Pipeline.PaletteOutput;
 			TileMapOutputFile.Text = Pipeline.TileMapOutput;
+			AttributeValue.Text = Pipeline.TileMapAttribute;
 			ChrPipelineOutput.SelectedIndex = (int)Pipeline.PaletteType;
 			_enablePaletteAssignments.Checked = Pipeline.PaletteAssignment.Count > 0;
 			_ignoreDuplicates.Checked = Pipeline.DiscardRedundantTiles;
 			_bigTiles.Checked = Pipeline.BigTiles;
 			PaletteOutputFile.Enabled = _exportPalette.Checked = Pipeline.ExportPalette;
-			TileMapOutputFile.Enabled = _exportTileMap.Checked = Pipeline.ExportTileMap;
+			AttributeValue.Enabled = TileMapOutputFile.Enabled = _exportTileMap.Checked = Pipeline.ExportTileMap;
 			RefreshPalette();
 		}
 
@@ -134,26 +136,29 @@ namespace Brewmaster.EditorWindows.Images
 			System.Windows.Forms.GroupBox ChrGroup;
 			System.Windows.Forms.Label BitDepthLabel;
 			System.Windows.Forms.GroupBox ExportTileMapGroup;
+			System.Windows.Forms.Label attributeLabel;
 			this.PaletteOutputFile = new System.Windows.Forms.TextBox();
 			this._exportPalette = new System.Windows.Forms.CheckBox();
 			this._bigTiles = new System.Windows.Forms.CheckBox();
 			this._ignoreDuplicates = new System.Windows.Forms.CheckBox();
 			this.ChrPipelineOutput = new System.Windows.Forms.ComboBox();
 			this.OutputFile = new System.Windows.Forms.TextBox();
+			this.AttributeValue = new System.Windows.Forms.TextBox();
 			this.TileMapOutputFile = new System.Windows.Forms.TextBox();
 			this._exportTileMap = new System.Windows.Forms.CheckBox();
 			this.comboBox1 = new System.Windows.Forms.ComboBox();
 			this.ChrPipelinePanel = new System.Windows.Forms.Panel();
 			this.PaletteGroup = new System.Windows.Forms.GroupBox();
+			this._paletteImport = new System.Windows.Forms.Button();
 			this.rgbValue = new System.Windows.Forms.TextBox();
 			this.PaletteEntries = new Brewmaster.EditorWindows.Images.PaletteEntries();
 			this._enablePaletteAssignments = new System.Windows.Forms.CheckBox();
 			this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
-			this._paletteImport = new System.Windows.Forms.Button();
 			ExportPaletteGroup = new System.Windows.Forms.GroupBox();
 			ChrGroup = new System.Windows.Forms.GroupBox();
 			BitDepthLabel = new System.Windows.Forms.Label();
 			ExportTileMapGroup = new System.Windows.Forms.GroupBox();
+			attributeLabel = new System.Windows.Forms.Label();
 			ExportPaletteGroup.SuspendLayout();
 			ChrGroup.SuspendLayout();
 			ExportTileMapGroup.SuspendLayout();
@@ -272,15 +277,35 @@ namespace Brewmaster.EditorWindows.Images
 			// 
 			// ExportTileMapGroup
 			// 
+			ExportTileMapGroup.Controls.Add(attributeLabel);
+			ExportTileMapGroup.Controls.Add(this.AttributeValue);
 			ExportTileMapGroup.Controls.Add(this.TileMapOutputFile);
 			ExportTileMapGroup.Controls.Add(this._exportTileMap);
 			ExportTileMapGroup.Dock = System.Windows.Forms.DockStyle.Top;
 			ExportTileMapGroup.Location = new System.Drawing.Point(0, 295);
 			ExportTileMapGroup.Name = "ExportTileMapGroup";
-			ExportTileMapGroup.Size = new System.Drawing.Size(355, 42);
+			ExportTileMapGroup.Size = new System.Drawing.Size(355, 66);
 			ExportTileMapGroup.TabIndex = 6;
 			ExportTileMapGroup.TabStop = false;
 			ExportTileMapGroup.Text = "Export tile map";
+			// 
+			// attributeLabel
+			// 
+			attributeLabel.AutoSize = true;
+			attributeLabel.Location = new System.Drawing.Point(6, 43);
+			attributeLabel.Name = "attributeLabel";
+			attributeLabel.Size = new System.Drawing.Size(147, 13);
+			attributeLabel.TabIndex = 3;
+			attributeLabel.Text = "Attribute value (16 bit, ORed):";
+			// 
+			// AttributeValue
+			// 
+			this.AttributeValue.Location = new System.Drawing.Point(156, 40);
+			this.AttributeValue.Name = "AttributeValue";
+			this.AttributeValue.Size = new System.Drawing.Size(73, 20);
+			this.AttributeValue.TabIndex = 2;
+			this.AttributeValue.Text = "0000";
+			this.AttributeValue.TextChanged += new System.EventHandler(this.AttributeValue_TextChanged);
 			// 
 			// TileMapOutputFile
 			// 
@@ -321,7 +346,7 @@ namespace Brewmaster.EditorWindows.Images
 			this.ChrPipelinePanel.Controls.Add(ChrGroup);
 			this.ChrPipelinePanel.Location = new System.Drawing.Point(0, 0);
 			this.ChrPipelinePanel.Name = "ChrPipelinePanel";
-			this.ChrPipelinePanel.Size = new System.Drawing.Size(355, 337);
+			this.ChrPipelinePanel.Size = new System.Drawing.Size(355, 361);
 			this.ChrPipelinePanel.TabIndex = 3;
 			// 
 			// PaletteGroup
@@ -342,6 +367,17 @@ namespace Brewmaster.EditorWindows.Images
 			this.PaletteGroup.Text = "Palette assignments";
 			this.PaletteGroup.Enter += new System.EventHandler(this.PaletteGroup_Enter);
 			// 
+			// _paletteImport
+			// 
+			this._paletteImport.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this._paletteImport.Location = new System.Drawing.Point(274, 14);
+			this._paletteImport.Name = "_paletteImport";
+			this._paletteImport.Size = new System.Drawing.Size(75, 23);
+			this._paletteImport.TabIndex = 3;
+			this._paletteImport.Text = "Import...";
+			this._paletteImport.UseVisualStyleBackColor = true;
+			this._paletteImport.Click += new System.EventHandler(this._paletteImport_Click);
+			// 
 			// rgbValue
 			// 
 			this.rgbValue.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
@@ -350,7 +386,6 @@ namespace Brewmaster.EditorWindows.Images
 			this.rgbValue.Name = "rgbValue";
 			this.rgbValue.Size = new System.Drawing.Size(340, 20);
 			this.rgbValue.TabIndex = 2;
-			this.rgbValue.Visible = true;
 			// 
 			// PaletteEntries
 			// 
@@ -379,23 +414,12 @@ namespace Brewmaster.EditorWindows.Images
 			this.contextMenuStrip1.Name = "contextMenuStrip1";
 			this.contextMenuStrip1.Size = new System.Drawing.Size(61, 4);
 			// 
-			// _paletteImport
-			// 
-			this._paletteImport.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this._paletteImport.Location = new System.Drawing.Point(274, 14);
-			this._paletteImport.Name = "_paletteImport";
-			this._paletteImport.Size = new System.Drawing.Size(75, 23);
-			this._paletteImport.TabIndex = 3;
-			this._paletteImport.Text = "Import...";
-			this._paletteImport.UseVisualStyleBackColor = true;
-			this._paletteImport.Click += new System.EventHandler(this._paletteImport_Click);
-			// 
 			// ChrPipelineSettings
 			// 
 			this.AutoSize = true;
 			this.Controls.Add(this.ChrPipelinePanel);
 			this.Name = "ChrPipelineSettings";
-			this.Size = new System.Drawing.Size(358, 340);
+			this.Size = new System.Drawing.Size(358, 364);
 			ExportPaletteGroup.ResumeLayout(false);
 			ExportPaletteGroup.PerformLayout();
 			ChrGroup.ResumeLayout(false);
@@ -505,13 +529,19 @@ namespace Brewmaster.EditorWindows.Images
 
 		private void _exportTileMap_CheckedChanged(object sender, EventArgs e)
 		{
-			TileMapOutputFile.Enabled = Pipeline.ExportTileMap = _exportTileMap.Checked;
+			AttributeValue.Enabled = TileMapOutputFile.Enabled = Pipeline.ExportTileMap = _exportTileMap.Checked;
 			RegisterChange();
 		}
 
 		private void TileMapOutputFile_TextChanged(object sender, EventArgs e)
 		{
 			Pipeline.TileMapOutput = TileMapOutputFile.Text;
+			RegisterChange();
+		}
+
+		private void AttributeValue_TextChanged(object sender, EventArgs e)
+		{
+			Pipeline.TileMapAttribute = AttributeValue.Text;
 			RegisterChange();
 		}
 	}
