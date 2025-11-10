@@ -31,6 +31,7 @@ namespace Brewsic
 				sampleAddress += brr.Length;
 				sampleData.AddRange(brr);
 			}
+			return new byte[10];
 			sampleDirectory.AddRange(new int[2 * emptySampleSlots]);
 			output(string.Format("Sample data size: {0} bytes", sampleData.Count));
 

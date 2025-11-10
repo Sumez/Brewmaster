@@ -90,12 +90,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AudioFile.cs" />
+    <Compile Include="BrrSample.cs" />
     <Compile Include="Channel.cs" />
     <Compile Include="Instrument.cs" />
     <Compile Include="ItModule.cs" />
     <Compile Include="ModuleConverter.cs" />
     <Compile Include="Pattern.cs" />
     <Compile Include="PatternNote.cs" />
+    <Compile Include="Playback\BrrSampleProvider.cs" />
+    <Compile Include="Playback\PreviewPlayer.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

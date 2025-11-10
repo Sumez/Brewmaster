@@ -213,7 +213,7 @@ namespace Brewmaster.ProjectExplorer
 							_assemblySetting.Value = "Yes";
 							break;
 						case CompileMode.Spc:
-							_assemblySetting.Value = "No";
+							_assemblySetting.Value = "Build as SPC";
 							break;
 					}
 

@@ -134,7 +134,7 @@ namespace Brewsic
 			sample.Length = ReadUInt32(stream);
 			sample.LoopStart = ReadUInt32(stream);
 			sample.LoopEnd = ReadUInt32(stream);
-			sample.C5Speed = (double)ReadUInt32(stream);
+			sample.C5Speed = (double)ReadUInt32(stream); // TODO: half/double depending on 8 or 16 bit samples?
 			var sustainStart = ReadUInt32(stream);
 			var sustainEnd = ReadUInt32(stream);
 			var samplePointer = ReadUInt32(stream);
@@ -629,7 +629,7 @@ namespace Brewsic
 			var sample = Samples[instrument.Sample];
 			var playbackRate = sample.C5Speed / 8363; // 8363 means C-5 plays at a $042E pitch (~8khz)
 			var pitchAdjust = (int)Math.Round(768 * Math.Log(playbackRate) / Math.Log(2)); // Adjust pitch by this number to get the correct playback rate
-																						   //var volume = Math.Min(255, Math.Round(instrument.Volume * sample.Volume / 32f)); // Instrument global volume is 0-128, but sample vol is 0-64, adjust to 0-255
+			//var volume = Math.Min(255, Math.Round(instrument.Volume * sample.Volume / 32f)); // Instrument global volume is 0-128, but sample vol is 0-64, adjust to 0-255
 			var volume = Math.Min(255, Math.Round(instrument.Volume * sample.Volume / 128f)); // Instrument global volume is 0-128, but sample vol is 0-64, adjust combined range to 0-64
 
 			data[0] = instrument.Sample;

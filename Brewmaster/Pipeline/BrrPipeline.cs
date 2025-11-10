@@ -13,18 +13,13 @@ namespace Brewmaster.Pipeline
 
 		public override IEnumerable<FileType> SupportedFileTypes => new [] { FileType.Audio };
 
-		public override IEnumerable<PipelineProperty> Properties
-		{
-			get
-			{
-				return new[]
+		public override IEnumerable<PipelineProperty> Properties => new[]
 				{
 					new PipelineProperty("sample-rate", PipelinePropertyType.Text, "32000"),
 					new PipelineProperty("pitch", PipelinePropertyType.Text, ""),
 					new PipelineProperty("max-size", PipelinePropertyType.Text, ""),
+					new PipelineProperty("loop", PipelinePropertyType.Boolean, "0"),
 				};
-			}
-		}
 
 		public override PipelineSettings Create(AsmProjectFile file)
 		{
@@ -35,6 +30,7 @@ namespace Brewmaster.Pipeline
 			var sampleRate = 32000;
 			if (int.TryParse(settings.GenericSettings["sample-rate"], out var parsedSampleRate)) sampleRate = parsedSampleRate;
 			var audioFile = AudioFile.LoadFromFile(settings.File.File.FullName, sampleRate, output);
+			audioFile.Sample.LoopEnd = settings.GenericSettings.GetBoolean("loop") ? (uint)audioFile.Sample.Data.Length : 0;
 			using (var outputStream = System.IO.File.Create(settings.GetFilePath(0)))
 			{
 				var maxSize = 0;
