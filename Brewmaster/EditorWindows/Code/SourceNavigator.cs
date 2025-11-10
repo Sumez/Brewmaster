@@ -101,7 +101,7 @@ namespace Brewmaster.EditorWindows.Code
 
 		public void UpdateSymbols(IEnumerable<Symbol> symbols)
 		{
-			Symbols = symbols.Where(s => !s.Text.StartsWith("@")).OrderBy(s => s.Line).ToList();
+			Symbols = symbols.Where(s => !s.Text.StartsWith("@")).OrderBy(s => s.Line).OrderBy(s => s.Text).ToList(); // TODO: split ups symbols depending on whether they are assigned to RAM or ROM segments
 			if (Symbols.Count > 0) Symbols.Insert(0, new Symbol { Text = new FileInfo(Symbols[0].Source).Name, Line = 0 });
 			_symbolSelector.Items.Clear();
 			_symbolSelector.Items.AddRange(Symbols.ToArray());
