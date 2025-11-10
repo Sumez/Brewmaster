@@ -1,17 +1,9 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{25A34560-1B49-4408-B5B8-B6441A25AB9A}</ProjectGuid>
+    <TargetFramework>net8.0-windows</TargetFramework>
     <OutputType>WinExe</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Brewmaster</RootNamespace>
     <AssemblyName>Brewmaster</AssemblyName>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
@@ -28,754 +20,309 @@
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+    <Configurations>Debug;Prevent Errorhandling;Release</Configurations>
+    <ApplicationIcon>brewmaster.ico</ApplicationIcon>
+    <ManifestCertificateThumbprint>F75947C0B5F7DE38ECAAC318AFCBC1444D1A1FFC</ManifestCertificateThumbprint>
+    <GenerateManifests>false</GenerateManifests>
+    <SignManifests>false</SignManifests>
+    <TargetZone>Internet</TargetZone>
+		<GenerateRuntimeConfigDevFile>true</GenerateRuntimeConfigDevFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>TRACE;DEBUG;CODE_ANALYSIS;CODE_ANALYSIS;WINDOWS;sTHROWERRORS</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-    <RunCodeAnalysis>true</RunCodeAnalysis>
     <CodeAnalysisRuleSet>..\CleanUp.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE;WINDOWS</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup>
-    <ApplicationIcon>brewmaster.ico</ApplicationIcon>
-  </PropertyGroup>
-  <PropertyGroup>
-    <ManifestCertificateThumbprint>F75947C0B5F7DE38ECAAC318AFCBC1444D1A1FFC</ManifestCertificateThumbprint>
-  </PropertyGroup>
-  <PropertyGroup>
-    <GenerateManifests>false</GenerateManifests>
-  </PropertyGroup>
-  <PropertyGroup>
-    <SignManifests>false</SignManifests>
-  </PropertyGroup>
-  <PropertyGroup />
-  <PropertyGroup>
-    <TargetZone>Internet</TargetZone>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
-    <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\x86\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
     <OutputPath>bin\x86\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
-    <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\x64\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
     <OutputPath>bin\x64\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Prevent Errorhandling|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\Prevent Errorhandling\</OutputPath>
     <DefineConstants>TRACE;DEBUG;CODE_ANALYSIS;WINDOWS;THROWERRORS</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <RunCodeAnalysis>true</RunCodeAnalysis>
-    <LangVersion>7.3</LangVersion>
-    <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>..\CleanUp.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Prevent Errorhandling|x86'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\x86\Prevent Errorhandling\</OutputPath>
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <LangVersion>7.3</LangVersion>
-    <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Prevent Errorhandling|x64'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\x64\Prevent Errorhandling\</OutputPath>
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <LangVersion>7.3</LangVersion>
-    <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="HtmlAgilityPack, Version=1.11.23.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
-      <HintPath>..\packages\HtmlAgilityPack.1.11.23\lib\Net45\HtmlAgilityPack.dll</HintPath>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="ICSharpCode.TextEditor, Version=3.2.1.6466, Culture=neutral, PublicKeyToken=4d61825e8dd49f1a, processorArchitecture=MSIL">
-      <HintPath>..\packages\ICSharpCode.TextEditor.3.2.1.6466\lib\Net20\ICSharpCode.TextEditor.dll</HintPath>
-      <Private>True</Private>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-    </Reference>
-    <Reference Include="Mesen-S, Version=0.4.7422.4650, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>Mesen\Mesen-S.dll</HintPath>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-      <Private>False</Private>
+    <Reference Include="Mesen-S">
+      <HintPath>lib\Mesen-S.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Build.Tasks.v4.0" />
     <Reference Include="Microsoft.Build.Utilities.v4.0" />
-    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Activities" />
-    <Reference Include="System.Configuration" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Design" />
-    <Reference Include="System.Drawing.Design" />
-    <Reference Include="System.Web.Extensions" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Deployment" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.12.4" />
+    <PackageReference Include="ICSharpCode.TextEditor" Version="3.2.1.6466" />
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="3.3.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="9.0.10" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AboutWindow.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="AboutWindow.Designer.cs">
-      <DependentUpon>AboutWindow.cs</DependentUpon>
-    </Compile>
-    <Compile Include="BuildProcess\BuildHandler.cs" />
-    <Compile Include="CartridgeExplorer\CartridgeExplorer.cs">
+    <Compile Update="CartridgeExplorer\CartridgeExplorer.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\AutoFocusMenuStrip.cs">
+    <Compile Update="Controls\AutoFocusMenuStrip.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\CheckedToolStripSplitButton.cs">
+    <Compile Update="Controls\CheckedToolStripSplitButton.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="EditorWindows\Code\AllCompletion.cs" />
-    <Compile Include="EditorWindows\Code\CodeMarkers.cs" />
-    <Compile Include="EditorWindows\Code\GoToAll.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="EditorWindows\ISaveable.cs" />
-    <Compile Include="EditorWindows\IUndoable.cs" />
-    <Compile Include="EditorWindows\Text\TextEditor.cs">
+    <Compile Update="EditorWindows\Text\TextEditor.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="EditorWindows\Text\TextEditorMenu.cs">
+    <Compile Update="EditorWindows\Text\TextEditorMenu.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="EditorWindows\Code\FileCompletion.cs" />
-    <Compile Include="EditorWindows\Text\FindResults.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="EditorWindows\TileMaps\ChrTilePalette.cs">
+    <Compile Update="EditorWindows\TileMaps\ChrTilePalette.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="EditorWindows\TileMaps\MapEditorState.cs" />
-    <Compile Include="EditorWindows\TileMaps\ResizeWindow.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="EditorWindows\TileMaps\Tools\FlipTool.cs" />
-    <Compile Include="EditorWindows\TileMaps\Tools\FloodFill.cs" />
-    <Compile Include="EditorWindows\TileMaps\Tools\MapEditorTool.cs" />
-    <Compile Include="EditorWindows\TileMaps\MapEditorToolBar.cs">
+    <Compile Update="EditorWindows\TileMaps\MapEditorToolBar.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="EditorWindows\TileMaps\MapEditorWindow.cs">
+    <Compile Update="EditorWindows\TileMaps\MapEditorWindow.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="EditorWindows\TileMaps\MapGrid.cs" />
-    <Compile Include="EditorWindows\TileMaps\MapOverview.cs">
+    <Compile Update="EditorWindows\TileMaps\MapOverview.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="EditorWindows\TileMaps\MapScreenView.cs">
+    <Compile Update="EditorWindows\TileMaps\MapScreenView.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="EditorWindows\TileMaps\ColorPaletteView.cs">
+    <Compile Update="EditorWindows\TileMaps\ColorPaletteView.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="EditorWindows\TileMaps\MetaTilePalette.cs">
+    <Compile Update="EditorWindows\TileMaps\MetaTilePalette.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="EditorWindows\TileMaps\ToolSettings.cs">
+    <Compile Update="EditorWindows\TileMaps\ToolSettings.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="EditorWindows\TileMaps\MiniMap.cs">
+    <Compile Update="EditorWindows\TileMaps\MiniMap.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="EditorWindows\TileMaps\ColorPicker.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="EditorWindows\TileMaps\ScreenPanel.cs">
+    <Compile Update="EditorWindows\TileMaps\ScreenPanel.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="EditorWindows\TileMaps\TileImage.cs" />
-    <Compile Include="EditorWindows\TileMaps\TileMap.cs" />
-    <Compile Include="EditorWindows\TileMaps\TilePalette.cs">
+    <Compile Update="EditorWindows\TileMaps\TilePalette.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="EditorWindows\TileMaps\Tools\MetaTilePen.cs" />
-    <Compile Include="EditorWindows\TileMaps\Tools\MetaValuePen.cs" />
-    <Compile Include="EditorWindows\TileMaps\Tools\PalettePen.cs" />
-    <Compile Include="EditorWindows\TileMaps\Tools\PixelPen.cs" />
-    <Compile Include="EditorWindows\TileMaps\Tools\PixelTool.cs" />
-    <Compile Include="EditorWindows\TileMaps\Tools\TilePen.cs" />
-    <Compile Include="EditorWindows\TileMaps\UndoStep.cs" />
-    <Compile Include="Emulation\EmulatorHandler.cs" />
-    <Compile Include="Layout\StoredLayoutHandler.cs" />
-    <Compile Include="MemoryViewer\HexEditor.cs">
+    <Compile Update="MemoryViewer\HexEditor.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="MemoryViewer\HexEditor.Drawing.cs">
+    <Compile Update="MemoryViewer\HexEditor.Drawing.cs">
       <SubType>Component</SubType>
       <DependentUpon>HexEditor.cs</DependentUpon>
     </Compile>
-    <Compile Include="MemoryViewer\MemoryTabs.cs">
+    <Compile Update="MemoryViewer\MemoryTabs.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Modules\Breakpoints\BreakpointEditor.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Modules\Ca65Helper\Ca65DocParser.cs" />
-    <Compile Include="Modules\Ca65Helper\Ca65CommandDocumentation.cs">
+    <Compile Update="Modules\Ca65Helper\Ca65CommandDocumentation.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Modules\LanguageHandler.cs" />
-    <Compile Include="Modules\MenuHelper.cs">
+    <Compile Update="Modules\MenuHelper.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Modules\OpcodeHelper\AddressingModeDescription.cs">
+    <Compile Update="Modules\OpcodeHelper\AddressingModeDescription.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Modules\OpcodeHelper\OpcodeHelper.cs">
+    <Compile Update="Modules\OpcodeHelper\OpcodeHelper.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Modules\OpcodeHelper\OpcodeParser.cs" />
-    <Compile Include="Modules\Ppu\ChrRender.cs">
+    <Compile Update="Modules\Ppu\ChrRender.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Modules\Ppu\ChrViewer.cs">
+    <Compile Update="Modules\Ppu\ChrViewer.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Modules\Ppu\ChrViewer.Designer.cs">
-      <DependentUpon>ChrViewer.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Modules\Ppu\ConsolePaletteViewer.cs">
+    <Compile Update="Modules\Ppu\ConsolePaletteViewer.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Modules\Ppu\GamePaletteViewer.cs">
+    <Compile Update="Modules\Ppu\GamePaletteViewer.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Modules\Ppu\Palette.cs" />
-    <Compile Include="Modules\Ppu\PaletteViewer.cs">
+    <Compile Update="Modules\Ppu\PaletteViewer.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Modules\ScrollableView.cs">
+    <Compile Update="Modules\ScrollableView.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Modules\SpriteList\Sprite.cs" />
-    <Compile Include="Modules\SpriteList\SpriteList.cs">
+    <Compile Update="Modules\SpriteList\SpriteList.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Modules\Ppu\SpriteRender.cs">
+    <Compile Update="Modules\Ppu\SpriteRender.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Modules\Ppu\SpriteViewer.cs">
+    <Compile Update="Modules\Ppu\SpriteViewer.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Modules\Ppu\SpriteViewer.Designer.cs">
-      <DependentUpon>SpriteViewer.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Modules\Ppu\ScaledImageRenderer.cs">
+    <Compile Update="Modules\Ppu\ScaledImageRenderer.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Modules\Ppu\TileMapViewer.cs">
+    <Compile Update="Modules\Ppu\TileMapViewer.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Modules\Ppu\TileMapViewer.Designer.cs">
-      <DependentUpon>TileMapViewer.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\NonBuggyComboBox.cs">
+    <Compile Update="Controls\NonBuggyComboBox.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Pipeline\BrewsicModulePipeline.cs" />
-    <Compile Include="Pipeline\BrrPipeline.cs" />
-    <Compile Include="Pipeline\CustomTileMapPipeline.cs" />
-    <Compile Include="Pipeline\ModulePipeline.cs" />
-    <Compile Include="Pipeline\PaletteCompression.cs" />
-    <Compile Include="Pipeline\PipelineOption.cs" />
-    <Compile Include="Pipeline\TilemapAsmPipeline.cs" />
-    <Compile Include="Pipeline\TilemapBinaryPipeline.cs" />
-    <Compile Include="ProjectExplorer\ProjectExplorer.cs">
+    <Compile Update="ProjectExplorer\ProjectExplorer.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="ProjectExplorer\ProjectExplorerMenu.cs">
+    <Compile Update="ProjectExplorer\ProjectExplorerMenu.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="EditorWindows\Code\CpuAddressMargin.cs" />
-    <Compile Include="EditorWindows\EditorTabs.cs">
+    <Compile Update="EditorWindows\EditorTabs.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="EditorWindows\Code\Ca65Completion.cs" />
-    <Compile Include="EditorWindows\Code\Ca65Editor.cs" />
-    <Compile Include="EditorWindows\Code\Ca65Highlighting.cs" />
-    <Compile Include="EditorWindows\Code\CodeMenu.cs">
+    <Compile Update="EditorWindows\Code\CodeMenu.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="EditorWindows\Code\CompletionWindow.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="EditorWindows\EditorWindow.cs">
+    <Compile Update="EditorWindows\EditorWindow.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="EditorWindows\Images\PaletteReductionSettings.cs">
+    <Compile Update="EditorWindows\Images\PaletteReductionSettings.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="EditorWindows\Images\ChrPipelineSettings.cs">
+    <Compile Update="EditorWindows\Images\ChrPipelineSettings.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="EditorWindows\Images\ImagePipelineSettings.cs">
+    <Compile Update="EditorWindows\Images\ImagePipelineSettings.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="EditorWindows\Images\ImageWindow.cs">
+    <Compile Update="EditorWindows\Images\ImageWindow.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="EditorWindows\Images\PaletteEntries.cs">
+    <Compile Update="EditorWindows\Images\PaletteEntries.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="EditorWindows\Code\Symbol.cs" />
-    <Compile Include="EditorWindows\Text\TextEditorWindow.cs">
+    <Compile Update="EditorWindows\Text\TextEditorWindow.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="EditorWindows\Text\FindWindow.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="EditorWindows\Text\FindWindow.Designer.cs">
-      <DependentUpon>FindWindow.cs</DependentUpon>
-    </Compile>
-    <Compile Include="EditorWindows\Code\SourceNavigator.cs">
+    <Compile Update="EditorWindows\Code\SourceNavigator.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Emulation\Emulator.cs" />
-    <Compile Include="Emulation\NesEmulatorHandler.cs" />
-    <Compile Include="Emulation\IEmulatorHandler.cs" />
-    <Compile Include="Emulation\MesenControl.cs">
+    <Compile Update="Emulation\MesenControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Emulation\MesenRenderer.cs">
+    <Compile Update="Emulation\MesenRenderer.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Emulation\SmallTrackBar.cs">
+    <Compile Update="Emulation\SmallTrackBar.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Emulation\SnesEmulatorHandler.cs" />
-    <Compile Include="EditorWindows\Text\GoToWindow.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="EditorWindows\Text\GoToWindow.Designer.cs">
-      <DependentUpon>GoToWindow.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Layout\FloatPanel.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Layout\FloatPanel.Designer.cs">
-      <DependentUpon>FloatPanel.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Layout\IdePanel.cs" />
-    <Compile Include="Layout\LayoutHandler.cs" />
-    <Compile Include="Layout\MultiSplitContainer.cs">
+    <Compile Update="Layout\MultiSplitContainer.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Layout\Overlay.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Layout\Prompt.cs" />
-    <Compile Include="LoadWindow.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="LoadWindow.Designer.cs">
-      <DependentUpon>LoadWindow.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Modules\Build\LogData.cs" />
-    <Compile Include="MainForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="MainForm.Designer.cs">
-      <DependentUpon>MainForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="MemoryViewer\MemoryViewer.cs">
+    <Compile Update="MemoryViewer\MemoryViewer.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Modules\Breakpoints\BreakpointList.cs">
+    <Compile Update="Modules\Breakpoints\BreakpointList.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Modules\Build\ErrorList.cs">
+    <Compile Update="Modules\Build\ErrorList.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Modules\Build\OutputWindow.cs">
+    <Compile Update="Modules\Build\OutputWindow.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Modules\Events.cs" />
-    <Compile Include="Modules\NumberHelper\NumberHelper.cs">
+    <Compile Update="Modules\NumberHelper\NumberHelper.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Modules\NumberHelper\NumberHelper.Designer.cs">
-      <DependentUpon>NumberHelper.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Modules\Watch\WatchList.cs">
+    <Compile Update="Modules\Watch\WatchList.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Modules\Watch\WatchValues.cs">
+    <Compile Update="Modules\Watch\WatchValues.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Modules\Watch\WatchValues.Designer.cs">
-      <DependentUpon>WatchValues.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Layout\HeaderPanel.cs">
+    <Compile Update="Layout\HeaderPanel.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Pipeline\ChrPipeline.cs" />
-    <Compile Include="Pipeline\PipelineSettings.cs" />
-    <Compile Include="Modules\Ppu\TileMapRender.cs">
+    <Compile Update="Modules\Ppu\TileMapRender.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Program.cs" />
-    <Compile Include="ProjectExplorer\FileNode.cs" />
-    <Compile Include="ProjectExplorer\OsFeatures.cs" />
-    <Compile Include="ProjectExplorer\ProjectExplorerTree.cs">
+    <Compile Update="ProjectExplorer\ProjectExplorerTree.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="ProjectExplorer\ProjectFileSettings.cs">
+    <Compile Update="ProjectExplorer\ProjectFileSettings.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="ProjectExplorer\SelectableTreeView.cs">
+    <Compile Update="ProjectExplorer\SelectableTreeView.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="ProjectExplorer\SettingControl.cs">
+    <Compile Update="ProjectExplorer\SettingControl.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="ProjectExplorer\SortableTreeView.cs">
+    <Compile Update="ProjectExplorer\SortableTreeView.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="ProjectModel\AsmProject.cs" />
-    <Compile Include="ProjectModel\AsmProjectFile.cs" />
-    <Compile Include="ProjectModel\Breakpoint.cs" />
-    <Compile Include="ProjectModel\DebugInfo.cs" />
-    <Compile Include="ProjectModel\Compatibility\LegacyProjectFileHeaderV1.cs" />
-    <Compile Include="ProjectModel\NesCartridge.cs" />
-    <Compile Include="ProjectModel\ProjectFileHeader.cs" />
-    <Compile Include="ProjectWizard\BuildConfigurationStep.cs">
+    <Compile Update="ProjectWizard\BuildConfigurationStep.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="ProjectWizard\ConfigurationManager.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="ProjectWizard\ConfigurationManager.Designer.cs">
-      <DependentUpon>ConfigurationManager.cs</DependentUpon>
-    </Compile>
-    <Compile Include="ProjectWizard\ImportProject.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="ProjectWizard\ImportFile.cs">
+    <Compile Update="ProjectWizard\ImportFile.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="ProjectWizard\ImportFile.Designer.cs">
-      <DependentUpon>ImportFile.cs</DependentUpon>
-    </Compile>
-    <Compile Include="ProjectWizard\ImportProjectFiles.cs">
+    <Compile Update="ProjectWizard\ImportProjectFiles.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="ProjectWizard\ImportProjectFiles.Designer.cs">
-      <DependentUpon>ImportProjectFiles.cs</DependentUpon>
-    </Compile>
-    <Compile Include="ProjectWizard\NewAssetProject.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="ProjectWizard\NewProject.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="ProjectWizard\ImportProjectPath.cs">
+    <Compile Update="ProjectWizard\ImportProjectPath.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="ProjectWizard\ImportProjectPath.Designer.cs">
-      <DependentUpon>ImportProjectPath.cs</DependentUpon>
-    </Compile>
-    <Compile Include="ProjectWizard\SelectBuildProcessType.cs">
+    <Compile Update="ProjectWizard\SelectBuildProcessType.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="ProjectWizard\WizardDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="ProjectWizard\WizardDialog.Designer.cs">
-      <DependentUpon>WizardDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="ProjectWizard\ConfigurationSettings.cs">
+    <Compile Update="ProjectWizard\ConfigurationSettings.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="ProjectWizard\ConfigurationSettings.Designer.cs">
-      <DependentUpon>ConfigurationSettings.cs</DependentUpon>
-    </Compile>
-    <Compile Include="ProjectWizard\ProjectTemplates.cs">
+    <Compile Update="ProjectWizard\ProjectTemplates.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="ProjectWizard\ProjectTemplates.Designer.cs">
-      <DependentUpon>ProjectTemplates.cs</DependentUpon>
-    </Compile>
-    <Compile Include="ProjectWizard\NewProjectPath.cs">
+    <Compile Update="ProjectWizard\NewProjectPath.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="ProjectWizard\NewProjectPath.Designer.cs">
-      <DependentUpon>NewProjectPath.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <Compile Include="Settings\KeyBindingWindow.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Settings\ButtonAssignment.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Settings\KeyBindingSettings.cs">
+    <Compile Update="Settings\KeyBindingSettings.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Settings\Settings.cs" />
-    <Compile Include="Settings\ProjectSettingsWindow.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Settings\ProjectSettingsWindow.Designer.cs">
-      <DependentUpon>ProjectSettingsWindow.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Settings\SettingsWindow.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Settings\SettingsWindow.Designer.cs">
-      <DependentUpon>SettingsWindow.cs</DependentUpon>
-    </Compile>
-    <Compile Include="StatusView\CpuStatus.cs">
+    <Compile Update="StatusView\CpuStatus.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="StatusView\CpuStatus.Designer.cs">
-      <DependentUpon>CpuStatus.cs</DependentUpon>
-    </Compile>
-    <Compile Include="StatusView\ExpandButton.cs">
+    <Compile Update="StatusView\ExpandButton.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="StatusView\HorizontalLine.cs">
+    <Compile Update="StatusView\HorizontalLine.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="StatusView\RegisterValue.cs">
+    <Compile Update="StatusView\RegisterValue.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Templates\TemplateModule.cs" />
-    <EmbeddedResource Include="AboutWindow.resx">
-      <DependentUpon>AboutWindow.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="CartridgeExplorer\CartridgeExplorer.resx">
-      <DependentUpon>CartridgeExplorer.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="EditorWindows\Code\GoToAll.resx">
-      <DependentUpon>GoToAll.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="EditorWindows\Images\PaletteReductionSettings.resx">
-      <DependentUpon>PaletteReductionSettings.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="EditorWindows\Images\ChrPipelineSettings.resx">
-      <DependentUpon>ChrPipelineSettings.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="EditorWindows\Images\ImagePipelineSettings.resx">
-      <DependentUpon>ImagePipelineSettings.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="EditorWindows\Text\TextEditorWindow.resx">
-      <DependentUpon>TextEditorWindow.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="EditorWindows\Text\FindResults.resx">
-      <DependentUpon>FindResults.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="EditorWindows\Text\FindWindow.resx">
-      <DependentUpon>FindWindow.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="EditorWindows\Code\SourceNavigator.resx">
-      <DependentUpon>SourceNavigator.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="EditorWindows\TileMaps\ChrTilePalette.resx">
-      <DependentUpon>ChrTilePalette.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="EditorWindows\TileMaps\MapOverview.resx">
-      <DependentUpon>MapOverview.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="EditorWindows\TileMaps\MetaTilePalette.resx">
-      <DependentUpon>MetaTilePalette.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="EditorWindows\TileMaps\ResizeWindow.resx">
-      <DependentUpon>ResizeWindow.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Emulation\MesenControl.resx">
-      <DependentUpon>MesenControl.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="EditorWindows\Text\GoToWindow.resx">
-      <DependentUpon>GoToWindow.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Layout\FloatPanel.resx">
-      <DependentUpon>FloatPanel.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="LoadWindow.resx">
-      <DependentUpon>LoadWindow.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="MainForm.resx">
-      <DependentUpon>MainForm.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="MemoryViewer\MemoryViewer.resx">
-      <DependentUpon>MemoryViewer.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Modules\Breakpoints\BreakpointList.resx">
-      <DependentUpon>BreakpointList.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Modules\Breakpoints\BreakpointEditor.resx">
-      <DependentUpon>BreakpointEditor.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Modules\Build\ErrorList.resx">
-      <DependentUpon>ErrorList.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Modules\Build\OutputWindow.resx">
-      <DependentUpon>OutputWindow.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Modules\Ca65Helper\Ca65CommandDocumentation.resx">
-      <DependentUpon>Ca65CommandDocumentation.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Modules\NumberHelper\NumberHelper.resx">
-      <DependentUpon>NumberHelper.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Modules\OpcodeHelper\AddressingModeDescription.resx">
-      <DependentUpon>AddressingModeDescription.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Modules\OpcodeHelper\OpcodeHelper.resx">
-      <DependentUpon>OpcodeHelper.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Modules\Ppu\ChrViewer.resx">
-      <DependentUpon>ChrViewer.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Modules\Watch\WatchList.resx">
-      <DependentUpon>WatchList.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Modules\Watch\WatchValues.resx">
-      <DependentUpon>WatchValues.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Layout\HeaderPanel.resx">
-      <DependentUpon>HeaderPanel.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Modules\Ppu\SpriteViewer.resx">
-      <DependentUpon>SpriteViewer.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Modules\Ppu\TileMapViewer.resx">
-      <DependentUpon>TileMapViewer.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ProjectExplorer\ProjectExplorer.resx">
-      <DependentUpon>ProjectExplorer.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ProjectExplorer\ProjectExplorerTree.resx">
-      <DependentUpon>ProjectExplorerTree.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ProjectExplorer\ProjectFileSettings.resx">
-      <DependentUpon>ProjectFileSettings.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ProjectWizard\BuildConfigurationStep.resx">
-      <DependentUpon>BuildConfigurationStep.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ProjectWizard\ConfigurationManager.resx">
-      <DependentUpon>ConfigurationManager.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ProjectWizard\ImportFile.resx">
-      <DependentUpon>ImportFile.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ProjectWizard\ImportProjectFiles.resx">
-      <DependentUpon>ImportProjectFiles.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ProjectWizard\ImportProjectPath.resx">
-      <DependentUpon>ImportProjectPath.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ProjectWizard\SelectBuildProcessType.resx">
-      <DependentUpon>SelectBuildProcessType.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ProjectWizard\WizardDialog.resx">
-      <DependentUpon>WizardDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ProjectWizard\ConfigurationSettings.resx">
-      <DependentUpon>ConfigurationSettings.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ProjectWizard\ProjectTemplates.resx">
-      <DependentUpon>ProjectTemplates.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ProjectWizard\NewProjectPath.resx">
-      <DependentUpon>NewProjectPath.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <SubType>Designer</SubType>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Settings\KeyBindingWindow.resx">
-      <DependentUpon>KeyBindingWindow.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Settings\ButtonAssignment.resx">
-      <DependentUpon>ButtonAssignment.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Settings\ProjectSettingsWindow.resx">
-      <DependentUpon>ProjectSettingsWindow.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Settings\SettingsWindow.resx">
-      <DependentUpon>SettingsWindow.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="StatusView\CpuStatus.resx">
-      <DependentUpon>CpuStatus.cs</DependentUpon>
-    </EmbeddedResource>
     <Content Include="brewmaster.ico" />
     <Content Include="English.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -801,85 +348,15 @@
     <Content Include="nes.pal">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <None Include="packages.config">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Properties\app.manifest" />
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
-    <None Include="Resources\Toolbar\stop.png" />
-    <None Include="Resources\Files\cartridge.png" />
     <Content Include="nesproject.ico" />
-    <None Include="Resources\Other\collapsed.png" />
-    <None Include="Resources\6502.html" />
-    <None Include="Resources\ca65.html" />
-    <None Include="Resources\Other\ca65icon.png" />
-    <None Include="Resources\65816.html" />
-    <None Include="Resources\Other\close.png" />
-    <None Include="Resources\Files\chip.png" />
-    <None Include="Resources\Files\file.png" />
-    <None Include="Resources\Files\folder.png" />
-    <None Include="Resources\Files\folder-dark.png" />
-    <None Include="Resources\Files\image.png" />
-    <None Include="Resources\Files\nesproject.png" />
-    <None Include="Resources\Files\text.png" />
-    <None Include="Resources\Files\file_config.png" />
-    <None Include="Resources\Files\file_image.png" />
-    <None Include="Resources\Files\file_text.png" />
-    <None Include="Resources\Files\data.png" />
-    <None Include="Resources\Files\snesproject.png" />
-    <None Include="Resources\Files\file_missing.png" />
-    <None Include="Resources\bucket.cur" />
-    <None Include="Resources\Other\alignment center.png" />
-    <None Include="Resources\Other\arrow down.png" />
-    <None Include="Resources\Other\arrow left.png" />
-    <None Include="Resources\Other\arrow right.png" />
-    <None Include="Resources\Other\arrow up.png" />
     <Content Include="Resources\Other\error.png" />
-    <None Include="Resources\Other\smallload.png" />
-    <None Include="Resources\Other\smallsave.png" />
-    <None Include="Resources\Other\logo.png" />
-    <None Include="Resources\Other\expanded.png" />
-    <None Include="Resources\Other\label.png" />
-    <None Include="Resources\Other\opcode.png" />
-    <None Include="Resources\Other\macro.png" />
-    <None Include="Resources\Other\left_arrow.png" />
     <Content Include="Resources\Other\smallclear.png" />
     <Content Include="Resources\Other\warning.png" />
-    <None Include="Resources\Toolbar\buildrun.png" />
-    <None Include="Resources\Toolbar\config.png" />
-    <None Include="Resources\Toolbar\step out.png" />
-    <None Include="Resources\Toolbar\step.png" />
-    <None Include="Resources\Toolbar\stepback.png" />
-    <None Include="Resources\Toolbar\stepover.png" />
-    <None Include="Resources\Toolbar\build2.png" />
-    <None Include="Resources\Toolbar\build3.png" />
     <Content Include="Resources\pen.cur" />
-    <None Include="Resources\Toolbar\pen tool.png" />
-    <None Include="Resources\Toolbar\tile tool.png" />
-    <None Include="Resources\Toolbar\metatile tool.png" />
-    <None Include="Resources\Toolbar\palette tool.png" />
-    <None Include="Resources\Toolbar\import tilemap.png" />
-    <None Include="Resources\Toolbar\grid.png" />
-    <None Include="Resources\Toolbar\overlay.png" />
-    <None Include="Resources\Toolbar\overlay tool.png" />
     <Content Include="Resources\Toolbar\bucket tool.png" />
-    <None Include="Resources\Toolbar\flip h.png" />
-    <None Include="Resources\Toolbar\flip v.png" />
     <Content Include="Templates\ftm">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <None Include="setup.iss" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="cc65\bin\ar65.exe">
@@ -926,20 +403,6 @@
     <Content Include="lib\Mesen\LICENSE.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <None Include="Resources\Toolbar\pause.png" />
-    <None Include="Resources\Toolbar\run.png" />
-    <None Include="Resources\Toolbar\restart.png" />
-    <None Include="Resources\Toolbar\new.png" />
-    <None Include="Resources\Toolbar\open.png" />
-    <None Include="Resources\Toolbar\save.png" />
-    <None Include="Resources\Toolbar\save-all.png" />
-    <None Include="Resources\Toolbar\cut.png" />
-    <None Include="Resources\Toolbar\undo.png" />
-    <None Include="Resources\Toolbar\redo.png" />
-    <None Include="Resources\Toolbar\build.png" />
-    <None Include="Resources\Toolbar\copy.png" />
-    <None Include="Resources\Toolbar\paste.png" />
-    <None Include="Resources\Toolbar\settings.png" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
@@ -959,22 +422,6 @@
     <Folder Include="tools\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Brewsic\Brewsic.csproj">
-      <Project>{0508927b-5633-42c8-b718-2a153dc3d6df}</Project>
-      <Name>Brewsic</Name>
-    </ProjectReference>
+    <ProjectReference Include="..\Brewsic\Brewsic.csproj" />
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>move "$(ProjectDir)$(OutDir)\HtmlAgilityPack.*" "$(ProjectDir)$(OutDir)\lib"
-move "$(ProjectDir)$(OutDir)\ICSharpCode.*" "$(ProjectDir)$(OutDir)\lib"
-</PostBuildEvent>
-  </PropertyGroup>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

@@ -143,7 +143,14 @@ namespace Brewmaster.Modules.Build
 				_logString.Append(newText);
 			}
 
-			OutputTextBox.Rtf = _logString.ToString();
+			try
+			{
+				OutputTextBox.Rtf = _logString.ToString();
+			}
+			catch (Exception ex)
+			{
+				// TODO: Why does this throw an exception, even if it works?
+			}
 			//OutputTextBox.SelectionStart = OutputTextBox.Text.Length;
 			//OutputTextBox.ScrollToCaret();
 

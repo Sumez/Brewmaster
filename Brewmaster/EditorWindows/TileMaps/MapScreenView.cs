@@ -39,7 +39,7 @@ namespace Brewmaster.EditorWindows.TileMaps
 			_screens = new List<TileMapScreen>();
 
 			DoubleBuffered = true;
-			ContextMenu = new ContextMenu();
+			ContextMenuStrip = new ContextMenuStrip();
 			SetStyle(ControlStyles.Selectable, true);
 
 			var gridColor = Color.FromArgb(128, 255, 255, 255);
