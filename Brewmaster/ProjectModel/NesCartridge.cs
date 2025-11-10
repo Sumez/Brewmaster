@@ -20,6 +20,7 @@ namespace Brewmaster.ProjectModel
 		[XmlElement(ElementName = "Symbol")]
 		public List<string> Symbols { get; set; }
 		public bool CalculateChecksum { get; set; }
+		public bool HiRom { get; set; }
 		public bool Custom { get; set; }
 		[XmlElement(ElementName = "Script")]
 		public List<string> ScriptCommands { get; set; }

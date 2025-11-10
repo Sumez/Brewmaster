@@ -61,6 +61,7 @@ namespace Brewmaster.ProjectWizard
 			this.CustomOutputFile = new System.Windows.Forms.TextBox();
 			this.button1 = new System.Windows.Forms.Button();
 			this.CustomScript = new System.Windows.Forms.TextBox();
+			this.ChecksumHiRom = new System.Windows.Forms.CheckBox();
 			configurationLabel = new System.Windows.Forms.Label();
 			outputLabel = new System.Windows.Forms.Label();
 			label1 = new System.Windows.Forms.Label();
@@ -286,6 +287,7 @@ namespace Brewmaster.ProjectWizard
 			// 
 			this._integratedPanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this._integratedPanel.Controls.Add(this.ChecksumHiRom);
 			this._integratedPanel.Controls.Add(this.OutputFile);
 			this._integratedPanel.Controls.Add(outputLabel);
 			this._integratedPanel.Controls.Add(this.CalculateSnesChecksum);
@@ -398,6 +400,16 @@ namespace Brewmaster.ProjectWizard
 			this.CustomScript.Size = new System.Drawing.Size(378, 75);
 			this.CustomScript.TabIndex = 15;
 			// 
+			// ChecksumHiRom
+			// 
+			this.ChecksumHiRom.AutoSize = true;
+			this.ChecksumHiRom.Location = new System.Drawing.Point(282, 245);
+			this.ChecksumHiRom.Name = "ChecksumHiRom";
+			this.ChecksumHiRom.Size = new System.Drawing.Size(164, 17);
+			this.ChecksumHiRom.TabIndex = 21;
+			this.ChecksumHiRom.Text = "HiRom (checksum at $FFDC)";
+			this.ChecksumHiRom.UseVisualStyleBackColor = true;
+			// 
 			// ConfigurationSettings
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -439,5 +451,6 @@ namespace Brewmaster.ProjectWizard
 		private Button button1;
 		public RadioButton UseIntegrated;
 		public RadioButton UseCustom;
+		public CheckBox ChecksumHiRom;
 	}
 }

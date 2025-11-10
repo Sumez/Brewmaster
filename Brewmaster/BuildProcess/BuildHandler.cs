@@ -402,6 +402,10 @@ namespace Brewmaster.BuildProcess
 			if (project.Platform == TargetPlatform.Snes && config.CalculateChecksum)
 				using (var stream = File.Open(outputFile, FileMode.Open, FileAccess.ReadWrite))
 				{
+					var loRomOffset = 0x7FDC;
+					var hiRomOffset = 0xFFDC;
+					var checksumOffset = config.HiRom ? hiRomOffset : loRomOffset;
+
 					Log(new LogData("Calculating SNES checksum", LogType.Headline));
 
 					var prgSize = (Int32)stream.Length; // We don't expect the PRG size to ever be longer than a 32 bit int
@@ -415,7 +419,7 @@ namespace Brewmaster.BuildProcess
 					{
 						for (var i = 0; i < prgSize; i++)
 						{
-							if (i >= 0x7FDC && i <= 0x7FDF) continue;
+							if (i >= checksumOffset && i < (checksumOffset + 4)) continue;
 							checksum += prgData[i];
 						}
 						checksum += 0xff;
@@ -426,7 +430,7 @@ namespace Brewmaster.BuildProcess
 					checksumData[0] = (byte)(~checksum & 0xff);
 					checksumData[1] = (byte)((~checksum >> 8) & 0xff);
 
-					stream.Position = 0x7FDC;
+					stream.Position = checksumOffset;
 					stream.Write(checksumData, 0, 4);
 				}
 

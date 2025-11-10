@@ -52,6 +52,7 @@ namespace Brewmaster.ProjectWizard
 			GenerateMapFile.Checked = configuration.MapFile != null;
 			ConfigurationFile.Text = configuration.LinkerConfigFile;
 			CalculateSnesChecksum.Checked = configuration.CalculateChecksum;
+			ChecksumHiRom.Checked = configuration.HiRom;
 			UseCustom.Checked = configuration.Custom;
 			UseIntegrated.Checked = !configuration.Custom;
 			Symbols.Text = string.Join(Environment.NewLine, configuration.Symbols);
@@ -97,6 +98,7 @@ namespace Brewmaster.ProjectWizard
 			configuration.ScriptCommands = CustomScript.Text.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries).ToList();
 
 			configuration.CalculateChecksum = CalculateSnesChecksum.Checked;
+			configuration.HiRom = ChecksumHiRom.Checked;
 			configuration.Custom = UseCustom.Checked;
 
 			return true;
